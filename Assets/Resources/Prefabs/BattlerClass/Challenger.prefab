@@ -1,0 +1,79 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &6768939212969032023
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3957778834778998836}
+  - component: {fileID: 7961651032974854018}
+  - component: {fileID: 7015841975370810414}
+  m_Layer: 0
+  m_Name: Challenger
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3957778834778998836
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6768939212969032023}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -6.691177, y: -2.5876398, z: -1782.9915}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7961651032974854018
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6768939212969032023}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d606f9e6c895ed940be686b3890c02f8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Id: 3
+  Name: Challenger
+  Description: Hard-hitter with low speed and tech
+  BaseStats: {fileID: 7015841975370810414}
+  UpgradedClass1: {fileID: 0}
+  UpgradedClass2: {fileID: 0}
+  UsableWeapon1Type: 2
+  UsableWeapon2Type: 0
+  SoloSkillSet: []
+--- !u!114 &7015841975370810414
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6768939212969032023}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 266aef9b79cbf74438f340fe01139120, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  MaxHP: 55
+  Atk: 50
+  Def: 30
+  Map: 15
+  Mar: 10
+  Spd: 10
+  Tec: 20
+  Luk: 20
+  Acc: 100
+  Eva: 100
+  Crt: 100
+  Cev: 100

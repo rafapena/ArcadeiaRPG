@@ -1,0 +1,155 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1298462127858329898
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6205315082123132090}
+  - component: {fileID: 7170123059155225320}
+  - component: {fileID: -1304980510227198865}
+  - component: {fileID: 3766843789567019807}
+  - component: {fileID: 2573103975170026935}
+  - component: {fileID: 1447513362255356273}
+  m_Layer: 0
+  m_Name: SecondOne
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6205315082123132090
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1298462127858329898}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 122.052536, y: 69.95724, z: -1782.9915}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7170123059155225320
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1298462127858329898}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d7d3e29226c3fd34abfdcf0b48057487, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Id: 2
+  Name: This one's not so easy
+  Description: Objective TWO
+  Type: 0
+  EXPReward: 100
+  InventoryRewards: {fileID: -1304980510227198865}
+  NextObjectives:
+  - {fileID: 3766843789567019807}
+  Marked: 0
+  Cleared: 0
+--- !u!114 &-1304980510227198865
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1298462127858329898}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2e58dd75ae14194dbbd85a96326b9ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Gold: 30
+  Items:
+  - {fileID: 1623505104987198706, guid: db3b6b36abc81214a8b4f9956b5e567c, type: 3}
+  - {fileID: 7230775191068158404, guid: db8c71b6c4218214086cf5982e9e2adb, type: 3}
+  - {fileID: 1623505104987198706, guid: db3b6b36abc81214a8b4f9956b5e567c, type: 3}
+  Weapons:
+  - {fileID: 4959000729214192542, guid: f43fc6a9a0487964283e05224babca5a, type: 3}
+  - {fileID: 3552097900181454016, guid: ffa9f6fe244c85248a1bb202285c251d, type: 3}
+  - {fileID: 3552097900181454016, guid: ffa9f6fe244c85248a1bb202285c251d, type: 3}
+  - {fileID: 3552097900181454016, guid: ffa9f6fe244c85248a1bb202285c251d, type: 3}
+  KeyItems: []
+  NumberOfTools: 30
+  ToolCapacity: 30
+--- !u!114 &3766843789567019807
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1298462127858329898}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c0ae9b626b3c5b47a33a59fddba462e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Id: 0
+  Name: first task
+  Description: the first part
+  Type: 0
+  EXPReward: 0
+  InventoryRewards: {fileID: 0}
+  NextObjectives:
+  - {fileID: 2573103975170026935}
+  Marked: 0
+  Cleared: 0
+  MustClearAll: 1
+  Hidden: 0
+--- !u!114 &2573103975170026935
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1298462127858329898}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c0ae9b626b3c5b47a33a59fddba462e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Id: 0
+  Name: second task
+  Description: THE SECOND part
+  Type: 0
+  EXPReward: 0
+  InventoryRewards: {fileID: 0}
+  NextObjectives:
+  - {fileID: 1447513362255356273}
+  Marked: 0
+  Cleared: 0
+  MustClearAll: 1
+  Hidden: 0
+--- !u!114 &1447513362255356273
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1298462127858329898}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1c0ae9b626b3c5b47a33a59fddba462e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Id: 0
+  Name: THIRD
+  Description: The last part of the thing
+  Type: 0
+  EXPReward: 0
+  InventoryRewards: {fileID: 0}
+  NextObjectives: []
+  Marked: 0
+  Cleared: 0
+  MustClearAll: 1
+  Hidden: 0
