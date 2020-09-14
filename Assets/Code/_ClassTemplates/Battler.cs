@@ -80,7 +80,6 @@ public abstract class Battler : BaseObject
         Properties = transform.GetChild(0).transform;
         MainLocation = transform.position;
         SetupElementRates();
-        StatConversion();
     }
 
     protected virtual void Start()
@@ -152,7 +151,7 @@ public abstract class Battler : BaseObject
         Properties.GetChild(2).gameObject.SetActive(true);
         Properties.GetChild(0).GetComponent<TextMeshProUGUI>().text = Name;
         Properties.GetChild(1).GetComponent<Image>().sprite = UIMaster.LetterCommands[TargetLetterCommand];
-        Properties.GetChild(2).GetChild(0).GetComponent<Gauge>().Set(HP, Stats.MaxHP);
+        Properties.GetChild(2).GetComponent<Gauge>().Set(HP, Stats.MaxHP);
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -190,6 +189,12 @@ public abstract class Battler : BaseObject
         return item;
     }
 
+    public void ReplaceItemWith(Item item, int index)
+    {
+        if (index < 0 || index >= Items.Count || !item) return;
+        Items[index] = item;
+    }
+
     public int EquipWeapon(Weapon weapon)
     {
         if (!weapon) return -1;
@@ -203,6 +208,12 @@ public abstract class Battler : BaseObject
         Weapon weapon = Weapons[index];
         Weapons.RemoveAt(index);
         return weapon;
+    }
+
+    public void ReplaceWeaponWith(Weapon weapon, int index)
+    {
+        if (index < 0 || index >= Weapons.Count || !weapon) return;
+        Weapons[index] = weapon;
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -509,7 +520,7 @@ public abstract class Battler : BaseObject
     private Item ExecuteItem()
     {
         Item it = SelectedItem;
-        Stats.Add(it.PermantentStatChanges);
+        if (it.PermantentStatChanges) Stats.Add(it.PermantentStatChanges);
         if (it.TurnsInto) Items[Items.FindIndex(x => x.Id == it.Id)] = Instantiate(it.TurnsInto, gameObject.transform);
         else if (it.Consumable) Items.Remove(it);
         ShootProjectile();
@@ -536,6 +547,8 @@ public abstract class Battler : BaseObject
 
             int totalHPChange = (formulaOutput + directHPChange) * ratesTotal;
             int totalSPChange = (formulaOutput + tool.SPPecent) * ratesTotal;
+
+            //Debug.Log(totalHPChange);
 
             //List<int>[] states = tool.TriggeredStates(user, this, effectMagnitude);
             //oneTarget.Add(states[0].Count);

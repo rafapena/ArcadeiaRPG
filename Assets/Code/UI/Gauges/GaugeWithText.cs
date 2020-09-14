@@ -45,7 +45,7 @@ public abstract class GaugeWithText : Gauge
         Title.color = EmptyBarTextColor;
     }
 
-    private void SetColors()
+    protected virtual void SetColors()
     {
         if (CurrentAmount > 0)
         {

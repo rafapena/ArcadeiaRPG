@@ -27,7 +27,6 @@ public class MMInventory : MM_Super
 
     // Child GameObjects;
     public GameObject ToolListTabs;
-    public Gauge CarryInfoBar;
     public InventoryToolListSorter Sorter;
     public GameObject SelectingUsage;
     public GameObject ConfirmDiscard;
@@ -42,7 +41,7 @@ public class MMInventory : MM_Super
     public TextMeshProUGUI SelectTeammateLabel;
 
     // Keep track of selected content
-    private ListSelectable SelectedInventoryListBtn;
+    private ListSelectable SelectedInventoryTab;
     private ListSelectable SelectedUsageListBtn;
 
     // List of potential targets
@@ -62,7 +61,7 @@ public class MMInventory : MM_Super
                 if (Input.GetKeyDown(KeyCode.Alpha1)) SelectItemList();
                 else if (Input.GetKeyDown(KeyCode.Alpha2)) SelectWeaponList();
                 else if (Input.GetKeyDown(KeyCode.Alpha3)) SelectKeyItemList();
-                else if (Input.GetKeyDown(KeyCode.C)) SetupSorting();
+                // else if (Input.GetKeyDown(KeyCode.C)) SetupSorting();
                 break;
             case Selections.UsageDone:
             case Selections.EquippedDone:
@@ -77,6 +76,7 @@ public class MMInventory : MM_Super
     public override void Open()
     {
         base.Open();
+        ToolList.LinkToInventory(MenuManager.PartyInfo.Inventory);
         SelectItemList();
     }
 
@@ -141,41 +141,32 @@ public class MMInventory : MM_Super
     /// -- Inventory Lists --
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private void SetupCarryWeight()
-    {
-        MenuManager.PartyInfo.Inventory.UpdateNumberOfTools();
-        ToolList.FilterUnneededBlanks(MenuManager.PartyInfo.Inventory);
-        CarryInfoBar.Set(MenuManager.PartyInfo.Inventory.NumberOfTools, MenuManager.PartyInfo.Inventory.ToolCapacity);
-    }
-
     public void SelectItemList()
     {
-        EventSystem.current.SetSelectedGameObject(ToolListTabs.transform.GetChild(0).gameObject);
-        SelectToolTab(InventorySystem.ListType.Items, MenuManager.PartyInfo.Inventory.Items);
+        SelectToolTab(InventorySystem.ListType.Items, MenuManager.PartyInfo.Inventory.Items, 0);
     }
 
     public void SelectWeaponList()
     {
-        EventSystem.current.SetSelectedGameObject(ToolListTabs.transform.GetChild(1).gameObject);
-        SelectToolTab(InventorySystem.ListType.Weapons, MenuManager.PartyInfo.Inventory.Weapons);
+        SelectToolTab(InventorySystem.ListType.Weapons, MenuManager.PartyInfo.Inventory.Weapons, 1);
     }
 
     public void SelectKeyItemList()
     {
-        EventSystem.current.SetSelectedGameObject(ToolListTabs.transform.GetChild(2).gameObject);
-        SelectToolTab(InventorySystem.ListType.KeyItems, MenuManager.PartyInfo.Inventory.KeyItems);
+        SelectToolTab(InventorySystem.ListType.KeyItems, MenuManager.PartyInfo.Inventory.KeyItems, 2);
     }
 
-    private void SelectToolTab<T>(InventorySystem.ListType inventoryList, List<T> toolList) where T : ToolForInventory
+    private void SelectToolTab<T>(InventorySystem.ListType inventoryList, List<T> toolList, int tabIndex) where T : ToolForInventory
     {
+        if (Sorter.gameObject.activeSelf) return;
         Selection = Selections.InventoryLists;
         InventoryList = inventoryList;
+        EventSystem.current.SetSelectedGameObject(ToolListTabs.transform.GetChild(tabIndex).gameObject);
         ReturnToInitialStep();
-        KeepOnlyHighlightedSelected(ref SelectedInventoryListBtn);
+        KeepOnlyHighlightedSelected(ref SelectedInventoryTab);
         ToolList.Selecting = true;
         ToolList.Setup(toolList);
         if (ToolList.SelectedButton) ToolList.SelectedButton.ClearHighlights();
-        SetupCarryWeight();
         EventSystem.current.SetSelectedGameObject(ToolList.transform.GetChild(0).gameObject);
     }
 
@@ -209,18 +200,7 @@ public class MMInventory : MM_Super
         ToolList.Selecting = false;
         ToolList.ClearSelections();
         if (SelectedUsageListBtn) SelectedUsageListBtn.ClearHighlights();
-        switch (InventoryList)
-        {
-            case InventorySystem.ListType.Items:
-                Sorter.Setup(ToolList, MenuManager.PartyInfo.Inventory, InventoryList, SetupCarryWeight);
-                break;
-            case InventorySystem.ListType.Weapons:
-                Sorter.Setup(ToolList, MenuManager.PartyInfo.Inventory, InventoryList, SetupCarryWeight);
-                break;
-            case InventorySystem.ListType.KeyItems:
-                Sorter.Setup(ToolList, MenuManager.PartyInfo.Inventory, InventoryList, SetupCarryWeight);
-                break;
-        }
+        Sorter.Setup(ToolList, MenuManager.PartyInfo.Inventory, InventoryList);
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -364,7 +344,6 @@ public class MMInventory : MM_Super
                 ToolList.Setup(MenuManager.PartyInfo.Inventory.Weapons);
                 break;
         }
-        SetupCarryWeight();
         UndoDiscard();
         UndoSelectTool();
     }
@@ -469,7 +448,6 @@ public class MMInventory : MM_Super
         {
             MenuManager.PartyInfo.Inventory.RemoveItem(it);
             ToolList.Setup(MenuManager.PartyInfo.Inventory.Items);
-            SetupCarryWeight();
         }
     }
     
@@ -571,6 +549,7 @@ public class MMInventory : MM_Super
         Equip(true, EquippedToolList.SelectedIndex);
     }
 
+    // USE REPLACE INSTEAD
     public void Equip(bool switchOut, int slot)
     {
         if (Selection == Selections.EquippedDone) return;
@@ -580,10 +559,10 @@ public class MMInventory : MM_Super
         {
             if (switchOut)
             {
-                PartyList.SelectedObject.UnequipItem(slot);
+                PartyList.SelectedObject.ReplaceItemWith(ToolList.SelectedObject as Item, slot);
                 MenuManager.PartyInfo.Inventory.AddItem(EquippedToolList.SelectedObject as Item);
             }
-            PartyList.SelectedObject.EquipItem(ToolList.SelectedObject as Item);
+            else PartyList.SelectedObject.EquipItem(ToolList.SelectedObject as Item);
             MenuManager.PartyInfo.Inventory.RemoveItem(ToolList.SelectedIndex);
             ToolList.Setup(MenuManager.PartyInfo.Inventory.Items);
             EquippedToolList.Setup(PartyList.SelectedObject.Items, BattleMaster.MAX_NUMBER_OF_ITEMS);
@@ -592,15 +571,14 @@ public class MMInventory : MM_Super
         {
             if (switchOut)
             {
-                PartyList.SelectedObject.UnequipWeapon(slot);
+                PartyList.SelectedObject.ReplaceWeaponWith(ToolList.SelectedObject as Weapon, slot);
                 MenuManager.PartyInfo.Inventory.AddWeapon(EquippedToolList.SelectedObject as Weapon);
             }
-            PartyList.SelectedObject.EquipWeapon(ToolList.SelectedObject as Weapon);
+            else PartyList.SelectedObject.EquipWeapon(ToolList.SelectedObject as Weapon);
             MenuManager.PartyInfo.Inventory.RemoveWeapon(ToolList.SelectedIndex);
             ToolList.Setup(MenuManager.PartyInfo.Inventory.Weapons);
             EquippedToolList.Setup(PartyList.SelectedObject.Weapons, BattleMaster.MAX_NUMBER_OF_WEAPONS);
         }
-        SetupCarryWeight();
         ConfirmSwap.SetActive(false);
     }
 }

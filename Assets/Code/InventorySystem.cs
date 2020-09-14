@@ -18,8 +18,8 @@ public class InventorySystem : MonoBehaviour
     public List<Weapon> Weapons;
     public List<Item> KeyItems;
 
-    [HideInInspector] public int NumberOfTools;
-    public int ToolCapacity = 30;
+    [HideInInspector] public int CarryWeight;
+    public int WeightCapacity = 30;
 
     private void Awake()
     {
@@ -30,17 +30,17 @@ public class InventorySystem : MonoBehaviour
 
     public void UpdateNumberOfTools()
     {
-        NumberOfTools = 0;
-        NumberOfTools += SetupCarryWeightForList(Items);
-        NumberOfTools += SetupCarryWeightForList(Weapons);
-        NumberOfTools += SetupCarryWeightForList(KeyItems);
+        CarryWeight = 0;
+        CarryWeight += SetupCarryWeightForList(Items);
+        CarryWeight += SetupCarryWeightForList(Weapons);
+        CarryWeight += SetupCarryWeightForList(KeyItems);
     }
 
     private int SetupCarryWeightForList<T>(List<T> tools) where T : ToolForInventory
     {
         int total = 0;
         foreach (T t in tools)
-            total += t.Quantity;
+            total += t.Quantity * t.Weight;
         return total;
     }
 
@@ -113,20 +113,15 @@ public class InventorySystem : MonoBehaviour
 
     private T AddInventoryTool<T>(ref List<T> toolList, T newTool) where T : ToolForInventory
     {
-        if (NumberOfTools + 1 > ToolCapacity) return null;
-        NumberOfTools++;
-
+        CarryWeight += newTool.Weight;
         newTool.gameObject.GetComponent<Renderer>().enabled = false;
         bool toolFound = false;
         foreach (T t in toolList)
         {
-            if (newTool.Id < t.Id) break;   // Ensure ID sorting
-            else if (newTool.Id == t.Id)
-            {
-                t.Quantity++;
-                toolFound = true;
-                break;
-            }
+            if (newTool.Id != t.Id) continue;
+            t.Quantity++;
+            toolFound = true;
+            break;
         }
         if (!toolFound)
         {
@@ -141,13 +136,9 @@ public class InventorySystem : MonoBehaviour
     {
         if (index < 0 || index >= toolList.Count) return null;
         T t = toolList[index];
-        if (t.Quantity <= 1)
-        {
-            Destroy(toolList[index]);
-            toolList.RemoveAt(index);
-        }
+        if (t.Quantity <= 1) toolList.RemoveAt(index);
         else t.Quantity--;
-        NumberOfTools--;
+        CarryWeight -= t.Weight;
         return t;
     }
 
@@ -158,13 +149,9 @@ public class InventorySystem : MonoBehaviour
         {
             T t = toolList[i];
             if (tool.Id != t.Id) continue;
-            if (t.Quantity <= 1)
-            {
-                Destroy(toolList[i]);
-                toolList.RemoveAt(i);
-            }
+            else if (t.Quantity <= 1) toolList.RemoveAt(i);
             else t.Quantity--;
-            NumberOfTools--;
+            CarryWeight -= t.Weight;
             break;
         }
         return i;

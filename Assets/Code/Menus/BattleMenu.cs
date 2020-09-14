@@ -31,8 +31,9 @@ public class BattleMenu : MonoBehaviour
     // Child GameObjects
     public MenuFrame CharacterInfo;
     public MenuFrame CommonActionsFrame;
-    public MenuFrame SelectActionFrame;
-    public MenuFrame SelectToolFrame;
+    public MenuFrame SelectionFrame;
+    public GameObject SelectActionList;
+    public GameObject SelectToolList;
     public MenuFrame ConfirmToolFrame;
     public GameObject SelectTargetInTeam;
 
@@ -93,8 +94,8 @@ public class BattleMenu : MonoBehaviour
         {
             BattlePlayer p = CurrentBattle.PlayerParty.Players[i];
             Transform oneCI = CharacterInfo.transform.GetChild(i);
-            oneCI.GetChild(0).GetComponent<TextMeshProUGUI>().text = p.Name;
-            oneCI.GetChild(1).GetComponent<Image>().sprite = p.FaceImage;
+            oneCI.GetChild(0).GetComponent<TextMeshProUGUI>().text = p.Name.ToUpper();
+            oneCI.GetChild(1).GetComponent<Image>().sprite = p.MainImage;
             oneCI.GetChild(2).GetComponent<Gauge>().Set(p.HP, p.Stats.MaxHP);
             oneCI.GetChild(3).GetComponent<Gauge>().Set(p.SP, 100);
             SetupPlayerStateComponents(p, oneCI);
@@ -127,16 +128,17 @@ public class BattleMenu : MonoBehaviour
         ResetChoices();
         Selection = 0;
         SelectedAction = SelectedActions.None;
-        GrayOutIconSelection(SelectActionFrame.transform.GetChild(1).gameObject, CP.SoloSkills.Count == 0 && CP.TeamSkills.Count == 0);
-        GrayOutIconSelection(SelectActionFrame.transform.GetChild(2).gameObject, CP.Items.Count == 0);
+        GrayOutIconSelection(SelectActionList.transform.GetChild(1).gameObject, CP.SoloSkills.Count == 0 && CP.TeamSkills.Count == 0);
+        GrayOutIconSelection(SelectActionList.transform.GetChild(2).gameObject, CP.Items.Count == 0);
         CharacterInfo.Activate();
         CommonActionsFrame.Activate();
         CommonActionsFrame.transform.GetChild(0).gameObject.SetActive(CurrentPlayer == 0);
         CommonActionsFrame.transform.GetChild(1).gameObject.SetActive(CurrentPlayer > 0);
         SetWeaponOnMenuAndCharacter();
         GrayOutIconSelection(CommonActionsFrame.transform.GetChild(0).gameObject, CurrentBattle.EnemyParty.RunDisabled);
-        SelectActionFrame.Activate();
-        SelectToolFrame.Deactivate();
+        SelectionFrame.Activate();
+        SelectActionList.SetActive(true);
+        SelectToolList.SetActive(false);
         ConfirmToolFrame.Deactivate();
         SelectTargetInTeam.SetActive(false);
         CSelected.SetActive(false);
@@ -174,21 +176,21 @@ public class BattleMenu : MonoBehaviour
                 SelectedTool = CP.SelectedWeapon;
                 SelectedAction = SelectedActions.Attack;
                 CSelected.SetActive(true);
-                CSelected.GetComponent<Image>().sprite = SelectActionFrame.transform.GetChild(0).GetChild(0).GetComponent<Image>().sprite;
+                CSelected.GetComponent<Image>().sprite = SelectActionList.transform.GetChild(0).GetChild(0).GetComponent<Image>().sprite;
                 SetupForSelectTarget();
                 break;
             case "S":
-                if (IsDisabled(SelectActionFrame.transform.GetChild(1).gameObject)) break;
+                if (IsDisabled(SelectActionList.transform.GetChild(1).gameObject)) break;
                 SelectedAction = SelectedActions.Skill;
                 CSelected.SetActive(true);
-                CSelected.GetComponent<Image>().sprite = SelectActionFrame.transform.GetChild(1).GetChild(0).GetComponent<Image>().sprite;
+                CSelected.GetComponent<Image>().sprite = SelectActionList.transform.GetChild(1).GetChild(0).GetComponent<Image>().sprite;
                 SetupForSelectSkill();
                 break;
             case "D":
-                if (IsDisabled(SelectActionFrame.transform.GetChild(2).gameObject)) break;
+                if (IsDisabled(SelectActionList.transform.GetChild(2).gameObject)) break;
                 SelectedAction = SelectedActions.Item;
                 CSelected.SetActive(true);
-                CSelected.GetComponent<Image>().sprite = SelectActionFrame.transform.GetChild(2).GetChild(0).GetComponent<Image>().sprite;
+                CSelected.GetComponent<Image>().sprite = SelectActionList.transform.GetChild(2).GetChild(0).GetComponent<Image>().sprite;
                 SetupForSelectItem();
                 break;
             case "R":
@@ -214,8 +216,9 @@ public class BattleMenu : MonoBehaviour
         CommonActionsFrame.transform.GetChild(0).gameObject.SetActive(false);
         CommonActionsFrame.transform.GetChild(1).gameObject.SetActive(true);
         CommonActionsFrame.transform.GetChild(2).gameObject.SetActive(true);
-        SelectActionFrame.Deactivate();
-        SelectToolFrame.Activate();
+        SelectionFrame.Activate();
+        SelectActionList.SetActive(false);
+        SelectToolList.SetActive(true);
         ConfirmToolFrame.Deactivate();
         SelectTargetInTeam.SetActive(false);
         DisableToolReasons = new string[MAX_NUMBER_OF_SOLO_SKILLS + MAX_NUMBER_OF_TEAM_SKILLS];
@@ -233,10 +236,10 @@ public class BattleMenu : MonoBehaviour
         for (; i < sLimit; i++)
         {
             int iconI = start + i;
-            Transform t = SelectToolFrame.transform.GetChild(iconI);
+            Transform t = SelectToolList.transform.GetChild(iconI);
             T skill = skillList[i];
             t.GetChild(0).GetComponent<Image>().sprite = skill.GetComponent<SpriteRenderer>().sprite;
-            t.GetChild(1).GetComponent<TextMeshProUGUI>().text = skill.SPConsume > 0 ? skill.SPConsume + " SP" : "";
+            t.GetChild(1).GetComponent<TextMeshProUGUI>().text = skill.SPConsume > 0 ? skill.SPConsume.ToString() : "";
             t.GetChild(2).GetComponent<TextMeshProUGUI>().text = skill.DisabledFromWarmupOrCooldown() ? skill.DisabledCount.ToString() : "";
             t.gameObject.SetActive(true);
 
@@ -255,7 +258,7 @@ public class BattleMenu : MonoBehaviour
         for (; i < maxListCount; i++)
         {
             int iconI = start + i;
-            SelectToolFrame.transform.GetChild(iconI).gameObject.SetActive(false);
+            SelectToolList.transform.GetChild(iconI).gameObject.SetActive(false);
         }
     }
 
@@ -329,8 +332,9 @@ public class BattleMenu : MonoBehaviour
         CommonActionsFrame.transform.GetChild(0).gameObject.SetActive(false);
         CommonActionsFrame.transform.GetChild(1).gameObject.SetActive(true);
         CommonActionsFrame.transform.GetChild(2).gameObject.SetActive(false);
-        SelectActionFrame.Deactivate();
-        SelectToolFrame.Activate();
+        SelectionFrame.Activate();
+        SelectActionList.SetActive(false);
+        SelectToolList.SetActive(true);
         ConfirmToolFrame.Deactivate();
         SelectTargetInTeam.SetActive(false);
         DisableToolReasons = new string[BattleMaster.MAX_NUMBER_OF_ITEMS];
@@ -345,18 +349,18 @@ public class BattleMenu : MonoBehaviour
         int iLimit = (CP.Items.Count < BattleMaster.MAX_NUMBER_OF_ITEMS) ? CP.Items.Count : BattleMaster.MAX_NUMBER_OF_ITEMS;
         for (; i < iLimit; i++)
         {
-            SelectToolFrame.transform.GetChild(i).GetChild(0).GetComponent<Image>().sprite = CP.Items[i].GetComponent<SpriteRenderer>().sprite;
-            SelectToolFrame.transform.GetChild(i).GetChild(1).gameObject.SetActive(false);
-            SelectToolFrame.transform.GetChild(i).GetChild(2).gameObject.SetActive(false);
-            SelectToolFrame.transform.GetChild(i).gameObject.SetActive(true);
+            SelectToolList.transform.GetChild(i).GetChild(0).GetComponent<Image>().sprite = CP.Items[i].GetComponent<SpriteRenderer>().sprite;
+            SelectToolList.transform.GetChild(i).GetChild(1).gameObject.SetActive(false);
+            SelectToolList.transform.GetChild(i).GetChild(2).gameObject.SetActive(false);
+            SelectToolList.transform.GetChild(i).gameObject.SetActive(true);
             bool nva = NoAvailableTargets(CP.Items[i]);
             bool nc =  !CP.Items[i].UsedByClassUser(CP);
-            GrayOutIconSelection(SelectToolFrame.transform.GetChild(i).gameObject, nva || nc);
+            GrayOutIconSelection(SelectToolList.transform.GetChild(i).gameObject, nva || nc);
             if (nva) DisableToolReasons[i] = "No available teammates to select";
             else if (nc) DisableToolReasons[i] = "Must be at class " + CP.Items[i].ClassExclusives[0].Name + " to use this";
         }
         for (; i < BattleMaster.MAX_NUMBER_OF_ITEMS; i++)
-            SelectToolFrame.transform.GetChild(i).gameObject.SetActive(false);
+            SelectToolList.transform.GetChild(i).gameObject.SetActive(false);
     }
 
     private void SelectItem()
@@ -406,14 +410,20 @@ public class BattleMenu : MonoBehaviour
         if (ConfirmToolMenuIndex == toolMenuConfirmIndex) return isDisabled ? null : GenericToolSelectionFinal(tool);   // Final confirmation on tool, before going to target selection
         ConfirmToolMenuIndex = toolMenuConfirmIndex;
 
+        bool isSkill = (Selection == Selections.Skills);
+        ConfirmToolFrame.transform.GetChild(4).gameObject.SetActive(isSkill);
+        ConfirmToolFrame.transform.GetChild(5).gameObject.SetActive(isSkill);
+        ConfirmToolFrame.transform.GetChild(6).gameObject.SetActive(isSkill);
+
         ConfirmToolFrame.transform.GetChild(0).GetComponent<Image>().sprite = tool.GetComponent<SpriteRenderer>().sprite;
-        SetElementImage(1, tool);
-        ConfirmToolFrame.transform.GetChild(2).GetComponent<TextMeshProUGUI>().text = tool.Name;
-        ConfirmToolFrame.transform.GetChild(3).GetComponent<TextMeshProUGUI>().text = tool.Description;
-        ConfirmToolFrame.transform.GetChild(4).GetChild(0).GetComponent<TextMeshProUGUI>().text = tool.Power > 0 ? tool.Power.ToString() : "-";
-        ConfirmToolFrame.transform.GetChild(5).GetChild(0).GetComponent<TextMeshProUGUI>().text = GetCritStr(tool.CritcalRate);
-        ConfirmToolFrame.transform.GetChild(6).gameObject.SetActive(false); // Always false for Items, uses a different function to activate for Skills
-        SetConfirmUsability(7, toolMenuConfirmIndex);
+        ConfirmToolFrame.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = tool.Name.ToUpper();
+        ConfirmToolFrame.transform.GetChild(2).GetComponent<TextMeshProUGUI>().text = tool.Description;
+        InventoryToolSelectionList.SetElementImage(ConfirmToolFrame.gameObject, 3, tool);
+        ConfirmToolFrame.transform.GetChild(4).GetChild(0).GetComponent<TextMeshProUGUI>().text = tool.Power.ToString();
+        ConfirmToolFrame.transform.GetChild(5).GetChild(0).GetComponent<TextMeshProUGUI>().text = tool.ConsecutiveActs.ToString();
+        ConfirmToolFrame.transform.GetChild(6).GetChild(0).GetComponent<TextMeshProUGUI>().text = tool.CritcalRate + "%"; //GetCritStr(tool.CritcalRate);
+        ConfirmToolFrame.transform.GetChild(7).gameObject.SetActive(false); // Always false for Items, uses a different function to activate for Skills
+        SetConfirmUsability(8, toolMenuConfirmIndex);
         ConfirmToolFrame.Activate();
         return tool;
     }
@@ -449,7 +459,7 @@ public class BattleMenu : MonoBehaviour
         else
         {
             ConfirmToolFrame.transform.GetChild(index).GetComponent<TextMeshProUGUI>().color = Color.white;
-            ConfirmToolFrame.transform.GetChild(index).GetComponent<TextMeshProUGUI>().text = "Confirm";
+            ConfirmToolFrame.transform.GetChild(index).GetComponent<TextMeshProUGUI>().text = "\nCONFIRM";
             ConfirmToolFrame.transform.GetChild(index).GetChild(0).gameObject.SetActive(true);
             ConfirmToolFrame.transform.GetChild(index).GetChild(0).GetComponent<Image>().sprite = UIMaster.LetterCommands[TOOL_LETTER_COMMANDS[toolMenuConfirmIndex]];
         }
@@ -494,8 +504,7 @@ public class BattleMenu : MonoBehaviour
         CommonActionsFrame.transform.GetChild(0).gameObject.SetActive(false);
         CommonActionsFrame.transform.GetChild(1).gameObject.SetActive(true);
         CommonActionsFrame.transform.GetChild(2).gameObject.SetActive(false);
-        SelectActionFrame.Deactivate();
-        SelectToolFrame.Deactivate();
+        SelectionFrame.Deactivate();
         ConfirmToolFrame.Deactivate();
         SelectTargetInTeam.SetActive(true);
         CP.SelectedTeamSkillPartners = new List<Battler>();
@@ -575,7 +584,7 @@ public class BattleMenu : MonoBehaviour
     {
         int currSelectedTeammates = CP.SelectedTeamSkillPartners.Count;
         int maxSelectedTeammates = CP.SelectedTeamSkill.NumberOfTeammates;
-        string text = maxSelectedTeammates == 1 ? "Select 1 to assist" : "Select " + (maxSelectedTeammates - currSelectedTeammates) + " more to assist";
+        string text = maxSelectedTeammates == 1 ? "SELECT 1 TO ASSIST" : "SELECT " + (maxSelectedTeammates - currSelectedTeammates) + " MORE TO ASSIST";
         SelectTargetInTeam.transform.GetChild(4).GetComponent<TextMeshProUGUI>().text = text;
         SelectTargetInTeam.transform.GetChild(4).gameObject.SetActive(true);
     }
@@ -590,8 +599,7 @@ public class BattleMenu : MonoBehaviour
         CommonActionsFrame.transform.GetChild(0).gameObject.SetActive(false);
         CommonActionsFrame.transform.GetChild(1).gameObject.SetActive(true);
         CommonActionsFrame.transform.GetChild(2).gameObject.SetActive(false);
-        SelectActionFrame.Deactivate();
-        SelectToolFrame.Deactivate();
+        SelectionFrame.Deactivate();
         ConfirmToolFrame.Deactivate();
         TargetSetupTeamTargets();
         SetupFromScope();
@@ -932,8 +940,7 @@ public class BattleMenu : MonoBehaviour
         Selection = Selections.Actions;
         LoadReady = false;
         CommonActionsFrame.Deactivate();
-        SelectActionFrame.Deactivate();
-        SelectToolFrame.Deactivate();
+        SelectionFrame.Deactivate();
         WaitTimeBeforeTurnStarts = Time.time + 0.3f;
     }
 
@@ -951,8 +958,7 @@ public class BattleMenu : MonoBehaviour
         SelectedAction = SelectedActions.None;
         CharacterInfo.Deactivate();
         CommonActionsFrame.Deactivate();
-        SelectActionFrame.Deactivate();
-        SelectToolFrame.Deactivate();
+        SelectionFrame.Deactivate();
         ConfirmToolFrame.Deactivate();
         SelectTargetInTeam.SetActive(false);
     }
@@ -968,7 +974,7 @@ public class BattleMenu : MonoBehaviour
 
     private void SetWeaponOnMenuAndCharacter()
     {
-        SelectActionFrame.transform.GetChild(0).GetChild(0).GetComponent<Image>().sprite = CP.SelectedWeapon.GetComponent<SpriteRenderer>().sprite;
+        SelectActionList.transform.GetChild(0).GetChild(0).GetComponent<Image>().sprite = CP.SelectedWeapon.GetComponent<SpriteRenderer>().sprite;
         CommonActionsFrame.transform.GetChild(2).GetChild(0).GetComponent<Image>().sprite = CP.SelectedWeapon.GetComponent<SpriteRenderer>().sprite;
         CommonActionsFrame.transform.GetChild(2).GetChild(2).gameObject.SetActive(CP.Weapons.Count > 1);
         CommonActionsFrame.transform.GetChild(2).gameObject.SetActive(true);

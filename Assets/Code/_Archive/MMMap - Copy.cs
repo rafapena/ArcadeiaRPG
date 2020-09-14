@@ -9,7 +9,9 @@ using UnityEditor.Tilemaps;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 
-public class MMMap : MM_Super, IDragHandler
+// Had incomplete zoom and map navigation that might be used for elsewhere
+
+/*public class MMMapBACKUP : MM_Super, IDragHandler
 {
     public enum Selections { None, MoveMap, ConfirmTravel }
 
@@ -28,12 +30,51 @@ public class MMMap : MM_Super, IDragHandler
     private int SelectedLocationIndex;
     //private LocationInfo SelectedLocation;
 
+    public float NavigationSpeed;
+    private float Zoom;
+    public float ZoomSpeed;
+    public float ZoomMin;
+    public float ZoomMax;
+    public float DefaultZoom;
+
+    public const float NAVIGATION_RIGHT_BOUND = 800;
+    public const float NAVIGATION_LEFT_BOUND = -1600;
+    public const float NAVIGATION_UPPER_BOUND = 800;
+    public const float NAVIGATION_LOWER_BOUND = -1200;
+
+    private Color TrackerColor;
+    private Color HighlightedTrackerColor = new Color(1f, 1f, 0);
+
     protected override void Update()
     {
         base.Update();
         if (Selection != Selections.MoveMap) return;
-        else if (Input.GetKeyDown(KeyCode.LeftArrow)) MoveLocation(-1);
+
+        if (Input.GetKeyDown(KeyCode.LeftArrow)) MoveLocation(-1);
         else if (Input.GetKeyDown(KeyCode.RightArrow)) MoveLocation(1);
+
+        // Zooming
+        Zoom = Input.GetAxis("Mouse ScrollWheel") * Time.unscaledDeltaTime * ZoomSpeed;
+        MapImage.transform.localScale += new Vector3(MapImage.transform.localScale.x * Zoom, MapImage.transform.localScale.y * Zoom);
+        MapImage.transform.localScale = new Vector3(Mathf.Clamp(MapImage.transform.localScale.x, ZoomMin, ZoomMax), Mathf.Clamp(MapImage.transform.localScale.y, ZoomMin, ZoomMax));
+        Vector3 scale = MapImage.transform.localScale;
+        MapImage.transform.localScale = scale;
+
+        // Navigating with keyboard
+        if (Selection == Selections.MoveMap)
+        {
+            Vector3 movement = new Vector3(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+            MapImage.transform.position -= movement * Time.unscaledDeltaTime * NavigationSpeed;
+            CheckBounds();
+        }
+    }
+
+    private void CheckBounds()
+    {
+        if (MapImage.transform.position.x > NAVIGATION_RIGHT_BOUND) MapImage.transform.position = new Vector3(NAVIGATION_RIGHT_BOUND, MapImage.transform.position.y);
+        else if (MapImage.transform.position.x < NAVIGATION_LEFT_BOUND) MapImage.transform.position = new Vector3(NAVIGATION_LEFT_BOUND, MapImage.transform.position.y);
+        if (MapImage.transform.position.y > NAVIGATION_UPPER_BOUND) MapImage.transform.position = new Vector3(MapImage.transform.position.x, NAVIGATION_UPPER_BOUND);
+        else if (MapImage.transform.position.y < NAVIGATION_LOWER_BOUND) MapImage.transform.position = new Vector3(MapImage.transform.position.x, NAVIGATION_LOWER_BOUND);
     }
 
     public void OnDrag(PointerEventData eventData)
@@ -48,6 +89,7 @@ public class MMMap : MM_Super, IDragHandler
         MapImage.SetActive(true);
         Tracker.SetActive(true);
         Selection = Selections.MoveMap;
+        //MapImage.transform.localScale = new Vector3(DefaultZoom, DefaultZoom);
         foreach (MenuFrame f in Borders) f.Activate();
     }
 
@@ -79,6 +121,7 @@ public class MMMap : MM_Super, IDragHandler
         Tracker.SetActive(false);
         foreach (MenuFrame f in Borders) f.Deactivate();
         ConfirmTravelFrame.SetActive(false);
+        //TrackerColor = Tracker.GetComponent<Image>().color;
     }
 
 
@@ -132,10 +175,20 @@ public class MMMap : MM_Super, IDragHandler
         Tracker.transform.position = SelectedLocationBtn.transform.position;
     }
 
+    public void TrackerOverLocation()
+    {
+        Tracker.GetComponent<Image>().color = TrackerColor;
+    }
+
     public void DeselectLocation()
     {
         LocationFrame.Deactivate();
         if (Selection == Selections.MoveMap) Tracker.SetActive(false);
+    }
+
+    public void TrackerDeselectedLocation()
+    {
+        Tracker.GetComponent<Image>().color = HighlightedTrackerColor;
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -167,4 +220,4 @@ public class MMMap : MM_Super, IDragHandler
         MenuManager.ExitAll();
         // Travel to location
     }
-}
+}*/

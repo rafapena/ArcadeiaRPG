@@ -37,13 +37,11 @@ public class InventoryToolListSorter : MonoBehaviour
     /// -- Sorting --
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public void Setup(InventoryToolSelectionList tig, InventorySystem tinv, InventorySystem.ListType inventoryList, ExtraFunction func = null)
+    public void Setup(InventoryToolSelectionList tig, InventorySystem tinv, InventorySystem.ListType inventoryList)
     {
         TargetInventoryGUI = tig;
         TargetInventory = tinv;
         InventoryList = inventoryList;
-        if (func != null)
-            ExtraFunc = func;
         gameObject.SetActive(true);
         SortButton.KeepSelected();
         GameObject firstButton = transform.GetChild(1).GetChild(0).gameObject;
@@ -73,20 +71,6 @@ public class InventoryToolListSorter : MonoBehaviour
         ExtraFunc?.Invoke();
     }
 
-    public void SortByCraftedAscending()
-    {
-        GetList();
-        TargetInventoryGUI.Setup(ReferenceData.OrderBy(t => t.IsCraftable()).ToList());
-        ExtraFunc?.Invoke();
-    }
-
-    public void SortByCraftedDescending()
-    {
-        GetList();
-        TargetInventoryGUI.Setup(ReferenceData.OrderByDescending(t => t.IsCraftable()).ToList());
-        ExtraFunc?.Invoke();
-    }
-
     public void SortByQuantityAscending()
     {
         GetList();
@@ -98,6 +82,20 @@ public class InventoryToolListSorter : MonoBehaviour
     {
         GetList();
         TargetInventoryGUI.Setup(ReferenceData.OrderByDescending(t => t.Quantity).ToList());
+        ExtraFunc?.Invoke();
+    }
+
+    public void SortByWeightAscending()
+    {
+        GetList();
+        TargetInventoryGUI.Setup(ReferenceData.OrderBy(t => t.Weight).ToList());
+        ExtraFunc?.Invoke();
+    }
+
+    public void SortByWeightDescending()
+    {
+        GetList();
+        TargetInventoryGUI.Setup(ReferenceData.OrderByDescending(t => t.Weight).ToList());
         ExtraFunc?.Invoke();
     }
 

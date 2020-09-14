@@ -13,7 +13,7 @@ using System.Collections.Generic;
 /// </summary>
 public class ObjectiveSelectionList : SelectionList_Super<Objective>
 {
-    public void Setup<T>(List<T> dataList, int hardLimit = -1) where T : Objective
+    public void Setup<T>(List<T> dataList) where T : Objective
     {
         ReferenceData = new List<Objective>();
         int i = 0;
@@ -41,8 +41,7 @@ public class ObjectiveSelectionList : SelectionList_Super<Objective>
             i++;
         }
 
-        // If there are excess entries, make them invisible
-        if (hardLimit > 0) i = hardLimit;
+        // If there are excess blank rows, make them invisible
         for (; i < transform.childCount; i++)
             transform.GetChild(i).gameObject.SetActive(false);
     }

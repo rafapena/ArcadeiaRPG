@@ -6,6 +6,7 @@ public abstract class ToolForInventory : Tool
     public int DefaultPrice;
     public List<ToolForInventory> RequiredTools;
     public int Quantity;
+    public int Weight;
 
     public bool IsCraftable()
     {

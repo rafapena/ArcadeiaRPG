@@ -13,8 +13,7 @@ public class BattleWin : MonoBehaviour
         None,
         FirstWinScreen,
         LevelUp,
-        CompanionShipUp,
-        ItemInventoryFull_SelectNew, ItemInventoryFull_SelectOld, AreYouSureDiscardItems, ItemDiscarded
+        CompanionShipUp
     }
 
     // Battle data, including parties, levelling/exp and inventory info
@@ -38,6 +37,7 @@ public class BattleWin : MonoBehaviour
     public MenuFrame ProceedButton;
 
     // General UI
+    public TextMeshProUGUI NoItemsLabel;
     private Color CInfoFrameMainColor;
     private Color CInfoFrameLevelUpColor;
 
@@ -66,6 +66,7 @@ public class BattleWin : MonoBehaviour
         ItemsEarned = new List<ToolForInventory>();
         CompaionshipUpPlayers = new List<PlayerCompanionship>();
         CompanionshipUpBoostAmounts = new List<int>();
+        NoItemsLabel.gameObject.SetActive(false);
     }
 
     private void LateUpdate()
@@ -85,16 +86,6 @@ public class BattleWin : MonoBehaviour
                 if (KeyPressed == "Z" && ProceedButton.Activated) ExitBattle();
                 break;
             case Selections.LevelUp:
-                break;
-            case Selections.CompanionShipUp:
-                break;
-            case Selections.ItemInventoryFull_SelectNew:
-                break;
-            case Selections.ItemInventoryFull_SelectOld:
-                break;
-            case Selections.AreYouSureDiscardItems:
-                break;
-            case Selections.ItemDiscarded:
                 break;
         }
     }
@@ -179,12 +170,11 @@ public class BattleWin : MonoBehaviour
         int i = 0;
         if (ItemsEarned.Count == 0)
         {
-            ItemsObtained.transform.GetChild(i++).gameObject.SetActive(true);
             for (; i < ItemsObtained.transform.childCount; i++)
                 ItemsObtained.transform.GetChild(i).gameObject.SetActive(false);
             return;
         }
-        ItemsObtained.transform.GetChild(0).gameObject.SetActive(false);
+        NoItemsLabel.gameObject.SetActive(ItemsEarned.Count == 0);
         int childSize = ItemsObtained.transform.childCount - 1;
         int limit = ItemsEarned.Count < childSize ? ItemsEarned.Count : childSize;
         for (; i < limit; i++)

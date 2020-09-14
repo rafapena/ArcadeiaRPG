@@ -19,7 +19,14 @@ using System.Linq;
 /// </summary>
 public class InventoryToolSelectionList : SelectionList_Super<ToolForInventory>
 {
+    // Data tracker
+    [HideInInspector] public InventorySystem ReferenceInventory;
+    public Gauge CarryTracker;
+    private Selectable NavToLeft;
+    private Selectable NavToRight;
+
     // Structure
+    protected int NumberOfBlankSquares;
     protected int NumberOfColumns;
     protected int NumberOfVisibleRows;
     protected Color CraftedBackgroundColor = new Color(0.7f, 0.9f, 1f, 0.7f);
@@ -31,16 +38,27 @@ public class InventoryToolSelectionList : SelectionList_Super<ToolForInventory>
         base.Awake();
     }
 
+    public void LinkToInventory(InventorySystem inventory)
+    {
+        if (ReferenceInventory) return;
+        ReferenceInventory = inventory;
+    }
+
     public void Setup<T>(List<T> listData, int hardLimit = -1, bool customNavigation = false) where T : ToolForInventory
     {
         // Get number of scrollable rows
         int totalNumberOfRows = NumberOfVisibleRows;
-        int numberOfBlankSquares = NumberOfVisibleRows * NumberOfColumns;
-        while (numberOfBlankSquares < listData.Count)
+        NumberOfBlankSquares = NumberOfVisibleRows * NumberOfColumns;
+        while (NumberOfBlankSquares < listData.Count)
         {
-            numberOfBlankSquares += NumberOfColumns;
+            NumberOfBlankSquares += NumberOfColumns;
+            NumberOfBlankSquares += NumberOfColumns;
             totalNumberOfRows++;
         }
+
+        // Set navigation buttons
+        NavToLeft = transform.GetChild(0).GetComponent<Button>().navigation.selectOnLeft;
+        NavToRight = transform.GetChild(NumberOfColumns - 1).GetComponent<Button>().navigation.selectOnRight;
 
         // Add the data
         ReferenceData = new List<ToolForInventory>();
@@ -60,7 +78,7 @@ public class InventoryToolSelectionList : SelectionList_Super<ToolForInventory>
                 {
                     // Allocate new space for new box entries the table will be adding
                     entry = Instantiate(transform.GetChild(c).gameObject, transform);
-                    if (!customNavigation) SetNavigation(entry, i);
+                    if (!customNavigation) SetNavigation(entry, i, c);
                 }
 
                 // Initialize button settings
@@ -77,6 +95,10 @@ public class InventoryToolSelectionList : SelectionList_Super<ToolForInventory>
                 else SetToBlank(entry);
                 i++;
             }
+
+            // Setting up the capacity then reset right navigation to point to the top
+            if (ReferenceInventory) SetupCarryWeight();
+            if (NavToRight) SetHorizontalPointer(transform.GetChild(NumberOfColumns - 1), NavToRight.transform);
         }
 
         // If there are excess blank squares, make them invisible
@@ -101,11 +123,20 @@ public class InventoryToolSelectionList : SelectionList_Super<ToolForInventory>
         }
     }
 
-    protected void SetNavigation(GameObject entry, int i)
+    private void SetNavigation(GameObject entry, int i, int columnIndex)
     {
         entry.GetComponent<Button>().navigation = new Navigation() { mode = Navigation.Mode.Explicit };
-        SetHorizontalPointer(transform.GetChild(i - 1), entry.transform);
-        SetVerticalPointer(transform.GetChild(i - NumberOfColumns), entry.transform);
+        Transform aboveEntry = transform.GetChild(i - NumberOfColumns);
+        if (columnIndex == 0)
+        {
+            if (NavToLeft) SetHorizontalPointer(NavToLeft.transform, entry.transform);
+        }
+        else
+        {
+            if (NavToRight && columnIndex == NumberOfColumns - 1) SetHorizontalPointer(entry.transform, NavToRight.transform);
+            SetHorizontalPointer(transform.GetChild(i - 1), entry.transform);
+        }
+        SetVerticalPointer(aboveEntry, entry.transform);
     }
 
     private void SetToBlank(GameObject entry)
@@ -115,16 +146,10 @@ public class InventoryToolSelectionList : SelectionList_Super<ToolForInventory>
             entry.transform.GetChild(2).gameObject.SetActive(false);
     }
 
-    public void FilterUnneededBlanks(InventorySystem inventory)
+    public void SetupCarryWeight()
     {
-        if (ReferenceData == null) return;
-        int limit = ReferenceData.Count + (inventory.ToolCapacity - inventory.NumberOfTools);
-        for (int i = limit; i < transform.childCount; i++)
-        {
-            GameObject g = transform.GetChild(i).gameObject;
-            if (g.activeSelf) g.SetActive(false);
-            else return;
-        }
+        ReferenceInventory.UpdateNumberOfTools();
+        CarryTracker.Set(ReferenceInventory.CarryWeight, ReferenceInventory.WeightCapacity);
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -159,13 +184,31 @@ public class InventoryToolSelectionList : SelectionList_Super<ToolForInventory>
 
         InfoFrame.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = SelectedObject.Name.ToUpper();
         InfoFrame.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = SelectedObject.Description;
+        SetElementImage(InfoFrame, 2, SelectedObject);
 
         bool isWeapon = (SelectedObject.GetType().Name == "Weapon");
-        InfoFrame.transform.GetChild(2).gameObject.SetActive(isWeapon);
         InfoFrame.transform.GetChild(3).gameObject.SetActive(isWeapon);
         InfoFrame.transform.GetChild(4).gameObject.SetActive(isWeapon);
-        InfoFrame.transform.GetChild(2).GetChild(0).GetComponent<TextMeshProUGUI>().text = SelectedObject.Power.ToString();
-        InfoFrame.transform.GetChild(3).GetChild(0).GetComponent<TextMeshProUGUI>().text = SelectedObject.ConsecutiveActs.ToString();
-        InfoFrame.transform.GetChild(4).GetChild(0).GetComponent<TextMeshProUGUI>().text = "+" + SelectedObject.CritcalRate + "%";
+        InfoFrame.transform.GetChild(5).gameObject.SetActive(isWeapon);
+        InfoFrame.transform.GetChild(3).GetChild(0).GetComponent<TextMeshProUGUI>().text = SelectedObject.Power.ToString();
+        InfoFrame.transform.GetChild(4).GetChild(0).GetComponent<TextMeshProUGUI>().text = SelectedObject.ConsecutiveActs.ToString();
+        InfoFrame.transform.GetChild(5).GetChild(0).GetComponent<TextMeshProUGUI>().text = "+" + SelectedObject.CritcalRate + "%";
+
+        InfoFrame.transform.GetChild(6).GetChild(0).GetComponent<TextMeshProUGUI>().text = SelectedObject.Weight.ToString();
+    }
+
+    public static void SetElementImage<T>(GameObject infoFrame, int index, T tool) where T : Tool
+    {
+        bool hasElement = UIMaster.ElementImages.ContainsKey(tool.Element);
+        if (hasElement) infoFrame.transform.GetChild(index).GetComponent<Image>().sprite = UIMaster.ElementImages[tool.Element];
+        infoFrame.transform.GetChild(index).gameObject.SetActive(hasElement);
+    }
+
+    public void UpdateNavRight(Transform newNavToRight)
+    {
+        NavToRight = newNavToRight.GetComponent<Button>();
+        for (int i = NumberOfColumns - 1; i < NumberOfBlankSquares; i += NumberOfColumns)
+            SetHorizontalPointer(transform.GetChild(i).transform, NavToRight.transform);
+        SetHorizontalPointer(transform.GetChild(NumberOfColumns - 1), NavToRight.transform);
     }
 }

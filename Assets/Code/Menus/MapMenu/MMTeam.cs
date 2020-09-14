@@ -16,6 +16,7 @@ public class MMTeam : MM_Super
     private enum Selections { None, SelectFirstPlayer, SelectSecondPlayer }
 
     public MenuFrame Relations;
+    public TextMeshProUGUI RelationsCharacterName;
     public GridLayoutGroup RelationsList;
     public PlayerSelectionList OneAvatar;
     public PlayerSelectionList CurrentPartyList;
@@ -55,7 +56,7 @@ public class MMTeam : MM_Super
                 MenuManager.GoToMain();
                 break;
             case Selections.SelectSecondPlayer:
-                UndoFirstSelection();
+                UndoFirstSelection(true);
                 break;
         }
     }
@@ -98,6 +99,7 @@ public class MMTeam : MM_Super
     private void HoverOverPlayer(BattlePlayer p)
     {
         Relations.Activate();
+        RelationsCharacterName.text = p.Name.ToUpper();
         int i = 0;
         int i0 = 0;
         for (; i < MenuManager.PartyInfo.Players.Count; i++)
@@ -160,11 +162,11 @@ public class MMTeam : MM_Super
         EventSystem.current.SetSelectedGameObject(landingPsl.transform.GetChild(0).gameObject);
     }
 
-    private void UndoFirstSelection()
+    private void UndoFirstSelection(bool moveToPrevious)
     {
         Selection = Selections.SelectFirstPlayer;
         SwapLabel.gameObject.SetActive(false);
-        EventSystem.current.SetSelectedGameObject(ToSwapWithButton.gameObject);
+        if (moveToPrevious) EventSystem.current.SetSelectedGameObject(ToSwapWithButton.gameObject);
         ToSwapWithTeammate = null;
         ToSwapWithButton.ClearHighlights();
     }
@@ -173,11 +175,16 @@ public class MMTeam : MM_Super
     {
         int firstSelectedIndex = SelectedFirstFromReserves ? (MenuManager.PartyInfo.Players.Count + ToSwapWithIndex) : (1 + ToSwapWithIndex);
         int secondSelectedIndex = selectedSecondFromReserves ? (MenuManager.PartyInfo.Players.Count + ReservePartyList.SelectedIndex) : (1 + CurrentPartyList.SelectedIndex);
-        UndoFirstSelection();
+        UndoFirstSelection(false);
+        
+        // Swap teammates
         BattlePlayer temp = MenuManager.PartyInfo.AllPlayers[firstSelectedIndex];
         MenuManager.PartyInfo.AllPlayers[firstSelectedIndex] = MenuManager.PartyInfo.AllPlayers[secondSelectedIndex];
         MenuManager.PartyInfo.AllPlayers[secondSelectedIndex] = temp;
+
         MenuManager.PartyInfo.UpdateActivePlayers();
         SetupLists();
+        if (selectedSecondFromReserves) HoverOverReservePlayer();
+        else HoverOverCurrentPlayer();
     }
 }

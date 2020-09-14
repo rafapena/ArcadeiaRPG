@@ -192,9 +192,10 @@ public class MMSpecial : MM_Super
         DisplayCannotUseMessage();
         SkillInfo.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = SelectedSkill.Name.ToUpper();
         SkillInfo.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = SelectedSkill.Description;
-        SkillInfo.transform.GetChild(2).GetChild(0).GetComponent<TextMeshProUGUI>().text = SelectedSkill.Power.ToString();
-        SkillInfo.transform.GetChild(3).GetChild(0).GetComponent<TextMeshProUGUI>().text = SelectedSkill.ConsecutiveActs.ToString();
-        SkillInfo.transform.GetChild(4).GetChild(0).GetComponent<TextMeshProUGUI>().text = "+" + SelectedSkill.CritcalRate + "%";
+        InventoryToolSelectionList.SetElementImage(SkillInfo, 2, SelectedSkill);
+        SkillInfo.transform.GetChild(3).GetChild(0).GetComponent<TextMeshProUGUI>().text = SelectedSkill.Power.ToString();
+        SkillInfo.transform.GetChild(4).GetChild(0).GetComponent<TextMeshProUGUI>().text = SelectedSkill.ConsecutiveActs.ToString();
+        SkillInfo.transform.GetChild(5).GetChild(0).GetComponent<TextMeshProUGUI>().text = "+" + SelectedSkill.CritcalRate + "%";
     }
 
     private void DisplayCannotUseMessage()
@@ -320,14 +321,8 @@ public class MMSpecial : MM_Super
     private void UseSkill(int index)
     {
         PartyTargetsList.SelectedObject = SelectableTeammates[index];
-        PartyTargetsList.SelectedObject.ReceiveToolEffects(PartyTargetsList.SelectedObject, SelectedSkill);
-        Gauge hpg = PartyTargetsList.transform.GetChild(index).GetChild(3).GetComponent<Gauge>();
-        Gauge spg = PartyTargetsList.transform.GetChild(index).GetChild(4).GetComponent<Gauge>();
-        hpg.SetAndAnimate(PartyTargetsList.SelectedObject.HP, PartyTargetsList.SelectedObject.Stats.MaxHP);
-        spg.SetAndAnimate(PartyTargetsList.SelectedObject.SP, BattleMaster.SP_CAP);
-        //PartyTargetsList.SelectedObject = SelectableTeammates[index];
-        //PartyTargetsList.SelectedObject.ReceiveToolEffects(PartyTargetsList.SelectedObject, SelectedSkill);
-        //UpdateGauges(PartyTargetsList, index, PartyTargetsList.SelectedObject);
+        PartyTargetsList.SelectedObject.ReceiveToolEffects(PartyUserList.SelectedObject, SelectedSkill);
+        UpdateGauges(PartyTargetsList, index, PartyTargetsList.SelectedObject);
     }
 
     private void ApplyEffectsToUser()

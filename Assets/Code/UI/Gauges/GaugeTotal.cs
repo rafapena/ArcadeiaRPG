@@ -10,6 +10,8 @@ public class GaugeTotal : GaugeWithText
     private int Current;
     private int Max;
 
+    private Color PastCapColor = new Color(1f, 0.8f, 0.2f);
+
     protected override void SetBarAmount()
     {
         base.SetBarAmount();
@@ -53,12 +55,27 @@ public class GaugeTotal : GaugeWithText
     public override void Empty()
     {
         base.Empty();
-        Label.text = "0/" + GetMax();
+        Label.text = "0 / " + GetMax();
     }
 
     private string GetMax()
     {
         string[] s = Label.text.Split(' ');
         return s.Length > 1 ? s[2] : s[0];
+    }
+
+    protected override void SetColors()
+    {
+        base.SetColors();
+        /*if (CurrentAmount > Max)
+        {
+            Title.color = PastCapColor;
+            Label.color = PastCapColor;
+        }*/
+    }
+
+    public bool SurpassedCap()
+    {
+        return CurrentAmount > Max;
     }
 }

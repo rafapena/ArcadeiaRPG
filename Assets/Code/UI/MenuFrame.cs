@@ -6,7 +6,7 @@ public class MenuFrame : MonoBehaviour
     public enum DirEnum { Left, Right, Top, Bottom }
 
     public enum SpeedTypes { Fast, Med, Slow }
-    private float[] SPEED_TYPES = new float[] { 2.5f, 1f, 0.4f };   // Ensure the length of this list == the number of SpeedTypes
+    private float[] SPEED_TYPES = new float[] { 3.5f, 1.5f, 0.7f };   // Ensure the length of this list == the number of SpeedTypes
 
     // Activation related
     public bool Activated { get; private set; }

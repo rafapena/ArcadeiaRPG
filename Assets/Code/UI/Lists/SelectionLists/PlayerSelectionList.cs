@@ -13,7 +13,7 @@ using System.Collections.Generic;
 /// </summary>
 public class PlayerSelectionList : SelectionList_Super<Battler>
 {
-    public void Setup<T>(List<T> dataList, int hardLimit = -1) where T : Battler
+    public void Setup<T>(List<T> dataList) where T : Battler
     {
         ReferenceData = new List<Battler>();
         int i = 0;
@@ -42,8 +42,7 @@ public class PlayerSelectionList : SelectionList_Super<Battler>
             i++;
         }
 
-        // If there are excess entries, make them invisible
-        if (hardLimit > 0) i = hardLimit;
+        // If there are excess blank rows, make them invisible
         for (; i < transform.childCount; i++)
             transform.GetChild(i).gameObject.SetActive(false);
     }

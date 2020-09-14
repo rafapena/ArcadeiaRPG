@@ -93,10 +93,10 @@ public class Stats : MonoBehaviour
             Spd = SetStatNorms(level, Spd, 0);
             Tec = SetStatNorms(level, Tec, 0);
             Luk = SetStatNorms(level, Luk, 0);
-            Acc = SetOtherStatNorms(Acc, 0);
-            Eva = SetOtherStatNorms(Eva, 0);
-            Crt = SetOtherStatNorms(Crt, 0);
-            Cev = SetOtherStatNorms(Cev, 0);
+            Acc = SetOtherStatNorms(Acc, 100);
+            Eva = SetOtherStatNorms(Eva, 100);
+            Crt = SetOtherStatNorms(Crt, 100);
+            Cev = SetOtherStatNorms(Cev, 100);
         }
     }
 

@@ -159,7 +159,7 @@ public class Battle : MonoBehaviour
 
     private T InstantiateContents<T>(T b) where T : Battler
     {
-        for (int i = 0; i < b.SoloSkills.Count; i++)
+        /*for (int i = 0; i < b.SoloSkills.Count; i++)
         {
             b.SoloSkills[i] = Instantiate(b.SoloSkills[i], b.transform);
             b.SoloSkills[i].DisableForWarmup();
@@ -172,7 +172,7 @@ public class Battle : MonoBehaviour
         for (int i = 0; i < b.Weapons.Count; i++) b.Weapons[i] = Instantiate(b.Weapons[i], b.transform);
         for (int i = 0; i < b.Items.Count; i++) b.Items[i] = Instantiate(b.Items[i], b.transform);
         for (int i = 0; i < b.PassiveSkills.Count; i++) b.PassiveSkills[i] = Instantiate(b.PassiveSkills[i], b.transform);
-        for (int i = 0; i < b.States.Count; i++) b.States[i] = Instantiate(b.States[i], b.transform);
+        for (int i = 0; i < b.States.Count; i++) b.States[i] = Instantiate(b.States[i], b.transform);*/
         b.StatBoosts = gameObject.AddComponent<Stats>(); // TEMP
         b.StatBoosts.transform.SetParent(b.transform);   // TEMP
         b.StatBoosts.SetToZero();                        // TEMP

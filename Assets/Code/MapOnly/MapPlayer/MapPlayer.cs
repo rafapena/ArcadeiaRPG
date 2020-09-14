@@ -42,6 +42,21 @@ public class MapPlayer : MapExplorer
                 foreach (SoloSkill s in p.SoloSkills)
                     if (s.CanUseOutsideOfBattle) p.MapUsableSkills.Add(s);
             }
+            Battler b = all[i];
+            for (int j = 0; j < b.SoloSkills.Count; j++)
+            {
+                b.SoloSkills[j] = Instantiate(b.SoloSkills[j], b.transform);
+                //b.SoloSkills[j].DisableForWarmup();
+            }
+            for (int j = 0; j < b.TeamSkills.Count;j++)
+            {
+                b.TeamSkills[j] = Instantiate(b.TeamSkills[j], b.transform);
+                //b.TeamSkills[j].DisableForWarmup();
+            }
+            for (int j = 0; j < b.Weapons.Count; j++) b.Weapons[j] = Instantiate(b.Weapons[j], b.transform);
+            for (int j = 0; j < b.Items.Count; j++) b.Items[j] = Instantiate(b.Items[j], b.transform);
+            for (int j = 0; j < b.PassiveSkills.Count; j++) b.PassiveSkills[j] = Instantiate(b.PassiveSkills[j], b.transform);
+            for (int j = 0; j < b.States.Count; j++) b.States[j] = Instantiate(b.States[j], b.transform);
         }
         Party.UpdateAll(all);
         for (int i = 0; i < Party.LoggedObjectives.Count; i++)
