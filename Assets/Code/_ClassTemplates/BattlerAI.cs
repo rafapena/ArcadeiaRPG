@@ -25,7 +25,8 @@ public abstract class BattlerAI : Battler
 
     public override void StatConversion()
     {
-        if (Class) Stats = Instantiate(Class.BaseStats, gameObject.transform);
+        Stats = gameObject.AddComponent<Stats>();
+        if (Class) Stats.SetTo(Class.BaseStats);
         Stats.ConvertFromBaseToActual(Level);
         HP = Stats.MaxHP;
         SP = 100;

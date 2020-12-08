@@ -36,25 +36,25 @@ public abstract class GaugeWithText : Gauge
     public override void Fill()
     {
         base.Fill();
-        Title.color = NormalColor;
+        if (Title) Title.color = NormalColor;
     }
 
     public override void Empty()
     {
         base.Empty();
-        Title.color = EmptyBarTextColor;
+        if (Title) Title.color = EmptyBarTextColor;
     }
 
     protected virtual void SetColors()
     {
         if (CurrentAmount > 0)
         {
-            Title.color = NormalColor;
+            if (Title) Title.color = NormalColor;
             Label.color = NormalColor;
         }
         else
         {
-            Title.color = EmptyBarTextColor;
+            if (Title) Title.color = EmptyBarTextColor;
             Label.color = EmptyBarTextColor;
         }
     }

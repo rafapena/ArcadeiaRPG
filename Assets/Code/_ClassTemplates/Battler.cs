@@ -547,8 +547,10 @@ public abstract class Battler : BaseObject
 
             int totalHPChange = (formulaOutput + directHPChange) * ratesTotal;
             int totalSPChange = (formulaOutput + tool.SPPecent) * ratesTotal;
-
-            //Debug.Log(totalHPChange);
+            int realHPTotal = tool.GetTotalWithVariance(totalHPChange);
+            int realSPTotal = tool.GetTotalWithVariance(totalSPChange);
+            if (tool.HPModType != Tool.ModType.None && realHPTotal <= 0) realHPTotal = 1;
+            if (tool.SPModType != Tool.ModType.None && realSPTotal <= 0) realSPTotal = 1;
 
             //List<int>[] states = tool.TriggeredStates(user, this, effectMagnitude);
             //oneTarget.Add(states[0].Count);
@@ -557,11 +559,14 @@ public abstract class Battler : BaseObject
             //foreach (int stateReceiveId in states[1]) oneTarget.Add(stateReceiveId);
             extraFunc?.Invoke(user, tool, effectMagnitude);
 
-            int realHPTotal = tool.GetTotalWithVariance(totalHPChange);
-            int realSPTotal = tool.GetTotalWithVariance(totalSPChange);
             ChangeAndDisplayPopup(user, realHPTotal, tool.HPModType, "HP", user.ChangeHP, ChangeHP);
             ChangeAndDisplayPopup(user, realSPTotal, tool.SPModType, "SP", user.ChangeSP, ChangeSP);
             CheckKO();
+        }
+        else
+        {
+            Popup popup = Instantiate(UIMaster.Popups["NoHit"], transform.position, Quaternion.identity);
+            popup.GetComponent<TextMesh>().text = "MISS";
         }
     }
 
@@ -596,7 +601,7 @@ public abstract class Battler : BaseObject
 
     private void CheckKO()
     {
-        Unconscious = (HP == 0 || Petrified);
+        Unconscious = (HP <= 0 || Petrified);
         if (Unconscious) ClearTurnChoices();
         if (GetComponent<SpriteRenderer>()) GetComponent<SpriteRenderer>().enabled = !Unconscious;
         else if (GetComponent<Animator>()) GetComponent<Animator>().enabled = !Unconscious;

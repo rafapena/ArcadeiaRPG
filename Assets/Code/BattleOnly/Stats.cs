@@ -20,6 +20,22 @@ public class Stats : MonoBehaviour
     public int Cev = 100;
     private bool Converted;
 
+    public void SetTo(Stats other)
+    {
+        MaxHP = other.MaxHP;
+        Atk = other.Atk;
+        Def = other.Def;
+        Map = other.Map;
+        Mar = other.Mar;
+        Spd = other.Spd;
+        Tec = other.Tec;
+        Luk = other.Luk;
+        Acc = other.Acc;
+        Crt = other.Crt;
+        Eva = other.Eva;
+        Cev = other.Cev;
+    }
+
     public void SetToZero()
     {
         MaxHP = 0;
@@ -126,7 +142,7 @@ public class Stats : MonoBehaviour
 
     private int SetOtherStatNorms(int baseStat, int natMod)
     {
-        return baseStat * natMod / 10000;
+        return baseStat * natMod / 100;
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

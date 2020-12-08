@@ -48,7 +48,8 @@ public class BattlePlayer : Battler
 
     public override void StatConversion()
     {
-        Stats = Instantiate(Class.BaseStats, gameObject.transform);
+        Stats = gameObject.AddComponent<Stats>();
+        Stats.SetTo(Class.BaseStats);
         Stats.ConvertFromBaseToActual(Level, NaturalStats);
         HP = Stats.MaxHP;
         SP = 100;

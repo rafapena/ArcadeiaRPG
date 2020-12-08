@@ -59,8 +59,8 @@ public abstract class Tool : BaseObject
         if (AlwaysHits) return true;
         float weaponAcc = u.SelectedWeapon != null ? u.SelectedWeapon.Accuracy : 100;
         float toolAcc = Accuracy * weaponAcc / 10000f;
-        float result = BattleMaster.BASE_ACCURACY * toolAcc * u.Acc() / t.Eva();
-        //Debug.Log("HIT OR MISS => " + toolAcc + " " + u.Acc() + " " + t.Eva() + " => " + result);
+        float statsAcc = u.Tec() / t.Spd();
+        float result = BattleMaster.BASE_ACCURACY * toolAcc * statsAcc * u.Acc() / t.Eva();
         return Chance(result * effectMagnitude);
     }
 
