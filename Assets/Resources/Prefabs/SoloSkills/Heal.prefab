@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8314127567917476285}
   - component: {fileID: 3039436623926717342}
-  - component: {fileID: 7667141599275808724}
+  - component: {fileID: 4510640406153721997}
   m_Layer: 0
   m_Name: Heal
   m_TagString: Untagged
@@ -82,7 +82,7 @@ SpriteRenderer:
   m_WasSpriteAssigned: 0
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &7667141599275808724
+--- !u!114 &4510640406153721997
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -91,18 +91,18 @@ MonoBehaviour:
   m_GameObject: {fileID: 3997247745119845421}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d228878253da8aa468327e5d4a097097, type: 3}
+  m_Script: {fileID: 11500000, guid: 93d63bffb241f284aa147625cf04b742, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Id: 3
+  Id: 1
   Name: Heal
-  Description: Heals people
+  Description: Recovers 50 HP
   Type: 4
-  Formula: 2
-  ActionTime: 3
+  Formula: 0
+  ActionTime: 0
   HPModType: 2
   SPModType: 0
-  HPAmount: 0
+  HPAmount: 50
   HPPercent: 0
   SPPecent: 0
   HPRecoil: 0
@@ -110,19 +110,18 @@ MonoBehaviour:
   ConsecutiveActs: 1
   RandomTarget: 0
   Element: 0
-  AlwaysHits: 0
-  Power: 30
+  AlwaysHits: 1
+  Power: 10
   Accuracy: 100
-  CritcalRate: 0
+  CritcalRate: 2
   Variance: 0
   Priority: 0
-  Projectile: {fileID: 4298730171705373736, guid: 60c2800cce44acf4e9c3aec06c8823bc,
-    type: 3}
+  Projectile: {fileID: 0}
   ClassExclusives: []
   ChangedStatesGiveRate: []
   ChangedStatesReceiveRate: []
   Disabled: 0
-  SPConsume: 8
+  SPConsume: 10
   Charge: 0
   Warmup: 0
   Cooldown: 0
@@ -130,7 +129,7 @@ MonoBehaviour:
   CanUseOutsideOfBattle: 1
   WeaponDependent: 0
   WeaponExclusives: 
-  Commnads: []
+  Commands: []
   SummonChances: []
   ChargeCount: 0
   DisabledCount: 0

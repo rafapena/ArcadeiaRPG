@@ -11,7 +11,7 @@ public class SoloSkill : Tool
     public bool CanUseOutsideOfBattle;
     public bool WeaponDependent;
     public List<BattleMaster.WeaponTypes> WeaponExclusives;
-    public List<Command> Commnads;
+    public List<Command> Commands;
     public List<SummonBattler> SummonChances;
 
     [HideInInspector] public int ChargeCount;

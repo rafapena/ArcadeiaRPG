@@ -57,22 +57,13 @@ public class BattlePlayer : Battler
 
     public void AddLearnedSkills()
     {
-        int i = 0;
         foreach (SkillLearnLevel sll in SkillSet)
         {
-            if (sll.Skill)
-            {
-                if (Level >= sll.LearnLevel)
-                    TeamSkills.Add(sll.Skill);
-            }
-            else if (Class.SoloSkillSet[i])
-            {
-                if (Level >= sll.LearnLevel)
-                {
-                    SoloSkills.Add(Class.SoloSkillSet[i]);
-                    i++;
-                }
-            }
+            if (Level >= sll.LearnLevel) TeamSkills.Add(sll.Skill);
+        }
+        for (int i = 0; i < Class.SoloSkillSet.Count; i++)
+        {
+            if (Level >= (i + 1) * 5) SoloSkills.Add(Class.SoloSkillSet[i]);
         }
     }
 

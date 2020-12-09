@@ -26,7 +26,7 @@ public class BattleMenu : MonoBehaviour
 
     // Loading
     private bool LoadReady;
-    private float WaitTimeBeforeTurnStarts = 3f;
+    private float WaitTimeBeforeTurnStarts = 2f;
 
     // Child GameObjects
     public MenuFrame CharacterInfo;
@@ -57,6 +57,7 @@ public class BattleMenu : MonoBehaviour
         SelectTargetInTeam.SetActive(false);
         CInfoFrameMainColor = CharacterInfo.transform.GetChild(0).GetComponent<Image>().color;
         CInfoFrameCurrentColor = new Color(1, 0.8f, 0.4f);
+        WaitTimeBeforeTurnStarts = Time.time + WaitTimeBeforeTurnStarts;
     }
 
     private void LateUpdate()

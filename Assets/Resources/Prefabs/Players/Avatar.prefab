@@ -920,8 +920,6 @@ GameObject:
   - component: {fileID: 4298201553111633178}
   - component: {fileID: -1661851768111992753}
   - component: {fileID: 420698567687869480}
-  - component: {fileID: 7507296843734669464}
-  - component: {fileID: -5458880108410702642}
   - component: {fileID: 972542898174788101}
   - component: {fileID: 659829131407068566}
   - component: {fileID: 9150242368358636562}
@@ -1092,7 +1090,6 @@ MonoBehaviour:
   IsCharging: 0
   FaceImage: {fileID: 0}
   NaturalStats: {fileID: -1661851768111992753}
-  NaturalPartnerBoosts: {fileID: 0}
   Companionship: 100
   SavePartnerRate: 100
   CounterattackRate: 100
@@ -1102,8 +1099,6 @@ MonoBehaviour:
   - {fileID: 1791329435643984854, guid: 0c755c9bf65f36a4daba5c184e8a7aaa, type: 3}
   SkillSet:
   - {fileID: 420698567687869480}
-  - {fileID: 7507296843734669464}
-  - {fileID: -5458880108410702642}
   AttackSkill: {fileID: 0}
   MapUsableSkills: []
   Relations: []
@@ -1143,35 +1138,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 978a76f5d903a0d439777b590d396dea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Skill: {fileID: 6941692195349867724, guid: 8dd68cadd7302554498dceb1e20040be, type: 3}
-  LearnLevel: 1
---- !u!114 &7507296843734669464
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5149667342464974805}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 978a76f5d903a0d439777b590d396dea, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Skill: {fileID: 0}
-  LearnLevel: 1
---- !u!114 &-5458880108410702642
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5149667342464974805}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 978a76f5d903a0d439777b590d396dea, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Skill: {fileID: 0}
+  Skill: {fileID: 2134449432004664704, guid: 8dd68cadd7302554498dceb1e20040be, type: 3}
   LearnLevel: 1
 --- !u!114 &972542898174788101
 MonoBehaviour:

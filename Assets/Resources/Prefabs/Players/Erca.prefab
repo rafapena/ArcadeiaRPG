@@ -690,7 +690,6 @@ MonoBehaviour:
   IsCharging: 0
   FaceImage: {fileID: 0}
   NaturalStats: {fileID: 504469134075856786}
-  NaturalPartnerBoosts: {fileID: 4930098279123164199}
   Companionship: 100
   SavePartnerRate: 100
   CounterattackRate: 100
@@ -701,7 +700,13 @@ MonoBehaviour:
   SkillSet: []
   AttackSkill: {fileID: 0}
   MapUsableSkills: []
-  Relations: []
+  Relations:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
 --- !u!114 &504469134075856786
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -91,15 +91,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 7569271499837528704}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d228878253da8aa468327e5d4a097097, type: 3}
+  m_Script: {fileID: 11500000, guid: 93d63bffb241f284aa147625cf04b742, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Id: 1
+  Id: 0
   Name: Attack
-  Description: Basic attack
+  Description: 
   Type: 0
   Formula: 0
-  ActionTime: 3
+  ActionTime: 0
   HPModType: 0
   SPModType: 0
   HPAmount: 0
@@ -110,11 +110,14 @@ MonoBehaviour:
   ConsecutiveActs: 1
   RandomTarget: 0
   Element: 0
+  AlwaysHits: 0
   Power: 10
   Accuracy: 100
   CritcalRate: 2
+  Variance: 0
   Priority: 0
-  Projectile: {fileID: 0}
+  Projectile: {fileID: 4298730171705373736, guid: 60c2800cce44acf4e9c3aec06c8823bc,
+    type: 3}
   ClassExclusives: []
   ChangedStatesGiveRate: []
   ChangedStatesReceiveRate: []

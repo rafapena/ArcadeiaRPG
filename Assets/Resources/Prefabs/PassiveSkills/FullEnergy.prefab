@@ -96,7 +96,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Id: 1
   Name: FullEnergy
-  Description: Deals 50% extra damage if the user's HP is full
+  Description: User, at full health, deals 50% extra damage
   HPRegen: 0
   SPRegen: 0
   SPConsumeRate: 0
@@ -111,8 +111,8 @@ MonoBehaviour:
   MagicalDamageRate: 150
   ExtraTurns: 0
   DisabledToolTypes: 
-  ElementRates: []
-  StateRates: []
+  ChangedElementRates: []
+  ChangedStateRates: []
   TurnsLeft: 0
   HPMin: 100
   HPMax: 100

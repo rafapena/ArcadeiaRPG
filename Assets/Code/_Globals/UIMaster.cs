@@ -40,7 +40,7 @@ public class UIMaster : MonoBehaviour
 
         Popups = new Dictionary<string, Popup>();
         foreach (string s in PopupsListFileNames)
-            Popups.Add(s, Resources.Load<Popup>("Prefabs/Popups/" + s));
+            Popups.Add(s, Resources.Load<Popup>("Prefabs/UI/Popups/" + s));
 
         WeaponImages = new Dictionary<BattleMaster.WeaponTypes, Sprite>();
         var wt = (BattleMaster.WeaponTypes[])System.Enum.GetValues(typeof(BattleMaster.WeaponTypes));

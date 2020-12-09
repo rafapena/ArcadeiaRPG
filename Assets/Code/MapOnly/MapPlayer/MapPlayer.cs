@@ -31,8 +31,8 @@ public class MapPlayer : MapExplorer
             all[i].Level = Party.Level;
             if (all[i].Weapons.Count > 0) all[i].SelectedWeapon = all[i].Weapons[0];
             all[i].StatConversion();
-            all[i].HP = all[i].Stats.MaxHP / 2;
-            all[i].SP = 50;
+            all[i].HP = all[i].Stats.MaxHP;
+            all[i].SP = 100;
             all[i].gameObject.SetActive(false);
             if (all[i].GetType().Name == "BattlePlayer")
             {

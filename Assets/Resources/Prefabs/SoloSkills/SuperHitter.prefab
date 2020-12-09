@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3248169618960043792}
   - component: {fileID: 8384673876078120243}
-  - component: {fileID: 3752993136341733753}
+  - component: {fileID: 7319605355004161415}
   m_Layer: 0
   m_Name: SuperHitter
   m_TagString: Untagged
@@ -83,7 +83,7 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &3752993136341733753
+--- !u!114 &7319605355004161415
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -92,28 +92,30 @@ MonoBehaviour:
   m_GameObject: {fileID: 7569271499837528704}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d228878253da8aa468327e5d4a097097, type: 3}
+  m_Script: {fileID: 11500000, guid: 93d63bffb241f284aa147625cf04b742, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Id: 2
+  Id: 3
   Name: Super Hitter
-  Description: Hits superly
-  Type: 3
-  Formula: 2
-  ActionTime: 3
-  HPModType: 3
-  SPModType: 1
+  Description: Hits Superly
+  Type: 1
+  Formula: 1
+  ActionTime: 0
+  HPModType: 1
+  SPModType: 0
   HPAmount: 0
   HPPercent: 0
   SPPecent: 0
   HPRecoil: 0
-  Scope: 5
+  Scope: 0
   ConsecutiveActs: 1
   RandomTarget: 0
-  Element: 1
-  Power: 10
+  Element: 0
+  AlwaysHits: 0
+  Power: 20
   Accuracy: 100
-  CritcalRate: 4
+  CritcalRate: 2
+  Variance: 0
   Priority: 0
   Projectile: {fileID: 4298730171705373736, guid: 60c2800cce44acf4e9c3aec06c8823bc,
     type: 3}
@@ -121,14 +123,15 @@ MonoBehaviour:
   ChangedStatesGiveRate: []
   ChangedStatesReceiveRate: []
   Disabled: 0
-  SPConsume: 10
+  SPConsume: 25
   Charge: 0
   Warmup: 0
   Cooldown: 0
   Steal: 0
+  CanUseOutsideOfBattle: 0
   WeaponDependent: 0
-  WeaponExclusives: 02000000
-  Commnads: []
+  WeaponExclusives: 
+  Commands: []
   SummonChances: []
   ChargeCount: 0
   DisabledCount: 0

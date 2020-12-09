@@ -13,6 +13,7 @@ public abstract class BattlerAI : Battler
         base.Awake();
         foreach (AITool ait in ToolAI)
         {
+            if (!ait.Move) continue;
             switch (ait.Move.GetType().Name)
             {
                 case "Weapon": Weapons.Add(ait.Move as Weapon); break;
