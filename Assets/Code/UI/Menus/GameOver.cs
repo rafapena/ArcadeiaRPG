@@ -22,6 +22,6 @@ public class GameOver : MonoBehaviour
     public void BackToMenu()
     {
         ButtonClickSFX.Play();
-        ScreenFadeManager.ChangeScene("Title", 2, "");
+        ScreenTransitioner.ChangeScene("Title", 2, "");
     }
 }

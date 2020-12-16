@@ -546,7 +546,9 @@ MonoBehaviour:
   SelectedTargets: []
   States: []
   ExecutedAction: 0
-  CriticalHitRatio: 0
+  HitCritical: 0
+  HitWeakness: 0
+  HitResistant: 0
   ChangedElementRates: []
   ChangedStateRates: []
   ComboDifficulty: 0
@@ -612,7 +614,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cc89f1065ebaaa846829fa5f5027360d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Move: {fileID: 3752993136341733753, guid: dcb917dcac2f1eb4395fd9bf9871dae5, type: 3}
+  Move: {fileID: 3297598885578702653, guid: dcb917dcac2f1eb4395fd9bf9871dae5, type: 3}
   Priority: 0
   Quantity: 0
   HPLow: 0

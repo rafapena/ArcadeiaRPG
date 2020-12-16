@@ -43,10 +43,15 @@ public class BattleWin : MonoBehaviour
 
     // Level and EXP
     private int LevelUps;
-    private Gauge EXPGauge;     // Quickly access the child Game Object
+    public Gauge EXPGauge;
     private int EXPEarned;
     private int EXPIncreaseSpeed;
     private int NewEXPTotal;
+    public TextMeshProUGUI LevelLabel;
+    public TextMeshProUGUI EXPGainedSoFarLabel;
+    public TextMeshProUGUI EXPGainedLabel;
+    public TextMeshProUGUI ToNextLabel;
+    public TextMeshProUGUI TotalEXPLabel;
 
     // Gold and Items
     private int GoldEarned;
@@ -139,11 +144,10 @@ public class BattleWin : MonoBehaviour
 
     private void SetupLevelEXPInfo()
     {
-        EXPGauge = LevelEXP.transform.GetChild(1).GetChild(2).GetComponent<Gauge>();
         int gCurr = FinishedBattle.PlayerParty.EXP - FinishedBattle.PlayerParty.LastEXPToNext;
         int gMax = FinishedBattle.PlayerParty.EXPToNext - FinishedBattle.PlayerParty.LastEXPToNext;
         EXPGauge.Set(gCurr, gMax);
-        //EXPIncreaseSpeed = (int)(gMax * EXPGauge.ChangePerSecond);
+        EXPIncreaseSpeed = (int)(gMax * 0.005f);
         NewEXPTotal = FinishedBattle.PlayerParty.EXP + EXPEarned;
         UpdateForLevelUpInfo();
         UpdateEXPInfo();
@@ -151,42 +155,42 @@ public class BattleWin : MonoBehaviour
 
     private void UpdateForLevelUpInfo()
     {
-        TextMeshProUGUI lvlTxt = LevelEXP.transform.GetChild(0).GetChild(0).GetComponent<TextMeshProUGUI>();
-        lvlTxt.text = FinishedBattle.PlayerParty.Level.ToString();
-        if (LevelUps > 0) lvlTxt.color = new Color(0.7f, 1, 0.5f);
-        LevelEXP.transform.GetChild(1).GetChild(4).GetComponent<TextMeshProUGUI>().text = "/ " + (FinishedBattle.PlayerParty.EXPToNext - FinishedBattle.PlayerParty.LastEXPToNext);
+        LevelLabel.text = FinishedBattle.PlayerParty.Level.ToString();
+        if (LevelUps > 0) LevelLabel.color = new Color(0.7f, 1, 0.5f);
+        ToNextLabel.text = "/ " + (FinishedBattle.PlayerParty.EXPToNext - FinishedBattle.PlayerParty.LastEXPToNext);
     }
 
     private void UpdateEXPInfo()
     {
         int totalExp = FinishedBattle.PlayerParty.EXP;
-        LevelEXP.transform.GetChild(1).GetChild(1).GetComponent<TextMeshProUGUI>().text = EXPEarned > 0 ? ("+" + EXPEarned) : "";
-        LevelEXP.transform.GetChild(1).GetChild(3).GetComponent<TextMeshProUGUI>().text = (totalExp - FinishedBattle.PlayerParty.LastEXPToNext).ToString();
-        LevelEXP.transform.GetChild(1).GetChild(6).GetComponent<TextMeshProUGUI>().text = totalExp.ToString();
+        EXPGainedLabel.text = EXPEarned > 0 ? ("+" + EXPEarned) : "";
+        EXPGainedSoFarLabel.text = (totalExp - FinishedBattle.PlayerParty.LastEXPToNext).ToString();
+        TotalEXPLabel.text = totalExp.ToString();
     }
 
     private void SetupItems()
     {
         int i = 0;
-        if (ItemsEarned.Count == 0)
+        bool noItems = ItemsEarned.Count == 0;
+        NoItemsLabel.gameObject.SetActive(noItems);
+        if (noItems)
         {
             for (; i < ItemsObtained.transform.childCount; i++)
                 ItemsObtained.transform.GetChild(i).gameObject.SetActive(false);
             return;
         }
-        NoItemsLabel.gameObject.SetActive(ItemsEarned.Count == 0);
-        int childSize = ItemsObtained.transform.childCount - 1;
+        int childSize = ItemsObtained.transform.childCount;
         int limit = ItemsEarned.Count < childSize ? ItemsEarned.Count : childSize;
         for (; i < limit; i++)
         {
-            Transform it = ItemsObtained.transform.GetChild(i + 1);
+            Transform it = ItemsObtained.transform.GetChild(i);
             it.gameObject.SetActive(true);
             it.GetChild(0).GetComponent<TextMeshProUGUI>().text = ItemsEarned[i].Name;
             it.GetChild(1).GetComponent<Image>().sprite = ItemsEarned[i].GetComponent<SpriteRenderer>().sprite;
             it.GetChild(2).GetComponent<TextMeshProUGUI>().text = "+" + ItemsEarned[i].Quantity;
         }
         for (; i < childSize; i++)
-            ItemsObtained.transform.GetChild(i + 1).gameObject.SetActive(false);
+            ItemsObtained.transform.GetChild(i).gameObject.SetActive(false);
     }
 
     private void SetupGold()

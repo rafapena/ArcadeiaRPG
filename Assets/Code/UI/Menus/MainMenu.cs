@@ -14,6 +14,6 @@ public class MainMenu : MonoBehaviour
     {
         ButtonClickSFX.Play();
         //ScreenFadeManager.ChangeScene((int)Globals.Scenes.CIntro, 2, "");
-        ScreenFadeManager.ChangeScene("Testland", 2, "");
+        ScreenTransitioner.ChangeScene("Testland", 2, "");
     }
 }

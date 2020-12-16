@@ -54,9 +54,9 @@ public class Cutscenes : MonoBehaviour
     // Finish cutscene and land on the next level or page
     public void CompleteCutscene(FlowJumper jumper)
     {
-        if (jumper.ToGamePlay) ScreenFadeManager.ChangeScene("gameplayLvl" + jumper.GoToLevel, 2, "Level " + jumper.GoToLevel);
-        else if (jumper.ToYouWinScreen) ScreenFadeManager.ChangeScene("Title", 3, "");
-        else if (jumper.ToGameOverScreen) ScreenFadeManager.ChangeScene("GameOver", 2, "");
-        else ScreenFadeManager.ChangeScene(0, 2, "");
+        if (jumper.ToGamePlay) ScreenTransitioner.ChangeScene("gameplayLvl" + jumper.GoToLevel, 2, "Level " + jumper.GoToLevel);
+        else if (jumper.ToYouWinScreen) ScreenTransitioner.ChangeScene("Title", 3, "");
+        else if (jumper.ToGameOverScreen) ScreenTransitioner.ChangeScene("GameOver", 2, "");
+        else ScreenTransitioner.ChangeScene(0, 2, "");
     }
 }

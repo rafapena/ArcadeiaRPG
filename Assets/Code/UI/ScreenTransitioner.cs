@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 // Directly handles screen transitioning and player position/cutscene changes
-public class ScreenFadeManager : MonoBehaviour
+public class ScreenTransitioner : MonoBehaviour
 {
     private static MapPlayer TargetPlayer;
     private static float ToX;
@@ -21,11 +21,11 @@ public class ScreenFadeManager : MonoBehaviour
     private const float FADE_IN_TIMER = 0.5f;
     private const float FADE_OUT_TIMER = 0.5f;
     private const float FADE_SPEED = 0.01f;
-    private const string BlackScreenUI = "/UISceneTransition/Fade";
+    private const string BlackScreenUI = "/Fade";
 
     void Start()
     {
-        GameObject.Find(BlackScreenUI).GetComponent<CanvasGroup>().alpha = 1;
+        GetComponent<CanvasGroup>().alpha = 0;
         ToScene = -1;
         FadeChangesMade = 1;
         TimeMarker = Time.realtimeSinceStartup + FADE_OUT_TIMER;
@@ -89,7 +89,7 @@ public class ScreenFadeManager : MonoBehaviour
     {
         FadeChangesMade = 0;
         InBlackScreenTime = blackScreenTime;
-        GameObject.Find("/UISceneTransition").GetComponent<Canvas>().sortingOrder = 2;
+        GameObject.Find(BlackScreenUI).GetComponent<Canvas>().sortingOrder = 2;
         Time.timeScale = 0;
         TimeMarker = Time.realtimeSinceStartup + InBlackScreenTime + FADE_IN_TIMER + FADE_OUT_TIMER;
     }
