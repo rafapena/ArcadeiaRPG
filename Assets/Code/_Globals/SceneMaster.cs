@@ -9,27 +9,30 @@ public class SceneMaster : MonoBehaviour
 {
     public static bool InMapMenu = false;
     public static bool InBattle = false;
+    public static List<GameObject> StoredMapScene;
 
-    public void ChangeScene(string sceneName, string BlackScreenTime)
+    public const string SCREEN_TRANSITION_SCENE = "ScreenTransition";
+    public const float BATTLE_TRANSITION_TIME = 1f;
+
+    public static void ChangeScene(string sceneName, float blackScreenTime,
+        ScreenTransitioner.SceneChangeModes changeMode = ScreenTransitioner.SceneChangeModes.Change,
+        ScreenTransitioner.TransitionModes transitionMode = ScreenTransitioner.TransitionModes.BlackScreen)
     {
-        SceneManager.LoadScene("ScreenTransition", LoadSceneMode.Additive);
+        ScreenTransitioner.SetupComponents(sceneName, blackScreenTime, changeMode, transitionMode);
+        SceneManager.LoadScene(SCREEN_TRANSITION_SCENE, LoadSceneMode.Additive);
     }
 
     public static void StartBattle(PlayerParty playerParty, EnemyParty enemyParty)
     {
         BattleMaster.Setup(null, playerParty, enemyParty);
-        GameObject[] allObjects = FindObjectsOfType<GameObject>();
-        foreach (GameObject g in allObjects)
-            g.SetActive(false);
-        SceneManager.LoadScene("Battle", LoadSceneMode.Additive);
+        StoreGameObjects();
+        ChangeScene("Battle", BATTLE_TRANSITION_TIME, ScreenTransitioner.SceneChangeModes.Add, ScreenTransitioner.TransitionModes.Batte);
     }
 
     public static void EndBattle(PlayerParty playerParty)
     {
-        SceneManager.UnloadSceneAsync("Battle");
-        GameObject[] allObjects = FindObjectsOfType<GameObject>();
-        foreach (GameObject g in allObjects)
-            g.SetActive(true);
+        ChangeScene("Battle", BATTLE_TRANSITION_TIME / 2, ScreenTransitioner.SceneChangeModes.Remove, ScreenTransitioner.TransitionModes.BlackScreen);
+        MapMaster.EnemyEncountered.DeclareDefeated();
     }
 
     public static void OpenMenu(PlayerParty playerParty)
@@ -46,5 +49,24 @@ public class SceneMaster : MonoBehaviour
         SceneManager.UnloadSceneAsync("MapMenu");
         InMapMenu = false;
         Time.timeScale = 1;
+    }
+
+    public static void StoreGameObjects()
+    {
+        StoredMapScene = new List<GameObject>();
+        GameObject[] allObjects = FindObjectsOfType<GameObject>();
+        foreach (GameObject g in allObjects) StoredMapScene.Add(g);
+    }
+
+    public static void ActivateStoredGameObjects()
+    {
+        foreach (GameObject g in StoredMapScene)
+            if (g) g.SetActive(true);
+    }
+
+    public static void DeactivateStoredGameObjects()
+    {
+        foreach (GameObject g in StoredMapScene)
+            if (g) g.SetActive(false);
     }
 }

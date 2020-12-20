@@ -5,4 +5,5 @@ using UnityEngine;
 public class MapMaster
 {
     public static int Elevation;
+    public static MapEnemy EnemyEncountered;
 }

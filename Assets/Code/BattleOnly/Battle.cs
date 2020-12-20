@@ -53,6 +53,7 @@ public class Battle : MonoBehaviour
 
     void Start()
     {
+        SceneMaster.DeactivateStoredGameObjects();      // Hide overworld
         SetupBackground();
         SetupPlayerParty();
         SetupEnemyParty();
@@ -355,5 +356,10 @@ public class Battle : MonoBehaviour
         BattleState = BattleStates.GameOver;
         BattleStateTime = Time.time + 0.5f;
         Debug.Log("YOU LOSE");
+    }
+
+    private void OnDestroy()
+    {
+        SceneMaster.ActivateStoredGameObjects();      // Return overworld
     }
 }

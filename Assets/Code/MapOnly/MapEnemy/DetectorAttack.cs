@@ -6,8 +6,13 @@ public class DetectorAttack : MonoBehaviour
     {
         MapEnemy e = gameObject.GetComponentInParent<MapEnemy>();
         MapPlayer p = collider.gameObject.GetComponent<MapPlayer>();
-        if (e && p && Physics2D.Raycast(transform.position, p.transform.position - e.transform.position).collider.CompareTag("Player"))
-            e.GoAfterPlayer();
+        try
+        {
+            if (e && p && Physics2D.Raycast(transform.position, p.transform.position - e.transform.position).collider.CompareTag("Player"))
+                e.GoAfterPlayer();
+        }
+        catch { }
+        
     }
 
     private void OnTriggerStay2D(Collider2D collider)

@@ -10,6 +10,7 @@ public class MapEnemy : MapExplorer
 
     public EnemyParty EnemyPartyOnContact;
     [HideInInspector] public bool ChasingPlayer;
+    private bool Defeated;
 
     protected override void Start()
     {
@@ -20,7 +21,13 @@ public class MapEnemy : MapExplorer
 
     protected override void Update()
     {
+        if (Defeated)
+        {
+            UpdateSprite();
+            return;
+        }
         base.Update();
+        if (gameObject.layer == NON_COLLIDABLE_EXPLORER_LAYER && !IsBlinking()) gameObject.layer = ENEMY_LAYER;
         if (DetectTime > Time.time) return;
         else if (ChasingPlayer) ChasePlayer();
         else WanderAround();
@@ -35,7 +42,10 @@ public class MapEnemy : MapExplorer
     private void OnCollisionEnter2D(Collision2D collision)
     {
         if (collision.gameObject.GetComponent<MapPlayer>())
+        {
             SceneMaster.StartBattle(TargetPlayer.Party, EnemyPartyOnContact);
+            MapMaster.EnemyEncountered = this;
+        }
     }
 
     public void WanderAround()
@@ -68,5 +78,12 @@ public class MapEnemy : MapExplorer
     {
         if (!ChasingPlayer) return;
         ChasingPlayer = false;
+    }
+
+    public void DeclareDefeated()
+    {
+        Defeated = true;
+        MapMaster.EnemyEncountered.Blink(1.5f);
+        Destroy(MapMaster.EnemyEncountered.gameObject, 1.5f);
     }
 }

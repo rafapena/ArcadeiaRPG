@@ -60,7 +60,9 @@ public class MapPlayer : MapExplorer
         }
         Party.UpdateAll(all);
         for (int i = 0; i < Party.LoggedObjectives.Count; i++)
+        {
             Party.LoggedObjectives[i] = Instantiate(Party.LoggedObjectives[i], gameObject.transform);
+        }
     }
     // FOR TESTING PURPOSES ONLY
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -70,6 +72,7 @@ public class MapPlayer : MapExplorer
         if (SceneMaster.InMapMenu) return;      // Player input should not work, while in the menu
         if (Input.GetKeyDown(KeyCode.Space)) SceneMaster.OpenMenu(Party);
         base.Update();
+        if (gameObject.layer == NON_COLLIDABLE_EXPLORER_LAYER && !IsBlinking()) gameObject.layer = PLAYER_LAYER;
         Movement = new Vector3(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
         transform.position += Movement * Speed * Time.deltaTime;
         AnimateDirection();

@@ -5,14 +5,14 @@ using UnityEngine.SceneManagement;
 // Directly handles screen transitioning and player position/cutscene changes
 public class ScreenTransitioner : MonoBehaviour
 {
-    private static MapPlayer TargetPlayer;
-    private static float ToX;
-    private static float ToY;
+    public enum TransitionModes { BlackScreen, Batte }
+    private static TransitionModes TransitionMode;
 
-    private static int ToScene;
-    private static string ToSceneS;
-    private static bool SwitchScenes;
-    private static bool IntMode;
+    public enum SceneChangeModes { Remove, Change, Add }
+    private static SceneChangeModes ChangeMode;
+
+    private static string TargetScene;
+    private static GameObject TransitionScreen;
 
     private static float InBlackScreenTime;
     private static float TimeMarker;
@@ -21,15 +21,19 @@ public class ScreenTransitioner : MonoBehaviour
     private const float FADE_IN_TIMER = 0.5f;
     private const float FADE_OUT_TIMER = 0.5f;
     private const float FADE_SPEED = 0.01f;
-    private const string BlackScreenUI = "/Fade";
 
+    // NOTE: Setup components should be called first, beforehand
     void Start()
     {
-        GetComponent<CanvasGroup>().alpha = 0;
-        ToScene = -1;
+        for (int i = 0; i < transform.childCount; i++)
+            transform.GetChild(i).gameObject.SetActive(false);
+        TransitionScreen = transform.GetChild((int)TransitionMode).gameObject;
+        TransitionScreen.SetActive(true);
+        TransitionScreen.GetComponent<CanvasGroup>().alpha = 0;
         FadeChangesMade = 1;
         TimeMarker = Time.realtimeSinceStartup + FADE_OUT_TIMER;
         Time.timeScale = 0;
+        FadeInStart(InBlackScreenTime);
     }
 
     void Update()
@@ -37,59 +41,48 @@ public class ScreenTransitioner : MonoBehaviour
         float time = TimeMarker - Time.realtimeSinceStartup;
 
         if (time > InBlackScreenTime + FADE_OUT_TIMER)
-            GameObject.Find(BlackScreenUI).GetComponent<CanvasGroup>().alpha += FADE_SPEED;
+            TransitionScreen.GetComponent<CanvasGroup>().alpha += FADE_SPEED;
 
         // Black screen period
         else if (time > FADE_OUT_TIMER)
-            GameObject.Find(BlackScreenUI).GetComponent<CanvasGroup>().alpha = 1;
+            TransitionScreen.GetComponent<CanvasGroup>().alpha = 1;
 
         else if (FadeChangesMade == 0)
         {
-            if (SwitchScenes)
+            switch (ChangeMode)
             {
-                if (ToScene >= 0 && IntMode) SceneManager.LoadScene(ToScene);
-                else if (ToSceneS != null && !ToSceneS.Equals("") && !IntMode) SceneManager.LoadScene(ToSceneS);
+                case SceneChangeModes.Remove:
+                    SceneManager.UnloadSceneAsync(TargetScene);
+                    break;
+                case SceneChangeModes.Change:
+                    SceneManager.LoadScene(TargetScene);
+                    break;
+                case SceneChangeModes.Add:
+                    SceneManager.LoadScene(TargetScene, LoadSceneMode.Additive);
+                    break;
             }
-            else TargetPlayer.transform.position = new Vector3(ToX, ToY);
             FadeChangesMade++;
         }
 
         else if (time > 0)
-            GameObject.Find(BlackScreenUI).GetComponent<CanvasGroup>().alpha -= FADE_SPEED;
+            TransitionScreen.GetComponent<CanvasGroup>().alpha -= FADE_SPEED;
 
         else if (time <= 0 && FadeChangesMade == 1)
             FadeOutEnd();
     }
 
-    public static void ChangeScene(int scene, float blackScreenTime, string transitionText)
+    public static void SetupComponents(string toScene, float inBlackScreenTime, SceneChangeModes changeMode, TransitionModes transitionMode)
     {
-        IntMode = true;
-        SwitchScenes = true;
-        ToScene = scene;
-        FadeInStart(blackScreenTime);
-    }
-    public static void ChangeScene(string scene, float blackScreenTime, string transitionText)
-    {
-        IntMode = false;
-        SwitchScenes = true;
-        ToSceneS = scene;
-        FadeInStart(blackScreenTime);
-    }
-
-    public static void ChangeLocation(float toX, float toY, MapPlayer targetPlayer, float blackScreenTime, string transitionText)
-    {
-        SwitchScenes = false;
-        ToX = toX;
-        ToY = toY;
-        TargetPlayer = targetPlayer;
-        FadeInStart(blackScreenTime);
+        TargetScene = toScene;
+        InBlackScreenTime = inBlackScreenTime;
+        ChangeMode = changeMode;
+        TransitionMode = transitionMode;
     }
 
     private static void FadeInStart(float blackScreenTime)
     {
         FadeChangesMade = 0;
         InBlackScreenTime = blackScreenTime;
-        GameObject.Find(BlackScreenUI).GetComponent<Canvas>().sortingOrder = 2;
         Time.timeScale = 0;
         TimeMarker = Time.realtimeSinceStartup + InBlackScreenTime + FADE_IN_TIMER + FADE_OUT_TIMER;
     }
@@ -97,8 +90,8 @@ public class ScreenTransitioner : MonoBehaviour
     private static void FadeOutEnd()
     {
         FadeChangesMade++;
-        GameObject.Find(BlackScreenUI).GetComponent<CanvasGroup>().alpha = 0;
+        TransitionScreen.GetComponent<CanvasGroup>().alpha = 0;
         Time.timeScale = 1;
-        ToScene = -1;
+        SceneManager.UnloadSceneAsync(SceneMaster.SCREEN_TRANSITION_SCENE);
     }
 }
