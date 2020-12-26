@@ -11,6 +11,7 @@ public class ScreenTransitioner : MonoBehaviour
     public enum SceneChangeModes { Remove, Change, Add }
     private static SceneChangeModes ChangeMode;
 
+    private static string SourceScene;
     private static string TargetScene;
     private static GameObject TransitionScreen;
 
@@ -55,7 +56,8 @@ public class ScreenTransitioner : MonoBehaviour
                     SceneManager.UnloadSceneAsync(TargetScene);
                     break;
                 case SceneChangeModes.Change:
-                    SceneManager.LoadScene(TargetScene);
+                    SceneManager.UnloadSceneAsync(SourceScene);
+                    SceneManager.LoadScene(TargetScene, LoadSceneMode.Additive);
                     break;
                 case SceneChangeModes.Add:
                     SceneManager.LoadScene(TargetScene, LoadSceneMode.Additive);
@@ -71,8 +73,9 @@ public class ScreenTransitioner : MonoBehaviour
             FadeOutEnd();
     }
 
-    public static void SetupComponents(string toScene, float inBlackScreenTime, SceneChangeModes changeMode, TransitionModes transitionMode)
+    public static void SetupComponents(string fromScene, string toScene, float inBlackScreenTime, SceneChangeModes changeMode, TransitionModes transitionMode)
     {
+        SourceScene = fromScene;
         TargetScene = toScene;
         InBlackScreenTime = inBlackScreenTime;
         ChangeMode = changeMode;

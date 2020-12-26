@@ -57,6 +57,7 @@ public class PlayerParty : MonoBehaviour
     {
         for (int i = 0; i < AllPlayers.Count; i++)
         {
+            AllPlayers[i].Relations = new List<PlayerCompanionship>();
             for (int j = 0; j < AllPlayers.Count; j++)
             {
                 if (i == j)
@@ -136,5 +137,8 @@ public class PlayerParty : MonoBehaviour
             if (i < AllPlayers.Count) AllPlayers[i] = all[i] as BattlePlayer;
             else Allies[i - AllPlayers.Count] = all[i] as BattleAlly;
         }
+        UpdateActivePlayers();
+        SetupExpCurve();
+        SetupCompanionships();
     }
 }

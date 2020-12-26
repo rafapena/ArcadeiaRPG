@@ -22,6 +22,7 @@ public class BattleWin : MonoBehaviour
     // Selection management
     private Selections Selection;
     private string KeyPressed;
+    private bool ExitingBattle;
 
     // Loading + Animating
     private float DisableTime;
@@ -294,6 +295,8 @@ public class BattleWin : MonoBehaviour
 
     public void ExitBattle()
     {
+        if (ExitingBattle) return;
+        ExitingBattle = true;
         SceneMaster.EndBattle(FinishedBattle.PlayerParty);
     }
 }

@@ -10,10 +10,21 @@ public class MainMenu : MonoBehaviour
         if (OpeningMusic) OpeningMusic.Play();
     }
 
-    public void PlayGame()
+    public void StartNew()
     {
         ButtonClickSFX.Play();
-        //ScreenFadeManager.ChangeScene((int)Globals.Scenes.CIntro, 2, "");
-        SceneMaster.ChangeScene("Testland", 2f);
+        SceneMaster.ChangeScene("Testland1", 2f);
+    }
+
+    public void Continue()
+    {
+        ButtonClickSFX.Play();
+        SceneMaster.OpenFileSelect(FileSelect.FileMode.Load, null);
+    }
+
+    public void ExitGame()
+    {
+        ButtonClickSFX.Play();
+        Application.Quit();
     }
 }
