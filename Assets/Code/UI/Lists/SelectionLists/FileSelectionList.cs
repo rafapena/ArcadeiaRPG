@@ -11,64 +11,70 @@ using System.Collections.Generic;
 /// - Content gameobject is inside a ScrollRect's viewport, which carries the entries
 /// - Needs at least one entry has a ListSelectable object attached to it, with an explicit navigation set up
 /// </summary>
-public class FileSelectionList : SelectionList_Super<Battler>
+public class FileSelectionList : SelectionList_Super<SaveData>
 {
-    public void Setup<T>(List<T> dataList) where T : Battler
+    public static GameObject HighlightedButtonAfterUndo;
+    private bool SelectedFinal;
+    public int TotalNumberOfFiles;
+    public string EmptyText;
+
+    public void Setup()
     {
-        ReferenceData = new List<Battler>();
-        int i = 0;
-        foreach (T dataEntry in dataList)
+        ReferenceData = new List<SaveData>();
+        GameObject go = transform.GetChild(0).gameObject;
+        EventSystem.current.SetSelectedGameObject(go);
+        for (int i = transform.childCount; i < TotalNumberOfFiles; i++)
         {
-            GameObject entry;
-            if (i < transform.childCount)
-            {
-                // Set box entry to visible as it already exists in the table
-                entry = transform.GetChild(i).gameObject;
-                entry.SetActive(true);
-            }
-            else
-            {
-                // Allocate new space for new box entries the table will be adding
-                entry = Instantiate(transform.GetChild(0).gameObject, transform);
-                entry.GetComponent<Button>().navigation = new Navigation() { mode = Navigation.Mode.Explicit };
-                SetVerticalPointer(transform.GetChild(i - 1), entry.transform);
-                DuplicateHorizontalPointers(transform.GetChild(i - 1), entry.transform);
-            }
-            AddToList(entry.transform, dataEntry);
+            GameObject entry = Instantiate(go, transform);
+            entry.GetComponent<Button>().navigation = new Navigation() { mode = Navigation.Mode.Explicit };
+            SetVerticalPointer(transform.GetChild(i - 1), entry.transform);
             ListSelectable e = entry.GetComponent<ListSelectable>();
-            if (i % 2 == 1) e.SetMainAlpha(ENTRY_ALTERNATE_ALPHA);
             e.Index = i;
             e.ClearHighlights();
-            i++;
         }
-
-        // If there are excess blank rows, make them invisible
-        for (; i < transform.childCount; i++)
-            transform.GetChild(i).gameObject.SetActive(false);
-    }
-
-    private void AddToList<T>(Transform entry, T dataEntry) where T : Battler
-    {
-        ReferenceData.Add(dataEntry);
-        entry.GetChild(0).GetComponent<Image>().sprite = dataEntry.MainImage;
-        entry.GetChild(1).GetComponent<TextMeshProUGUI>().text = dataEntry.Name.ToUpper();
-        entry.GetChild(2).GetComponent<TextMeshProUGUI>().text = dataEntry.Class.Name.ToUpper();
-        entry.GetChild(3).GetComponent<Gauge>().Set(dataEntry.HP, dataEntry.Stats.MaxHP);
-        entry.GetChild(4).GetComponent<Gauge>().Set(dataEntry.SP, 100);
-        AddStates(entry, dataEntry);
-        if (entry.childCount > 6) entry.GetChild(6).gameObject.SetActive(false);
-    }
-
-    private void AddStates<T>(Transform entry, T teammate) where T : Battler
-    {
-        Transform statesGO = entry.GetChild(5).transform;
-        int limit = teammate.States.Count < statesGO.childCount ? teammate.States.Count : statesGO.childCount;
-        int i = 0;
-        for (; i < limit; i++)
+        for (int i = 0; i < TotalNumberOfFiles; i++)
         {
-            statesGO.GetChild(i).gameObject.SetActive(true);
-            statesGO.GetChild(i).GetComponent<Image>().sprite = teammate.States[i].GetComponent<Image>().sprite;
+            SaveData data = new SaveData(i);
+            if (data.FileExists) SetFileContent(data, i);
+            else SetEmptyFile(i);
+            ReferenceData.Add(data);
         }
-        for (; i < statesGO.childCount; i++) statesGO.GetChild(i).gameObject.SetActive(false);
+    }
+
+    public void SetFileContent(SaveData data, int i)
+    {
+        transform.GetChild(i).GetChild(0).GetComponent<TextMeshProUGUI>().text = "File " + (i + 1);
+        transform.GetChild(i).GetChild(1).GetComponent<TextMeshProUGUI>().text = data.PlayerName;
+    }
+
+    public void SetEmptyFile(int i)
+    {
+        transform.GetChild(i).GetChild(0).GetComponent<TextMeshProUGUI>().text = EmptyText;
+        transform.GetChild(i).GetChild(1).GetComponent<TextMeshProUGUI>().text = "";
+    }
+
+    private void OnDestroy()
+    {
+        if (HighlightedButtonAfterUndo) EventSystem.current.SetSelectedGameObject(HighlightedButtonAfterUndo);
+        HighlightedButtonAfterUndo = null;
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// -- Browsing Through List --
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public override void ResetSelected()
+    {
+        if (ReferenceData.Count > 0) base.ResetSelected();
+    }
+
+    public override void SetSelected()
+    {
+        if (ReferenceData.Count > 0) base.SetSelected();
+    }
+
+    public override void SetSelected(int index)
+    {
+        if (ReferenceData.Count > 0) base.SetSelected(index);
     }
 }

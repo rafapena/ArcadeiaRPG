@@ -5,10 +5,10 @@ using UnityEditor.PackageManager;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class GameplayMaster : MonoBehaviour
+public class InputMaster : MonoBehaviour
 {
-    public enum Difficulties { Easy, Medium, Hard, Lunatic }
-    public static Difficulties Difficulty;
-
-    public static int SelectedFile;
+    public static bool GoingBack()
+    {
+        return Input.GetKeyDown(KeyCode.X) || Input.GetMouseButtonDown(1);
+    }
 }

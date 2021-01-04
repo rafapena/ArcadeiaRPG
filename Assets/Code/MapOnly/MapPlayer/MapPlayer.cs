@@ -17,7 +17,13 @@ public class MapPlayer : MapExplorer
     protected override void Start()
     {
         base.Start();
-        TEST_SETUP();
+        SetupParty();
+        //TEST_SETUP();
+    }
+
+    private void SetupParty()
+    {
+
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

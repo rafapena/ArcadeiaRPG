@@ -34,8 +34,7 @@ public class MapMenuManager : MonoBehaviour
 
     private void Update()
     {
-        bool goingBack = Input.GetKeyDown(KeyCode.X) || Input.GetMouseButtonDown(1);
-        if (goingBack)
+        if (InputMaster.GoingBack())
         {
             if (Main.MainComponent.Activated) Main.GoBack();
             else if (Inventory.MainComponent.Activated) Inventory.GoBack();
