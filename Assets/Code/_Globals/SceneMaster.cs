@@ -7,7 +7,8 @@ using UnityEngine.SceneManagement;
 
 public class SceneMaster : MonoBehaviour
 {
-    public static bool InMapMenu = false;
+    private static bool InMapMenu = false;
+    private static bool InFileSelectMenu = false;
     public static bool InBattle = false;
     public static List<GameObject> StoredMapScene;
 
@@ -29,6 +30,7 @@ public class SceneMaster : MonoBehaviour
 
     public static void StartBattle(PlayerParty playerParty, EnemyParty enemyParty)
     {
+        InBattle = true;
         BattleMaster.Setup(null, playerParty, enemyParty);
         StoreGameObjects();
         ChangeScene(BATTLE_SCENE, BATTLE_TRANSITION_TIME, ScreenTransitioner.SceneChangeModes.Add, ScreenTransitioner.TransitionModes.Batte);
@@ -38,6 +40,7 @@ public class SceneMaster : MonoBehaviour
     {
         ChangeScene(BATTLE_SCENE, BATTLE_TRANSITION_TIME / 2, ScreenTransitioner.SceneChangeModes.Remove, ScreenTransitioner.TransitionModes.BlackScreen);
         MapMaster.EnemyEncountered.DeclareDefeated();
+        InBattle = false;
     }
 
     public static void OpenMenu(PlayerParty playerParty)
@@ -58,15 +61,17 @@ public class SceneMaster : MonoBehaviour
 
     public static void OpenFileSelect(FileSelect.FileMode fileMode, PlayerParty playerParty = null)
     {
-        if (MenuMaster.PartyInfo) MenuMaster.PartyInfo = playerParty;
+        if (!MenuMaster.PartyInfo) MenuMaster.PartyInfo = playerParty;
         FileSelect.FileSelectMode = fileMode;
         SceneManager.LoadScene(FILE_SELECT_MENU_SCENE, LoadSceneMode.Additive);
+        InFileSelectMenu = true;
         Time.timeScale = 0;
     }
 
     public static void CloseFileSelect()
     {
         SceneManager.UnloadSceneAsync(FILE_SELECT_MENU_SCENE);
+        InFileSelectMenu = false;
         Time.timeScale = 1;
     }
 
@@ -87,5 +92,10 @@ public class SceneMaster : MonoBehaviour
     {
         foreach (GameObject g in StoredMapScene)
             if (g) g.SetActive(false);
+    }
+
+    public static bool InMenu()
+    {
+        return InMapMenu || InFileSelectMenu;
     }
 }

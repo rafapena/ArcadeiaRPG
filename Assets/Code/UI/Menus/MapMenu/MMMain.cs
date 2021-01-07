@@ -11,6 +11,7 @@ public class MMMain : MM_Super
     public GameObject ButtonList;
     public MenuFrame InfoSection;
     public PlayerSelectionList PartyList;
+    public GameObject TeamButton;
 
     // UI Elements
     public TextMeshProUGUI Time;
@@ -28,6 +29,7 @@ public class MMMain : MM_Super
         Level.text = MenuManager.PartyInfo.Level.ToString();
         SetupEXPInfo();
         PartyList.Setup(MenuManager.PartyInfo.Players);
+        if (MenuManager.PartyInfo.AllPlayers.Count <= 4) MenuMaster.DisableSelection(ref TeamButton);
     }
 
     public override void Close()
@@ -59,6 +61,6 @@ public class MMMain : MM_Super
     protected override void Update()
     {
         base.Update();
-        Time.text = "12:00 PM";
+        Time.text = GameplayMaster.GetInGameTime();
     }
 }

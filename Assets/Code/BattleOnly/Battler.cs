@@ -17,6 +17,8 @@ public abstract class Battler : BaseObject
     public VerticalPositions RowPosition;
     public HorizontalPositions ColumnPosition;
 
+    public Rigidbody2D Figure;
+
     // General battler data
     public Sprite MainImage;
     public int Level = 1;
@@ -78,6 +80,7 @@ public abstract class Battler : BaseObject
     protected virtual void Awake()
     {
         Properties = transform.GetChild(0).transform;
+        Figure = gameObject.GetComponent<Rigidbody2D>();
         MainLocation = transform.position;
         SetupElementRates();
     }

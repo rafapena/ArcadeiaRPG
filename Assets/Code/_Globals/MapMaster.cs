@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class MapMaster
 {
+    public static string CurrentLocation;
     public static int Elevation;
     public static MapEnemy EnemyEncountered;
 }

@@ -19,6 +19,9 @@ public class MainMenu : MonoBehaviour
 
     private void Start()
     {
+        // TEST SETUP
+        //PlayerPrefs.DeleteAll();
+
         if (OpeningMusic) OpeningMusic.Play();
         CheckSaves();
         EventSystem.current.SetSelectedGameObject(NewGameButton);
@@ -39,14 +42,15 @@ public class MainMenu : MonoBehaviour
     public void Continue()
     {
         ButtonClickSFX.Play();
-        RetrieveLatestGameLoaded();
+        SaveData data = new SaveData(GameplayMaster.GetLastManagedFile());
+        data.LoadGame();
     }
 
     public void SwitchFiles()
     {
         ButtonClickSFX.Play();
         FileSelectionList.HighlightedButtonAfterUndo = EventSystem.current.currentSelectedGameObject;
-        SceneMaster.OpenFileSelect(FileSelect.FileMode.Load, null);
+        SceneMaster.OpenFileSelect(FileSelect.FileMode.Load);
     }
 
     public void ExitGame()
@@ -55,24 +59,27 @@ public class MainMenu : MonoBehaviour
         Application.Quit();
     }
 
-    public void RetrieveLatestGameLoaded()
-    {
-        //
-    }
-
     public void CheckSaves()
     {
-        Color c = Color.white;
-        c.a = 0.2f;
-        ContinueButton.GetComponent<Button>().interactable = false;
-        ContinueButton.transform.GetChild(0).GetComponent<TextMeshProUGUI>().color = c;
-        SwitchFilesButton.GetComponent<Button>().interactable = false;
-        SwitchFilesButton.transform.GetChild(0).GetComponent<TextMeshProUGUI>().color = c;
+        bool fileExists = false;
+        for (int i = 0; i < 100; i++)
+        {
+            SaveData s = new SaveData(i);
+            if (!s.FileDataExists) continue;
+            fileExists = true;
+            break;
+        }
+        if (!fileExists)
+        {
+            MenuMaster.DisableSelection(ref ContinueButton);
+            MenuMaster.DisableSelection(ref SwitchFilesButton);
+        }
     }
 
-    private void StartGame()
+    private void StartNewGame()
     {
-        GameplayMaster.SelectedFile = 0;
+        GameplayMaster.SelectedFile = -1;
+        SaveData.SetupForNewGame();
         SceneMaster.ChangeScene("Testland1", 2f);
     }
 
@@ -117,7 +124,7 @@ public class MainMenu : MonoBehaviour
                 break;
         }
         SelectedFinal = true;
-        StartGame();
+        StartNewGame();
     }
 
     public void UndoDifficultySelect()

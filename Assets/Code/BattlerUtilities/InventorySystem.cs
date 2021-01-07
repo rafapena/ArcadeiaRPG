@@ -114,7 +114,6 @@ public class InventorySystem : MonoBehaviour
     private T AddInventoryTool<T>(ref List<T> toolList, T newTool) where T : ToolForInventory
     {
         CarryWeight += newTool.Weight;
-        newTool.gameObject.GetComponent<Renderer>().enabled = false;
         bool toolFound = false;
         foreach (T t in toolList)
         {
@@ -125,8 +124,10 @@ public class InventorySystem : MonoBehaviour
         }
         if (!toolFound)
         {
-            newTool = Instantiate(newTool, gameObject.transform);
+            MapPlayer p = gameObject.GetComponent<MapPlayer>();
+            newTool = Instantiate(newTool, (p ? p.ItemsListDump : null));
             newTool.Quantity = 1;
+            newTool.gameObject.GetComponent<Renderer>().enabled = false;
             toolList.Add(newTool);
         }
         return newTool;

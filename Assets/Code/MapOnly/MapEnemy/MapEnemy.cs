@@ -28,10 +28,12 @@ public class MapEnemy : MapExplorer
         }
         base.Update();
         if (gameObject.layer == NON_COLLIDABLE_EXPLORER_LAYER && !IsBlinking()) gameObject.layer = ENEMY_LAYER;
-        if (DetectTime > Time.time) return;
-        else if (ChasingPlayer) ChasePlayer();
-        else WanderAround();
-        transform.position += Movement * Time.deltaTime * Speed;
+        if (DetectTime < Time.time)
+        {
+            if (ChasingPlayer) ChasePlayer();
+            else WanderAround();
+        }
+        Figure.velocity = Movement * Speed;
     }
 
     protected override void AnimateDirection()
@@ -70,6 +72,7 @@ public class MapEnemy : MapExplorer
     public void GoAfterPlayer()
     {
         if (ChasingPlayer) return;
+        Movement = Vector3.zero;
         DetectTime = Time.time + 1f;
         ChasingPlayer = true;
     }

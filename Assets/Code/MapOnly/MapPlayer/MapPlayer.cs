@@ -8,6 +8,9 @@ public class MapPlayer : MapExplorer
     private int Mode;
 
     public PlayerParty Party;
+    public Transform BattlersListDump;
+    public Transform ItemsListDump;
+    public Transform ObjectivesListDump;
 
     protected override void Awake()
     {
@@ -17,13 +20,61 @@ public class MapPlayer : MapExplorer
     protected override void Start()
     {
         base.Start();
-        SetupParty();
-        //TEST_SETUP();
+        if (GameplayMaster.SelectedFile == 0) TEST_SETUP();
+        else if (GameplayMaster.NoFileSelected()) SetupPartyNew();
+        else SetupPartyContinue();
     }
 
-    private void SetupParty()
+    private void SetupPartyNew()
     {
+        List<Battler> all = Party.GetWholeParty();
+        for (int i = 0; i < all.Count; i++)
+        {
+            all[i] = Instantiate(all[i], BattlersListDump);
+            Battler b = all[i];
+            b.transform.parent = BattlersListDump;
+            b.Level = Party.Level;
+            b.StatConversion();
+            b.gameObject.SetActive(false);
+        }
+        Party.UpdateAll(all);
+        for (int i = 0; i < Party.LoggedObjectives.Count; i++)
+        {
+            Party.LoggedObjectives[i] = Instantiate(Party.LoggedObjectives[i], ObjectivesListDump);
+        }
+    }
 
+    private void SetupPartyContinue()
+    {
+        List<Battler> all = Party.GetWholeParty();
+        for (int i = 0; i < all.Count; i++)
+        {
+            all[i] = Instantiate(all[i], gameObject.transform);
+            Battler b = all[i];
+            b.Level = Party.Level;
+            if (b.Weapons.Count > 0) b.SelectedWeapon = b.Weapons[0];
+            b.StatConversion();
+            b.HP = b.Stats.MaxHP;
+            b.SP = 100;
+            b.gameObject.SetActive(false);
+            if (b.GetType().Name == "BattlePlayer")
+            {
+                BattlePlayer p = all[i] as BattlePlayer;
+                p.AddLearnedSkills();
+                p.MapUsableSkills = new List<SoloSkill>();
+                foreach (SoloSkill s in p.SoloSkills)
+                    if (s.CanUseOutsideOfBattle) p.MapUsableSkills.Add(s);
+            }
+            for (int j = 0; j < b.SoloSkills.Count; j++) b.SoloSkills[j] = Instantiate(b.SoloSkills[j], b.transform);
+            for (int j = 0; j < b.TeamSkills.Count; j++) b.TeamSkills[j] = Instantiate(b.TeamSkills[j], b.transform);
+            for (int j = 0; j < b.Weapons.Count; j++) b.Weapons[j] = Instantiate(b.Weapons[j], b.transform);
+            for (int j = 0; j < b.Items.Count; j++) b.Items[j] = Instantiate(b.Items[j], b.transform);
+            for (int j = 0; j < b.PassiveSkills.Count; j++) b.PassiveSkills[j] = Instantiate(b.PassiveSkills[j], b.transform);
+            for (int j = 0; j < b.States.Count; j++) b.States[j] = Instantiate(b.States[j], b.transform);
+        }
+        Party.UpdateAll(all);
+        for (int i = 0; i < Party.LoggedObjectives.Count; i++)
+            Party.LoggedObjectives[i] = Instantiate(Party.LoggedObjectives[i], gameObject.transform);
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -54,7 +105,7 @@ public class MapPlayer : MapExplorer
                 b.SoloSkills[j] = Instantiate(b.SoloSkills[j], b.transform);
                 //b.SoloSkills[j].DisableForWarmup();
             }
-            for (int j = 0; j < b.TeamSkills.Count;j++)
+            for (int j = 0; j < b.TeamSkills.Count; j++)
             {
                 b.TeamSkills[j] = Instantiate(b.TeamSkills[j], b.transform);
                 //b.TeamSkills[j].DisableForWarmup();
@@ -75,12 +126,13 @@ public class MapPlayer : MapExplorer
 
     protected override void Update()
     {
-        if (SceneMaster.InMapMenu) return;      // Player input should not work, while in the menu
-        if (Input.GetKeyDown(KeyCode.Space)) SceneMaster.OpenMenu(Party);
+        if (SceneMaster.InMenu()) return;      // Player input should not work, while in the menu
+        if (Input.GetKeyDown(KeyCode.Q)) SceneMaster.OpenFileSelect(FileSelect.FileMode.Save, Party);
+        if (Input.GetKeyDown(KeyCode.Space) && !SceneMaster.InBattle) SceneMaster.OpenMenu(Party);
         base.Update();
         if (gameObject.layer == NON_COLLIDABLE_EXPLORER_LAYER && !IsBlinking()) gameObject.layer = PLAYER_LAYER;
         Movement = new Vector3(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
-        transform.position += Movement * Speed * Time.deltaTime;
+        Figure.velocity = Movement * Speed;
         AnimateDirection();
     }
 

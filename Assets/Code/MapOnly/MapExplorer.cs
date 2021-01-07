@@ -7,6 +7,7 @@ public abstract class MapExplorer : MonoBehaviour
     public const int PLAYER_LAYER = 9;
     public const int ENEMY_LAYER = 10;
 
+    public Rigidbody2D Figure;
     protected Vector3 Movement;
     public float Speed;
 
@@ -14,6 +15,7 @@ public abstract class MapExplorer : MonoBehaviour
 
     protected virtual void Awake()
     {
+        Figure = gameObject.GetComponent<Rigidbody2D>();
         Physics2D.IgnoreLayerCollision(PLAYER_LAYER, NON_COLLIDABLE_EXPLORER_LAYER);
         Physics2D.IgnoreLayerCollision(ENEMY_LAYER, NON_COLLIDABLE_EXPLORER_LAYER);
     }

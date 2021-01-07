@@ -50,7 +50,7 @@ public class PlayerParty : MonoBehaviour
             LevelCurves[i] = LevelCurves[i - 1] + i * 100;
         LastEXPToNext = Level <= 1 ? 0 : LevelCurves[Level - 1];
         EXPToNext = LevelCurves[Level];
-        EXP = LastEXPToNext + 10;
+        EXP = LastEXPToNext;
     }
 
     private void SetupCompanionships()

@@ -34,8 +34,8 @@ public class FileSelectionList : SelectionList_Super<SaveData>
         }
         for (int i = 0; i < TotalNumberOfFiles; i++)
         {
-            SaveData data = new SaveData(i);
-            if (data.FileExists) SetFileContent(data, i);
+            SaveData data = new SaveData(i + 1);
+            if (data.FileDataExists) SetFileContent(data, i);
             else SetEmptyFile(i);
             ReferenceData.Add(data);
         }
