@@ -1,4 +1,7 @@
-﻿using UnityEngine;
+﻿using System;
+using TMPro;
+using UnityEngine;
+using UnityEngine.UI;
 
 public class ItemBox : MonoBehaviour
 {
@@ -6,6 +9,7 @@ public class ItemBox : MonoBehaviour
     public ToolForInventory[] StoredTools;
     public Sprite OpenedSprite;
     private bool Opened;
+    [HideInInspector] public MapPlayer ClosingPlayer;
 
     public GameObject UIPopup;
     private float UIPopupTimer;
@@ -24,10 +28,8 @@ public class ItemBox : MonoBehaviour
     public void Open(MapPlayer opener)
     {
         if (Opened) return;
-        Opened = true;
-        UIPopup.SetActive(true);
-        UIPopupTimer = Time.unscaledTime + UIPopupTimeLimit;
-        gameObject.GetComponent<SpriteRenderer>().sprite = OpenedSprite;
+        SetOpen();
+        DisplayObtainedTools();
         foreach (ToolForInventory t in StoredTools)
         {
             Item it = t as Item;
@@ -40,5 +42,22 @@ public class ItemBox : MonoBehaviour
     public void SetOpen()
     {
         Opened = true;
+        gameObject.GetComponent<SpriteRenderer>().sprite = OpenedSprite;
+    }
+
+    public void DisplayObtainedTools()
+    {
+        UIPopup.SetActive(true);
+        UIPopupTimer = Time.unscaledTime + UIPopupTimeLimit;
+        Transform list = UIPopup.transform.GetChild(0);
+        int limit = Math.Min(StoredTools.Length, 3);
+        int i = 0;
+        for (; i < limit; i++)
+        {
+            Transform it = list.GetChild(i);
+            it.GetChild(0).GetComponent<TextMeshProUGUI>().text = StoredTools[i].Name;
+            it.GetChild(1).GetComponent<Image>().sprite = StoredTools[i].GetComponent<SpriteRenderer>().sprite;
+        }
+        for (; i < list.childCount; i++) list.GetChild(i).gameObject.SetActive(false);
     }
 }

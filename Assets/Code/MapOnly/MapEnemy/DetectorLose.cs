@@ -2,10 +2,15 @@
 
 public class DetectorLose : MonoBehaviour
 {
+    private MapEnemy Avatar;
+
+    private void Awake()
+    {
+        Avatar = gameObject.GetComponentInParent<MapEnemy>();
+    }
+
     void OnTriggerExit2D(Collider2D collider)
     {
-        MapEnemy e = gameObject.GetComponentInParent<MapEnemy>();
-        MapPlayer p = collider.gameObject.GetComponent<MapPlayer>();
-        if (e && p) e.StopGoingAfterPlayer();
+        if (collider.gameObject.tag == "Player") Avatar.StopGoingAfterPlayer();
     }
 }
