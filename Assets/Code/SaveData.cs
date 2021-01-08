@@ -73,4 +73,9 @@ public class SaveData
         GameplayMaster.TotalPlayTime = 0;
         GameplayMaster.SetInGameTime(20, 0);
     }
+
+    private void SetupPrefabLists()
+    {
+        //
+    }
 }

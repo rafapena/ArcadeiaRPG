@@ -8,11 +8,13 @@ using UnityEngine.SceneManagement;
 public class SceneMaster : MonoBehaviour
 {
     private static bool InMapMenu = false;
+    private static bool InPauseMenu = false;
     private static bool InFileSelectMenu = false;
     public static bool InBattle = false;
     public static List<GameObject> StoredMapScene;
 
     public const string MAP_MENU_SCENE = "MapMenu";
+    public const string PAUSE_MENU_SCENE = "PauseMenu";
     public const string FILE_SELECT_MENU_SCENE = "FileSelect";
     public const string BATTLE_SCENE = "Battle";
     public const string SCREEN_TRANSITION_SCENE = "ScreenTransition";
@@ -43,7 +45,7 @@ public class SceneMaster : MonoBehaviour
         InBattle = false;
     }
 
-    public static void OpenMenu(PlayerParty playerParty)
+    public static void OpenMapMenu(PlayerParty playerParty)
     {
         MenuMaster.PartyInfo = playerParty;
         SceneManager.LoadScene(MAP_MENU_SCENE, LoadSceneMode.Additive);
@@ -51,12 +53,28 @@ public class SceneMaster : MonoBehaviour
         Time.timeScale = 0;
     }
 
-    public static void CloseMenu(PlayerParty playerParty)
+    public static void CloseMapMenu(PlayerParty playerParty)
     {
         MenuMaster.PartyInfo = playerParty;
         SceneManager.UnloadSceneAsync(MAP_MENU_SCENE);
         InMapMenu = false;
-        Time.timeScale = 1;
+        if (!InMenu()) Time.timeScale = 1;
+    }
+
+    public static void OpenPauseMenu(PlayerParty playerParty)
+    {
+        MenuMaster.PartyInfo = playerParty;
+        SceneManager.LoadScene(PAUSE_MENU_SCENE, LoadSceneMode.Additive);
+        InPauseMenu = true;
+        Time.timeScale = 0;
+    }
+
+    public static void ClosePauseMenu(PlayerParty playerParty)
+    {
+        MenuMaster.PartyInfo = playerParty;
+        SceneManager.UnloadSceneAsync(PAUSE_MENU_SCENE);
+        InPauseMenu = false;
+        if (!InMenu()) Time.timeScale = 1;
     }
 
     public static void OpenFileSelect(FileSelect.FileMode fileMode, PlayerParty playerParty = null)
@@ -72,7 +90,7 @@ public class SceneMaster : MonoBehaviour
     {
         SceneManager.UnloadSceneAsync(FILE_SELECT_MENU_SCENE);
         InFileSelectMenu = false;
-        Time.timeScale = 1;
+        if (!InMenu()) Time.timeScale = 1;
     }
 
     public static void StoreGameObjects()
@@ -96,6 +114,6 @@ public class SceneMaster : MonoBehaviour
 
     public static bool InMenu()
     {
-        return InMapMenu || InFileSelectMenu;
+        return InMapMenu || InPauseMenu || InFileSelectMenu;
     }
 }

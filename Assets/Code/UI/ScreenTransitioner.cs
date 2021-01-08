@@ -15,6 +15,7 @@ public class ScreenTransitioner : MonoBehaviour
     private static string TargetScene;
     private static GameObject TransitionScreen;
 
+    private bool SceneUpdated;
     private static float InBlackScreenTime;
     private static float TimeMarker;
     private static int FadeChangesMade;
@@ -46,25 +47,29 @@ public class ScreenTransitioner : MonoBehaviour
 
         // Black screen period
         else if (time > FADE_OUT_TIMER)
+        {
             TransitionScreen.GetComponent<CanvasGroup>().alpha = 1;
+            if (!SceneUpdated)
+            {
+                SceneUpdated = true;
+                switch (ChangeMode)
+                {
+                    case SceneChangeModes.Remove:
+                        SceneManager.UnloadSceneAsync(TargetScene);
+                        break;
+                    case SceneChangeModes.Change:
+                        SceneManager.UnloadSceneAsync(SourceScene);
+                        SceneManager.LoadScene(TargetScene, LoadSceneMode.Additive);
+                        break;
+                    case SceneChangeModes.Add:
+                        SceneManager.LoadScene(TargetScene, LoadSceneMode.Additive);
+                        break;
+                }
+            }
+        }
 
         else if (FadeChangesMade == 0)
-        {
-            switch (ChangeMode)
-            {
-                case SceneChangeModes.Remove:
-                    SceneManager.UnloadSceneAsync(TargetScene);
-                    break;
-                case SceneChangeModes.Change:
-                    SceneManager.UnloadSceneAsync(SourceScene);
-                    SceneManager.LoadScene(TargetScene, LoadSceneMode.Additive);
-                    break;
-                case SceneChangeModes.Add:
-                    SceneManager.LoadScene(TargetScene, LoadSceneMode.Additive);
-                    break;
-            }
             FadeChangesMade++;
-        }
 
         else if (time > 0)
             TransitionScreen.GetComponent<CanvasGroup>().alpha -= FADE_SPEED;
@@ -93,8 +98,8 @@ public class ScreenTransitioner : MonoBehaviour
     private static void FadeOutEnd()
     {
         FadeChangesMade++;
-        TransitionScreen.GetComponent<CanvasGroup>().alpha = 0;
         Time.timeScale = 1;
+        TransitionScreen.GetComponent<CanvasGroup>().alpha = 0;
         SceneManager.UnloadSceneAsync(SceneMaster.SCREEN_TRANSITION_SCENE);
     }
 }

@@ -127,8 +127,12 @@ public class MapPlayer : MapExplorer
     protected override void Update()
     {
         if (SceneMaster.InMenu()) return;      // Player input should not work, while in the menu
-        if (Input.GetKeyDown(KeyCode.Q)) SceneMaster.OpenFileSelect(FileSelect.FileMode.Save, Party);
-        if (Input.GetKeyDown(KeyCode.Space) && !SceneMaster.InBattle) SceneMaster.OpenMenu(Party);
+        if (!SceneMaster.InBattle)
+        {
+            if (Input.GetKeyDown(KeyCode.Q)) SceneMaster.OpenFileSelect(FileSelect.FileMode.Save, Party);
+            else if (InputMaster.MapMenu()) SceneMaster.OpenMapMenu(Party);
+            else if (InputMaster.Pause()) SceneMaster.OpenPauseMenu(Party);
+        }
         base.Update();
         if (gameObject.layer == NON_COLLIDABLE_EXPLORER_LAYER && !IsBlinking()) gameObject.layer = PLAYER_LAYER;
         Movement = new Vector3(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));

@@ -2209,6 +2209,7 @@ GameObject:
   - component: {fileID: 965368534}
   - component: {fileID: 965368533}
   - component: {fileID: 965368531}
+  - component: {fileID: 965368532}
   m_Layer: 5
   m_Name: SelectionFrame
   m_TagString: Untagged
@@ -2251,6 +2252,21 @@ MonoBehaviour:
   m_EffectColor: {r: 1, g: 1, b: 1, a: 0.5}
   m_EffectDistance: {x: 1, y: -1}
   m_UseGraphicAlpha: 1
+--- !u!114 &965368532
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 965368529}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5cfd9532d908a1543a8c0453b8b10a68, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  ComeFrom: 3
+  ApproachSpeed: 1
+  Flexible: 0
 --- !u!114 &965368533
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3920,6 +3936,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   OpeningMusic: {fileID: 1524990361}
   ButtonClickSFX: {fileID: 1053914154}
+  SelectionFrame: {fileID: 965368532}
   NewGameButton: {fileID: 110093225}
   ContinueButton: {fileID: 1468353396}
   SwitchFilesButton: {fileID: 743186921}
@@ -3927,6 +3944,7 @@ MonoBehaviour:
   DifficultyFrame: {fileID: 1550114360}
   DifficultyList: {fileID: 672856872}
   DifficultyDescriptions: {fileID: 222630959}
+  IntroTime: 1
 --- !u!1 &1745159314
 GameObject:
   m_ObjectHideFlags: 0

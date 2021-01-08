@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -6,10 +7,10 @@ using UnityEngine.UI;
 
 public class FileSelect : MonoBehaviour
 {
-    public enum FileMode { Save, Load, Delete }
+    public enum FileMode { Save, LoadOrDelete }
     public static FileMode FileSelectMode;
 
-    public enum Selections { Files, OverwriteConfirm, DeleteConfirm, Waiting, Success }
+    public enum Selections { Files, OverwriteConfirm, SelectFileMode, DeleteConfirm, Waiting, Success }
     private Selections Selection;
 
     public MenuFrame MainFrame;
@@ -52,11 +53,8 @@ public class FileSelect : MonoBehaviour
             case FileMode.Save:
                 ModeHeader.text = "SAVE GAME";
                 break;
-            case FileMode.Load:
+            case FileMode.LoadOrDelete:
                 ModeHeader.text = "LOAD GAME";
-                break;
-            case FileMode.Delete:
-                ModeHeader.text = "DELETE GAME";
                 break;
         }
     }
@@ -71,6 +69,9 @@ public class FileSelect : MonoBehaviour
                 break;
             case Selections.OverwriteConfirm:
                 if (goingBack) UndoOverwriteConfirm();
+                break;
+            case Selections.SelectFileMode:
+                if (goingBack) UndoLoadOrDelete();
                 break;
             case Selections.DeleteConfirm:
                 if (goingBack) UndoDeleteConfirm();
@@ -120,17 +121,18 @@ public class FileSelect : MonoBehaviour
     {
         if (Waiting()) return;
         bool selectedNonEmptyFile = SetupFileInfo();
+        FilesList.UnhighlightAll();
+        SelectModeFrame.SetActive(false);
+        DeleteConfirmationFrame.SetActive(false);
+        OverwriteConfirmationFrame.SetActive(false);
         switch (FileSelectMode)
         {
             case FileMode.Save:
                 if (selectedNonEmptyFile) SetupOverwriteConfirm();
                 else SaveGame();
                 break;
-            case FileMode.Load:
-                if (selectedNonEmptyFile) LoadGame();
-                break;
-            case FileMode.Delete:
-                if (selectedNonEmptyFile) SetupDeleteConfirm();
+            case FileMode.LoadOrDelete:
+                if (selectedNonEmptyFile) SetupLoadOrDelete();
                 break;
         }
     }
@@ -141,9 +143,10 @@ public class FileSelect : MonoBehaviour
 
     public void SetupLoadOrDelete()
     {
-        //Selection = Selections.LoadOrDelete;
+        Selection = Selections.SelectFileMode;
         SelectModeFrame.SetActive(true);
-        EventSystem.current.SetSelectedGameObject(transform.GetChild(1).gameObject);
+        FilesList.SelectedButton.KeepSelected();
+        EventSystem.current.SetSelectedGameObject(SelectModeFrame.transform.GetChild(0).gameObject);
     }
 
     public void UndoLoadOrDelete()
@@ -162,15 +165,17 @@ public class FileSelect : MonoBehaviour
     public void SetupDeleteConfirm()
     {
         Selection = Selections.DeleteConfirm;
+        SelectModeFrame.SetActive(false);
         DeleteConfirmationFrame.SetActive(true);
         DeleteConfirmationFrame.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "DELETE\nFILE " + FilesList.SelectedObject.FileNumber + "?";
         FilesList.SelectedButton.KeepSelected();
-        EventSystem.current.SetSelectedGameObject(transform.GetChild(1).gameObject);
+        EventSystem.current.SetSelectedGameObject(DeleteConfirmationFrame.transform.GetChild(1).gameObject);
     }
 
     public void UndoDeleteConfirm()
     {
         Selection = Selections.Files;
+        SelectModeFrame.SetActive(false);
         DeleteConfirmationFrame.SetActive(false);
         FilesList.UnhighlightAll();
         EventSystem.current.SetSelectedGameObject(FilesList.SelectedButton.gameObject);
@@ -205,6 +210,7 @@ public class FileSelect : MonoBehaviour
     {
         FilesList.SelectedObject.SaveGame();
         OverwriteConfirmationFrame.SetActive(false);
+        GameplayMaster.SelectedFile = FilesList.SelectedIndex + 1;
         AwaitWrite("Saving...");
     }
 
@@ -212,12 +218,14 @@ public class FileSelect : MonoBehaviour
     {
         FilesList.SelectedButton.KeepSelected();
         FilesList.SelectedObject.LoadGame();
+        GameplayMaster.SelectedFile = FilesList.SelectedIndex + 1;
         SceneMaster.CloseFileSelect();
     }
 
     public void DeleteGame()
     {
         FilesList.SelectedObject.DeleteGame();
+        SelectModeFrame.SetActive(false);
         DeleteConfirmationFrame.SetActive(false);
         AwaitWrite("Deleting...");
     }
@@ -253,7 +261,7 @@ public class FileSelect : MonoBehaviour
     public void DeclareSuccess()
     {
         Selection = Selections.Success;
-        WaitingFrame.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = (FileSelectMode == FileMode.Delete) ? "Deletion Successful" : "Save Successful";
+        WaitingFrame.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = (FileSelectMode == FileMode.LoadOrDelete) ? "Deletion Successful" : "Save Successful";
         SuccessWaitingTimer = Time.unscaledTime + SUCCESS_WAITING_TIMER_LIMIT;
         GameObject selected = FilesList.SelectedButton.gameObject;
         FilesList.Setup();

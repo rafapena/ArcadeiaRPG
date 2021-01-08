@@ -7,6 +7,7 @@ public class MainMenu : MonoBehaviour
 {
     public AudioSource OpeningMusic;
     public AudioSource ButtonClickSFX;
+    public MenuFrame SelectionFrame;
     public GameObject NewGameButton;
     public GameObject ContinueButton;
     public GameObject SwitchFilesButton;
@@ -17,19 +18,27 @@ public class MainMenu : MonoBehaviour
     public MenuFrame DifficultyDescriptions;
     private bool SelectedFinal;
 
+    private float IntroTimer;
+    public float IntroTime;
+
     private void Start()
     {
         // TEST SETUP
         //PlayerPrefs.DeleteAll();
 
+        IntroTimer = Time.time + IntroTime;
         if (OpeningMusic) OpeningMusic.Play();
         CheckSaves();
-        EventSystem.current.SetSelectedGameObject(NewGameButton);
         DifficultySelect.SetActive(false);
     }
 
     private void Update()
     {
+        if (!SelectionFrame.Activated && Time.time > IntroTimer)
+        {
+            SelectionFrame.Activate();
+            EventSystem.current.SetSelectedGameObject(NewGameButton);
+        }
         if (DifficultySelect.activeSelf && InputMaster.GoingBack()) UndoDifficultySelect();
     }
 
@@ -50,7 +59,7 @@ public class MainMenu : MonoBehaviour
     {
         ButtonClickSFX.Play();
         FileSelectionList.HighlightedButtonAfterUndo = EventSystem.current.currentSelectedGameObject;
-        SceneMaster.OpenFileSelect(FileSelect.FileMode.Load);
+        SceneMaster.OpenFileSelect(FileSelect.FileMode.LoadOrDelete);
     }
 
     public void ExitGame()

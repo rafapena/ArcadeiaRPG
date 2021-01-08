@@ -22,7 +22,6 @@ public class FileSelectionList : SelectionList_Super<SaveData>
     {
         ReferenceData = new List<SaveData>();
         GameObject go = transform.GetChild(0).gameObject;
-        EventSystem.current.SetSelectedGameObject(go);
         for (int i = transform.childCount; i < TotalNumberOfFiles; i++)
         {
             GameObject entry = Instantiate(go, transform);
@@ -39,6 +38,8 @@ public class FileSelectionList : SelectionList_Super<SaveData>
             else SetEmptyFile(i);
             ReferenceData.Add(data);
         }
+        int selectedFile = System.Math.Max(0, GameplayMaster.SelectedFile - 1);
+        EventSystem.current.SetSelectedGameObject(transform.GetChild(selectedFile).gameObject);
     }
 
     public void SetFileContent(SaveData data, int i)

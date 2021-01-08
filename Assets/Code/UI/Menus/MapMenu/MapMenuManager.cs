@@ -50,7 +50,7 @@ public class MapMenuManager : MonoBehaviour
     public void ExitAll()
     {
         CloseAll();
-        SceneMaster.CloseMenu(PartyInfo);
+        SceneMaster.CloseMapMenu(PartyInfo);
     }
 
     private void CloseAll()
