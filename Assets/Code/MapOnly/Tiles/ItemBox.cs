@@ -9,7 +9,7 @@ public class ItemBox : MonoBehaviour
     public ToolForInventory[] StoredTools;
     public Sprite OpenedSprite;
     private bool Opened;
-    [HideInInspector] public MapPlayer ClosingPlayer;
+    [HideInInspector] public bool CloseToPlayer;
 
     public GameObject UIPopup;
     private float UIPopupTimer;
@@ -28,6 +28,7 @@ public class ItemBox : MonoBehaviour
     public void Open(MapPlayer opener)
     {
         if (Opened) return;
+        opener.PointToDirectionOf(this);
         SetOpen();
         DisplayObtainedTools();
         foreach (ToolForInventory t in StoredTools)

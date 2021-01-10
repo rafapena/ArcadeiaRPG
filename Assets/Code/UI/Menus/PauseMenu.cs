@@ -14,7 +14,7 @@ public class PauseMenu : MonoBehaviour
     private const string TITLE_SCREEN_SCENE = "Title";
     public MenuFrame PauseFrame;
     public GameObject ButtonList;
-    public MenuFrame OptionsFrame;
+    public OptionsFrame Options;
     public GameObject ConfirmReturnToTitleFrame;
     public GameObject ConfirmExitGameFrame;
 
@@ -35,6 +35,8 @@ public class PauseMenu : MonoBehaviour
                 if (InputMaster.GoingBack()) Continue();
                 break;
             case Selections.Options:
+                if (InputMaster.GoingBack()) BackToPauseMain();
+                break;
             case Selections.ConfirmReturnTitle:
             case Selections.ConfirmExitGame:
                 if (InputMaster.GoingBack()) BackToPauseMain();
@@ -46,7 +48,7 @@ public class PauseMenu : MonoBehaviour
     {
         Selection = Selections.PauseMain;
         PauseFrame.Activate();
-        OptionsFrame.Deactivate();
+        Options.Deactivate();
         ConfirmReturnToTitleFrame.SetActive(false);
         ConfirmExitGameFrame.SetActive(false);
         EventSystem.current.SetSelectedGameObject(ButtonList.transform.GetChild(0).gameObject);
@@ -72,17 +74,16 @@ public class PauseMenu : MonoBehaviour
     public void GoToOptions()
     {
         Selection = Selections.Options;
-        OptionsFrame.Activate();
         ConfirmReturnToTitleFrame.gameObject.SetActive(false);
         ConfirmExitGameFrame.gameObject.SetActive(false);
         HighlightSelection();
-        //EventSystem.current.SetSelectedGameObject(OptionsFrame.transform.GetChild(1).gameObject);
+        Options.Activate();
     }
 
     public void GoToReturnToTitle()
     {
         Selection = Selections.ConfirmReturnTitle;
-        OptionsFrame.Deactivate();
+        Options.Deactivate();
         ConfirmReturnToTitleFrame.gameObject.SetActive(true);
         ConfirmExitGameFrame.gameObject.SetActive(false);
         HighlightSelection();
@@ -92,7 +93,7 @@ public class PauseMenu : MonoBehaviour
     public void GoToExitGame()
     {
         Selection = Selections.ConfirmExitGame;
-        OptionsFrame.Deactivate();
+        Options.Deactivate();
         ConfirmReturnToTitleFrame.gameObject.SetActive(false);
         ConfirmExitGameFrame.gameObject.SetActive(true);
         HighlightSelection();
@@ -120,20 +121,6 @@ public class PauseMenu : MonoBehaviour
         {
             ButtonList.transform.GetChild(i).GetComponent<ListSelectable>().ClearHighlights();
         }
-    }
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// -- Options --
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    public void AdjustMusic()
-    {
-
-    }
-
-    public void AdjustSound()
-    {
-
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

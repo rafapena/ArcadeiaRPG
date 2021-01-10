@@ -12,9 +12,13 @@ public class PlayerInteractionField : MonoBehaviour
     {
         if (!InputMaster.Interact()) return;
         foreach (ItemBox b in ItemsBoxesFound)
-            if (b.ClosingPlayer) b.Open(Avatar);
-        //foreach (NPC n in NPCsFound)
-        //    if (n.ClosingPlayer) n.InteractWith(Avatar);
+            if (b.CloseToPlayer) b.Open(Avatar);
+        /*foreach (NPC n in NPCsFound)
+        {
+            if (!n.ClosingPlayer) return;
+            Avatar.PointToDirectionOf(n);
+            n.InteractWith(Avatar);
+        }*/
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -33,8 +37,8 @@ public class PlayerInteractionField : MonoBehaviour
         {
             case "ItemBox":
                 ItemBox b = collision.gameObject.GetComponent<ItemBox>();
-                b.ClosingPlayer = nearby ? Avatar : null;
-                ItemsBoxesFound.Add(b);
+                b.CloseToPlayer = nearby;
+                if (nearby) ItemsBoxesFound.Add(b);
                 break;
             case "NPC":
                 //NPC n = collision.gameObject.GetComponent<NPC>();

@@ -7,16 +7,24 @@ public class MainMenu : MonoBehaviour
 {
     public AudioSource OpeningMusic;
     public AudioSource ButtonClickSFX;
+
+    public GameObject PressAnyKeyInput;
+    private bool PressedKey;
+
     public MenuFrame SelectionFrame;
     public GameObject NewGameButton;
     public GameObject ContinueButton;
     public GameObject SwitchFilesButton;
+    public GameObject OptionsButtton;
 
     public GameObject DifficultySelect;
     public MenuFrame DifficultyFrame;
     public Transform DifficultyList;
     public MenuFrame DifficultyDescriptions;
     private bool SelectedFinal;
+
+    public GameObject OptionsMenu;
+    public OptionsFrame OptionsFrame;
 
     private float IntroTimer;
     public float IntroTime;
@@ -26,20 +34,34 @@ public class MainMenu : MonoBehaviour
         // TEST SETUP
         //PlayerPrefs.DeleteAll();
 
+        Time.timeScale = 1;
         IntroTimer = Time.time + IntroTime;
         if (OpeningMusic) OpeningMusic.Play();
+        PressAnyKeyInput.SetActive(false);
+        SelectionFrame.Deactivate();
         CheckSaves();
         DifficultySelect.SetActive(false);
+        OptionsMenu.SetActive(false);
     }
 
     private void Update()
     {
-        if (!SelectionFrame.Activated && Time.time > IntroTimer)
+        if (!PressedKey && Time.time > IntroTimer)
         {
-            SelectionFrame.Activate();
-            EventSystem.current.SetSelectedGameObject(NewGameButton);
+            PressAnyKeyInput.SetActive(Time.time % 1 < 0.5f);
+            if (Input.anyKeyDown)
+            {
+                PressedKey = true;
+                SelectionFrame.Activate();
+                EventSystem.current.SetSelectedGameObject(NewGameButton);
+                PressAnyKeyInput.SetActive(false);
+            }
         }
-        if (DifficultySelect.activeSelf && InputMaster.GoingBack()) UndoDifficultySelect();
+        else if (InputMaster.GoingBack())
+        {
+            if (OptionsMenu.activeSelf) GoBackFromOptions();
+            else if (DifficultySelect.activeSelf) UndoDifficultySelect();
+        }
     }
 
     public void StartNew()
@@ -60,6 +82,12 @@ public class MainMenu : MonoBehaviour
         ButtonClickSFX.Play();
         FileSelectionList.HighlightedButtonAfterUndo = EventSystem.current.currentSelectedGameObject;
         SceneMaster.OpenFileSelect(FileSelect.FileMode.LoadOrDelete);
+    }
+
+    public void GoToOptions()
+    {
+        OptionsMenu.SetActive(true);
+        OptionsFrame.Activate();
     }
 
     public void ExitGame()
@@ -143,5 +171,16 @@ public class MainMenu : MonoBehaviour
         DifficultyFrame.Deactivate();
         DifficultyDescriptions.Deactivate();
         EventSystem.current.SetSelectedGameObject(NewGameButton);
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// -- Options --
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public void GoBackFromOptions()
+    {
+        OptionsFrame.Deactivate();
+        OptionsMenu.SetActive(false);
+        EventSystem.current.SetSelectedGameObject(OptionsButtton);
     }
 }

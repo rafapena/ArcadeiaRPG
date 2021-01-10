@@ -142,7 +142,11 @@ public class MapPlayer : MapExplorer
 
     protected override void AnimateDirection()
     {
-        if (Movement.x != 0 && Movement.y != 0)
+        if (Movement.x == 0 && Movement.y == 0)
+        {
+            return;
+        }
+        else if (Movement.x != 0 && Movement.y != 0)
         {
             AnimationDirectionAUX(Movement.x > 0 && Movement.y > 0, 5, "TR");
             AnimationDirectionAUX(Movement.x > 0 && Movement.y < 0, 7, "BR");
@@ -165,5 +169,19 @@ public class MapPlayer : MapExplorer
             Animate.SetTrigger(dir);
             Mode = mode;
         }
+    }
+
+    public void PointToDirectionOf(MonoBehaviour target)
+    {
+        float xDist = transform.position.x - target.transform.position.x;
+        float yDist = transform.position.y - target.transform.position.y;
+        bool r = xDist < 0 && Mathf.Abs(xDist) > Mathf.Abs(yDist);
+        bool l = xDist > 0 && Mathf.Abs(xDist) > Mathf.Abs(yDist);
+        bool t = yDist < 0 && Mathf.Abs(xDist) < Mathf.Abs(yDist);
+        bool b = yDist > 0 && Mathf.Abs(xDist) < Mathf.Abs(yDist);
+        AnimationDirectionAUX(r, 6, "R");
+        AnimationDirectionAUX(l, 2, "L");
+        AnimationDirectionAUX(t, 4, "T");
+        AnimationDirectionAUX(b, 0, "B");
     }
 }
