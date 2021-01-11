@@ -9,6 +9,7 @@ public class GameplayMaster : MonoBehaviour
 {
     public enum Difficulties { Easy, Medium, Hard, Lunatic }
     public static Difficulties Difficulty;
+    public MapMaster.Locations Location;
 
     public static int SelectedFile;
     public static int Chapter;
@@ -26,7 +27,8 @@ public class GameplayMaster : MonoBehaviour
 
     private void Start()
     {
-        if (!SceneMaster.InBattle) MapMaster.CurrentLocation = gameObject.scene.name.Replace("_", " ");
+        MapMaster.SetScene(gameObject);
+        MapMaster.CurrentLocation = Location.ToString().Replace("_", " ");
         SetupAudio();
     }
 

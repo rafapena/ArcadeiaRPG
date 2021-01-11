@@ -43,24 +43,23 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 01668228a49593249b94d46ff1220443, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Id: 2
+  Id: 1
   Name: 
   Description: 
-  ElementRates: []
   HPRegen: 0
   SPRegen: 0
   SPConsumeRate: 0
   ComboDifficulty: 0
   TurnEnd1: 0
   TurnEnd2: 0
-  TurnSequence: 0
-  RemoveByHit: 0
-  Counter: 0
-  Reflect: 0
+  WhenToExecute: 0
+  RemoveByHitChance: 0
+  CounterRate: 0
+  ReflectRate: 0
   PhysicalDamageRate: 0
   MagicalDamageRate: 0
-  DisabledToolType1: 0
-  DisabledToolType2: 0
   ExtraTurns: 0
-  StateRates: []
+  DisabledToolTypes: 
+  ChangedElementRates: []
+  ChangedStateRates: []
   TurnsLeft: 0

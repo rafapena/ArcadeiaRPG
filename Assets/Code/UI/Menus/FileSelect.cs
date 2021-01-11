@@ -167,7 +167,7 @@ public class FileSelect : MonoBehaviour
         Selection = Selections.DeleteConfirm;
         SelectModeFrame.SetActive(false);
         DeleteConfirmationFrame.SetActive(true);
-        DeleteConfirmationFrame.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "DELETE\nFILE " + FilesList.SelectedObject.FileNumber + "?";
+        DeleteConfirmationFrame.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "DELETE\nFILE " + FilesList.SelectedObject.File + "?";
         FilesList.SelectedButton.KeepSelected();
         EventSystem.current.SetSelectedGameObject(DeleteConfirmationFrame.transform.GetChild(1).gameObject);
     }
@@ -189,7 +189,7 @@ public class FileSelect : MonoBehaviour
     {
         Selection = Selections.OverwriteConfirm;
         OverwriteConfirmationFrame.SetActive(true);
-        OverwriteConfirmationFrame.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "OVERWRITE\nFILE " + FilesList.SelectedObject.FileNumber + "?";
+        OverwriteConfirmationFrame.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "OVERWRITE\nFILE " + FilesList.SelectedObject.File + "?";
         FilesList.SelectedButton.KeepSelected();
         EventSystem.current.SetSelectedGameObject(OverwriteConfirmationFrame.transform.GetChild(1).gameObject);
     }

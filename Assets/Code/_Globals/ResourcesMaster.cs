@@ -11,18 +11,32 @@ public class ResourcesMaster : MonoBehaviour
     private const float DEFAULT_MASTER_MUSIC_VOLUME = 1f;
     private const float DEFAULT_MASTER_SFX_VOLUME = 0.8f;
 
-    public static List<BattleAlly> Allies;
-    public static List<BattlerClass> Classes;
-    public static List<BattleEnemy> Enemies;
-    public static List<EnemyParty> EnemyParties;
-    public static List<Environment> Environments;
-    public static List<Item> Items;
-    public static List<PassiveEffect> PassiveEffects;
-    public static List<BattlePlayer> BattlePlayers;
-    public static List<SoloSkill> SoloSkills;
-    public static List<State> States; 
-    public static List<TeamSkill> TeamSkills;
-    public static List<Weapon> Weapon;
+    public static BattleAlly[] Allies { get; private set; }
+
+    public static BattlerClass[] Classes { get; private set; }
+    
+    public static BattleEnemy[] Enemies { get; private set; }
+
+    public static BattlePlayer[] Players { get; private set; }
+
+    public static EnemyParty[] EnemyParties { get; private set; }
+    
+    public static Environment[] Environments { get; private set; }
+    
+    public static Item[] Items { get; private set; }
+    
+    public static Objective[] Objectives { get; private set; }
+
+    public static PassiveEffect[] PassiveEffects { get; private set; }
+    
+    public static SoloSkill[] SoloSkills { get; private set; }
+    
+    public static State[] States { get; private set; }
+    
+    public static TeamSkill[] TeamSkills { get; private set; }
+    
+    public static Weapon[] Weapons { get; private set; }
+
 
     private void Awake()
     {
@@ -42,17 +56,18 @@ public class ResourcesMaster : MonoBehaviour
 
     private void SetupLists()
     {
-        Allies = new List<BattleAlly>();
-        Classes = new List<BattlerClass>();
-        Enemies = new List<BattleEnemy>();
-        EnemyParties = new List<EnemyParty>();
-        Environments = new List<Environment>();
-        Items = new List<Item>();
-        PassiveEffects = new List<PassiveEffect>();
-        BattlePlayers = new List<BattlePlayer>();
-        SoloSkills = new List<SoloSkill>();
-        States = new List<State>();
-        TeamSkills = new List<TeamSkill>();
-        Weapon = new List<Weapon>();
+        Allies = Resources.LoadAll<BattleAlly>("Prefabs/Allies");
+        Players = Resources.LoadAll<BattlePlayer>("Prefabs/BattlePlayers");
+        Classes = Resources.LoadAll<BattlerClass>("Prefabs/BattlerClasses");
+        Enemies = Resources.LoadAll<BattleEnemy>("Prefabs/BattleEnemies");
+        EnemyParties = Resources.LoadAll<EnemyParty>("Prefabs/EnemyParties");
+        Environments = Resources.LoadAll<Environment>("Prefabs/Environments");
+        Items = Resources.LoadAll<Item>("Prefabs/Items");
+        Objectives = Resources.LoadAll<Objective>("Prefabs/Objectives");
+        PassiveEffects = Resources.LoadAll<PassiveEffect>("Prefabs/PassiveEffects");
+        SoloSkills = Resources.LoadAll<SoloSkill>("Prefabs/SoloSkills");
+        States = Resources.LoadAll<State>("Prefabs/States");
+        TeamSkills = Resources.LoadAll<TeamSkill>("Prefabs/TeamSkills");
+        Weapons = Resources.LoadAll<Weapon>("Prefabs/Weapons");
     }
 }

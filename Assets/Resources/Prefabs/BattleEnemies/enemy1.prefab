@@ -411,7 +411,7 @@ GameObject:
   - component: {fileID: 2413003443368104337}
   - component: {fileID: 6077460687212625879}
   m_Layer: 10
-  m_Name: enemy1b
+  m_Name: enemy1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -521,11 +521,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5886faf046f10aa4ea6fbf208411f835, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Id: 1
+  Id: 0
   Name: EvilGuy
   Description: It's a bad guy! Run for your lives!
   RowPosition: 0
   ColumnPosition: 0
+  Figure: {fileID: 0}
   MainImage: {fileID: 0}
   Level: 1
   Class: {fileID: 0}
