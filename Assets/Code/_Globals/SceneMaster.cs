@@ -47,7 +47,7 @@ public class SceneMaster : MonoBehaviour
 
     public static void OpenMapMenu(PlayerParty playerParty)
     {
-        MenuMaster.PartyInfo = playerParty;
+        GameplayMaster.Party = playerParty;
         SceneManager.LoadScene(MAP_MENU_SCENE, LoadSceneMode.Additive);
         InMapMenu = true;
         Time.timeScale = 0;
@@ -55,7 +55,7 @@ public class SceneMaster : MonoBehaviour
 
     public static void CloseMapMenu(PlayerParty playerParty)
     {
-        MenuMaster.PartyInfo = playerParty;
+        GameplayMaster.Party = playerParty;
         SceneManager.UnloadSceneAsync(MAP_MENU_SCENE);
         InMapMenu = false;
         if (!InMenu()) Time.timeScale = 1;
@@ -63,7 +63,7 @@ public class SceneMaster : MonoBehaviour
 
     public static void OpenPauseMenu(PlayerParty playerParty)
     {
-        MenuMaster.PartyInfo = playerParty;
+        GameplayMaster.Party = playerParty;
         SceneManager.LoadScene(PAUSE_MENU_SCENE, LoadSceneMode.Additive);
         InPauseMenu = true;
         Time.timeScale = 0;
@@ -71,7 +71,7 @@ public class SceneMaster : MonoBehaviour
 
     public static void ClosePauseMenu(PlayerParty playerParty)
     {
-        MenuMaster.PartyInfo = playerParty;
+        GameplayMaster.Party = playerParty;
         SceneManager.UnloadSceneAsync(PAUSE_MENU_SCENE);
         InPauseMenu = false;
         if (!InMenu()) Time.timeScale = 1;
@@ -79,7 +79,7 @@ public class SceneMaster : MonoBehaviour
 
     public static void OpenFileSelect(FileSelect.FileMode fileMode, PlayerParty playerParty = null)
     {
-        if (!MenuMaster.PartyInfo) MenuMaster.PartyInfo = playerParty;
+        if (!GameplayMaster.Party) GameplayMaster.Party = playerParty;
         FileSelect.FileSelectMode = fileMode;
         SceneManager.LoadScene(FILE_SELECT_MENU_SCENE, LoadSceneMode.Additive);
         InFileSelectMenu = true;

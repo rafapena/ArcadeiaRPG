@@ -77,8 +77,9 @@ public abstract class Battler : BaseObject
     [HideInInspector] public int SPToConsumeThisTurn;
     [HideInInspector] public bool IsCharging;   // Skill has this as well, but is needed to the BattleMenu
 
-    protected virtual void Awake()
+    protected override void Awake()
     {
+        base.Awake();
         Properties = transform.GetChild(0).transform;
         Figure = gameObject.GetComponent<Rigidbody2D>();
         MainLocation = transform.position;

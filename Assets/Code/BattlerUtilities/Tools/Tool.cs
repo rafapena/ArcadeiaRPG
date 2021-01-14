@@ -39,8 +39,9 @@ public abstract class Tool : BaseObject
     private int[] StatesGiveRate;
     private int[] StatesReceiveRate;
 
-    protected void Awake()
+    protected override void Awake()
     {
+        base.Awake();
         // Set up states give and receive rates
     }
 

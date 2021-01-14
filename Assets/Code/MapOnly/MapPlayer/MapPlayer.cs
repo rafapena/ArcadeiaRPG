@@ -22,7 +22,9 @@ public class MapPlayer : MapExplorer
         base.Start();
         if (GameplayMaster.SelectedFile == 0) TEST_SETUP();
         else if (GameplayMaster.NoFileSelected()) SetupPartyNew();
-        else SetupPartyContinue();
+        else if (!GameplayMaster.FinishedLoadingContent()) Party.LoadFromFile(GameplayMaster.SelectedFile, this);
+        else Setup();
+        GameplayMaster.Party = Party;
     }
 
     private void SetupPartyNew()
@@ -32,7 +34,6 @@ public class MapPlayer : MapExplorer
         {
             all[i] = Instantiate(all[i], BattlersListDump);
             Battler b = all[i];
-            b.transform.parent = BattlersListDump;
             b.Level = Party.Level;
             b.StatConversion();
             b.gameObject.SetActive(false);
@@ -44,7 +45,7 @@ public class MapPlayer : MapExplorer
         }
     }
 
-    private void SetupPartyContinue()
+    private void Setup()
     {
         List<Battler> all = Party.GetWholeParty();
         for (int i = 0; i < all.Count; i++)
@@ -74,7 +75,9 @@ public class MapPlayer : MapExplorer
         }
         Party.UpdateAll(all);
         for (int i = 0; i < Party.LoggedObjectives.Count; i++)
+        {
             Party.LoggedObjectives[i] = Instantiate(Party.LoggedObjectives[i], gameObject.transform);
+        }
     }
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

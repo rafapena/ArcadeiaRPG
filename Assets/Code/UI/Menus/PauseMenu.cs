@@ -23,7 +23,7 @@ public class PauseMenu : MonoBehaviour
 
     private void Awake()
     {
-        PartyInfo = MenuMaster.PartyInfo;
+        PartyInfo = GameplayMaster.Party;
         SetupPauseMenu();
     }
 

@@ -28,7 +28,7 @@ public class MapMenuManager : MonoBehaviour
         if (!Stats.gameObject.activeSelf) Stats.gameObject.SetActive(true);
         if (!Map.gameObject.activeSelf) Map.gameObject.SetActive(true);
         if (!Objectives.gameObject.activeSelf) Objectives.gameObject.SetActive(true);
-        PartyInfo = MenuMaster.PartyInfo;
+        PartyInfo = GameplayMaster.Party;
         Main.Open();
     }
 

@@ -11,6 +11,8 @@ public class GameplayMaster : MonoBehaviour
     public static Difficulties Difficulty;
     public MapMaster.Locations Location;
 
+    public static int MAX_LOADED_FILE_CONTENT = 2;
+    private static int LoadedFile;
     public static int SelectedFile;
     public static int Chapter;
 
@@ -24,6 +26,8 @@ public class GameplayMaster : MonoBehaviour
     public static int InGameTime;
     private static float InGameTimeCounter;
     public float InGameMinuteIncrementFrequency;
+
+    public static PlayerParty Party;
 
     private void Start()
     {
@@ -64,8 +68,23 @@ public class GameplayMaster : MonoBehaviour
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// -- Files list --
+    /// -- File Management --
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public static void ResetLoad()
+    {
+        LoadedFile = 0;
+    }
+
+    public static void DeclareContentLoaded()
+    {
+        LoadedFile++;
+    }
+
+    public static bool FinishedLoadingContent()
+    {
+        return LoadedFile >= MAX_LOADED_FILE_CONTENT;
+    }
 
     public static bool NoFileSelected()
     {

@@ -10,8 +10,6 @@ using UnityEngine.UI;
 
 public class MenuMaster : MonoBehaviour
 {
-    public static PlayerParty PartyInfo;
-
     public static void DisableSelection(ref GameObject button)
     {
         Color c = Color.white;

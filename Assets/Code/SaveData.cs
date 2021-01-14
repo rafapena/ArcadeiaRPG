@@ -33,31 +33,33 @@ public class SaveData
         TotalPlayTime = PlayerPrefs.GetInt("TotalPlayTime_" + File);
         Location = PlayerPrefs.GetString("Location_" + File);
         Gold = PlayerPrefs.GetInt("Gold_" + File);
-
     }
 
     public void SaveGame()
     {
         GameplayMaster.SetLastManagedFile(File);
         PlayerPrefs.SetInt("File_" + File, File);
-        PlayerPrefs.SetString("PlayerName_" + File, MenuMaster.PartyInfo.AllPlayers[0].Name);
+        PlayerPrefs.SetString("PlayerName_" + File, GameplayMaster.Party.AllPlayers[0].Name);
         PlayerPrefs.SetInt("Chapter_" + File, GameplayMaster.Chapter);
-        PlayerPrefs.SetInt("Level_" + File, MenuMaster.PartyInfo.Level);
+        PlayerPrefs.SetInt("Level_" + File, GameplayMaster.Party.Level);
         PlayerPrefs.SetInt("Difficulty_" + File, (int)GameplayMaster.Difficulty);
         PlayerPrefs.SetInt("TotalPlayTime_" + File, (int)GameplayMaster.TotalPlayTime);
         PlayerPrefs.SetString("Location_" + File, MapMaster.CurrentLocation);
-        PlayerPrefs.SetInt("Gold_" + File, MenuMaster.PartyInfo.Inventory.Gold);
-        //SaveParty();
+        PlayerPrefs.SetInt("Gold_" + File, GameplayMaster.Party.Inventory.Gold);
+        SaveParty();
+        SaveMapContent();
         PlayerPrefs.SetString("SceneName", MapMaster.SceneName);
     }
 
     public void LoadGame()
     {
+        GameplayMaster.ResetLoad();
         GameplayMaster.SetLastManagedFile(File);
         GameplayMaster.Chapter = Chapter;
         GameplayMaster.Difficulty = (GameplayMaster.Difficulties)Difficulty;
         GameplayMaster.TotalPlayTime = TotalPlayTime;
-        LoadParty();
+        //LoadParty();
+        //LoadMapContent();
         SceneMaster.ChangeScene(PlayerPrefs.GetString("SceneName"), 2f);
     }
 
@@ -77,74 +79,58 @@ public class SaveData
     /// -- Party --
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    // Loading can be found in MapPlayer.cs
     private void SaveParty()
     {
-        PlayerParty p = MenuMaster.PartyInfo;
+        PlayerParty p = GameplayMaster.Party;
         PlayerPrefs.SetInt("PartyEXP_" + File, p.EXP);
         PlayerPrefs.SetInt("PartyLastEXPToNext_" + File, p.LastEXPToNext);
         PlayerPrefs.SetInt("PartyEXPToNext_" + File, p.EXPToNext);
         int i = 0;
-        foreach (BattlePlayer bp in p.AllPlayers) SavePlayer(i++, bp);
-        foreach (BattleAlly ally in p.Allies) SavePlayer(i++, ally);
+        foreach (BattlePlayer bp in p.AllPlayers) SaveBattler(i++, bp);
+        int numberOfPlayers = i;
+        PlayerPrefs.SetInt("NumberOfPlayers", numberOfPlayers);
+        foreach (BattleAlly ally in p.Allies) SaveBattler(i++, ally);
+        PlayerPrefs.SetInt("NumberOfAllies", i - numberOfPlayers);
+        SaveInventory();
+        SaveObjectives();
     }
 
-    private void LoadParty()
-    {
-        //PlayerParty p = MenuMaster.PartyInfo;
-        //p.EXP = PlayerPrefs.GetInt("");
-    }
-
-    private void SavePlayer(int index, Battler b)
+    private void SaveBattler(int index, Battler b)
     {
         string bt = "Battler" + index;
         PlayerPrefs.SetInt(bt + "Id_" + File, b.Id);
         PlayerPrefs.SetInt(bt + "HP_" + File, b.HP);
         PlayerPrefs.SetInt(bt + "SP_" + File, b.SP);
-        SavePlayerAttributesList(b.SoloSkills, bt);
-        SavePlayerAttributesList(b.TeamSkills, bt);
-        SavePlayerAttributesList(b.Weapons, bt);
-        SavePlayerAttributesList(b.Items, bt);
-        SavePlayerAttributesList(b.PassiveSkills, bt);
-        SavePlayerAttributesList(b.States, bt);
-        BattlePlayer p = b as BattlePlayer;
+        SaveBattlersList(b.SoloSkills, bt);
+        SaveBattlersList(b.TeamSkills, bt);
+        SaveBattlersList(b.Weapons, bt);
+        SaveBattlersList(b.Items, bt);
+        SaveBattlersList(b.PassiveSkills, bt);
+        SaveBattlersList(b.States, bt);
+        /*BattlePlayer p = b as BattlePlayer;
         if (!p) return;
         for (int i = 0; i < p.Relations.Count; i++)
         {
             int r = p.Relations[i] ? p.Relations[i].Points : -1;
             PlayerPrefs.SetInt(bt + "Relation" + i + "_" + File, r);
-        }
-        SaveInventory();
-        SaveObjectives();
+        }*/
     }
 
-    private void LoadPlayer()
-    {
-        //
-    }
-
-    private void SavePlayerAttributesList<T>(List<T> list, string pre) where T : BaseObject
+    private void SaveBattlersList<T>(List<T> list, string pre) where T : BaseObject
     {
         int i = 0;
-        foreach (T entry in list) PlayerPrefs.SetInt(pre + typeof(T).Name + i + "_" + File, entry.Id);
-    }
-
-    private void LoadPlayerAttributesList()
-    {
-        //
+        foreach (T entry in list) PlayerPrefs.SetInt(pre + typeof(T).Name + i++ + "_" + File, entry.Id);
+        PlayerPrefs.SetInt(pre + typeof(T).Name + "Count_" + File, i);
     }
 
     private void SaveInventory()
     {
         string inv = "Inventory";
-        PlayerPrefs.SetInt("InventoryCapacity_" + File, MenuMaster.PartyInfo.Inventory.WeightCapacity);
-        SaveToolsList(MenuMaster.PartyInfo.Inventory.Items, inv);
-        SaveToolsList(MenuMaster.PartyInfo.Inventory.Weapons, inv);
-        SaveToolsList(MenuMaster.PartyInfo.Inventory.KeyItems, inv);
-    }
-
-    private void LoadInventory()
-    {
-        //
+        PlayerPrefs.SetInt("InventoryCapacity_" + File, GameplayMaster.Party.Inventory.WeightCapacity);
+        SaveToolsList(GameplayMaster.Party.Inventory.Items, inv);
+        SaveToolsList(GameplayMaster.Party.Inventory.Weapons, inv);
+        SaveToolsList(GameplayMaster.Party.Inventory.KeyItems, inv);
     }
 
     private void SaveToolsList<T>(List<T> list, string pre) where T : ToolForInventory
@@ -152,38 +138,38 @@ public class SaveData
         foreach (T entry in list) PlayerPrefs.SetInt(pre + typeof(T).Name + entry.Id + "_" + File, entry.Quantity);
     }
 
-    private void LoadToolsList()
-    {
-        //
-    }
-
     private void SaveObjectives()
     {
         int markedObjective = 0;
         int markedSubObjective = 0;
-        foreach (Objective o in MenuMaster.PartyInfo.LoggedObjectives)
+        foreach (Objective o in GameplayMaster.Party.LoggedObjectives)
         {
             if (o.Marked) markedObjective = o.Id;
-            PlayerPrefs.SetInt("Objective" + o.Id + "_" + File, o.Cleared ? 1 : 0);
+            PlayerPrefs.SetInt("Objective" + o.Id + "_" + File, o.Cleared ? 2 : 1);
             foreach (SubObjective so in o.NextObjectives)
             {
                 if (so.Marked) markedSubObjective = so.Id;
-                int soIndex = 0;
-                if (so.Cleared) soIndex = 1;
-                else if (so.Hidden) soIndex = 2;
+                int soIndex = 1;
+                if (so.Cleared) soIndex = 2;
+                else if (so.Hidden) soIndex = 3;
                 PlayerPrefs.SetInt("SubObjective" + so.Id + "_" + o.Id + "_" + File, soIndex);
             }
         }
         PlayerPrefs.SetInt("MarkedObjective_" + File, markedObjective);
-        PlayerPrefs.SetFloat("MarkedSubObjective_" + File, markedSubObjective);
-    }
-
-    private void LoadObjectives()
-    {
-        //
+        PlayerPrefs.SetInt("MarkedSubObjective_" + File, markedSubObjective);
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- Map --
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    private void SaveMapContent()
+    {
+        //
+    }
+
+    private void LoadMapContent()
+    {
+        //
+    }
 }

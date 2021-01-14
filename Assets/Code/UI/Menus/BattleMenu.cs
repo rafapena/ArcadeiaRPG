@@ -514,7 +514,7 @@ public class BattleMenu : MonoBehaviour
         string[] plc = new string[] { "A", "S", "D", "F" };
         for (; i < CurrentBattle.PlayerParty.Players.Count; i++)
             SetupKeyInputForPlayer(SelectTargetInTeam.transform.GetChild(i).gameObject, CurrentBattle.PlayerParty.Players[i], plc[i]);
-        for (; i < CurrentBattle.PlayerParty.MAX_NUMBER_OF_ACTIVE_PLAYERS; i++)
+        for (; i < CurrentBattle.PlayerParty.MAX_NUMBER_OF_PLAYABLE_BATTLERS; i++)
             SelectTargetInTeam.transform.GetChild(i).gameObject.SetActive(false);
     }
 
@@ -628,7 +628,7 @@ public class BattleMenu : MonoBehaviour
         if (selectOneInOwnTeam || selectLotsInOwnTeam)
         {
             string[] playerLetterCommands = new string[] { "A", "S", "D", "F" };
-            for (int i = 0; i < CurrentBattle.PlayerParty.MAX_NUMBER_OF_ACTIVE_PLAYERS; i++)
+            for (int i = 0; i < CurrentBattle.PlayerParty.MAX_NUMBER_OF_PLAYABLE_BATTLERS; i++)
             {
                 SelectTargetInTeam.transform.GetChild(i).GetChild(0).GetComponent<Image>().sprite = UIMaster.LetterCommands[selectOneInOwnTeam ? playerLetterCommands[i] : "A"];
                 SelectTargetInTeam.transform.GetChild(i).GetChild(0).gameObject.SetActive(true);

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemyParty : MonoBehaviour
+public class EnemyParty : BaseObject
 {
     public enum EnemyPartyModes { Regular, Boss, FinalBoss }
 
