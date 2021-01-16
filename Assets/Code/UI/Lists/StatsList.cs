@@ -53,21 +53,21 @@ public class StatsList : MonoBehaviour
     private int[] GetCurrentStatBoosts(BattlePlayer player)
     {
         int[] stats = new int[NUMBER_OF_STATS];
-        foreach (PlayerCompanionship pc in player.Relations)
+        foreach (PlayerRelation pr in player.Relations)
         {
-            if (!pc || !pc.Player.NaturalStats) continue;
-            stats[0] += GetStatBoost(pc, pc.Player.NaturalStats.Atk);
-            stats[1] += GetStatBoost(pc, pc.Player.NaturalStats.Def);
-            stats[2] += GetStatBoost(pc, pc.Player.NaturalStats.Map);
-            stats[3] += GetStatBoost(pc, pc.Player.NaturalStats.Mar);
-            stats[4] += GetStatBoost(pc, pc.Player.NaturalStats.Spd);
-            stats[5] += GetStatBoost(pc, pc.Player.NaturalStats.Tec);
-            stats[6] += GetStatBoost(pc, pc.Player.NaturalStats.Luk);
+            if (pr == null || !pr.Player.NaturalStats) continue;
+            stats[0] += GetStatBoost(pr, pr.Player.NaturalStats.Atk);
+            stats[1] += GetStatBoost(pr, pr.Player.NaturalStats.Def);
+            stats[2] += GetStatBoost(pr, pr.Player.NaturalStats.Map);
+            stats[3] += GetStatBoost(pr, pr.Player.NaturalStats.Mar);
+            stats[4] += GetStatBoost(pr, pr.Player.NaturalStats.Spd);
+            stats[5] += GetStatBoost(pr, pr.Player.NaturalStats.Tec);
+            stats[6] += GetStatBoost(pr, pr.Player.NaturalStats.Luk);
         }
         return stats;
     }
 
-    private int GetStatBoost(PlayerCompanionship pc, int stat)
+    private int GetStatBoost(PlayerRelation pc, int stat)
     {
         if (stat < 0) return (int)((pc.Level - 1) * stat / 3f);
         return (pc.Level - 1) * stat;

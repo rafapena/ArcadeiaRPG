@@ -24,7 +24,7 @@ public class SaveData
     public SaveData(int file)
     {
         File = file;
-        FileDataExists = PlayerPrefs.GetInt("File_" + File) > 0;
+        FileDataExists = PlayerPrefs.HasKey("File_" + File);
         if (!FileDataExists) return;
         PlayerName = PlayerPrefs.GetString("PlayerName_" + File);
         Chapter = PlayerPrefs.GetInt("Chapter_" + File);
@@ -38,6 +38,8 @@ public class SaveData
     public void SaveGame()
     {
         GameplayMaster.SetLastManagedFile(File);
+        DeleteParty();
+        DeleteMapContent();
         PlayerPrefs.SetInt("File_" + File, File);
         PlayerPrefs.SetString("PlayerName_" + File, GameplayMaster.Party.AllPlayers[0].Name);
         PlayerPrefs.SetInt("Chapter_" + File, GameplayMaster.Chapter);
@@ -58,14 +60,13 @@ public class SaveData
         GameplayMaster.Chapter = Chapter;
         GameplayMaster.Difficulty = (GameplayMaster.Difficulties)Difficulty;
         GameplayMaster.TotalPlayTime = TotalPlayTime;
-        //LoadParty();
-        //LoadMapContent();
         SceneMaster.ChangeScene(PlayerPrefs.GetString("SceneName"), 2f);
     }
 
     public void DeleteGame()
     {
         PlayerPrefs.DeleteKey("File_" + File);
+        DeleteParty();
     }
 
     public static void SetupForNewGame()
@@ -108,13 +109,12 @@ public class SaveData
         SaveBattlersList(b.Items, bt);
         SaveBattlersList(b.PassiveSkills, bt);
         SaveBattlersList(b.States, bt);
-        /*BattlePlayer p = b as BattlePlayer;
+        BattlePlayer p = b as BattlePlayer;
         if (!p) return;
         for (int i = 0; i < p.Relations.Count; i++)
         {
-            int r = p.Relations[i] ? p.Relations[i].Points : -1;
-            PlayerPrefs.SetInt(bt + "Relation" + i + "_" + File, r);
-        }*/
+            if (p.Relations[i] != null) PlayerPrefs.SetInt(bt + "Relation" + i + "_" + File, p.Relations[i].Points);
+        }
     }
 
     private void SaveBattlersList<T>(List<T> list, string pre) where T : BaseObject
@@ -159,11 +159,76 @@ public class SaveData
         PlayerPrefs.SetInt("MarkedSubObjective_" + File, markedSubObjective);
     }
 
+    private void DeleteParty()
+    {
+        PlayerPrefs.DeleteKey("NumberOfPlayers");
+        PlayerPrefs.DeleteKey("NumberOfAllies");
+        for (int i = 0; i < ResourcesMaster.Players.Length; i++) DeleteBattler(i);
+        for (int i = 0; i < ResourcesMaster.Allies.Length; i++) DeleteBattler(i);
+        DeleteInventory();
+        DeleteObjectives();
+    }
+
+    private void DeleteBattler(int index)
+    {
+        string bt = "Battler" + index;
+        PlayerPrefs.DeleteKey(bt + "Id_" + File);
+        PlayerPrefs.DeleteKey(bt + "HP_" + File);
+        PlayerPrefs.DeleteKey(bt + "SP_" + File);
+        DeleteBattlerList<SoloSkill>(bt);
+        DeleteBattlerList<TeamSkill>(bt);
+        DeleteBattlerList<Weapon>(bt);
+        DeleteBattlerList<Item>(bt);
+        DeleteBattlerList<PassiveSkill>(bt);
+        DeleteBattlerList<State>(bt);
+        for (int i = 0; i < ResourcesMaster.Players.Length; i++) PlayerPrefs.DeleteKey(bt + "Relation" + i + "_" + File);
+    }
+
+    private void DeleteBattlerList<T>(string pre)
+    {
+        PlayerPrefs.DeleteKey(pre + typeof(T).Name + "Count_" + File);
+        for (int i = 0; i < int.MaxValue; i++)
+        {
+            string str = pre + typeof(T).Name + i++ + "_" + File;
+            if (!PlayerPrefs.HasKey(str)) break;
+            PlayerPrefs.DeleteKey(str);
+        }
+    }
+
+    private void DeleteInventory()
+    {
+        string inv = "Inventory";
+        PlayerPrefs.DeleteKey("InventoryCapacity_" + File);
+        DeleteToolList(ResourcesMaster.Items, inv);
+        DeleteToolList(ResourcesMaster.Weapons, inv);
+    }
+
+    private void DeleteToolList<T>(T[] list, string pre) where T : ToolForInventory
+    {
+        foreach (T entry in list) PlayerPrefs.DeleteKey(pre + typeof(T).Name + entry.Id + "_" + File);
+    }
+
+    private void DeleteObjectives()
+    {
+        PlayerPrefs.DeleteKey("MarkedObjective_" + File);
+        PlayerPrefs.DeleteKey("MarkedSubObjective_" + File);
+        foreach (Objective o in ResourcesMaster.Objectives)
+        {
+            PlayerPrefs.DeleteKey("Objective" + o.Id + "_" + File);
+            foreach (SubObjective so in o.NextObjectives) PlayerPrefs.DeleteKey("SubObjective" + so.Id + "_" + o.Id + "_" + File);
+        }
+    }
+
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- Map --
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    
+
     private void SaveMapContent()
+    {
+        //
+    }
+
+    private void DeleteMapContent()
     {
         //
     }

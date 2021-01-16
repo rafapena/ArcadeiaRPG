@@ -13,10 +13,11 @@ public class BattlePlayer : Battler
     public int AssistDamageRate = 100;
     public List<BattlerClass> ClassSet;
     public List<SkillLearnLevel> SkillSet;
+    public PreExistingRelation[] PreExistingRelations;
 
     [HideInInspector] public SoloSkill AttackSkill;
     [HideInInspector] public List<SoloSkill> MapUsableSkills;
-    [HideInInspector] public List<PlayerCompanionship> Relations;
+    [HideInInspector] public List<PlayerRelation> Relations;
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- Setup --

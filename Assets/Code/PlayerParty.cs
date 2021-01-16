@@ -29,9 +29,14 @@ public class PlayerParty : MonoBehaviour
 
     private void Start()
     {
+        //
+    }
+
+    public void Setup()
+    {
         UpdateActivePlayers();
         SetupExpCurve();
-        SetupCompanionships();
+        SetupRelations();
     }
    
     public void UpdateActivePlayers()
@@ -53,21 +58,20 @@ public class PlayerParty : MonoBehaviour
         EXP = LastEXPToNext;
     }
 
-    private void SetupCompanionships()
+    private void SetupRelations()
     {
-        for (int i = 0; i < AllPlayers.Count; i++)
+        bool[] playerInParty = new bool[ResourcesMaster.Players.Length];
+        foreach (BattlePlayer p in AllPlayers)
         {
-            AllPlayers[i].Relations = new List<PlayerCompanionship>();
-            for (int j = 0; j < AllPlayers.Count; j++)
+            playerInParty[p.Id] = true;
+        }
+        foreach (BattlePlayer p in AllPlayers)
+        {
+            p.Relations = new List<PlayerRelation>();
+            for (int j = 0; j < ResourcesMaster.Players.Length; j++) p.Relations.Add(null);
+            foreach (PreExistingRelation pr in p.PreExistingRelations)
             {
-                if (i == j)
-                {
-                    AllPlayers[i].Relations.Add(null);
-                    continue;
-                }
-                PlayerCompanionship pc = gameObject.AddComponent<PlayerCompanionship>();
-                pc.Player = AllPlayers[j];
-                AllPlayers[i].Relations.Add(pc);
+                if (playerInParty[pr.Player.Id]) p.Relations[pr.Player.Id] = new PlayerRelation(pr.Player, pr.RelationLevel);
             }
         }  
     }
@@ -113,14 +117,16 @@ public class PlayerParty : MonoBehaviour
         b.Items = LoadBattlersList(file, b, ResourcesMaster.Items, bt);
         b.PassiveSkills = LoadBattlersList(file, b, ResourcesMaster.PassiveSkills, bt);
         b.States = LoadBattlersList(file, b, ResourcesMaster.States, bt);
-        /*BattlePlayer p = b as BattlePlayer;
-        if (!p) return;
-        for (int i = 0; i < p.Relations.Count; i++)
+        BattlePlayer p = b as BattlePlayer;
+        if (p)
         {
-            int points = PlayerPrefs.GetInt(bt + "Relation" + i + "_" + file);
-            if (points < -1) continue;
-            p.Relations[i].Points = points;
-        }*/  
+            p.Relations = new List<PlayerRelation>(ResourcesMaster.Players.Length);
+            for (int i = 0; i < p.Relations.Count; i++)
+            {
+                string str = bt + "Relation" + i + "_" + file;
+                if (PlayerPrefs.HasKey(str)) p.Relations[i].SetPoints(PlayerPrefs.GetInt(str));
+            }
+        }
         b.gameObject.SetActive(false);
         return b as T;
     }
@@ -216,9 +222,9 @@ public class PlayerParty : MonoBehaviour
     /// -- Companionship Info --
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public PlayerCompanionship GetCompanionshipInfo(BattlePlayer p1, BattlePlayer p2)
+    public PlayerRelation GetCompanionshipInfo(BattlePlayer p1, BattlePlayer p2)
     {
-        foreach (PlayerCompanionship pc in p1.Relations)
+        foreach (PlayerRelation pc in p1.Relations)
             if (pc.Player.Id == p2.Id)
                 return pc;
         return null;    // Function should never actually go here: Indicates a malformed setup, otherwise
@@ -253,6 +259,6 @@ public class PlayerParty : MonoBehaviour
         }
         UpdateActivePlayers();
         SetupExpCurve();
-        SetupCompanionships();
+        SetupRelations();
     }
 }

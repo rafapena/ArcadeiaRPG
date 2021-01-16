@@ -20,6 +20,7 @@ public class MapPlayer : MapExplorer
     protected override void Start()
     {
         base.Start();
+        Party.Setup();
         if (GameplayMaster.SelectedFile == 0) TEST_SETUP();
         else if (GameplayMaster.NoFileSelected()) SetupPartyNew();
         else if (!GameplayMaster.FinishedLoadingContent()) Party.LoadFromFile(GameplayMaster.SelectedFile, this);

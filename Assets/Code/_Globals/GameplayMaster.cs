@@ -93,11 +93,13 @@ public class GameplayMaster : MonoBehaviour
 
     public static int GetLastManagedFile()
     {
-        return PlayerPrefs.GetInt("LastManagedFile");
+        SelectedFile = PlayerPrefs.GetInt("LastManagedFile");
+        return SelectedFile;
     }
 
     public static void SetLastManagedFile(int file)
     {
+        SelectedFile = file;
         PlayerPrefs.SetInt("LastManagedFile", file);
     }
 

@@ -924,6 +924,8 @@ GameObject:
   - component: {fileID: 659829131407068566}
   - component: {fileID: 9150242368358636562}
   - component: {fileID: 2389618117010732945}
+  - component: {fileID: -558388285361851283}
+  - component: {fileID: -4338337135201812738}
   m_Layer: 9
   m_Name: Avatar
   m_TagString: Untagged
@@ -1037,6 +1039,7 @@ MonoBehaviour:
   Description: It's YOU!
   RowPosition: 0
   ColumnPosition: 0
+  Figure: {fileID: 0}
   MainImage: {fileID: 0}
   Level: 1
   Class: {fileID: 1791329435643984854, guid: 0c755c9bf65f36a4daba5c184e8a7aaa, type: 3}
@@ -1096,9 +1099,11 @@ MonoBehaviour:
   - {fileID: 1791329435643984854, guid: 0c755c9bf65f36a4daba5c184e8a7aaa, type: 3}
   SkillSet:
   - {fileID: 420698567687869480}
+  PreExistingRelations:
+  - {fileID: -558388285361851283}
+  - {fileID: -4338337135201812738}
   AttackSkill: {fileID: 0}
   MapUsableSkills: []
-  Relations: []
 --- !u!114 &-1661851768111992753
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1193,6 +1198,34 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   State: {fileID: 3779496790374096947, guid: bd7eb85fa4a761a4d9789a5478bae024, type: 3}
   Rate: 150
+--- !u!114 &-558388285361851283
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5149667342464974805}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5d2003acd58baf4c823e527c3d6dcd3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Player: {fileID: 7185878704187127010, guid: ae89b416acec17f48b3121ff5475b448, type: 3}
+  Level: 3
+--- !u!114 &-4338337135201812738
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5149667342464974805}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5d2003acd58baf4c823e527c3d6dcd3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Player: {fileID: 2945622617598325490, guid: 6d9f2dda27a03f14990a0bcd0bc6258d, type: 3}
+  Level: 2
 --- !u!1 &5423001180570012798
 GameObject:
   m_ObjectHideFlags: 0

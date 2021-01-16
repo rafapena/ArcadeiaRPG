@@ -121,17 +121,17 @@ public class MMStats : MM_Super
 
     public void SetupRelations()
     {
-        List<PlayerCompanionship> sortedRelations = SelectedPlayer.Relations;//.OrderByDescending(t => t.Points).ToList();
+        List<PlayerRelation> sortedRelations = SelectedPlayer.Relations;//.OrderByDescending(t => t.Points).ToList();
         int i = 0;
-        foreach (PlayerCompanionship pc in sortedRelations)
+        foreach (PlayerRelation pr in sortedRelations)
         {
-            if (!pc) continue;
-            else if (MenuManager.PartyInfo.AllPlayers.Contains(pc.Player))
+            if (pr == null) continue;
+            else if (MenuManager.PartyInfo.AllPlayers.Contains(pr.Player))
             {
                 Transform entry = RelationsList.transform.GetChild(i);
                 RelationBar relBar = entry.GetChild(1).GetComponent<RelationBar>();
                 entry.gameObject.SetActive(true);
-                relBar.Setup(pc);
+                relBar.Setup(pr);
             }
             i++;
         }

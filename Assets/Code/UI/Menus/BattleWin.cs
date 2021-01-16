@@ -61,7 +61,7 @@ public class BattleWin : MonoBehaviour
     private List<ToolForInventory> ItemsEarned;
 
     // Companionships
-    private List<PlayerCompanionship> CompaionshipUpPlayers;
+    private List<PlayerRelation> CompaionshipUpPlayers;
     private List<int> CompanionshipUpBoostAmounts;
 
     private void Start()
@@ -70,7 +70,7 @@ public class BattleWin : MonoBehaviour
         CInfoFrameMainColor = LevelEXP.GetComponent<Image>().color;
         CInfoFrameLevelUpColor = new Color(1, 0.9f, 0.3f, CInfoFrameMainColor.a);
         ItemsEarned = new List<ToolForInventory>();
-        CompaionshipUpPlayers = new List<PlayerCompanionship>();
+        CompaionshipUpPlayers = new List<PlayerRelation>();
         CompanionshipUpBoostAmounts = new List<int>();
         NoItemsLabel.gameObject.SetActive(false);
     }

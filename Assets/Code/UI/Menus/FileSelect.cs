@@ -209,7 +209,6 @@ public class FileSelect : MonoBehaviour
     {
         FilesList.SelectedObject.SaveGame();
         OverwriteConfirmationFrame.SetActive(false);
-        GameplayMaster.SelectedFile = FilesList.SelectedIndex + 1;
         AwaitWrite("Saving...");
     }
 
@@ -217,7 +216,6 @@ public class FileSelect : MonoBehaviour
     {
         FilesList.SelectedButton.KeepSelected();
         FilesList.SelectedObject.LoadGame();
-        GameplayMaster.SelectedFile = FilesList.SelectedIndex + 1;
         SceneMaster.CloseFileSelect();
     }
 

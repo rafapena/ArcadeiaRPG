@@ -15,7 +15,7 @@ public class RelationBar : MonoBehaviour
 
     private Color PastCircleColor = new Color(0.6f, 1f, 0.6f);
 
-    public void Setup(PlayerCompanionship companionShip)
+    public void Setup(PlayerRelation companionShip)
     {
         Status.text = companionShip.Player.Name;    // BattleMaster.CompanionshipLevels[companionShip.Level];
         RectTransform rt = Bar.transform.GetComponent<RectTransform>();

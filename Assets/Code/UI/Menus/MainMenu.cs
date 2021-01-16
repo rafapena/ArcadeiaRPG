@@ -130,7 +130,7 @@ public class MainMenu : MonoBehaviour
         DifficultyFrame.Activate();
         DifficultyDescriptions.Activate();
         GameObject highestDifficultyButton = DifficultyList.GetChild(DifficultyList.transform.childCount - 1).gameObject;
-        highestDifficultyButton.SetActive(PlayerPrefs.GetInt("GameBeatenInNormalOrHard") > 0);
+        highestDifficultyButton.SetActive(PlayerPrefs.HasKey("GameBeatenInNormalOrHard"));
         EventSystem.current.SetSelectedGameObject(DifficultyList.GetChild(0).gameObject);
     }
 

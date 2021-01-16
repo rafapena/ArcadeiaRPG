@@ -543,7 +543,7 @@ public class BattleMenu : MonoBehaviour
     {
         try
         {
-            PlayerCompanionship pcInfo = CurrentBattle.PlayerParty.GetCompanionshipInfo(CP, player as BattlePlayer);
+            PlayerRelation pcInfo = CurrentBattle.PlayerParty.GetCompanionshipInfo(CP, player as BattlePlayer);
             return pcInfo.Points / 2;
         }
         catch { return 0; }

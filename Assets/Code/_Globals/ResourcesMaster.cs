@@ -48,7 +48,7 @@ public class ResourcesMaster : MonoBehaviour
 
     private void SetupAudio()
     {
-        if (PlayerPrefs.GetInt(GameplayMaster.AUDIO_SETUP) != 0) return;
+        if (PlayerPrefs.HasKey(GameplayMaster.AUDIO_SETUP)) return;
         PlayerPrefs.SetInt(GameplayMaster.AUDIO_SETUP, 1);
         PlayerPrefs.SetFloat(GameplayMaster.MASTER_MUSIC_VOLUME, DEFAULT_MASTER_MUSIC_VOLUME);
         PlayerPrefs.SetFloat(GameplayMaster.MASTER_SFX_VOLUME, DEFAULT_MASTER_SFX_VOLUME);
