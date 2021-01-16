@@ -5,8 +5,6 @@ using UnityEngine.UI;
 
 public class Battle : MonoBehaviour
 {
-    public enum BattleEndTypes { None, Win, BossWin, FinalWin, Lose, GameOver, Cut }
-
     public enum BattleStates { None, Menu, Action, Won, GameOver }
 
     // UI
@@ -220,7 +218,7 @@ public class Battle : MonoBehaviour
                 break;
 
             case BattleStates.GameOver:
-                //SetupGameOver();
+                SetupGameOver();
                 BattleState = BattleStates.None;
                 break;
         }
@@ -248,10 +246,7 @@ public class Battle : MonoBehaviour
             {
                 int bj1 = battlers[j - 1].Spd();
                 int bj2 = battlers[j].Spd();
-                if (bj1 > bj2 || 
-                    battlers[j - 1].ExecutedAction ||
-                    bj1 == bj2 && Random.Range(0, 100) < 50)
-                    continue;
+                if (bj1 > bj2 || battlers[j - 1].ExecutedAction || bj1 == bj2 && Random.Range(0, 100) < 50) continue;
                 Battler temp = battlers[j - 1];
                 battlers[j - 1] = battlers[j];
                 battlers[j] = temp;
@@ -306,8 +301,8 @@ public class Battle : MonoBehaviour
         }
         else if (PlayerPartyDefeated())
         {
-            if (EnemyParty.BattleEndType == BattleEndTypes.GameOver) DeclareGameOver();
-            //else if (EnemyParty.BattleEndType == BattleEndTypes.Lose) ;
+            if (EnemyParty.GameOverOnWin) DeclareGameOver();
+            else SceneMaster.EndBattle(PlayerParty);
             return true;
         }
         return false;
@@ -348,14 +343,18 @@ public class Battle : MonoBehaviour
     private void DeclareWin()
     {
         BattleState = BattleStates.Won;
-        BattleStateTime = Time.time + 1f;
+        BattleStateTime = Time.time + 0.5f;
     }
 
     private void DeclareGameOver()
     {
         BattleState = BattleStates.GameOver;
         BattleStateTime = Time.time + 0.5f;
-        Debug.Log("YOU LOSE");
+    }
+
+    private void SetupGameOver()
+    {
+        SceneMaster.OpenGameOver();
     }
 
     private void OnDestroy()

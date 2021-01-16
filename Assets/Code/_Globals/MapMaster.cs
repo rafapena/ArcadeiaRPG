@@ -18,6 +18,6 @@ public class MapMaster
 
     public static void SetScene(GameObject go)
     {
-        SceneName = go.scene.name;
+        if (!SceneMaster.InBattle) SceneName = go.scene.name;
     }
 }

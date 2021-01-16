@@ -1,27 +1,51 @@
 ﻿using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 /// <summary>
 /// Game over screen
 /// </summary>
 public class GameOver : MonoBehaviour
 {
-    public AudioSource EndSound;
+    public GameObject ReloadButton;
     public AudioSource ButtonClickSFX;
+    public MenuFrame SelectionFrame;
+
+    private float IntroTimer;
+    public float IntroTime;
 
     private void Start()
     {
-        EndSound.Play();
+        SelectionFrame.Deactivate();
+        IntroTimer = Time.unscaledTime + IntroTime;
     }
 
-    public void TryAgain()
+    private void Update()
     {
-        ButtonClickSFX.Play();
-        //ScreenFadeManager.ChangeScene("gameplayLvl" + Globals.Level, 1, "");
+        if (!SelectionFrame.Activated && Time.unscaledTime > IntroTimer)
+        {
+            SelectionFrame.Activate();
+            EventSystem.current.SetSelectedGameObject(ReloadButton);
+        }
     }
 
-    public void BackToMenu()
+    public void ReloadFromLastSave()
     {
         ButtonClickSFX.Play();
-        SceneMaster.ChangeScene("Title", 2f);
+        SaveData data = new SaveData(GameplayMaster.GetLastManagedFile());
+        data.LoadGame();
+        SceneMaster.CloseGameOver();
+    }
+
+    public void ReturnToTitle()
+    {
+        ButtonClickSFX.Play();
+        SceneMaster.ChangeScene(SceneMaster.TITLE_SCREEN_SCENE, 2f);
+        SceneMaster.CloseGameOver();
+    }
+
+    public void ExitGame()
+    {
+        Application.Quit();
     }
 }

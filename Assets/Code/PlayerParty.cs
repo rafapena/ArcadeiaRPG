@@ -117,6 +117,8 @@ public class PlayerParty : MonoBehaviour
         b.Items = LoadBattlersList(file, b, ResourcesMaster.Items, bt);
         b.PassiveSkills = LoadBattlersList(file, b, ResourcesMaster.PassiveSkills, bt);
         b.States = LoadBattlersList(file, b, ResourcesMaster.States, bt);
+        string sw = bt + "SelectedWeapon_" + file;
+        if (PlayerPrefs.HasKey(sw)) b.SelectedWeapon = b.Weapons.Find(x => x.Id == PlayerPrefs.GetInt(sw));
         BattlePlayer p = b as BattlePlayer;
         if (p)
         {

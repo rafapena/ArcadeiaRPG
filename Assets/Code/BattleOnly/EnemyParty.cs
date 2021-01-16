@@ -7,8 +7,8 @@ public class EnemyParty : BaseObject
 
     public List<BattleEnemy> Enemies;
     public bool RunDisabled;
-    public Battle.BattleEndTypes BattleEndType;
     public EnemyPartyModes PartyMode;
+    public bool GameOverOnWin = true;
 
     [HideInInspector] public int[][] IndexMapping;
 

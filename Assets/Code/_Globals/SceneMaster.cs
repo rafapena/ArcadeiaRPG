@@ -13,10 +13,12 @@ public class SceneMaster : MonoBehaviour
     public static bool InBattle = false;
     public static List<GameObject> StoredMapScene;
 
+    public const string TITLE_SCREEN_SCENE = "Title";
     public const string MAP_MENU_SCENE = "MapMenu";
     public const string PAUSE_MENU_SCENE = "PauseMenu";
     public const string FILE_SELECT_MENU_SCENE = "FileSelect";
     public const string BATTLE_SCENE = "Battle";
+    public const string GAME_OVER_SCENE = "GameOver";
     public const string SCREEN_TRANSITION_SCENE = "ScreenTransition";
     public const float BATTLE_TRANSITION_TIME = 1f;
 
@@ -28,6 +30,21 @@ public class SceneMaster : MonoBehaviour
         string newScene = sceneName;
         ScreenTransitioner.SetupComponents(oldScene, newScene, blackScreenTime, changeMode, transitionMode);
         SceneManager.LoadScene(SCREEN_TRANSITION_SCENE, LoadSceneMode.Additive);
+    }
+
+    public static void OpenGameOver()
+    {
+        InBattle = false;
+        SceneManager.LoadScene(GAME_OVER_SCENE, LoadSceneMode.Additive);
+        Time.timeScale = 0;
+    }
+
+    public static void CloseGameOver()
+    {
+        Destroy(MapMaster.EnemyEncountered.gameObject);
+        SceneManager.UnloadSceneAsync(BATTLE_SCENE);
+        SceneManager.UnloadSceneAsync(GAME_OVER_SCENE);
+        Time.timeScale = 1;
     }
 
     public static void StartBattle(PlayerParty playerParty, EnemyParty enemyParty)

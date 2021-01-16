@@ -109,6 +109,7 @@ public class SaveData
         SaveBattlersList(b.Items, bt);
         SaveBattlersList(b.PassiveSkills, bt);
         SaveBattlersList(b.States, bt);
+        if (b.Weapons.Count > 0) PlayerPrefs.SetInt(bt + "SelectedWeapon_" + File, b.SelectedWeapon.Id);
         BattlePlayer p = b as BattlePlayer;
         if (!p) return;
         for (int i = 0; i < p.Relations.Count; i++)

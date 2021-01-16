@@ -11,7 +11,6 @@ public class PauseMenu : MonoBehaviour
     private Selections Selection;
 
     // Child GameObjects
-    private const string TITLE_SCREEN_SCENE = "Title";
     public MenuFrame PauseFrame;
     public GameObject ButtonList;
     public OptionsFrame Options;
@@ -130,7 +129,7 @@ public class PauseMenu : MonoBehaviour
     public void ReturnToTitle()
     {
         Continue();
-        SceneMaster.ChangeScene(TITLE_SCREEN_SCENE, 2f);
+        SceneMaster.ChangeScene(SceneMaster.TITLE_SCREEN_SCENE, 2f);
     }
 
     public void ExitGame()

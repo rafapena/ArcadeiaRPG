@@ -27,8 +27,7 @@ public class ScreenTransitioner : MonoBehaviour
     // NOTE: Setup components should be called first, beforehand
     void Start()
     {
-        for (int i = 0; i < transform.childCount; i++)
-            transform.GetChild(i).gameObject.SetActive(false);
+        for (int i = 0; i < transform.childCount; i++) transform.GetChild(i).gameObject.SetActive(false);
         TransitionScreen = transform.GetChild((int)TransitionMode).gameObject;
         TransitionScreen.SetActive(true);
         TransitionScreen.GetComponent<CanvasGroup>().alpha = 0;
@@ -69,7 +68,7 @@ public class ScreenTransitioner : MonoBehaviour
         }
 
         else if (FadeChangesMade == 0)
-            FadeChangesMade++;
+            FadeChangesMade++; 
 
         else if (time > 0)
             TransitionScreen.GetComponent<CanvasGroup>().alpha -= FADE_SPEED;

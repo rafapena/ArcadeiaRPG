@@ -36,6 +36,7 @@ public class MapPlayer : MapExplorer
             all[i] = Instantiate(all[i], BattlersListDump);
             Battler b = all[i];
             b.Level = Party.Level;
+            if (b.Weapons.Count > 0) b.SelectedWeapon = b.Weapons[0];
             b.StatConversion();
             b.gameObject.SetActive(false);
         }
