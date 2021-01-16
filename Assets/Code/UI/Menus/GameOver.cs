@@ -8,6 +8,7 @@ using UnityEngine.UI;
 public class GameOver : MonoBehaviour
 {
     public GameObject ReloadButton;
+    public GameObject ReturnToMenuButton;
     public AudioSource ButtonClickSFX;
     public MenuFrame SelectionFrame;
 
@@ -25,14 +26,19 @@ public class GameOver : MonoBehaviour
         if (!SelectionFrame.Activated && Time.unscaledTime > IntroTimer)
         {
             SelectionFrame.Activate();
-            EventSystem.current.SetSelectedGameObject(ReloadButton);
+            if (GameplayMaster.NoFileSelected())
+            {
+                MenuMaster.DisableSelection(ref ReloadButton);
+                EventSystem.current.SetSelectedGameObject(ReturnToMenuButton);
+            }
+            else EventSystem.current.SetSelectedGameObject(ReloadButton);
         }
     }
 
     public void ReloadFromLastSave()
     {
         ButtonClickSFX.Play();
-        SaveData data = new SaveData(GameplayMaster.GetLastManagedFile());
+        SaveData data = new SaveData(GameplayMaster.SelectedFile);
         data.LoadGame();
         SceneMaster.CloseGameOver();
     }
