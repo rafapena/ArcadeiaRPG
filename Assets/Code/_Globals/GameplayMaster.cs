@@ -29,7 +29,7 @@ public class GameplayMaster : MonoBehaviour
 
     public static PlayerParty Party;
 
-    private void Start()
+    private void Awake()
     {
         MapMaster.SetScene(gameObject);
         MapMaster.CurrentLocation = Location.ToString().Replace("_", " ");

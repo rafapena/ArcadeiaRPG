@@ -6,19 +6,15 @@ public class PlayerInteractionField : MonoBehaviour
 {
     public MapPlayer Avatar;
     public List<ItemBox> ItemsBoxesFound;
-    //public List<NPC> NPCsFound;
+    public List<MapNPC> NPCsFound;
 
     private void Update()
     {
         if (!InputMaster.Interact()) return;
         foreach (ItemBox b in ItemsBoxesFound)
             if (b.CloseToPlayer) b.Open(Avatar);
-        /*foreach (NPC n in NPCsFound)
-        {
-            if (!n.ClosingPlayer) return;
-            Avatar.PointToDirectionOf(n);
-            n.InteractWith(Avatar);
-        }*/
+        foreach (MapNPC n in NPCsFound)
+            if (n.CloseToPlayer) n.InteractWith(Avatar);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
@@ -41,9 +37,9 @@ public class PlayerInteractionField : MonoBehaviour
                 if (nearby) ItemsBoxesFound.Add(b);
                 break;
             case "NPC":
-                //NPC n = collision.gameObject.GetComponent<NPC>();
-                //n.ClosingPlayer = nearby ? Avatar : null;
-                //NPCsFound.Add(n)
+                MapNPC n = collision.gameObject.GetComponent<MapNPC>();
+                n.CloseToPlayer = nearby;
+                if (nearby) NPCsFound.Add(n);
                 break;
         }
     }

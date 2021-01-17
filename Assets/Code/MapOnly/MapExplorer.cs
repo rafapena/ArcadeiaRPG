@@ -7,7 +7,7 @@ public abstract class MapExplorer : MonoBehaviour
     public const int PLAYER_LAYER = 9;
     public const int ENEMY_LAYER = 10;
 
-    public Rigidbody2D Figure;
+    [HideInInspector] public Rigidbody2D Figure;
     protected Vector3 Movement;
     public float Speed;
 
@@ -22,7 +22,7 @@ public abstract class MapExplorer : MonoBehaviour
 
     protected virtual void Start()
     {
-
+        //
     }
 
     protected virtual void Update()
