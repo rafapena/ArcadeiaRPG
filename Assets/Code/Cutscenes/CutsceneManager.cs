@@ -15,27 +15,22 @@ public class CutsceneManager : MonoBehaviour
     public GameObject ChoicesFrame;
     public GameObject ChoicesList;
 
-    [HideInInspector] string TextInput;
-    private char[] TextInputSplit;
-    private char[] TextToPrintSplit;
+    private string FullText;
     private bool IsPrintingDialogue = false;
 
     public void SetText(string s)
     {
-        TextInput = s;
-        TextInputSplit = s.ToCharArray();
-        TextToPrintSplit = new char[TextInputSplit.Length];
+        FullText = s;
         StartCoroutine(PrintText());
     }
 
     IEnumerator PrintText()
     {
         IsPrintingDialogue = true;
-        for (int i = 0; i < TextInputSplit.Length; i++)
+        for (int i = 0; i <= FullText.Length; i++)
         {
-            TextToPrintSplit[i] = TextInputSplit[i];
-            string s = new string(TextToPrintSplit);
-            DialogueLabel.text = s;
+            DialogueLabel.text = IsPrintingDialogue ? FullText.Substring(0, i) : FullText;
+            if (!IsPrintingDialogue) break;
             yield return new WaitForSeconds(GameplayMaster.TextSpeed);
         }
         IsPrintingDialogue = false;
@@ -48,8 +43,6 @@ public class CutsceneManager : MonoBehaviour
 
     public void ForceStop()
     {
-        TextToPrintSplit = TextInputSplit;
-        DialogueLabel.text = TextInput;
         IsPrintingDialogue = false;
     }
 

@@ -11,6 +11,9 @@ public class GameplayMaster : MonoBehaviour
     public static Difficulties Difficulty;
     public MapMaster.Locations Location;
 
+    public enum TextSpeeds { Slow, Medium, Fast }
+    private static float[] TextSpeedNumbers = new float[] { 0.05f, 0.02f, 0.004f };
+
     public static int MAX_LOADED_FILE_CONTENT = 2;
     private static int LoadedFile;
     public static int SelectedFile;
@@ -22,7 +25,7 @@ public class GameplayMaster : MonoBehaviour
     public GameObject BGM_List;
 
     public static float TextSpeed;
-    public const string TEXT_DELAY = "TextDelay";
+    public const string TEXT_DELAY_INDEX = "TextDelay";
 
     public static float TotalPlayTime;
     public static int InGameDay;
@@ -37,7 +40,7 @@ public class GameplayMaster : MonoBehaviour
         MapMaster.SetScene(gameObject);
         MapMaster.CurrentLocation = Location.ToString().Replace("_", " ");
         SetupAudio();
-        TextSpeed = PlayerPrefs.GetFloat(TEXT_DELAY);
+        SetTextSpeed(PlayerPrefs.GetInt(TEXT_DELAY_INDEX));
     }
 
     private void Update()
@@ -58,7 +61,7 @@ public class GameplayMaster : MonoBehaviour
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// -- Audio --
+    /// -- Options --
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public void SetupAudio()
@@ -69,6 +72,12 @@ public class GameplayMaster : MonoBehaviour
         {
             t.gameObject.GetComponent<AudioSource>().volume = m;
         }
+    }
+
+    public static void SetTextSpeed(int index)
+    {
+        TextSpeed = TextSpeedNumbers[index];
+        PlayerPrefs.SetInt(TEXT_DELAY_INDEX, index);
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

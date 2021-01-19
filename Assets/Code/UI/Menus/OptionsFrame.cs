@@ -12,15 +12,9 @@ public class OptionsFrame : MonoBehaviour
     public Slider SFXSlider;
     private bool HoveredOverMusic;
     private bool HoveredOverSFX;
+    public GameObject TextSpeedList;
     public GameObject DifficultyList;
     private const float SLIDER_CHANGE_RATE = 0.01f;
-
-    private void Awake()
-    {
-        MusicSlider.value = PlayerPrefs.GetFloat(GameplayMaster.MASTER_MUSIC_VOLUME);
-        SFXSlider.value = PlayerPrefs.GetFloat(GameplayMaster.MASTER_SFX_VOLUME);
-        if (DifficultyList.activeSelf) SelectDifficulty((int)GameplayMaster.Difficulty);
-    }
 
     private void Update()
     {
@@ -32,6 +26,10 @@ public class OptionsFrame : MonoBehaviour
     {
         MainFrame.Activate();
         EventSystem.current.SetSelectedGameObject(transform.GetChild(1).gameObject);
+        MusicSlider.value = PlayerPrefs.GetFloat(GameplayMaster.MASTER_MUSIC_VOLUME);
+        SFXSlider.value = PlayerPrefs.GetFloat(GameplayMaster.MASTER_SFX_VOLUME);
+        SelectTextSpeed(PlayerPrefs.GetInt(GameplayMaster.TEXT_DELAY_INDEX));
+        if (DifficultyList.activeSelf) SelectDifficulty((int)GameplayMaster.Difficulty);
     }
 
     public void Deactivate()
@@ -76,13 +74,24 @@ public class OptionsFrame : MonoBehaviour
         else if (Input.GetKey(KeyCode.RightArrow)) slider.value += SLIDER_CHANGE_RATE;
     }
 
+    public void SelectTextSpeed(int index)
+    {
+        for (int i = 1; i < TextSpeedList.transform.childCount; i++) TextSpeedList.transform.GetChild(i).GetComponent<ListSelectable>().ClearHighlights();
+        TextSpeedList.transform.GetChild(index + 1).GetComponent<ListSelectable>().KeepHighlighted();
+        GameplayMaster.SetTextSpeed(index);
+    }
+
     public void SelectDifficulty(int index)
     {
-        for (int i = 1; i < DifficultyList.transform.childCount; i++)
-        {
-            DifficultyList.transform.GetChild(i).GetComponent<ListSelectable>().ClearHighlights();
-        }
+        for (int i = 1; i < DifficultyList.transform.childCount; i++) DifficultyList.transform.GetChild(i).GetComponent<ListSelectable>().ClearHighlights();
         DifficultyList.transform.GetChild(index + 1).GetComponent<ListSelectable>().KeepHighlighted();
         GameplayMaster.Difficulty = (GameplayMaster.Difficulties)index;
+    }
+
+    public void RestoreToDefaults()
+    {
+        MusicSlider.value = ResourcesMaster.DEFAULT_MASTER_MUSIC_VOLUME;
+        SFXSlider.value = ResourcesMaster.DEFAULT_MASTER_SFX_VOLUME;
+        SelectTextSpeed(ResourcesMaster.DEFAULT_TEXT_DELAY_INDEX);
     }
 }
