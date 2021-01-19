@@ -131,7 +131,7 @@ public class MapPlayer : MapExplorer
 
     protected override void Update()
     {
-        if (SceneMaster.InMenu()) return;      // Player input should not work, while in the menu
+        if (SceneMaster.InMenu() || SceneMaster.InCutscene) return;      // Player input should not work
         if (!SceneMaster.InBattle)
         {
             if (Input.GetKeyDown(KeyCode.Q)) SceneMaster.OpenFileSelect(FileSelect.FileMode.Save, Party);

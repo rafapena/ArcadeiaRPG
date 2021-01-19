@@ -10,6 +10,7 @@ public class SceneMaster : MonoBehaviour
     private static bool InMapMenu = false;
     private static bool InPauseMenu = false;
     private static bool InFileSelectMenu = false;
+    public static bool InCutscene = false;
     public static bool InBattle = false;
     public static List<GameObject> StoredMapScene;
 

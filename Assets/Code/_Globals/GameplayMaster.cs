@@ -15,11 +15,14 @@ public class GameplayMaster : MonoBehaviour
     private static int LoadedFile;
     public static int SelectedFile;
     public static int Chapter;
+    public const string OPTIONS_SETUP = "OptionsSetup";
 
-    public const string AUDIO_SETUP = "AudioSetup";
     public const string MASTER_MUSIC_VOLUME = "MasterMusicVolume";
     public const string MASTER_SFX_VOLUME = "MasterSFXVolume";
     public GameObject BGM_List;
+
+    public static float TextSpeed;
+    public const string TEXT_DELAY = "TextDelay";
 
     public static float TotalPlayTime;
     public static int InGameDay;
@@ -34,6 +37,7 @@ public class GameplayMaster : MonoBehaviour
         MapMaster.SetScene(gameObject);
         MapMaster.CurrentLocation = Location.ToString().Replace("_", " ");
         SetupAudio();
+        TextSpeed = PlayerPrefs.GetFloat(TEXT_DELAY);
     }
 
     private void Update()

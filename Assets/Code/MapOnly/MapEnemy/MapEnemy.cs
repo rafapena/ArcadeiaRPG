@@ -43,7 +43,7 @@ public class MapEnemy : MapExplorer
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.GetComponent<MapPlayer>())
+        if (collision.gameObject.GetComponent<MapPlayer>() && !SceneMaster.InCutscene)
         {
             SceneMaster.StartBattle(TargetPlayer.Party, EnemyPartyOnContact);
             MapMaster.EnemyEncountered = this;

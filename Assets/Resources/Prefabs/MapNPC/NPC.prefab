@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 11015396547104666}
   - component: {fileID: 4159594026987480694}
   - component: {fileID: -5435698255098521730}
+  - component: {fileID: 790067372471918092}
   m_Layer: 0
   m_Name: NPC
   m_TagString: NPC
@@ -145,3 +146,25 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Figure: {fileID: 0}
   Speed: 0
+  Cutscene: {fileID: 790067372471918092}
+  CloseToPlayer: 0
+  Interacting: 0
+--- !u!114 &790067372471918092
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5624627062513778443}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d47b2f093457be1428e35ee57151888e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Manager: {fileID: 0}
+  Dialogue:
+  - {fileID: 0}
+  - {fileID: 0}
+  OnComplete:
+    m_PersistentCalls:
+      m_Calls: []

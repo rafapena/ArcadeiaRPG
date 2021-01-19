@@ -10,6 +10,7 @@ public class ResourcesMaster : MonoBehaviour
     private bool IsSetup;
     private const float DEFAULT_MASTER_MUSIC_VOLUME = 1f;
     private const float DEFAULT_MASTER_SFX_VOLUME = 0.8f;
+    private const float DEFAULT_TEXT_DELAY = 0.02f;
 
     public static BattleAlly[] Allies { get; private set; }
 
@@ -42,16 +43,17 @@ public class ResourcesMaster : MonoBehaviour
     {
         if (IsSetup) return;
         IsSetup = true;
-        SetupAudio();
+        SetupOptions();
         SetupLists();   
     }
 
-    private void SetupAudio()
+    private void SetupOptions()
     {
-        if (PlayerPrefs.HasKey(GameplayMaster.AUDIO_SETUP)) return;
-        PlayerPrefs.SetInt(GameplayMaster.AUDIO_SETUP, 1);
+        if (PlayerPrefs.HasKey(GameplayMaster.OPTIONS_SETUP)) return;
+        PlayerPrefs.SetInt(GameplayMaster.OPTIONS_SETUP, 1);
         PlayerPrefs.SetFloat(GameplayMaster.MASTER_MUSIC_VOLUME, DEFAULT_MASTER_MUSIC_VOLUME);
         PlayerPrefs.SetFloat(GameplayMaster.MASTER_SFX_VOLUME, DEFAULT_MASTER_SFX_VOLUME);
+        PlayerPrefs.SetFloat(GameplayMaster.TEXT_DELAY, DEFAULT_TEXT_DELAY);
     }
 
     private void SetupLists()
