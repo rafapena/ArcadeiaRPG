@@ -7,3 +7,5 @@ P - Pause
 Q - Save
 SPACE - Open inventory
 Arrow Keys / WASD - Move around
+
+Title screen at ArcadeiaRPG\Assets\Scenes\Menus\Title.unity
