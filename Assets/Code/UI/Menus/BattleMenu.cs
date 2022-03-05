@@ -164,6 +164,7 @@ public class BattleMenu : MonoBehaviour
 
     private void SelectAction()
     {
+        if (!MenuMaster.ReadyToSelectInMenu) return;
         if (Input.GetKeyDown(KeyCode.Backspace) && CurrentPlayer > 0)
         {
             CSelected.GetComponent<Image>().sprite = null;
@@ -276,6 +277,7 @@ public class BattleMenu : MonoBehaviour
 
     private void SelectSkill()
     {
+        if (!MenuMaster.ReadyToSelectInMenu) return;
         if (Input.GetKeyDown(KeyCode.Backspace))
         {
             SetupForSelectAction();
@@ -366,6 +368,7 @@ public class BattleMenu : MonoBehaviour
 
     private void SelectItem()
     {
+        if (!MenuMaster.ReadyToSelectInMenu) return;
         if (Input.GetKeyDown(KeyCode.Backspace))
         {
             SetupForSelectAction();
@@ -551,6 +554,7 @@ public class BattleMenu : MonoBehaviour
 
     private void SelectTeammates()
     {
+        if (!MenuMaster.ReadyToSelectInMenu) return;
         if (Input.GetKeyDown(KeyCode.Backspace))
         {
             HideKeyboardChoiceButtons();

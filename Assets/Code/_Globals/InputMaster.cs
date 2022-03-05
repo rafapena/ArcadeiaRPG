@@ -9,21 +9,34 @@ public class InputMaster
 {
     public static bool GoingBack()
     {
-        return Input.GetKeyDown(KeyCode.X) || Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.Backspace) || Input.GetKeyDown(KeyCode.Escape);
+        return ReadyToGoBack && (Input.GetKeyDown(KeyCode.X) || Input.GetMouseButtonDown(1) || Input.GetKeyDown(KeyCode.Backspace) || Input.GetKeyDown(KeyCode.Escape));
     }
 
     public static bool Interact()
     {
-        return !SceneMaster.InMenu() && Input.GetKeyDown(KeyCode.Z);
+        return ReadyForInput && Input.GetKeyDown(KeyCode.Z);
     }
 
     public static bool Pause()
     {
-        return !SceneMaster.InMenu() && Input.GetKeyDown(KeyCode.P);
+        return ReadyForInput && Input.GetKeyDown(KeyCode.P);
+    }
+
+    public static bool FileSelect()
+    {
+        return ReadyForInput && Input.GetKeyDown(KeyCode.Q);
     }
 
     public static bool MapMenu()
     {
-        return !SceneMaster.InMenu() && Input.GetKeyDown(KeyCode.Space);
+        return ReadyForInput && Input.GetKeyDown(KeyCode.Space);
     }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// -- Setup for input --
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    private static bool ReadyForInput => MenuMaster.ReadyToSelectInMenu && MenuMaster.ReadyToSelectInGameplay && !SceneMaster.InMenu;
+
+    private static bool ReadyToGoBack => MenuMaster.ReadyToSelectInMenu && MenuMaster.ReadyToSelectInGameplay;
 }

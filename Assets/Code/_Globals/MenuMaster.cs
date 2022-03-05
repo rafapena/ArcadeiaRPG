@@ -10,6 +10,27 @@ using UnityEngine.UI;
 
 public class MenuMaster : MonoBehaviour
 {
+    // For menu selection
+    private static float SelectionTimer = 0;
+    private const float SELECTION_BUFFER = 0.6f;
+
+    // For gameplay
+    private static float SelectionTimerGP = 0;
+    private const float SELECTION_BUFFER_GP = 0.5f;
+
+    public static bool ReadyToSelectInMenu => Time.unscaledTime > SelectionTimer;
+    public static bool ReadyToSelectInGameplay => Time.time > SelectionTimerGP;
+
+    public static void SetupSelectionBufferInMenu(float change = 1f)
+    {
+        SelectionTimer = Time.unscaledTime + SELECTION_BUFFER * change;
+    }
+
+    public static void SetupSelectionBufferInGameplay(float change = 1f)
+    {
+        SelectionTimerGP = Time.time + SELECTION_BUFFER_GP * change;
+    }
+
     public static void DisableSelection(ref GameObject button)
     {
         Color c = Color.white;

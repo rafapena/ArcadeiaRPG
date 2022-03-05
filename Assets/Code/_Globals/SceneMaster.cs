@@ -10,8 +10,13 @@ public class SceneMaster : MonoBehaviour
     private static bool InMapMenu = false;
     private static bool InPauseMenu = false;
     private static bool InFileSelectMenu = false;
-    public static bool InCutscene = false;
-    public static bool InBattle = false;
+
+    public static bool InMenu => InMapMenu || InPauseMenu || InFileSelectMenu;
+
+    public static bool InCutscene { get; private set; } = false;
+
+    public static bool InBattle { get; private set; } = false;
+     
     public static List<GameObject> StoredMapScene;
 
     public const string TITLE_SCREEN_SCENE = "Title";
@@ -58,6 +63,7 @@ public class SceneMaster : MonoBehaviour
 
     public static void EndBattle(PlayerParty playerParty)
     {
+        MenuMaster.SetupSelectionBufferInGameplay(0.5f);
         ChangeScene(BATTLE_SCENE, BATTLE_TRANSITION_TIME / 2, ScreenTransitioner.SceneChangeModes.Remove, ScreenTransitioner.TransitionModes.BlackScreen);
         MapMaster.EnemyEncountered.DeclareDefeated();
         InBattle = false;
@@ -73,10 +79,11 @@ public class SceneMaster : MonoBehaviour
 
     public static void CloseMapMenu(PlayerParty playerParty)
     {
+        MenuMaster.SetupSelectionBufferInGameplay(0.5f);
         GameplayMaster.Party = playerParty;
         SceneManager.UnloadSceneAsync(MAP_MENU_SCENE);
         InMapMenu = false;
-        if (!InMenu()) Time.timeScale = 1;
+        if (!InMenu) Time.timeScale = 1;
     }
 
     public static void OpenPauseMenu(PlayerParty playerParty)
@@ -89,10 +96,11 @@ public class SceneMaster : MonoBehaviour
 
     public static void ClosePauseMenu(PlayerParty playerParty)
     {
+        MenuMaster.SetupSelectionBufferInGameplay(0.5f);
         GameplayMaster.Party = playerParty;
         SceneManager.UnloadSceneAsync(PAUSE_MENU_SCENE);
         InPauseMenu = false;
-        if (!InMenu()) Time.timeScale = 1;
+        if (!InMenu) Time.timeScale = 1;
     }
 
     public static void OpenFileSelect(FileSelect.FileMode fileMode, PlayerParty playerParty = null)
@@ -106,9 +114,21 @@ public class SceneMaster : MonoBehaviour
 
     public static void CloseFileSelect()
     {
+        MenuMaster.SetupSelectionBufferInGameplay();
         SceneManager.UnloadSceneAsync(FILE_SELECT_MENU_SCENE);
         InFileSelectMenu = false;
-        if (!InMenu()) Time.timeScale = 1;
+        if (!InMenu) Time.timeScale = 1;
+    }
+
+    public static void OpenCutscene()
+    {
+        InCutscene = true;
+    }
+
+    public static void CloseCutscene()
+    {
+        MenuMaster.SetupSelectionBufferInGameplay();
+        InCutscene = false;
     }
 
     public static void StoreGameObjects()
@@ -128,10 +148,5 @@ public class SceneMaster : MonoBehaviour
     {
         foreach (GameObject g in StoredMapScene)
             if (g) g.SetActive(false);
-    }
-
-    public static bool InMenu()
-    {
-        return InMapMenu || InPauseMenu || InFileSelectMenu;
     }
 }

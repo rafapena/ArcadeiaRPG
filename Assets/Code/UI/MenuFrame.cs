@@ -95,6 +95,7 @@ public class MenuFrame : MonoBehaviour
         if (Activated) return;
         Shifted = true;
         Activated = true;
+        MenuMaster.SetupSelectionBufferInMenu();
     }
 
     public void Deactivate()
@@ -108,6 +109,7 @@ public class MenuFrame : MonoBehaviour
     {
         transform.position = ActivatedSpot;
         Activated = true;
+        MenuMaster.SetupSelectionBufferInMenu();
     }
 
     public void DeactivateNonAnimate()

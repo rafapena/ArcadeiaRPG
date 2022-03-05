@@ -39,8 +39,8 @@ public class Cutscene : MonoBehaviour
     public void Open(bool hadToInteract = true)
     {
         Manager.Open();
+        SceneMaster.OpenCutscene();
         CurrentlyRunning = true;
-        SceneMaster.InCutscene = true;
         CurrentBubble = 0;
         Dialogue[CurrentBubble].Display(Manager);
         InteractionBuffer = hadToInteract;
@@ -56,8 +56,8 @@ public class Cutscene : MonoBehaviour
     public void Complete()
     {
         Manager.Close();
+        SceneMaster.CloseCutscene();
         CurrentlyRunning = false;
-        SceneMaster.InCutscene = false;
         CurrentBubble = 0;
     }
 }

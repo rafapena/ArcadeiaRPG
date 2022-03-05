@@ -118,7 +118,7 @@ public class FileSelect : MonoBehaviour
 
     public void SelectFile()
     {
-        if (Waiting()) return;
+        if (Waiting() || !MenuMaster.ReadyToSelectInMenu) return;
         bool selectedNonEmptyFile = SetupFileInfo();
         FilesList.UnhighlightAll();
         SelectModeFrame.SetActive(false);

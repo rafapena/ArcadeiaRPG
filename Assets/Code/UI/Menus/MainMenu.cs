@@ -27,7 +27,8 @@ public class MainMenu : MonoBehaviour
     public OptionsFrame OptionsFrame;
 
     private float IntroTimer;
-    public float IntroTime;
+    private float INTRO_TIMER_BUFFER = 0.6f;//3f;
+    private bool FileSelecting = false;
 
     private void Start()
     {
@@ -35,7 +36,7 @@ public class MainMenu : MonoBehaviour
         //PlayerPrefs.DeleteAll();
 
         Time.timeScale = 1;
-        IntroTimer = Time.time + IntroTime;
+        IntroTimer = Time.time + INTRO_TIMER_BUFFER;
         if (OpeningMusic) OpeningMusic.Play();
         PressAnyKeyInput.SetActive(false);
         SelectionFrame.Deactivate();
@@ -46,7 +47,7 @@ public class MainMenu : MonoBehaviour
 
     private void Update()
     {
-        if (!PressedKey && Time.time > IntroTimer)
+        if (!PressedKey && FinishedIntro())
         {
             PressAnyKeyInput.SetActive(Time.time % 1 < 0.5f);
             if (Input.anyKeyDown)
@@ -61,17 +62,29 @@ public class MainMenu : MonoBehaviour
         {
             if (OptionsMenu.activeSelf) GoBackFromOptions();
             else if (DifficultySelect.activeSelf) UndoDifficultySelect();
+            else if (FileSelecting)
+            {
+                FileSelecting = false;
+                CheckSaves();
+            }
         }
+    }
+
+    private bool FinishedIntro()
+    {
+        return Time.time > IntroTimer;
     }
 
     public void StartNew()
     {
+        if (!MenuMaster.ReadyToSelectInMenu) return;
         ButtonClickSFX.Play();
         SetupDifficultySelect();
     }
 
     public void Continue()
     {
+        if (!MenuMaster.ReadyToSelectInMenu) return;
         ButtonClickSFX.Play();
         SaveData data = new SaveData(GameplayMaster.GetLastManagedFile());
         data.LoadGame();
@@ -79,19 +92,23 @@ public class MainMenu : MonoBehaviour
 
     public void SwitchFiles()
     {
+        if (!MenuMaster.ReadyToSelectInMenu) return;
         ButtonClickSFX.Play();
         FileSelectionList.HighlightedButtonAfterUndo = EventSystem.current.currentSelectedGameObject;
         SceneMaster.OpenFileSelect(FileSelect.FileMode.LoadOrDelete);
+        FileSelecting = true;
     }
 
     public void GoToOptions()
     {
+        if (!MenuMaster.ReadyToSelectInMenu) return;
         OptionsMenu.SetActive(true);
         OptionsFrame.Activate();
     }
 
     public void ExitGame()
     {
+        if (!MenuMaster.ReadyToSelectInMenu) return;
         ButtonClickSFX.Play();
         Application.Quit();
     }
@@ -102,14 +119,19 @@ public class MainMenu : MonoBehaviour
         for (int i = 0; i < 100; i++)
         {
             SaveData s = new SaveData(i);
-            if (!s.FileDataExists) continue;
-            fileExists = true;
-            break;
+            if (s.FileDataExists)
+            {
+                fileExists = true;
+            }
+            else if (s.File == GameplayMaster.GetLastManagedFile())
+            {
+                MenuMaster.DisableSelection(ref ContinueButton);
+            }
         }
         if (!fileExists)
         {
-            MenuMaster.DisableSelection(ref ContinueButton);
             MenuMaster.DisableSelection(ref SwitchFilesButton);
+            EventSystem.current.SetSelectedGameObject(NewGameButton);
         }
     }
 
@@ -144,7 +166,7 @@ public class MainMenu : MonoBehaviour
 
     public void SelectDifficulty(int index)
     {
-        if (SelectedFinal) return;
+        if (SelectedFinal || !MenuMaster.ReadyToSelectInMenu) return;
         switch (index)
         {
             case 0:

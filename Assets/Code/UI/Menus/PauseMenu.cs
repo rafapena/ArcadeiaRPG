@@ -28,17 +28,18 @@ public class PauseMenu : MonoBehaviour
 
     private void Update()
     {
+        bool goingBack = InputMaster.GoingBack();
         switch (Selection)
         {
             case Selections.PauseMain:
-                if (InputMaster.GoingBack()) Continue();
+                if (goingBack) Continue();
                 break;
             case Selections.Options:
-                if (InputMaster.GoingBack()) BackToPauseMain();
+                if (goingBack) BackToPauseMain();
                 break;
             case Selections.ConfirmReturnTitle:
             case Selections.ConfirmExitGame:
-                if (InputMaster.GoingBack()) BackToPauseMain();
+                if (goingBack) BackToPauseMain();
                 break;
         }
     }
@@ -55,23 +56,27 @@ public class PauseMenu : MonoBehaviour
 
     public void Continue()
     {
+        if (!MenuMaster.ReadyToSelectInMenu) return;
         SceneMaster.ClosePauseMenu(PartyInfo);
     }
 
     public void GoToMenu()
     {
+        if (!MenuMaster.ReadyToSelectInMenu) return;
         SceneMaster.ClosePauseMenu(PartyInfo);
         SceneMaster.OpenMapMenu(PartyInfo);
     }
 
     public void GoToLoadGame()
     {
+        if (!MenuMaster.ReadyToSelectInMenu) return;
         SceneMaster.ClosePauseMenu(PartyInfo);
         SceneMaster.OpenFileSelect(FileSelect.FileMode.LoadOrDelete, PartyInfo);
     }
 
     public void GoToOptions()
     {
+        if (!MenuMaster.ReadyToSelectInMenu) return;
         Selection = Selections.Options;
         ConfirmReturnToTitleFrame.gameObject.SetActive(false);
         ConfirmExitGameFrame.gameObject.SetActive(false);
@@ -81,6 +86,7 @@ public class PauseMenu : MonoBehaviour
 
     public void GoToReturnToTitle()
     {
+        if (!MenuMaster.ReadyToSelectInMenu) return;
         Selection = Selections.ConfirmReturnTitle;
         Options.Deactivate();
         ConfirmReturnToTitleFrame.gameObject.SetActive(true);
@@ -91,6 +97,7 @@ public class PauseMenu : MonoBehaviour
 
     public void GoToExitGame()
     {
+        if (!MenuMaster.ReadyToSelectInMenu) return;
         Selection = Selections.ConfirmExitGame;
         Options.Deactivate();
         ConfirmReturnToTitleFrame.gameObject.SetActive(false);
@@ -128,12 +135,14 @@ public class PauseMenu : MonoBehaviour
 
     public void ReturnToTitle()
     {
+        if (!MenuMaster.ReadyToSelectInMenu) return;
         Continue();
         SceneMaster.ChangeScene(SceneMaster.TITLE_SCREEN_SCENE, 2f);
     }
 
     public void ExitGame()
     {
+        if (!MenuMaster.ReadyToSelectInMenu) return;
         Application.Quit();
     }
 }

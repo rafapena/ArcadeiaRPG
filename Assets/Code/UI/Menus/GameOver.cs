@@ -37,6 +37,7 @@ public class GameOver : MonoBehaviour
 
     public void ReloadFromLastSave()
     {
+        if (!MenuMaster.ReadyToSelectInMenu) return;
         ButtonClickSFX.Play();
         SaveData data = new SaveData(GameplayMaster.SelectedFile);
         data.LoadGame();
@@ -45,6 +46,7 @@ public class GameOver : MonoBehaviour
 
     public void ReturnToTitle()
     {
+        if (!MenuMaster.ReadyToSelectInMenu) return;
         ButtonClickSFX.Play();
         SceneMaster.ChangeScene(SceneMaster.TITLE_SCREEN_SCENE, 2f);
         SceneMaster.CloseGameOver();
@@ -52,6 +54,7 @@ public class GameOver : MonoBehaviour
 
     public void ExitGame()
     {
+        if (!MenuMaster.ReadyToSelectInMenu) return;
         Application.Quit();
     }
 }

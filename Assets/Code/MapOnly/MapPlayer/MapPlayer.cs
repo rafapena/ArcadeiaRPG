@@ -15,6 +15,7 @@ public class MapPlayer : MapExplorer
     protected override void Awake()
     {
         base.Awake();
+        MenuMaster.SetupSelectionBufferInGameplay();
     }
 
     protected override void Start()
@@ -131,10 +132,14 @@ public class MapPlayer : MapExplorer
 
     protected override void Update()
     {
-        if (SceneMaster.InMenu() || SceneMaster.InCutscene) return;      // Player input should not work
+        if (SceneMaster.InMenu || SceneMaster.InCutscene)
+        {
+            Figure.velocity = Vector3.zero;
+            return;
+        }
         if (!SceneMaster.InBattle)
         {
-            if (Input.GetKeyDown(KeyCode.Q)) SceneMaster.OpenFileSelect(FileSelect.FileMode.Save, Party);
+            if (InputMaster.FileSelect()) SceneMaster.OpenFileSelect(FileSelect.FileMode.Save, Party);
             else if (InputMaster.MapMenu()) SceneMaster.OpenMapMenu(Party);
             else if (InputMaster.Pause()) SceneMaster.OpenPauseMenu(Party);
         }

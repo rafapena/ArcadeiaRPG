@@ -49,12 +49,12 @@ public class MapMenuManager : MonoBehaviour
 
     public void ExitAll()
     {
-        CloseAll();
-        SceneMaster.CloseMapMenu(PartyInfo);
+        if (CloseAll()) SceneMaster.CloseMapMenu(PartyInfo);
     }
 
-    private void CloseAll()
+    private bool CloseAll()
     {
+        if (!MenuMaster.ReadyToSelectInMenu) return false;
         Main.Close();
         Inventory.Close();
         Equips.Close();
@@ -63,53 +63,46 @@ public class MapMenuManager : MonoBehaviour
         Stats.Close();
         Map.Close();
         Objectives.Close();
+        return true;
     }
 
     public void GoToMain()
     {
-        CloseAll();
-        Main.Open();
+        if (CloseAll()) Main.Open();
     }
 
     public void GoToInventory()
     {
-        CloseAll();
-        Inventory.Open();
+        if (CloseAll()) Inventory.Open();
     }
 
     public void GoToEquips()
     {
-        CloseAll();
-        Equips.Open();
+        if (CloseAll()) Equips.Open();
     }
 
     public void GoToSpecial()
     {
-        CloseAll();
-        Special.Open();
+        if (CloseAll()) Special.Open();
     }
 
     public void GoToTeam()
     {
-        CloseAll();
-        Team.Open();
+        if (CloseAll()) Team.Open();
     }
 
     public void GoToStats()
     {
-        CloseAll();
-        Stats.Open();
+        if (CloseAll()) Stats.Open();
     }
 
     public void GoToMap()
     {
-        CloseAll();
-        Map.Open();
+        if (CloseAll()) Map.Open();
     }
 
     public void GoToObjectives()
     {
-        CloseAll();
-        Objectives.Open();
+        if (CloseAll()) Objectives.Open();
     }
 }
