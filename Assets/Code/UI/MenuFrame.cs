@@ -98,6 +98,13 @@ public class MenuFrame : MonoBehaviour
         MenuMaster.SetupSelectionBufferInMenu();
     }
 
+    public void ActivateIgnoreBuffer()
+    {
+        if (Activated) return;
+        Shifted = true;
+        Activated = true;
+    }
+
     public void Deactivate()
     {
         if (!Activated) return;
@@ -110,6 +117,12 @@ public class MenuFrame : MonoBehaviour
         transform.position = ActivatedSpot;
         Activated = true;
         MenuMaster.SetupSelectionBufferInMenu();
+    }
+
+    public void ActivateNonAnimateIgnoreBuffer()
+    {
+        transform.position = ActivatedSpot;
+        Activated = true;
     }
 
     public void DeactivateNonAnimate()

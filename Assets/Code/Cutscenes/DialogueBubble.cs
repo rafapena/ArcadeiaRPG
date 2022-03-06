@@ -2,54 +2,70 @@
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using UnityEngine.Events;
 
 /// <summary>
 /// Administrates the game's cutscenes
 /// </summary>
 public class DialogueBubble : MonoBehaviour
 {
-    public enum DialogueCharacter { None, Left1, Left2, Right1, Right2 }
-
     [TextArea] public string Text;
-    public int JumpTo = 0;
-    public Image LeftCharacter1;
-    public Image LeftCharacter2;
-    public Image RightCharacter1;
-    public Image RightCharacter2;
+
+    [Tooltip("Jump to dialogue bubble in cutscene\nIf value is -1 => Next bubble in the sequence\nIf value is > # of dialogue bubbles => End cutscene")]
+    public int JumpTo = -1;
+
+    public enum DialogueCharacter { None, Left1, Right1, Left2, Right2 }
+
+    public Sprite LeftCharacter1;
+    public Sprite RightCharacter1;
+    public Sprite LeftCharacter2;
+    public Sprite RightCharacter2;
+
     public string Name;
     public DialogueCharacter TalkingCharacter;
 
+    public UnityEvent OnComplete;
     public DialogueChoice[] Choices;
+
+    public bool HasChoices => Choices.Length >= 2;
 
     public void Display(CutsceneManager cm)
     {
         cm.SetText(Text);
-        cm.NameLabel.text = Name;
+        cm.NameLabelL.text = Name;
+        cm.NameLabelR.text = Name;
         EstablishCharacters(cm);
     }
 
     private void EstablishCharacters(CutsceneManager cm)
     {
+        if (LeftCharacter1 != null) cm.ActivateCharacter(0, LeftCharacter1);
+        else cm.DeactivateCharacter(0);
 
+        if (RightCharacter1 != null) cm.ActivateCharacter(1, RightCharacter1);
+        else cm.DeactivateCharacter(1);
+
+        if (LeftCharacter2 != null) cm.ActivateCharacter(2, LeftCharacter2);
+        else cm.DeactivateCharacter(2);
+
+        if (RightCharacter2 != null) cm.ActivateCharacter(3, RightCharacter2);
+        else cm.DeactivateCharacter(3);
+
+        if (TalkingCharacter == DialogueCharacter.None) cm.HighlightAll();
+        else cm.HighlightCharacter((int)TalkingCharacter - 1);
     }
 
     public void SetupChoices(CutsceneManager cm)
     {
-        bool choices = HasChoices();
-        cm.ChoicesFrame.gameObject.SetActive(choices);
-        if (!choices) return;
-        int i = 1;
+        cm.ChoicesFrame.gameObject.SetActive(HasChoices);
+        if (!HasChoices) return;
+        int i = 0;
         foreach (Transform t in cm.ChoicesList.transform)
         {
             bool overflow = i >= Choices.Length;
             t.gameObject.SetActive(!overflow);
-            if (!overflow) t.GetChild(0).gameObject.GetComponent<TextMeshProUGUI>().text = Choices[i].Text;
+            if (!overflow) t.GetChild(1).gameObject.GetComponent<TextMeshProUGUI>().text = Choices[i].Text;
             i++;
         }
-    }
-
-    public bool HasChoices()
-    {
-        return Choices.Length >= 2;
     }
 }

@@ -22,7 +22,7 @@ public class Cutscene : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (CurrentlyRunning && InputMaster.Interact())
+        if (!Manager.ChoicesFrame.activeSelf && CurrentlyRunning && InputMaster.Interact())
         {
             if (InteractionBuffer)
             {
@@ -30,16 +30,35 @@ public class Cutscene : MonoBehaviour
                 return;
             }
             DialogueBubble db = Dialogue[CurrentBubble];
-            if (Manager.CurrentlyPrinting()) Manager.ForceStop();
-            else if (db.HasChoices()) db.SetupChoices(Manager);
+            if (Manager.CurrentlyPrinting())
+            {
+                Manager.ForceStop();
+            }
+            else if (db.HasChoices)
+            {
+                Manager.ForceStop();
+                db.SetupChoices(Manager);
+                Manager.ChoicesFrame.SetActive(true);
+            }
             else NextPage();
+        }
+        else if (Manager.ChoicesFrame.activeSelf)
+        {
+            DialogueBubble db = Dialogue[CurrentBubble];
+            string[] choices = { "W", "A", "S", "D" };
+            for (int i = 0; i < db.Choices.Length; i++)
+            {
+                if (Input.inputString.ToUpper() != choices[i]) continue;
+                SelectChoice(db.Choices[i]);
+                Manager.ChoicesFrame.SetActive(false);
+                break;
+            }
         }
     }
 
     public void Open(bool hadToInteract = true)
     {
         Manager.Open();
-        SceneMaster.OpenCutscene();
         CurrentlyRunning = true;
         CurrentBubble = 0;
         Dialogue[CurrentBubble].Display(Manager);
@@ -48,15 +67,30 @@ public class Cutscene : MonoBehaviour
 
     private void NextPage()
     {
-        CurrentBubble++;
-        if (CurrentBubble < Dialogue.Length) Dialogue[CurrentBubble].Display(Manager);
+        JumpTo(Dialogue[CurrentBubble].JumpTo);
+    }
+
+    private void SelectChoice(DialogueChoice dc)
+    {
+        JumpTo(dc.JumpTo);
+        dc.OnComplete?.Invoke();
+    }
+
+    private void JumpTo(int jumpTo)
+    {
+        CurrentBubble = (jumpTo >= 0) ? jumpTo : (CurrentBubble + 1);
+        if (CurrentBubble < Dialogue.Length)
+        {
+            Dialogue[CurrentBubble].Display(Manager);
+            Dialogue[CurrentBubble].OnComplete?.Invoke();
+        }
         else Complete();
     }
 
     public void Complete()
     {
+        OnComplete?.Invoke();
         Manager.Close();
-        SceneMaster.CloseCutscene();
         CurrentlyRunning = false;
         CurrentBubble = 0;
     }
