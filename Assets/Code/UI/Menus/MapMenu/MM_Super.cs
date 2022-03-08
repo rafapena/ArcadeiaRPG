@@ -13,7 +13,7 @@ public abstract class MM_Super : MonoBehaviour
 
     protected virtual void Start()
     {
-        ReturnToInitialStep();
+        ReturnToInitialSetup();
     }
 
     protected virtual void Update()
@@ -36,7 +36,7 @@ public abstract class MM_Super : MonoBehaviour
 
     public abstract void GoBack();
 
-    protected abstract void ReturnToInitialStep();
+    protected abstract void ReturnToInitialSetup();
 
     protected void KeepOnlyHighlightedSelected(ref ListSelectable selectedListBtn)
     {

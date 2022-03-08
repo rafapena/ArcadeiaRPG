@@ -60,7 +60,7 @@ public class MMMap : MM_Super, IDragHandler
     {
         if (Selection == Selections.MoveMap)
         {
-            ReturnToInitialStep();
+            ReturnToInitialSetup();
             Selection = Selections.None;
             MenuManager.GoToMain();
         }
@@ -70,7 +70,7 @@ public class MMMap : MM_Super, IDragHandler
         }
     }
 
-    protected override void ReturnToInitialStep()
+    protected override void ReturnToInitialSetup()
     {
         MainComponent.Deactivate();
         LocationFrame.Deactivate();
@@ -162,7 +162,7 @@ public class MMMap : MM_Super, IDragHandler
     {
         ConfirmTravelFrame.SetActive(false);
         Selection = Selections.None;
-        ReturnToInitialStep();
+        ReturnToInitialSetup();
         MenuManager.GoToMain();
         MenuManager.ExitAll();
         // Travel to location

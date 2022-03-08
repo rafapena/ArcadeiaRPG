@@ -10,8 +10,10 @@ public class SceneMaster : MonoBehaviour
     private static bool InMapMenu = false;
     private static bool InPauseMenu = false;
     private static bool InFileSelectMenu = false;
+    private static bool InShopMenu = false;
+    private static bool InStorageMenu = false;
 
-    public static bool InMenu => InMapMenu || InPauseMenu || InFileSelectMenu;
+    public static bool InMenu => InMapMenu || InPauseMenu || InFileSelectMenu || InShopMenu || InStorageMenu;
 
     public static bool InCutscene { get; private set; } = false;
 
@@ -23,6 +25,9 @@ public class SceneMaster : MonoBehaviour
     public const string MAP_MENU_SCENE = "MapMenu";
     public const string PAUSE_MENU_SCENE = "PauseMenu";
     public const string FILE_SELECT_MENU_SCENE = "FileSelect";
+    public const string SHOP_SCENE = "Shop";
+    public const string STORAGE_SCENE = "Storage";
+    public const string CRAFTING_SCENE = "CraftingMenu";
     public const string BATTLE_SCENE = "Battle";
     public const string GAME_OVER_SCENE = "GameOver";
     public const string SCREEN_TRANSITION_SCENE = "ScreenTransition";
@@ -118,6 +123,43 @@ public class SceneMaster : MonoBehaviour
         SceneManager.UnloadSceneAsync(FILE_SELECT_MENU_SCENE);
         InFileSelectMenu = false;
         if (!InMenu) Time.timeScale = 1;
+    }
+
+    public static void OpenShop()
+    {
+        //
+    }
+
+    public static void CloseShop()
+    {
+        //
+    }
+
+    public static void OpenStorage(PlayerParty playerParty = null)
+    {
+        GameplayMaster.Party = playerParty;
+        SceneManager.LoadScene(STORAGE_SCENE, LoadSceneMode.Additive);
+        InStorageMenu = true;
+        Time.timeScale = 0;
+    }
+
+    public static void CloseStorage(PlayerParty playerParty)
+    {
+        MenuMaster.SetupSelectionBufferInGameplay(0.5f);
+        GameplayMaster.Party = playerParty;
+        SceneManager.UnloadSceneAsync(STORAGE_SCENE);
+        InStorageMenu = false;
+        if (!InMenu) Time.timeScale = 1;
+    }
+
+    public static void OpenCraftingMenu()
+    {
+        //
+    }
+
+    public static void CloseCraftingMenu()
+    {
+        //
     }
 
     public static void OpenCutscene()

@@ -45,6 +45,7 @@ public class MMEquips : MM_Super
             if (Input.GetKeyDown(KeyCode.Alpha1)) SelectItemTab();
             else if (Input.GetKeyDown(KeyCode.Alpha2)) SelectWeaponTab();
             // else if (Input.GetKeyDown(KeyCode.C) && Selection != Selections.SelectToolSwap) SetupSorting();
+            // else if (Input.GetKeyDown(KeyCode.V) && Selection != Selections.SelectToolSwap) OptimizeEquips();
         }
     }
 
@@ -60,7 +61,7 @@ public class MMEquips : MM_Super
     public override void Close()
     {
         base.Close();
-        ReturnToInitialStep();
+        ReturnToInitialSetup();
     }
 
     public override void GoBack()
@@ -69,7 +70,7 @@ public class MMEquips : MM_Super
         {
             case Selections.PartyList:
                 Selection = Selections.None;
-                ReturnToInitialStep();
+                ReturnToInitialSetup();
                 MenuManager.GoToMain();
                 break;
             case Selections.SelectTool:
@@ -89,7 +90,7 @@ public class MMEquips : MM_Super
         Sorter.Undo();
     }
 
-    protected override void ReturnToInitialStep()
+    protected override void ReturnToInitialSetup()
     {
         PartyList.ClearSelections();
         EquippedWeapons.ClearSelections();
@@ -359,5 +360,15 @@ public class MMEquips : MM_Super
         InventoryToolList.Selecting = false;
         InventoryToolList.ClearSelections();
         Sorter.Setup(InventoryToolList, MenuManager.PartyInfo.Inventory, SelectedToolList);
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// -- Optimizing --
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public void OptimizeEquips()
+    {
+        if (Selection != Selections.SelectTool) return;
+        //
     }
 }

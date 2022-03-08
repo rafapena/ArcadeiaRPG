@@ -142,6 +142,7 @@ public class MapPlayer : MapExplorer
             if (InputMaster.FileSelect()) SceneMaster.OpenFileSelect(FileSelect.FileMode.Save, Party);
             else if (InputMaster.MapMenu()) SceneMaster.OpenMapMenu(Party);
             else if (InputMaster.Pause()) SceneMaster.OpenPauseMenu(Party);
+            else if (Input.GetKeyDown(KeyCode.T)) SceneMaster.OpenStorage(Party);       // TEST MODE
         }
         base.Update();
         if (gameObject.layer == NON_COLLIDABLE_EXPLORER_LAYER && !IsBlinking()) gameObject.layer = PLAYER_LAYER;

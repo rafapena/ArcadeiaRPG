@@ -43,7 +43,7 @@ public class MMMain : MM_Super
         MenuManager.ExitAll();
     }
 
-    protected override void ReturnToInitialStep()
+    protected override void ReturnToInitialSetup()
     {
         //
     }

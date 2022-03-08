@@ -61,7 +61,7 @@ public class MMTeam : MM_Super
         }
     }
 
-    protected override void ReturnToInitialStep()
+    protected override void ReturnToInitialSetup()
     {
         SwapLabel.gameObject.SetActive(false);
         OneAvatar.ClearSelections();

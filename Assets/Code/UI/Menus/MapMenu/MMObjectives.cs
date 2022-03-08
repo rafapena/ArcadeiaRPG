@@ -59,7 +59,7 @@ public class MMObjectives : MM_Super
     {
         if (Selection == Selections.SelectObjective)
         {
-            ReturnToInitialStep();
+            ReturnToInitialSetup();
             Selection = Selections.None;
             MenuManager.GoToMain();
         }
@@ -69,7 +69,7 @@ public class MMObjectives : MM_Super
         }
     }
 
-    protected override void ReturnToInitialStep()
+    protected override void ReturnToInitialSetup()
     {
         InfoFrame.Deactivate();
         //RewardsToolList.gameObject.SetActive(false);

@@ -10,16 +10,14 @@ using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using System.Threading;
 
-public class MMInventory : MM_Super
+public class Shop : MonoBehaviour
 {
     public enum Selections
     {
-        None, InventoryLists,
-        Usage, Discard,
-        UseOnCharacter, UsageDone,
-        EquipOnCharacter, CharacterEquipsList, ConfirmEquip, EquippedDone
+        None, Buy, Sell, ConfirmTransaction, TransactionDone
     }
 
+    /*
     // Selection lists
     public InventoryToolSelectionList ToolList;
     public InventoryToolSelectionList EquippedToolList;
@@ -37,7 +35,6 @@ public class MMInventory : MM_Super
     // General selection tracking
     private Selections Selection;
     private InventorySystem.ListType InventoryList;
-    public TextMeshProUGUI DiscardLabel;
     public TextMeshProUGUI SelectTeammateLabel;
 
     // Keep track of selected content
@@ -52,9 +49,8 @@ public class MMInventory : MM_Super
     // Delay after an item/weapon has been used/equipped
     private float DoneTimer;
 
-    protected override void Update()
+    void Update()
     {
-        base.Update();
         switch (Selection)
         {
             case Selections.InventoryLists:
@@ -67,39 +63,27 @@ public class MMInventory : MM_Super
             case Selections.EquippedDone:
                 if (Time.realtimeSinceStartup <= DoneTimer) return;
                 EventSystem.current.SetSelectedGameObject(ToolList.SelectedButton.gameObject);
-                ReturnToInitialSetup();
+                ReturnToInitialStep();
                 Selection = Selections.InventoryLists;
                 break;
         }
     }
 
-    public override void Open()
+    public void Open()
     {
-        base.Open();
         ToolList.LinkToInventory(MenuManager.PartyInfo.Inventory);
         SelectItemList();
     }
 
-    public override void Close()
+    public void Close()
     {
-        base.Close();
-        ReturnToInitialSetup();
+        ReturnToInitialStep();
     }
 
-    public override void GoBack()
+    public void GoBack()
     {
         switch (Selection)
         {
-            case Selections.InventoryLists:
-                if (Sorter.gameObject.activeSelf)
-                {
-                    ToolList.Selecting = true;
-                    Sorter.Undo();
-                    break;
-                }
-                Selection = Selections.None;
-                MenuManager.GoToMain();
-                break;
             case Selections.Usage:
                 UndoSelectTool();
                 break;
@@ -119,7 +103,7 @@ public class MMInventory : MM_Super
         }
     }
 
-    protected override void ReturnToInitialSetup()
+    protected override void ReturnToInitialStep()
     {
         ToolList.Selecting = true;
         Sorter.Undo();
@@ -162,7 +146,7 @@ public class MMInventory : MM_Super
         Selection = Selections.InventoryLists;
         InventoryList = inventoryList;
         EventSystem.current.SetSelectedGameObject(ToolListTabs.transform.GetChild(tabIndex).gameObject);
-        ReturnToInitialSetup();
+        ReturnToInitialStep();
         KeepOnlyHighlightedSelected(ref SelectedInventoryTab);
         ToolList.Selecting = true;
         ToolList.Setup(toolList);
@@ -580,5 +564,5 @@ public class MMInventory : MM_Super
             EquippedToolList.Setup(PartyList.SelectedObject.Weapons, BattleMaster.MAX_NUMBER_OF_WEAPONS);
         }
         ConfirmSwap.SetActive(false);
-    }
+    }*/
 }

@@ -44,7 +44,7 @@ public class MMStats : MM_Super
         MenuManager.GoToMain();
     }
 
-    protected override void ReturnToInitialStep()
+    protected override void ReturnToInitialSetup()
     {
         //
     }

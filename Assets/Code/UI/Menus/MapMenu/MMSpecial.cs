@@ -78,7 +78,7 @@ public class MMSpecial : MM_Super
         {
             case Selections.SelectPlayer:
                 Selection = Selections.None;
-                ReturnToInitialStep();
+                ReturnToInitialSetup();
                 MenuManager.GoToMain();
                 break;
             case Selections.SelectSkill:
@@ -90,7 +90,7 @@ public class MMSpecial : MM_Super
         }
     }
 
-    protected override void ReturnToInitialStep()
+    protected override void ReturnToInitialSetup()
     {
         SkillInfo.SetActive(false);
         SkillsListFrame.SetActive(false);
