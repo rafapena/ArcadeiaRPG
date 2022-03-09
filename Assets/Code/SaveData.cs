@@ -128,10 +128,13 @@ public class SaveData
     private void SaveInventory()
     {
         string inv = "Inventory";
+        string str = "Storage";
         PlayerPrefs.SetInt("InventoryCapacity_" + File, GameplayMaster.Party.Inventory.WeightCapacity);
         SaveToolsList(GameplayMaster.Party.Inventory.Items, inv);
         SaveToolsList(GameplayMaster.Party.Inventory.Weapons, inv);
         SaveToolsList(GameplayMaster.Party.Inventory.KeyItems, inv);
+        SaveToolsList(GameplayMaster.Party.Storage.Items, str);
+        SaveToolsList(GameplayMaster.Party.Storage.Weapons, str);
     }
 
     private void SaveToolsList<T>(List<T> list, string pre) where T : ToolForInventory
@@ -167,6 +170,7 @@ public class SaveData
         for (int i = 0; i < ResourcesMaster.Players.Length; i++) DeleteBattler(i);
         for (int i = 0; i < ResourcesMaster.Allies.Length; i++) DeleteBattler(i);
         DeleteInventory();
+        DeleteStorage();
         DeleteObjectives();
     }
 
@@ -202,6 +206,13 @@ public class SaveData
         PlayerPrefs.DeleteKey("InventoryCapacity_" + File);
         DeleteToolList(ResourcesMaster.Items, inv);
         DeleteToolList(ResourcesMaster.Weapons, inv);
+    }
+
+    private void DeleteStorage()
+    {
+        string str = "Storage";
+        DeleteToolList(ResourcesMaster.Items, str);
+        DeleteToolList(ResourcesMaster.Weapons, str);
     }
 
     private void DeleteToolList<T>(T[] list, string pre) where T : ToolForInventory

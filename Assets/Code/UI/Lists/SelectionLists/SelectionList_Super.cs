@@ -32,7 +32,6 @@ public abstract class SelectionList_Super<T> : MonoBehaviour
     protected List<T> ReferenceData;
 
     // Selected data
-    protected bool InfoIsSetup;
     [HideInInspector] public bool Selecting;
 
     // Slot info

@@ -172,6 +172,7 @@ GameObject:
   - component: {fileID: 8854167014643114189}
   - component: {fileID: 8854167014643114188}
   - component: {fileID: 8854167014643114184}
+  - component: {fileID: 5726009491312351033}
   m_Layer: 9
   m_Name: PlayerTest
   m_TagString: Player
@@ -360,6 +361,7 @@ MonoBehaviour:
   Allies:
   - {fileID: 7099805151486156264, guid: fcb8b5b5eefadd7408ac43da7fe057aa, type: 3}
   Inventory: {fileID: 8854167014643114184}
+  Storage: {fileID: 5726009491312351033}
   LoggedObjectives:
   - {fileID: 919590195915574048, guid: 2d664c82c02a78a4aa46897d66851c79, type: 3}
   - {fileID: 7170123059155225320, guid: cf93fa54f76e782469ff2cebb7972034, type: 3}
@@ -467,3 +469,35 @@ MonoBehaviour:
   KeyItems: []
   CarryWeight: 0
   WeightCapacity: 50
+--- !u!114 &5726009491312351033
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8854167014643114197}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2e58dd75ae14194dbbd85a96326b9ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Gold: 10
+  Items:
+  - {fileID: 1623505104987198706, guid: db3b6b36abc81214a8b4f9956b5e567c, type: 3}
+  - {fileID: 1623505104987198706, guid: db3b6b36abc81214a8b4f9956b5e567c, type: 3}
+  - {fileID: 1623505104987198706, guid: db3b6b36abc81214a8b4f9956b5e567c, type: 3}
+  - {fileID: 1623505104987198706, guid: db3b6b36abc81214a8b4f9956b5e567c, type: 3}
+  - {fileID: 1623505104987198706, guid: db3b6b36abc81214a8b4f9956b5e567c, type: 3}
+  - {fileID: 1623505104987198706, guid: db3b6b36abc81214a8b4f9956b5e567c, type: 3}
+  - {fileID: 1623505104987198706, guid: db3b6b36abc81214a8b4f9956b5e567c, type: 3}
+  - {fileID: 1623505104987198706, guid: db3b6b36abc81214a8b4f9956b5e567c, type: 3}
+  - {fileID: 7230775191068158404, guid: db8c71b6c4218214086cf5982e9e2adb, type: 3}
+  - {fileID: 7230775191068158404, guid: db8c71b6c4218214086cf5982e9e2adb, type: 3}
+  Weapons:
+  - {fileID: 4959000729214192542, guid: f43fc6a9a0487964283e05224babca5a, type: 3}
+  - {fileID: 4959000729214192542, guid: f43fc6a9a0487964283e05224babca5a, type: 3}
+  - {fileID: 4959000729214192542, guid: f43fc6a9a0487964283e05224babca5a, type: 3}
+  - {fileID: 3552097900181454016, guid: ffa9f6fe244c85248a1bb202285c251d, type: 3}
+  KeyItems: []
+  CarryWeight: 0
+  WeightCapacity: 0

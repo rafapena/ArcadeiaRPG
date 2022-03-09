@@ -125,8 +125,8 @@ public class MMEquips : MM_Super
         PartyList.SetSelected();
         EquippedToolsOwner.text = PartyList.SelectedObject.Name.ToUpper();
         EquippedToolsFrame.SetActive(true);
-        EquippedWeapons.Setup(PartyList.SelectedObject.Weapons, BattleMaster.MAX_NUMBER_OF_WEAPONS, true);
-        EquippedItems.Setup(PartyList.SelectedObject.Items, BattleMaster.MAX_NUMBER_OF_ITEMS, true);
+        EquippedWeapons.Refresh(PartyList.SelectedObject.Weapons, BattleMaster.MAX_NUMBER_OF_WEAPONS, true);
+        EquippedItems.Refresh(PartyList.SelectedObject.Items, BattleMaster.MAX_NUMBER_OF_ITEMS, true);
         StatsList.Setup(PartyList.SelectedObject as BattlePlayer);
         StatsList.gameObject.SetActive(true);
     }
@@ -224,7 +224,7 @@ public class MMEquips : MM_Super
         InventoryFrame.Activate();
         KeepOnlyHighlightedSelected(ref SelectedInventoryList);
         InventoryToolList.Selecting = true;
-        InventoryToolList.Setup(inventoryToolList);
+        InventoryToolList.Refresh(inventoryToolList);
         Sorter.Undo();
         
         if (InventoryToolList.SelectedButton) InventoryToolList.SelectedButton.ClearHighlights();
@@ -275,7 +275,7 @@ public class MMEquips : MM_Super
     {
         PartyList.SelectedObject.UnequipItem(EquippedItems.SelectedIndex);
         MenuManager.PartyInfo.Inventory.AddItem(EquippedItems.SelectedObject as Item);
-        EquippedItems.Setup(PartyList.SelectedObject.Items, BattleMaster.MAX_NUMBER_OF_ITEMS, true);
+        EquippedItems.Refresh(PartyList.SelectedObject.Items, BattleMaster.MAX_NUMBER_OF_ITEMS, true);
         SelectItemTab();
     }
 
@@ -283,7 +283,7 @@ public class MMEquips : MM_Super
     {
         PartyList.SelectedObject.UnequipWeapon(EquippedWeapons.SelectedIndex);
         MenuManager.PartyInfo.Inventory.AddWeapon(EquippedWeapons.SelectedObject as Weapon);
-        EquippedWeapons.Setup(PartyList.SelectedObject.Weapons, BattleMaster.MAX_NUMBER_OF_WEAPONS, true);
+        EquippedWeapons.Refresh(PartyList.SelectedObject.Weapons, BattleMaster.MAX_NUMBER_OF_WEAPONS, true);
         SelectWeaponTab();
     }
 
@@ -292,8 +292,8 @@ public class MMEquips : MM_Super
         Item it = InventoryToolList.SelectedObject as Item;
         PartyList.SelectedObject.EquipItem(it);
         MenuManager.PartyInfo.Inventory.RemoveItem(it);
-        EquippedItems.Setup(PartyList.SelectedObject.Items, BattleMaster.MAX_NUMBER_OF_ITEMS);
-        InventoryToolList.Setup(MenuManager.PartyInfo.Inventory.Items);
+        EquippedItems.Refresh(PartyList.SelectedObject.Items, BattleMaster.MAX_NUMBER_OF_ITEMS);
+        InventoryToolList.Refresh(MenuManager.PartyInfo.Inventory.Items);
     }
 
     private void EquipWeapon()
@@ -301,8 +301,8 @@ public class MMEquips : MM_Super
         Weapon wp = InventoryToolList.SelectedObject as Weapon;
         PartyList.SelectedObject.EquipWeapon(wp);
         MenuManager.PartyInfo.Inventory.RemoveWeapon(wp);
-        EquippedWeapons.Setup(PartyList.SelectedObject.Weapons, BattleMaster.MAX_NUMBER_OF_WEAPONS);
-        InventoryToolList.Setup(GetWeapons());
+        EquippedWeapons.Refresh(PartyList.SelectedObject.Weapons, BattleMaster.MAX_NUMBER_OF_WEAPONS);
+        InventoryToolList.Refresh(GetWeapons());
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -335,7 +335,7 @@ public class MMEquips : MM_Super
         PartyList.SelectedObject.ReplaceItemWith(it, EquippedItems.SelectedIndex);
         MenuManager.PartyInfo.Inventory.AddItem(EquippedItems.SelectedObject as Item);
         MenuManager.PartyInfo.Inventory.RemoveItem(it);
-        EquippedItems.Setup(PartyList.SelectedObject.Items, BattleMaster.MAX_NUMBER_OF_ITEMS, true);
+        EquippedItems.Refresh(PartyList.SelectedObject.Items, BattleMaster.MAX_NUMBER_OF_ITEMS, true);
         SelectItemTab();
     }
 
@@ -346,7 +346,7 @@ public class MMEquips : MM_Super
         PartyList.SelectedObject.ReplaceWeaponWith(wp, EquippedWeapons.SelectedIndex);
         MenuManager.PartyInfo.Inventory.AddWeapon(EquippedWeapons.SelectedObject as Weapon);
         MenuManager.PartyInfo.Inventory.RemoveWeapon(wp);
-        EquippedWeapons.Setup(PartyList.SelectedObject.Weapons, BattleMaster.MAX_NUMBER_OF_WEAPONS, true);
+        EquippedWeapons.Refresh(PartyList.SelectedObject.Weapons, BattleMaster.MAX_NUMBER_OF_WEAPONS, true);
         SelectWeaponTab();
     }
 

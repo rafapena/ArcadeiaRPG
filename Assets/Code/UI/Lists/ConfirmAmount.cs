@@ -27,8 +27,8 @@ public class ConfirmAmount : MonoBehaviour
     private void Update()
     {
         if (!Frame.activeSelf) return;
-        else if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetAxis("Mouse ScrollWheel") > 0) MoveUpInc();
-        else if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetAxis("Mouse ScrollWheel") < 0) MoveDownInc();
+        else if (Input.GetKey(KeyCode.UpArrow) || Input.GetAxis("Mouse ScrollWheel") > 0) MoveUpInc();
+        else if (Input.GetKey(KeyCode.DownArrow) || Input.GetAxis("Mouse ScrollWheel") < 0) MoveDownInc();
     }
 
     public void Activate(int minValue, int maxValue, bool useLastValue = false)

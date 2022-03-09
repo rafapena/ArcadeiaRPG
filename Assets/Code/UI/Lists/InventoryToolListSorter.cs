@@ -60,42 +60,42 @@ public class InventoryToolListSorter : MonoBehaviour
     public void SortByDefaultAscending()
     {
         GetList();
-        TargetInventoryGUI.Setup(ReferenceData.OrderBy(t => t.Id).ToList());
+        TargetInventoryGUI.Refresh(ReferenceData.OrderBy(t => t.Id).ToList());
         ExtraFunc?.Invoke();
     }
 
     public void SortByDefaultDescending()
     {
         GetList();
-        TargetInventoryGUI.Setup(ReferenceData.OrderByDescending(t => t.Id).ToList());
+        TargetInventoryGUI.Refresh(ReferenceData.OrderByDescending(t => t.Id).ToList());
         ExtraFunc?.Invoke();
     }
 
     public void SortByQuantityAscending()
     {
         GetList();
-        TargetInventoryGUI.Setup(ReferenceData.OrderBy(t => t.Quantity).ToList());
+        TargetInventoryGUI.Refresh(ReferenceData.OrderBy(t => t.Quantity).ToList());
         ExtraFunc?.Invoke();
     }
 
     public void SortByQuantityDescending()
     {
         GetList();
-        TargetInventoryGUI.Setup(ReferenceData.OrderByDescending(t => t.Quantity).ToList());
+        TargetInventoryGUI.Refresh(ReferenceData.OrderByDescending(t => t.Quantity).ToList());
         ExtraFunc?.Invoke();
     }
 
     public void SortByWeightAscending()
     {
         GetList();
-        TargetInventoryGUI.Setup(ReferenceData.OrderBy(t => t.Weight).ToList());
+        TargetInventoryGUI.Refresh(ReferenceData.OrderBy(t => t.Weight).ToList());
         ExtraFunc?.Invoke();
     }
 
     public void SortByWeightDescending()
     {
         GetList();
-        TargetInventoryGUI.Setup(ReferenceData.OrderByDescending(t => t.Weight).ToList());
+        TargetInventoryGUI.Refresh(ReferenceData.OrderByDescending(t => t.Weight).ToList());
         ExtraFunc?.Invoke();
     }
 

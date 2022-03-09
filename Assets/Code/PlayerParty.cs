@@ -22,6 +22,7 @@ public class PlayerParty : MonoBehaviour
 
     // Menu Items
     public InventorySystem Inventory;
+    public InventorySystem Storage;
     public List<Objective> LoggedObjectives;
 
     [HideInInspector] public float PreemptiveAttackChance;
@@ -99,6 +100,7 @@ public class PlayerParty : MonoBehaviour
         for (int i = playerIndexCap; i < allyIndexCap; i++) LoadBattler(file, mp, ResourcesMaster.Allies, i);
         UpdateAll(GetWholeParty());
         LoadInventory(file);
+        LoadStorage(file);
         LoadObjectives(file, mp);
         GameplayMaster.DeclareContentLoaded();
     }
@@ -150,11 +152,18 @@ public class PlayerParty : MonoBehaviour
     {
         string inv = "Inventory";
         Inventory.WeightCapacity = PlayerPrefs.GetInt("InventoryCapacity_" + file);
-        LoadToolsList(file, ResourcesMaster.Items, inv);
-        LoadToolsList(file, ResourcesMaster.Weapons, inv);
+        LoadToolsList(file, ResourcesMaster.Items, inv, Inventory);
+        LoadToolsList(file, ResourcesMaster.Weapons, inv, Inventory);
     }
 
-    private void LoadToolsList<T>(int file, T[] list, string pre) where T : ToolForInventory
+    private void LoadStorage(int file)
+    {
+        string str = "Storage";
+        LoadToolsList(file, ResourcesMaster.Items, str, Storage);
+        LoadToolsList(file, ResourcesMaster.Weapons, str, Storage);
+    }
+
+    private void LoadToolsList<T>(int file, T[] list, string pre, InventorySystem system) where T : ToolForInventory
     {
         for (int i = 0; i < list.Length; i++)
         {
@@ -163,11 +172,11 @@ public class PlayerParty : MonoBehaviour
             Weapon wp = list[i] as Weapon;
             if (it)
             {
-                for (int j = 0; j < quantity; j++) Inventory.AddItem(it);
+                for (int j = 0; j < quantity; j++) system.AddItem(it);
             }
             else if (wp)
             {
-                for (int j = 0; j < quantity; j++) Inventory.AddWeapon(wp);
+                for (int j = 0; j < quantity; j++) system.AddWeapon(wp);
             }
         }
     }

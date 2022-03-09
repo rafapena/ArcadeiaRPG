@@ -165,7 +165,7 @@ public class MMInventory : MM_Super
         ReturnToInitialSetup();
         KeepOnlyHighlightedSelected(ref SelectedInventoryTab);
         ToolList.Selecting = true;
-        ToolList.Setup(toolList);
+        ToolList.Refresh(toolList);
         if (ToolList.SelectedButton) ToolList.SelectedButton.ClearHighlights();
         EventSystem.current.SetSelectedGameObject(ToolList.transform.GetChild(0).gameObject);
     }
@@ -337,11 +337,11 @@ public class MMInventory : MM_Super
         {
             case InventorySystem.ListType.Items:
                 MenuManager.PartyInfo.Inventory.RemoveItem(ToolList.SelectedIndex);
-                ToolList.Setup(MenuManager.PartyInfo.Inventory.Items);
+                ToolList.Refresh(MenuManager.PartyInfo.Inventory.Items);
                 break;
             case InventorySystem.ListType.Weapons:
                 MenuManager.PartyInfo.Inventory.RemoveWeapon(ToolList.SelectedIndex);
-                ToolList.Setup(MenuManager.PartyInfo.Inventory.Weapons);
+                ToolList.Refresh(MenuManager.PartyInfo.Inventory.Weapons);
                 break;
         }
         UndoDiscard();
@@ -391,8 +391,8 @@ public class MMInventory : MM_Super
     {
         int index = EventSystem.current.currentSelectedGameObject.GetComponent<ListSelectable>().Index;
         EquippedTools.SetActive(true);
-        if (InventoryList == InventorySystem.ListType.Weapons) EquippedToolList.Setup(SelectableTeammatesEquip[index].Weapons, BattleMaster.MAX_NUMBER_OF_WEAPONS);
-        else if (InventoryList == InventorySystem.ListType.Items) EquippedToolList.Setup(SelectableTeammatesEquip[index].Items, BattleMaster.MAX_NUMBER_OF_ITEMS);
+        if (InventoryList == InventorySystem.ListType.Weapons) EquippedToolList.Refresh(SelectableTeammatesEquip[index].Weapons, BattleMaster.MAX_NUMBER_OF_WEAPONS);
+        else if (InventoryList == InventorySystem.ListType.Items) EquippedToolList.Refresh(SelectableTeammatesEquip[index].Items, BattleMaster.MAX_NUMBER_OF_ITEMS);
     }
 
     public void DeselectingTeammates()
@@ -447,7 +447,7 @@ public class MMInventory : MM_Super
         if (it.Consumable)
         {
             MenuManager.PartyInfo.Inventory.RemoveItem(it);
-            ToolList.Setup(MenuManager.PartyInfo.Inventory.Items);
+            ToolList.Refresh(MenuManager.PartyInfo.Inventory.Items);
         }
     }
     
@@ -564,8 +564,8 @@ public class MMInventory : MM_Super
             }
             else PartyList.SelectedObject.EquipItem(ToolList.SelectedObject as Item);
             MenuManager.PartyInfo.Inventory.RemoveItem(ToolList.SelectedIndex);
-            ToolList.Setup(MenuManager.PartyInfo.Inventory.Items);
-            EquippedToolList.Setup(PartyList.SelectedObject.Items, BattleMaster.MAX_NUMBER_OF_ITEMS);
+            ToolList.Refresh(MenuManager.PartyInfo.Inventory.Items);
+            EquippedToolList.Refresh(PartyList.SelectedObject.Items, BattleMaster.MAX_NUMBER_OF_ITEMS);
         }
         else if (InventoryList == InventorySystem.ListType.Weapons)
         {
@@ -576,8 +576,8 @@ public class MMInventory : MM_Super
             }
             else PartyList.SelectedObject.EquipWeapon(ToolList.SelectedObject as Weapon);
             MenuManager.PartyInfo.Inventory.RemoveWeapon(ToolList.SelectedIndex);
-            ToolList.Setup(MenuManager.PartyInfo.Inventory.Weapons);
-            EquippedToolList.Setup(PartyList.SelectedObject.Weapons, BattleMaster.MAX_NUMBER_OF_WEAPONS);
+            ToolList.Refresh(MenuManager.PartyInfo.Inventory.Weapons);
+            EquippedToolList.Refresh(PartyList.SelectedObject.Weapons, BattleMaster.MAX_NUMBER_OF_WEAPONS);
         }
         ConfirmSwap.SetActive(false);
     }

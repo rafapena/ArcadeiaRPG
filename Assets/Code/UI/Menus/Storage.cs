@@ -12,6 +12,8 @@ using System.Threading;
 
 public class Storage : MonoBehaviour
 {
+    public const int MAX_AMOUNT_PER_ITEM = 1000;
+
     public enum Selections
     {
         None, SelectingInventory, SelectingStorage, ConfirmAmountInventory, ConfirmAmountStorage
@@ -37,13 +39,19 @@ public class Storage : MonoBehaviour
     private Selections Selection;
     private InventorySystem.ListType InventoryList;
     private ListSelectable SelectedInventoryTab;
+    private InventorySystem SourceSystem;
+    private InventorySystem TargetSystem;
+    private ToolForInventory TargetTool;    // Map to selected tool from the opposite inventory system
 
     // Delay after an item/weapon has been used/equipped
     private float DoneTimer;
 
+    private bool SelectingTool => Selection == Selections.SelectingInventory || Selection == Selections.SelectingStorage;
+
+    private bool ConfirmingAmount => Selection == Selections.ConfirmAmountInventory || Selection == Selections.ConfirmAmountStorage;
+
     // Data
     [HideInInspector] public PlayerParty PartyInfo;
-    [HideInInspector] public InventorySystem StoredItems;
 
     private void Start()
     {
@@ -53,6 +61,7 @@ public class Storage : MonoBehaviour
         Initialize();
         SelectInventory();
         SelectItemList();
+        TargetTool = null;
     }
 
     void Update()
@@ -78,7 +87,6 @@ public class Storage : MonoBehaviour
     protected void Initialize()
     {
         ToolList.Selecting = true;
-        ToolList.ClearSelections();
         ConfirmFrame.Deactivate();
         FrameGoTo.Activate();
         ResultCheckFrame.SetActive(false);
@@ -92,14 +100,36 @@ public class Storage : MonoBehaviour
 
     private void SelectInventory()
     {
-        Selection = Selections.SelectingInventory;
-        ToolList.LinkToInventory(PartyInfo.Inventory);
+        SourceSystem = PartyInfo.Inventory;
+        TargetSystem = PartyInfo.Storage;
+        SelectInventorySystem(Selections.SelectingInventory, "INVENTORY");
+        ToolList.CarryTracker.gameObject.SetActive(true);
     }
 
     private void SelectStorage()
     {
-        Selection = Selections.SelectingStorage;
-        ToolList.LinkToInventory(StoredItems);
+        SourceSystem = PartyInfo.Storage;
+        TargetSystem = PartyInfo.Inventory;
+        SelectInventorySystem(Selections.SelectingStorage, "STORAGE");
+        ToolList.CarryTracker.gameObject.SetActive(false);
+    }
+
+    private void SelectInventorySystem(Selections selection, string title)
+    {
+        SelectionName.text = title;
+        Selection = selection;
+        ToolList.LinkToInventory(SourceSystem);
+        ToolList.Selecting = true;
+        ToolList.ClearSelections();
+        switch (InventoryList)
+        {
+            case InventorySystem.ListType.Items:
+                SelectItemList();
+                break;
+            case InventorySystem.ListType.Weapons:
+                SelectWeaponList();
+                break;
+        }
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -108,19 +138,17 @@ public class Storage : MonoBehaviour
 
     public void SelectItemList()
     {
-        if (Selection == Selections.SelectingInventory) SelectToolTab(InventorySystem.ListType.Items, PartyInfo.Inventory.Items, 0);
-        else if (Selection == Selections.SelectingStorage) SelectToolTab(InventorySystem.ListType.Items, StoredItems.Items, 0);
+        SelectToolTab(InventorySystem.ListType.Items, SourceSystem.Items, 0);
     }
 
     public void SelectWeaponList()
     {
-        if (Selection == Selections.SelectingInventory) SelectToolTab(InventorySystem.ListType.Weapons, PartyInfo.Inventory.Weapons, 1);
-        else if (Selection == Selections.SelectingStorage) SelectToolTab(InventorySystem.ListType.Weapons, StoredItems.Weapons, 1);
+        SelectToolTab(InventorySystem.ListType.Weapons, SourceSystem.Weapons, 1);
     }
 
     private void SelectToolTab<T>(InventorySystem.ListType inventoryList, List<T> toolList, int tabIndex) where T : ToolForInventory
     {
-        if (Sorter.gameObject.activeSelf) return;
+        if (!SelectingTool || Sorter.gameObject.activeSelf) return;
         InventoryList = inventoryList;
         EventSystem.current.SetSelectedGameObject(ToolListTabs.transform.GetChild(tabIndex).gameObject);
         
@@ -129,7 +157,7 @@ public class Storage : MonoBehaviour
         KeepOnlyHighlightedSelected(ref SelectedInventoryTab);
 
         ToolList.Selecting = true;
-        ToolList.Setup(toolList);
+        ToolList.Refresh(toolList);
         if (ToolList.SelectedButton) ToolList.SelectedButton.ClearHighlights();
         EventSystem.current.SetSelectedGameObject(ToolList.transform.GetChild(0).gameObject);
     }
@@ -144,34 +172,53 @@ public class Storage : MonoBehaviour
     public void SelectTool()
     {
         ToolList.Selecting = false;
+
         if (!ToolList.SetupToolInfo())
         {
             if (ToolList.SelectedButton) ToolList.SelectedButton.ClearHighlights();
-            UndoConfirmAmount();
+            if (ConfirmingAmount) UndoConfirmAmount();
             return;
         }
-        /*else
-        {
-            FrameCheckOther.SetActive(true);
-            AmountCheckOther.text = "";
-        }*/
-        if (Selection == Selections.SelectingInventory)
+        else if (Selection == Selections.SelectingInventory)
         {
             Selection = Selections.ConfirmAmountInventory;
-            ConfirmFrame.Activate(0, ToolList.SelectedObject.Quantity);
+            ConfirmFrame.Activate(1, GetMaxAmountToStorage());
             ConfirmText.text = "STORE?";
         }
         else if (Selection == Selections.SelectingStorage)
         {
             Selection = Selections.ConfirmAmountStorage;
-            ConfirmFrame.Activate(0, ToolList.SelectedObject.Quantity);
+            ConfirmFrame.Activate(1, ToolList.SelectedObject.Quantity);
             ConfirmText.text = "TAKE OUT?";
         }
+        TargetTool = GetTargetTool();
+
         FrameGoTo.Deactivate();
-        ResultCheckFrame.SetActive(true);
+        UpdateResultChecker(ConfirmFrame.Amount);
         KeepOnlyHighlightedSelected(ref ToolList.SelectedButton);
         EventSystem.current.SetSelectedGameObject(ConfirmFrame.OKButton.gameObject);
         Sorter.Undo();
+    }
+
+    private ToolForInventory GetTargetTool()
+    {
+        switch (InventoryList)
+        {
+            case InventorySystem.ListType.Items:
+                return TargetSystem.Items.Find(x => x.Id == ToolList.SelectedObject.Id);
+            case InventorySystem.ListType.Weapons:
+                return TargetSystem.Weapons.Find(x => x.Id == ToolList.SelectedObject.Id);
+            default:
+                return null;
+        }
+
+    }
+
+    private int GetMaxAmountToStorage()
+    {
+        int quantity = ToolList.SelectedObject.Quantity;
+        int inStorage = TargetTool?.Quantity ?? 0;
+        return (inStorage + quantity > MAX_AMOUNT_PER_ITEM) ? (MAX_AMOUNT_PER_ITEM - inStorage) : quantity;
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -192,6 +239,26 @@ public class Storage : MonoBehaviour
     /// -- Confirm Amount --
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    private void UpdateResultChecker(int amount)
+    {
+        ResultCheckFrame.SetActive(true);
+        int source = ToolList.SelectedObject.Quantity - amount;
+        int target = (TargetTool?.Quantity ?? 0) + amount;
+
+        if (Selection == Selections.ConfirmAmountInventory)
+        {
+            ResultCheckInventory.text = source.ToString();
+            ResultCheckStorage.text = target.ToString();
+            ResultCheckCarryWeight.Set(PartyInfo.Inventory.CarryWeight - amount, PartyInfo.Inventory.WeightCapacity);
+        }
+        else if (Selection == Selections.ConfirmAmountStorage)
+        {
+            ResultCheckInventory.text = target.ToString();
+            ResultCheckStorage.text = source.ToString();
+            ResultCheckCarryWeight.Set(PartyInfo.Inventory.CarryWeight + amount, PartyInfo.Inventory.WeightCapacity);
+        }
+    }
+
     public void UndoConfirmAmount()
     {
         EventSystem.current.SetSelectedGameObject(ToolList.SelectedButton.gameObject);
@@ -202,16 +269,29 @@ public class Storage : MonoBehaviour
 
     public void ConfirmAmountMoveUp()
     {
-
+        UpdateResultChecker(ConfirmFrame.Amount);
     }
 
     public void ConfirmAmountMoveDown()
     {
-
+        UpdateResultChecker(ConfirmFrame.Amount);
     }
 
     public void ConfirmTransaction()
     {
+        switch (InventoryList)
+        {
+            case InventorySystem.ListType.Items:
+                SourceSystem.RemoveItem(ToolList.SelectedObject as Item, ConfirmFrame.Amount);
+                TargetSystem.AddItem((TargetTool ?? ToolList.SelectedObject) as Item, ConfirmFrame.Amount);
+                ToolList.Refresh(SourceSystem.Items);
+                break;
+            case InventorySystem.ListType.Weapons:
+                SourceSystem.RemoveWeapon(ToolList.SelectedObject as Weapon, ConfirmFrame.Amount);
+                TargetSystem.AddWeapon((TargetTool ?? ToolList.SelectedObject) as Weapon, ConfirmFrame.Amount);
+                ToolList.Refresh(SourceSystem.Weapons);
+                break;
+        }
         UndoConfirmAmount();
     }
 }

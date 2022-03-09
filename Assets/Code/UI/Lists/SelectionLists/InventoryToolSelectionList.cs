@@ -44,7 +44,7 @@ public class InventoryToolSelectionList : SelectionList_Super<ToolForInventory>
         ReferenceInventory = inventory;
     }
 
-    public void Setup<T>(List<T> listData, int hardLimit = -1, bool customNavigation = false) where T : ToolForInventory
+    public void Refresh<T>(List<T> listData, int hardLimit = -1, bool customNavigation = false) where T : ToolForInventory
     {
         // Get number of scrollable rows
         int totalNumberOfRows = NumberOfVisibleRows;
@@ -85,7 +85,7 @@ public class InventoryToolSelectionList : SelectionList_Super<ToolForInventory>
                 ListSelectable btn = entry.GetComponent<ListSelectable>();
                 btn.Index = i;
                 btn.ClearHighlights();
-                if (btn.OnHoverInput != null) btn.OnHoverInput.AddListener(HoverOverTool);
+                if (btn.OnHoverInput != null) btn.OnHoverInput = transform.GetChild(0).GetComponent<ListSelectable>().OnHoverInput;
 
                 // Set the icon in the box entry
                 Image blankImage = entry.transform.GetChild(0).GetComponent<Image>();
@@ -158,24 +158,22 @@ public class InventoryToolSelectionList : SelectionList_Super<ToolForInventory>
 
     public bool SetupToolInfo()
     {
-        SetupToolInfoAUX();
-        return InfoIsSetup;
+        return SetupToolInfoAUX();
     }
 
-    private void HoverOverTool()
+    public void HoverOverTool()
     {
         if (Selecting) SetupToolInfoAUX();
     }
 
-    private void SetupToolInfoAUX()
+    private bool SetupToolInfoAUX()
     {
         ListSelectable btn = EventSystem.current.currentSelectedGameObject.GetComponent<ListSelectable>();
         int tmpIdx = btn.Index;
         
         bool isBlankSquare = (tmpIdx >= ReferenceData.Count);
         InfoFrame.SetActive(!isBlankSquare);
-        InfoIsSetup = !isBlankSquare;
-        if (isBlankSquare) return;
+        if (isBlankSquare) return false;
 
         if (SelectedButton) SelectedButton.ClearHighlights();
         SelectedButton = btn;
@@ -195,6 +193,7 @@ public class InventoryToolSelectionList : SelectionList_Super<ToolForInventory>
         InfoFrame.transform.GetChild(5).GetChild(0).GetComponent<TextMeshProUGUI>().text = "+" + SelectedObject.CritcalRate + "%";
 
         InfoFrame.transform.GetChild(6).GetChild(0).GetComponent<TextMeshProUGUI>().text = SelectedObject.Weight.ToString();
+        return true;
     }
 
     public static void SetElementImage<T>(GameObject infoFrame, int index, T tool) where T : Tool
