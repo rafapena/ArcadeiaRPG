@@ -11,6 +11,7 @@ public class MapMenuManager : MonoBehaviour
     public MMInventory Inventory;
     public MMEquips Equips;
     public MMSpecial Special;
+    public MMBlueprints Blueprints;
     public MMTeam Team;
     public MMStats Stats;
     public MMObjectives Objectives;
@@ -24,6 +25,7 @@ public class MapMenuManager : MonoBehaviour
         if (!Inventory.gameObject.activeSelf) Inventory.gameObject.SetActive(true);
         if (!Equips.gameObject.activeSelf) Equips.gameObject.SetActive(true);
         if (!Special.gameObject.activeSelf) Special.gameObject.SetActive(true);
+        if (!Blueprints.gameObject.activeSelf) Special.gameObject.SetActive(true);
         if (!Team.gameObject.activeSelf) Team.gameObject.SetActive(true);
         if (!Stats.gameObject.activeSelf) Stats.gameObject.SetActive(true);
         if (!Map.gameObject.activeSelf) Map.gameObject.SetActive(true);
@@ -40,6 +42,7 @@ public class MapMenuManager : MonoBehaviour
             else if (Inventory.MainComponent.Activated) Inventory.GoBack();
             else if (Equips.MainComponent.Activated) Equips.GoBack();
             else if (Special.MainComponent.Activated) Special.GoBack();
+            else if (Blueprints.MainComponent.Activated) Blueprints.GoBack();
             else if (Team.MainComponent.Activated) Team.GoBack();
             else if (Stats.MainComponent.Activated) Stats.GoBack();
             else if (Map.MainComponent.Activated) Map.GoBack();
@@ -59,6 +62,7 @@ public class MapMenuManager : MonoBehaviour
         Inventory.Close();
         Equips.Close();
         Special.Close();
+        Blueprints.Close();
         Team.Close();
         Stats.Close();
         Map.Close();
@@ -84,6 +88,11 @@ public class MapMenuManager : MonoBehaviour
     public void GoToSpecial()
     {
         if (CloseAll()) Special.Open();
+    }
+
+    public void GoToBlueprints()
+    {
+        if (CloseAll()) Blueprints.Open();
     }
 
     public void GoToTeam()

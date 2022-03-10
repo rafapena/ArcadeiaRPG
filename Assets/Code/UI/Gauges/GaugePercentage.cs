@@ -7,6 +7,8 @@ using System;
 
 public class GaugePercentage : GaugeWithText
 {
+    public int Percentage { get; private set; }
+
     protected override void SetBarAmount()
     {
         base.SetBarAmount();
@@ -27,13 +29,14 @@ public class GaugePercentage : GaugeWithText
 
     public override void Set(float current, float max)
     {
+        Percentage = (int)(current / max * 100);
         base.Set(current, max);
-        int value = (int)(current / max * 100);
-        Label.text = value + "%";
+        Label.text = Percentage + "%";
     }
 
     public override void Fill()
     {
+        Percentage = 100;
         base.Fill();
         Label.text = "100%";
     }
@@ -41,11 +44,17 @@ public class GaugePercentage : GaugeWithText
     public override void Empty()
     {
         base.Empty();
+        Percentage = 0;
         Label.text = "0%";
+    }
+
+    protected override bool SurpassedCap()
+    {
+        return Percentage > 100;
     }
 
     private string CurrentBarPercentageText()
     {
-        return Math.Round(Bar.fillAmount * 100) + "%";
+        return Percentage + "%";
     }
 }

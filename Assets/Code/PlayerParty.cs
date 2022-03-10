@@ -170,14 +170,8 @@ public class PlayerParty : MonoBehaviour
             int quantity = PlayerPrefs.GetInt(pre + typeof(T).Name + list[i].Id + "_" + file);
             Item it = list[i] as Item;
             Weapon wp = list[i] as Weapon;
-            if (it)
-            {
-                for (int j = 0; j < quantity; j++) system.AddItem(it);
-            }
-            else if (wp)
-            {
-                for (int j = 0; j < quantity; j++) system.AddWeapon(wp);
-            }
+            if (it) system.AddItem(it, quantity);
+            else if (wp) system.AddWeapon(wp, quantity);
         }
     }
 

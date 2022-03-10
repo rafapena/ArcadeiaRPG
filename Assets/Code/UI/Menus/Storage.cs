@@ -26,10 +26,17 @@ public class Storage : MonoBehaviour
     public InventoryToolSelectionList ToolList;
     public GameObject ToolListTabs;
     public InventoryToolListSorter Sorter;
+    
     public MenuFrame FrameGoTo;
     public TextMeshProUGUI MessageGoTo;
+
+    public GameObject TargetHoverFrame;
+    public TextMeshProUGUI TargetHoverMessage;
+    public TextMeshProUGUI TargetHoverNumber;
+
     public ConfirmAmount ConfirmFrame;
     public TextMeshProUGUI ConfirmText;
+
     public GameObject ResultCheckFrame;
     public TextMeshProUGUI ResultCheckInventory;
     public TextMeshProUGUI ResultCheckStorage;
@@ -42,9 +49,6 @@ public class Storage : MonoBehaviour
     private InventorySystem SourceSystem;
     private InventorySystem TargetSystem;
     private ToolForInventory TargetTool;    // Map to selected tool from the opposite inventory system
-
-    // Delay after an item/weapon has been used/equipped
-    private float DoneTimer;
 
     private bool SelectingTool => Selection == Selections.SelectingInventory || Selection == Selections.SelectingStorage;
 
@@ -92,6 +96,10 @@ public class Storage : MonoBehaviour
         ResultCheckFrame.SetActive(false);
     }
 
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// -- Inventory system lists --
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     public void Swap()
     {
         if (Selection == Selections.SelectingInventory) SelectStorage();
@@ -133,7 +141,7 @@ public class Storage : MonoBehaviour
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// -- Inventory Lists --
+    /// -- Inventory Lists from tabs --
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public void SelectItemList()
@@ -160,6 +168,18 @@ public class Storage : MonoBehaviour
         ToolList.Refresh(toolList);
         if (ToolList.SelectedButton) ToolList.SelectedButton.ClearHighlights();
         EventSystem.current.SetSelectedGameObject(ToolList.transform.GetChild(0).gameObject);
+    }
+
+    public void ExtraHover()
+    {
+        TargetHoverFrame.SetActive(true);
+        TargetHoverMessage.text = (Selection == Selections.SelectingInventory) ? "STORED" : "HELD";
+        TargetHoverNumber.text = (GetTargetTool()?.Quantity ?? 0).ToString();
+    }
+
+    public void ExtraHoverCancel()
+    {
+        TargetHoverFrame.SetActive(false);
     }
 
     private void KeepOnlyHighlightedSelected(ref ListSelectable selectedListBtn)
@@ -193,6 +213,7 @@ public class Storage : MonoBehaviour
         }
         TargetTool = GetTargetTool();
 
+        TargetHoverFrame.SetActive(false);
         FrameGoTo.Deactivate();
         UpdateResultChecker(ConfirmFrame.Amount);
         KeepOnlyHighlightedSelected(ref ToolList.SelectedButton);
@@ -211,7 +232,6 @@ public class Storage : MonoBehaviour
             default:
                 return null;
         }
-
     }
 
     private int GetMaxAmountToStorage()

@@ -6,7 +6,7 @@ public class Gauge : MonoBehaviour
     protected enum BarChangeModes { None, Increasing, Decreasing }
 
     public Image Bar;
-    protected float CurrentAmount;
+    private float CurrentAmount;
     protected BarChangeModes BarChangeMode;
 
     private float PrevTime;
@@ -86,9 +86,14 @@ public class Gauge : MonoBehaviour
         CurrentAmount = 0;
         Bar.fillAmount = 0;
     }
-
+    
     public bool IsChanging()
     {
         return BarChangeMode != BarChangeModes.None;
+    }
+
+    protected bool NotEmpty()
+    {
+        return CurrentAmount > 0;
     }
 }

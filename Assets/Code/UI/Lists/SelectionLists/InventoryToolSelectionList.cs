@@ -22,6 +22,13 @@ public class InventoryToolSelectionList : SelectionList_Super<ToolForInventory>
     // Data tracker
     [HideInInspector] public InventorySystem ReferenceInventory;
     public Gauge CarryTracker;
+
+    [Tooltip("Only works if OnHover buttons link to HoverOverTool")]
+    public UnityEvent ExtraOnHoverEvent;
+
+    [Tooltip("Only works if OnHover buttons link to HoverOverTool")]
+    public UnityEvent ExtraOnHoverCancelEvent;
+
     private Selectable NavToLeft;
     private Selectable NavToRight;
 
@@ -29,7 +36,7 @@ public class InventoryToolSelectionList : SelectionList_Super<ToolForInventory>
     protected int NumberOfBlankSquares;
     protected int NumberOfColumns;
     protected int NumberOfVisibleRows;
-    protected Color CraftedBackgroundColor = new Color(0.7f, 0.9f, 1f, 0.7f);
+    protected static Color CraftedBackgroundColor = new Color(0.7f, 0.9f, 1f, 0.7f);
 
     protected override void Awake()
     {
@@ -173,7 +180,11 @@ public class InventoryToolSelectionList : SelectionList_Super<ToolForInventory>
         
         bool isBlankSquare = (tmpIdx >= ReferenceData.Count);
         InfoFrame.SetActive(!isBlankSquare);
-        if (isBlankSquare) return false;
+        if (isBlankSquare)
+        {
+            ExtraOnHoverCancelEvent.Invoke();
+            return false;
+        }
 
         if (SelectedButton) SelectedButton.ClearHighlights();
         SelectedButton = btn;
@@ -191,8 +202,9 @@ public class InventoryToolSelectionList : SelectionList_Super<ToolForInventory>
         InfoFrame.transform.GetChild(3).GetChild(0).GetComponent<TextMeshProUGUI>().text = SelectedObject.Power.ToString();
         InfoFrame.transform.GetChild(4).GetChild(0).GetComponent<TextMeshProUGUI>().text = SelectedObject.ConsecutiveActs.ToString();
         InfoFrame.transform.GetChild(5).GetChild(0).GetComponent<TextMeshProUGUI>().text = "+" + SelectedObject.CritcalRate + "%";
-
         InfoFrame.transform.GetChild(6).GetChild(0).GetComponent<TextMeshProUGUI>().text = SelectedObject.Weight.ToString();
+
+        ExtraOnHoverEvent.Invoke();
         return true;
     }
 

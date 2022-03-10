@@ -55,23 +55,19 @@ public class InventorySystem : MonoBehaviour
 
     private List<T> SetupToolGroup<T>(List<T> toolList) where T : ToolForInventory
     {
-        List<T> ClonedList = new List<T>();
+        List<T> groupedList = new List<T>();
         for (int i = 0; i < toolList.Count; i++)
         {
-            bool itemAlreadyInList = false;
-            for (int j = 0; j < ClonedList.Count; j++)
+            int foundTool = groupedList.FindIndex(t => t.Id == toolList[i].Id);
+            if (foundTool < 0)
             {
-                if (toolList[i].Id != ClonedList[j].Id) continue;
-                ClonedList[j].Quantity++;
-                itemAlreadyInList = true;
-                break;
+                toolList[i] = Instantiate(toolList[i]);
+                toolList[i].Quantity = 1;
+                groupedList.Add(toolList[i]);
             }
-            if (itemAlreadyInList) continue;
-            toolList[i] = Instantiate(toolList[i]);
-            toolList[i].Quantity = 1;
-            ClonedList.Add(toolList[i]);
+            else groupedList[foundTool].Quantity++;
         }
-        return ClonedList;
+        return groupedList;
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

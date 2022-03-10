@@ -9,10 +9,11 @@ public abstract class GaugeWithText : Gauge
     public TextMeshProUGUI Title;
     public TextMeshProUGUI Label;   // Used by child subclasses
     public bool KeepTextColorOnEmpty;
-    
-    private Color NormalColor;
-    private Color EmptyBarTextColor;
-    private Color KOdColor = new Color(1f, 0.4f, 0.4f);
+
+    protected static Color NormalColor;
+    protected static Color EmptyBarTextColor;
+    protected static Color SurpassedCapColor = new Color(0.8f, 0.2f, 0.2f);
+    protected static Color KOdColor = new Color(0.8f, 0.1f, 0.1f);
 
     protected override void Awake()
     {
@@ -45,12 +46,21 @@ public abstract class GaugeWithText : Gauge
         if (Title) Title.color = EmptyBarTextColor;
     }
 
-    protected virtual void SetColors()
+    protected abstract bool SurpassedCap();
+
+    private void SetColors()
     {
-        if (CurrentAmount > 0)
+        if (SurpassedCap())
+        {
+            if (Title) Title.color = SurpassedCapColor;
+            Label.color = SurpassedCapColor;
+            Bar.color = SurpassedCapColor;
+        }
+        else if (NotEmpty())
         {
             if (Title) Title.color = NormalColor;
             Label.color = NormalColor;
+            Bar.color = NormalColor;
         }
         else
         {
