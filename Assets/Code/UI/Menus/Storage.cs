@@ -91,6 +91,7 @@ public class Storage : MonoBehaviour
     protected void Initialize()
     {
         ToolList.Selecting = true;
+        TargetHoverFrame.SetActive(true);
         ConfirmFrame.Deactivate();
         FrameGoTo.Activate();
         ResultCheckFrame.SetActive(false);
@@ -170,16 +171,19 @@ public class Storage : MonoBehaviour
         EventSystem.current.SetSelectedGameObject(ToolList.transform.GetChild(0).gameObject);
     }
 
-    public void ExtraHover()
+    // TODO: Select then unselect in storage to see error
+    public void HoverOverToolInStorage()
     {
-        TargetHoverFrame.SetActive(true);
-        TargetHoverMessage.text = (Selection == Selections.SelectingInventory) ? "STORED" : "HELD";
-        TargetHoverNumber.text = (GetTargetTool()?.Quantity ?? 0).ToString();
-    }
-
-    public void ExtraHoverCancel()
-    {
-        TargetHoverFrame.SetActive(false);
+        ToolList.HoverOverTool();
+        bool hoverFrame = ToolList.DisplayedToolInfo && ToolList.Selecting;
+        TargetHoverFrame.SetActive(hoverFrame);
+        if (hoverFrame)
+        {
+            if (Selection == Selections.SelectingInventory) TargetHoverMessage.text = "STORED";
+            else if (Selection == Selections.SelectingStorage) TargetHoverMessage.text = "HELD";
+            TargetHoverNumber.text = (GetTargetTool()?.Quantity ?? 0).ToString();
+        }
+        else ToolList.SelectedButton.ClearHighlights();
     }
 
     private void KeepOnlyHighlightedSelected(ref ListSelectable selectedListBtn)
@@ -193,7 +197,7 @@ public class Storage : MonoBehaviour
     {
         ToolList.Selecting = false;
 
-        if (!ToolList.SetupToolInfo())
+        if (!ToolList.RefreshToolInfo())
         {
             if (ToolList.SelectedButton) ToolList.SelectedButton.ClearHighlights();
             if (ConfirmingAmount) UndoConfirmAmount();

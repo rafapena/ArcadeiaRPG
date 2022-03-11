@@ -183,7 +183,7 @@ public class MMEquips : MM_Super
 
     public void SelectEquippedItem()
     {
-        if (!EquippedItems.SetupToolInfo()) return;
+        if (!EquippedItems.RefreshToolInfo()) return;
         Sorter.Undo();
         if (Selection == Selections.SelectTool) UnequipItem();
         else if (Selection == Selections.SelectToolSwap) SwapItem();
@@ -191,7 +191,7 @@ public class MMEquips : MM_Super
 
     public void SelectEquippedWeapon()
     {
-        if (!EquippedWeapons.SetupToolInfo()) return;
+        if (!EquippedWeapons.RefreshToolInfo()) return;
         Sorter.Undo();
         if (Selection == Selections.SelectTool) UnequipWeapon();
         else if (Selection == Selections.SelectToolSwap) SwapWeapon();
@@ -233,7 +233,7 @@ public class MMEquips : MM_Super
 
     public void SelectInventoryTool()
     {
-        if (!InventoryToolList.SetupToolInfo())
+        if (!InventoryToolList.RefreshToolInfo())
         {
             if (InventoryToolList.SelectedButton)
                 InventoryToolList.SelectedButton.ClearHighlights();

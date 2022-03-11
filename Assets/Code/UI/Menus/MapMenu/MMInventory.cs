@@ -173,7 +173,7 @@ public class MMInventory : MM_Super
     public void SelectTool()
     {
         ConfirmDiscard.SetActive(false);
-        if (!ToolList.SetupToolInfo())
+        if (!ToolList.RefreshToolInfo())
         {
             if (ToolList.SelectedButton) ToolList.SelectedButton.ClearHighlights();
             SelectingUsage.SetActive(false);
@@ -501,7 +501,7 @@ public class MMInventory : MM_Super
         {
             return;
         }
-        else if (EquippedToolList.SetupToolInfo())
+        else if (EquippedToolList.RefreshToolInfo())
         {
             if (EquippedToolList.SelectedObject.Id == ToolList.SelectedObject.Id &&
                 EquippedToolList.SelectedObject.Name == ToolList.SelectedObject.Name)

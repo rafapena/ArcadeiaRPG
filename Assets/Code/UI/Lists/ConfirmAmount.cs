@@ -24,11 +24,30 @@ public class ConfirmAmount : MonoBehaviour
 
     public int MaxValue { get; private set; }
 
+    private bool InputGoingFast => Time.unscaledTime > RapidInputHoldTime;
+    private float RapidInputHoldTime;
+    private const float RAPID_INPUT_HOLD_TIME_BUFFER = 0.5f;
+
     private void Update()
     {
         if (!Frame.activeSelf) return;
-        else if (Input.GetKey(KeyCode.UpArrow) || Input.GetAxis("Mouse ScrollWheel") > 0) MoveUpInc();
-        else if (Input.GetKey(KeyCode.DownArrow) || Input.GetAxis("Mouse ScrollWheel") < 0) MoveDownInc();
+        else if (Input.GetAxis("Mouse ScrollWheel") > 0) MoveUpInc();
+        else if (Input.GetAxis("Mouse ScrollWheel") < 0) MoveDownInc();
+        else KeyboardInputs();
+    }
+
+    private void KeyboardInputs()
+    {
+        if (Input.GetKeyDown(KeyCode.UpArrow)) StartRapidHoldTime(MoveUpInc);
+        else if (Input.GetKeyDown(KeyCode.DownArrow)) StartRapidHoldTime(MoveDownInc);
+        else if (Input.GetKey(KeyCode.UpArrow) && InputGoingFast) MoveUpInc();
+        else if (Input.GetKey(KeyCode.DownArrow) && InputGoingFast) MoveDownInc();
+    }
+
+    private void StartRapidHoldTime(UnityAction func)
+    {
+        func.Invoke();
+        RapidInputHoldTime = Time.unscaledTime + RAPID_INPUT_HOLD_TIME_BUFFER;
     }
 
     public void Activate(int minValue, int maxValue, bool useLastValue = false)

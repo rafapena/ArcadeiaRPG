@@ -23,12 +23,8 @@ public class InventoryToolSelectionList : SelectionList_Super<ToolForInventory>
     [HideInInspector] public InventorySystem ReferenceInventory;
     public Gauge CarryTracker;
 
-    [Tooltip("Only works if OnHover buttons link to HoverOverTool")]
-    public UnityEvent ExtraOnHoverEvent;
-
-    [Tooltip("Only works if OnHover buttons link to HoverOverTool")]
-    public UnityEvent ExtraOnHoverCancelEvent;
-
+    // Hovering/Navigation
+    public bool DisplayedToolInfo { get; private set; }
     private Selectable NavToLeft;
     private Selectable NavToRight;
 
@@ -163,28 +159,25 @@ public class InventoryToolSelectionList : SelectionList_Super<ToolForInventory>
     /// -- Browsing Through List --
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public bool SetupToolInfo()
+    public bool RefreshToolInfo()
     {
-        return SetupToolInfoAUX();
+        return RefreshToolInfoAUX();
     }
 
     public void HoverOverTool()
     {
-        if (Selecting) SetupToolInfoAUX();
+        if (Selecting) RefreshToolInfoAUX();
     }
 
-    private bool SetupToolInfoAUX()
+    private bool RefreshToolInfoAUX()
     {
         ListSelectable btn = EventSystem.current.currentSelectedGameObject.GetComponent<ListSelectable>();
         int tmpIdx = btn.Index;
         
         bool isBlankSquare = (tmpIdx >= ReferenceData.Count);
         InfoFrame.SetActive(!isBlankSquare);
-        if (isBlankSquare)
-        {
-            ExtraOnHoverCancelEvent.Invoke();
-            return false;
-        }
+        DisplayedToolInfo = !isBlankSquare;
+        if (isBlankSquare) return false;
 
         if (SelectedButton) SelectedButton.ClearHighlights();
         SelectedButton = btn;
@@ -202,9 +195,8 @@ public class InventoryToolSelectionList : SelectionList_Super<ToolForInventory>
         InfoFrame.transform.GetChild(3).GetChild(0).GetComponent<TextMeshProUGUI>().text = SelectedObject.Power.ToString();
         InfoFrame.transform.GetChild(4).GetChild(0).GetComponent<TextMeshProUGUI>().text = SelectedObject.ConsecutiveActs.ToString();
         InfoFrame.transform.GetChild(5).GetChild(0).GetComponent<TextMeshProUGUI>().text = "+" + SelectedObject.CritcalRate + "%";
-        InfoFrame.transform.GetChild(6).GetChild(0).GetComponent<TextMeshProUGUI>().text = SelectedObject.Weight.ToString();
 
-        ExtraOnHoverEvent.Invoke();
+        InfoFrame.transform.GetChild(6).GetChild(0).GetComponent<TextMeshProUGUI>().text = SelectedObject.Weight.ToString();
         return true;
     }
 
