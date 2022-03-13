@@ -109,7 +109,7 @@ public class MMObjectives : MM_Super
     {
         Selection = Selections.SelectObjective;
         SetFrameVisibility(objectiveList.Count != 0);
-        KeepOnlyHighlightedSelected(ref SelectedObjectivesTabBtn);
+        MenuMaster.KeepHighlightedSelected(ref SelectedObjectivesTabBtn);
         ObjectivesList.Setup(objectiveList);
         if (ObjectivesList.SelectedButton) ObjectivesList.SelectedButton.ClearHighlights();
         EventSystem.current.SetSelectedGameObject(ObjectivesList.transform.GetChild(0).gameObject);

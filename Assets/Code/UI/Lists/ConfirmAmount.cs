@@ -61,19 +61,15 @@ public class ConfirmAmount : MonoBehaviour
         if (StartingAmount > MaxValue) StartingAmount = MaxValue;
         if (StartingAmount < MinValue) StartingAmount = MinValue;
 
-        UpButton.interactable = true;
-        DownButton.interactable = true;
-        if (Amount >= MaxValue)
-        {
-            Amount = MaxValue;
-            UpButton.interactable = false;
-        }
-        if (Amount <= MinValue)
-        {
-            Amount = MinValue;
-            DownButton.interactable = false;
-        }
+        bool overflow = Amount >= MaxValue;
+        bool underflow = Amount <= MinValue;
+        if (overflow) Amount = MaxValue;
+        if (underflow) Amount = MinValue;
+        UpButton.interactable = !overflow;
+        DownButton.interactable = !underflow;
+
         DisplayedAmount.text = Amount.ToString();
+        EventSystem.current.SetSelectedGameObject(OKButton.gameObject);
     }
 
     public void Deactivate()

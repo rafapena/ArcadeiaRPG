@@ -7,8 +7,7 @@ public class InventorySystem : MonoBehaviour
     {
         None,
         Items,
-        Weapons,
-        KeyItems
+        Weapons
     }
 
     public int Gold;
@@ -28,7 +27,7 @@ public class InventorySystem : MonoBehaviour
         KeyItems = SetupToolGroup(KeyItems);
     }
 
-    public void UpdateNumberOfTools()
+    public void UpdateToCurrentWeight()
     {
         CarryWeight = 0;
         CarryWeight += SetupCarryWeightForList(Items);
@@ -110,8 +109,7 @@ public class InventorySystem : MonoBehaviour
     private T AddInventoryTool<T>(ref List<T> toolList, T newTool, int amount) where T : ToolForInventory
     {
         CarryWeight += newTool.Weight * amount;
-        T tool = toolList.Find(t => t.Id == newTool.Id);
-        if (tool == null)
+        if (toolList.Find(t => t.Id == newTool.Id) == null)
         {
             MapPlayer p = gameObject.GetComponent<MapPlayer>();
             newTool = Instantiate(newTool, (p ? p.ItemsListDump : null));

@@ -22,10 +22,11 @@ public class MapPlayer : MapExplorer
     {
         base.Start();
         Party.Setup();
-        if (GameplayMaster.SelectedFile == 0) TEST_SETUP();
-        else if (GameplayMaster.NoFileSelected()) SetupPartyNew();
-        else if (!GameplayMaster.FinishedLoadingContent()) Party.LoadFromFile(GameplayMaster.SelectedFile, this);
-        else Setup();
+        TEST_SETUP();
+        //if (GameplayMaster.SelectedFile == 0) TEST_SETUP();
+        //else if (GameplayMaster.NoFileSelected()) SetupPartyNew();
+        //else if (!GameplayMaster.FinishedLoadingContent()) Party.LoadFromFile(GameplayMaster.SelectedFile, this);
+        //else Setup();
         GameplayMaster.Party = Party;
     }
 
@@ -94,8 +95,8 @@ public class MapPlayer : MapExplorer
             all[i].Level = Party.Level;
             if (all[i].Weapons.Count > 0) all[i].SelectedWeapon = all[i].Weapons[0];
             all[i].StatConversion();
-            all[i].HP = all[i].Stats.MaxHP;
-            all[i].SP = 100;
+            all[i].HP = all[i].Stats.MaxHP / 2;
+            all[i].SP = 100 / 2;
             all[i].gameObject.SetActive(false);
             if (all[i].GetType().Name == "BattlePlayer")
             {

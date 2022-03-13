@@ -10,7 +10,7 @@ using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using System.Threading;
 
-public class MMInventory : MM_Super
+public class MMInventory : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOperations
 {
     public enum Selections
     {
@@ -21,13 +21,11 @@ public class MMInventory : MM_Super
     }
 
     // Selection lists
-    public InventoryToolSelectionList ToolList;
+    public ToolListCollectionFrame InventoryFrame;
     public InventoryToolSelectionList EquippedToolList;
     public PlayerSelectionList PartyList;
 
-    // Child GameObjects;
-    public GameObject ToolListTabs;
-    public InventoryToolListSorter Sorter;
+    // Child GameObjects
     public GameObject SelectingUsage;
     public GameObject ConfirmDiscard;
     public MenuFrame SelectingTeammate;
@@ -36,12 +34,10 @@ public class MMInventory : MM_Super
 
     // General selection tracking
     private Selections Selection;
-    private InventorySystem.ListType InventoryList;
     public TextMeshProUGUI DiscardLabel;
     public TextMeshProUGUI SelectTeammateLabel;
 
     // Keep track of selected content
-    private ListSelectable SelectedInventoryTab;
     private ListSelectable SelectedUsageListBtn;
 
     // List of potential targets
@@ -58,15 +54,12 @@ public class MMInventory : MM_Super
         switch (Selection)
         {
             case Selections.InventoryLists:
-                if (Input.GetKeyDown(KeyCode.Alpha1)) SelectItemList();
-                else if (Input.GetKeyDown(KeyCode.Alpha2)) SelectWeaponList();
-                else if (Input.GetKeyDown(KeyCode.Alpha3)) SelectKeyItemList();
-                // else if (Input.GetKeyDown(KeyCode.C)) SetupSorting();
+                InventoryFrame.SelectTabInputs();
                 break;
             case Selections.UsageDone:
             case Selections.EquippedDone:
                 if (Time.realtimeSinceStartup <= DoneTimer) return;
-                EventSystem.current.SetSelectedGameObject(ToolList.SelectedButton.gameObject);
+                EventSystem.current.SetSelectedGameObject(InventoryFrame.ToolList.SelectedButton.gameObject);
                 ReturnToInitialSetup();
                 Selection = Selections.InventoryLists;
                 break;
@@ -76,8 +69,11 @@ public class MMInventory : MM_Super
     public override void Open()
     {
         base.Open();
-        ToolList.LinkToInventory(MenuManager.PartyInfo.Inventory);
-        SelectItemList();
+        InventoryFrame.RegisterToolList(0, MenuManager.PartyInfo.Inventory.Items);
+        InventoryFrame.RegisterToolList(1, MenuManager.PartyInfo.Inventory.Weapons);
+        InventoryFrame.RegisterToolList(2, MenuManager.PartyInfo.Inventory.KeyItems);
+        InventoryFrame.TrackCarryWeight(MenuManager.PartyInfo.Inventory);
+        InventoryFrame.InitializeSelection();
     }
 
     public override void Close()
@@ -91,17 +87,12 @@ public class MMInventory : MM_Super
         switch (Selection)
         {
             case Selections.InventoryLists:
-                if (Sorter.gameObject.activeSelf)
-                {
-                    ToolList.Selecting = true;
-                    Sorter.Undo();
-                    break;
-                }
+                if (InventoryFrame.UndoSort()) break;
                 Selection = Selections.None;
                 MenuManager.GoToMain();
                 break;
             case Selections.Usage:
-                UndoSelectTool();
+                InventoryFrame.UndoSelectTool();
                 break;
             case Selections.Discard:
                 UndoDiscard();
@@ -121,14 +112,12 @@ public class MMInventory : MM_Super
 
     protected override void ReturnToInitialSetup()
     {
-        ToolList.Selecting = true;
-        Sorter.Undo();
+        InventoryFrame.SelectingToolList();
         SelectingUsage.SetActive(false);
         ConfirmDiscard.SetActive(false);
         SelectingTeammate.Deactivate();
         EquippedTools.SetActive(false);
         ConfirmSwap.SetActive(false);
-        ToolList.ClearSelections();
         PartyList.ClearSelections();
         EquippedToolList.ClearSelections();
         if (SelectedUsageListBtn)
@@ -141,66 +130,41 @@ public class MMInventory : MM_Super
     /// -- Inventory Lists --
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public void SelectItemList()
+    public void SelectTabSuccess()
     {
-        SelectToolTab(InventorySystem.ListType.Items, MenuManager.PartyInfo.Inventory.Items, 0);
-    }
-
-    public void SelectWeaponList()
-    {
-        SelectToolTab(InventorySystem.ListType.Weapons, MenuManager.PartyInfo.Inventory.Weapons, 1);
-    }
-
-    public void SelectKeyItemList()
-    {
-        SelectToolTab(InventorySystem.ListType.KeyItems, MenuManager.PartyInfo.Inventory.KeyItems, 2);
-    }
-
-    private void SelectToolTab<T>(InventorySystem.ListType inventoryList, List<T> toolList, int tabIndex) where T : ToolForInventory
-    {
-        if (Sorter.gameObject.activeSelf) return;
         Selection = Selections.InventoryLists;
-        InventoryList = inventoryList;
-        EventSystem.current.SetSelectedGameObject(ToolListTabs.transform.GetChild(tabIndex).gameObject);
-        ReturnToInitialSetup();
-        KeepOnlyHighlightedSelected(ref SelectedInventoryTab);
-        ToolList.Selecting = true;
-        ToolList.Refresh(toolList);
-        if (ToolList.SelectedButton) ToolList.SelectedButton.ClearHighlights();
-        EventSystem.current.SetSelectedGameObject(ToolList.transform.GetChild(0).gameObject);
     }
 
-    public void SelectTool()
+    public void SelectTabFailed()
     {
-        ConfirmDiscard.SetActive(false);
-        if (!ToolList.RefreshToolInfo())
-        {
-            if (ToolList.SelectedButton) ToolList.SelectedButton.ClearHighlights();
-            SelectingUsage.SetActive(false);
-            return;
-        }
+        //
+    }
+
+    public void SelectToolSuccess()
+    {
+        if ((InventoryFrame.ToolList.SelectedObject as Item)?.IsKey ?? false) return;
         Selection = Selections.Usage;
-        ToolList.Selecting = false;
+        ConfirmDiscard.SetActive(false);
         SelectingUsage.SetActive(true);
-        KeepOnlyHighlightedSelected(ref ToolList.SelectedButton);
-        Sorter.Undo();
         if (SelectedUsageListBtn) SelectedUsageListBtn.ClearHighlights();
         SetupUsageButtons();
     }
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// -- Sorting --
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    public void SelectToolFailed()
+    {
+        ConfirmDiscard.SetActive(false);
+        SelectingUsage.SetActive(false);
+    }
 
-    public void SetupSorting()
+    public void UndoSelectToolSuccess()
     {
         Selection = Selections.InventoryLists;
         SelectingUsage.SetActive(false);
         ConfirmDiscard.SetActive(false);
-        ToolList.Selecting = false;
-        ToolList.ClearSelections();
         if (SelectedUsageListBtn) SelectedUsageListBtn.ClearHighlights();
-        Sorter.Setup(ToolList, MenuManager.PartyInfo.Inventory, InventoryList);
+        foreach (Transform t0 in SelectingUsage.transform)
+            foreach (Transform t in t0)
+                t.GetComponent<ListSelectable>().ClearHighlights();
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -213,7 +177,7 @@ public class MMInventory : MM_Super
         SelectableTeammatesEquip = new List<Battler>();
         SelectAllTeammates = false;
         Transform CurrentUsageList;
-        switch (InventoryList)
+        switch (InventoryFrame.CurrentInventoryList)
         {
             case InventorySystem.ListType.Items:
                 CurrentUsageList = SelectingUsage.transform.GetChild(0);
@@ -242,7 +206,7 @@ public class MMInventory : MM_Super
     private bool GetSelectableTeammatesForUsingItems()
     {
         List<Battler> party = MenuManager.PartyInfo.GetWholeParty();
-        switch (ToolList.SelectedObject.Scope)
+        switch (InventoryFrame.ToolList.SelectedObject.Scope)
         {
             case Tool.ScopeType.OneTeammate:
             case Tool.ScopeType.Self:
@@ -278,7 +242,7 @@ public class MMInventory : MM_Super
     {
         foreach (BattlePlayer p in MenuManager.PartyInfo.AllPlayers)
         {
-            bool matchClassExclusive = ToolList.SelectedObject.ClassExclusives.Count == 0 || ToolList.SelectedObject.ClassExclusives.Contains(p.Class);
+            bool matchClassExclusive = InventoryFrame.ToolList.SelectedObject.ClassExclusives.Count == 0 || InventoryFrame.ToolList.SelectedObject.ClassExclusives.Contains(p.Class);
             if (matchClassExclusive) SelectableTeammatesEquip.Add(p);
         }
         return SelectableTeammatesEquip.Count > 0;
@@ -286,28 +250,14 @@ public class MMInventory : MM_Super
 
     private bool GetSelectableTeammatesForEquippingWeapons()
     {
-        Weapon selectedWeapon = ToolList.SelectedObject as Weapon;
+        Weapon selectedWeapon = InventoryFrame.ToolList.SelectedObject as Weapon;
         foreach (BattlePlayer p in MenuManager.PartyInfo.AllPlayers)
         {
-            bool matchClassExclusive = ToolList.SelectedObject.ClassExclusives.Count == 0 || ToolList.SelectedObject.ClassExclusives.Contains(p.Class);
+            bool matchClassExclusive = InventoryFrame.ToolList.SelectedObject.ClassExclusives.Count == 0 || InventoryFrame.ToolList.SelectedObject.ClassExclusives.Contains(p.Class);
             bool isUsableWeaponType = p.Class.UsableWeapon1Type == selectedWeapon.WeaponType || p.Class.UsableWeapon2Type == selectedWeapon.WeaponType;
             if (matchClassExclusive && isUsableWeaponType) SelectableTeammatesEquip.Add(p);
         }
         return SelectableTeammatesEquip.Count > 0;
-    }
-
-    public void UndoSelectTool()
-    {
-        Selection = Selections.InventoryLists;
-        SelectingUsage.SetActive(false);
-        ConfirmDiscard.SetActive(false);
-        ToolList.SelectedButton.ClearHighlights();
-        ToolList.Selecting = true;
-        if (SelectedUsageListBtn) SelectedUsageListBtn.ClearHighlights();
-        foreach (Transform t0 in SelectingUsage.transform)
-            foreach (Transform t in t0)
-                t.GetComponent<ListSelectable>().ClearHighlights();
-        EventSystem.current.SetSelectedGameObject(ToolList.SelectedButton.gameObject);
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -317,9 +267,9 @@ public class MMInventory : MM_Super
     public void SetupDiscard()
     {
         Selection = Selections.Discard;
-        KeepOnlyHighlightedSelected(ref SelectedUsageListBtn);
+        MenuMaster.KeepHighlightedSelected(ref SelectedUsageListBtn);
         ConfirmDiscard.SetActive(true);
-        DiscardLabel.text = "Discard\n" + ToolList.SelectedObject.Name + "?";
+        DiscardLabel.text = "Discard\n" + InventoryFrame.ToolList.SelectedObject.Name + "?";
         EventSystem.current.SetSelectedGameObject(ConfirmDiscard.transform.GetChild(1).gameObject);
     }
 
@@ -333,19 +283,19 @@ public class MMInventory : MM_Super
 
     public void DiscardTool()
     {
-        switch (InventoryList)
+        switch (InventoryFrame.CurrentInventoryList)
         {
             case InventorySystem.ListType.Items:
-                MenuManager.PartyInfo.Inventory.RemoveItem(ToolList.SelectedIndex);
-                ToolList.Refresh(MenuManager.PartyInfo.Inventory.Items);
+                MenuManager.PartyInfo.Inventory.RemoveItem(InventoryFrame.ToolList.SelectedIndex);
+                InventoryFrame.Refresh(MenuManager.PartyInfo.Inventory.Items);
                 break;
             case InventorySystem.ListType.Weapons:
-                MenuManager.PartyInfo.Inventory.RemoveWeapon(ToolList.SelectedIndex);
-                ToolList.Refresh(MenuManager.PartyInfo.Inventory.Weapons);
+                MenuManager.PartyInfo.Inventory.RemoveWeapon(InventoryFrame.ToolList.SelectedIndex);
+                InventoryFrame.Refresh(MenuManager.PartyInfo.Inventory.Weapons);
                 break;
         }
         UndoDiscard();
-        UndoSelectTool();
+        InventoryFrame.UndoSelectTool();
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -355,7 +305,7 @@ public class MMInventory : MM_Super
     public void SetupUseOnCharacter()
     {
         Selection = Selections.UseOnCharacter;
-        SelectTeammateLabel.text = SelectAllTeammates ? ("USE " + ToolList.SelectedObject.Name.ToUpper() + " ON EVERYONE?") : ("USE " + ToolList.SelectedObject.Name.ToUpper() + " ON...");
+        SelectTeammateLabel.text = SelectAllTeammates ? ("USE " + InventoryFrame.ToolList.SelectedObject.Name.ToUpper() + " ON EVERYONE?") : ("USE " + InventoryFrame.ToolList.SelectedObject.Name.ToUpper() + " ON...");
         PartyList.Setup(SelectableTeammatesUse);
         SetupTeammatesList();
     }
@@ -363,15 +313,15 @@ public class MMInventory : MM_Super
     public void SetupEquipOnCharacter()
     {
         Selection = Selections.EquipOnCharacter;
-        SelectTeammateLabel.text = "EQUIP " + ToolList.SelectedObject.Name.ToUpper() + " ON...";
-        EquippedTools.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = (InventoryList == InventorySystem.ListType.Items) ? "EQUIPPED ITEMS" : "EQUIPPED WEAPONS";
+        SelectTeammateLabel.text = "EQUIP " + InventoryFrame.ToolList.SelectedObject.Name.ToUpper() + " ON...";
+        EquippedTools.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = (InventoryFrame.CurrentInventoryList == InventorySystem.ListType.Items) ? "EQUIPPED ITEMS" : "EQUIPPED WEAPONS";
         PartyList.Setup(SelectableTeammatesEquip);
         SetupTeammatesList();
     }
 
     private void SetupTeammatesList()
     {
-        KeepOnlyHighlightedSelected(ref SelectedUsageListBtn);
+        MenuMaster.KeepHighlightedSelected(ref SelectedUsageListBtn);
         SelectingUsage.SetActive(false);
         ConfirmDiscard.SetActive(false);
         SelectingTeammate.Activate();
@@ -391,8 +341,8 @@ public class MMInventory : MM_Super
     {
         int index = EventSystem.current.currentSelectedGameObject.GetComponent<ListSelectable>().Index;
         EquippedTools.SetActive(true);
-        if (InventoryList == InventorySystem.ListType.Weapons) EquippedToolList.Refresh(SelectableTeammatesEquip[index].Weapons, BattleMaster.MAX_NUMBER_OF_WEAPONS);
-        else if (InventoryList == InventorySystem.ListType.Items) EquippedToolList.Refresh(SelectableTeammatesEquip[index].Items, BattleMaster.MAX_NUMBER_OF_ITEMS);
+        if (InventoryFrame.CurrentInventoryList == InventorySystem.ListType.Weapons) EquippedToolList.Refresh(SelectableTeammatesEquip[index].Weapons, BattleMaster.MAX_NUMBER_OF_WEAPONS);
+        else if (InventoryFrame.CurrentInventoryList == InventorySystem.ListType.Items) EquippedToolList.Refresh(SelectableTeammatesEquip[index].Items, BattleMaster.MAX_NUMBER_OF_ITEMS);
     }
 
     public void DeselectingTeammates()
@@ -428,7 +378,7 @@ public class MMInventory : MM_Super
             {
                 if (Selection == Selections.CharacterEquipsList) SetupEquippedTools();   // Can reclick another teammate, while selecting equipment from current teammate
                 PartyList.SelectedObject = SelectableTeammatesEquip[index];
-                KeepOnlyHighlightedSelected(ref PartyList.SelectedButton);
+                MenuMaster.KeepHighlightedSelected(ref PartyList.SelectedButton);
                 SetupCharacterEquipsList();
             }
         }
@@ -443,11 +393,11 @@ public class MMInventory : MM_Super
         Selection = Selections.UsageDone;
         DoneTimer = Time.realtimeSinceStartup + 1.5f;
         EventSystem.current.SetSelectedGameObject(null);
-        Item it = ToolList.SelectedObject as Item;
+        Item it = InventoryFrame.ToolList.SelectedObject as Item;
         if (it.Consumable)
         {
             MenuManager.PartyInfo.Inventory.RemoveItem(it);
-            ToolList.Refresh(MenuManager.PartyInfo.Inventory.Items);
+            InventoryFrame.Refresh(MenuManager.PartyInfo.Inventory.Items);
         }
     }
     
@@ -466,7 +416,7 @@ public class MMInventory : MM_Super
     private void UseItem(int index)
     {
         PartyList.SelectedObject = SelectableTeammatesUse[index];
-        PartyList.SelectedObject.ReceiveToolEffects(PartyList.SelectedObject, ToolList.SelectedObject);
+        PartyList.SelectedObject.ReceiveToolEffects(PartyList.SelectedObject, InventoryFrame.ToolList.SelectedObject);
         Gauge hpg = PartyList.transform.GetChild(index).GetChild(3).GetComponent<Gauge>();
         Gauge spg = PartyList.transform.GetChild(index).GetChild(4).GetComponent<Gauge>();
         hpg.SetAndAnimate(PartyList.SelectedObject.HP, PartyList.SelectedObject.Stats.MaxHP);
@@ -489,7 +439,7 @@ public class MMInventory : MM_Super
     {
         Selection = Selections.EquipOnCharacter;
         EquippedToolList.Selecting = false;
-        EquippedTools.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = (InventoryList == InventorySystem.ListType.Items) ? "EQUIPPED ITEMS" : "EQUIPPED WEAPONS";
+        EquippedTools.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = (InventoryFrame.CurrentInventoryList == InventorySystem.ListType.Items) ? "EQUIPPED ITEMS" : "EQUIPPED WEAPONS";
         EquippedToolList.InfoFrame.SetActive(false);
         PartyList.SelectedButton.ClearHighlights();
         EventSystem.current.SetSelectedGameObject(PartyList.SelectedButton.gameObject);
@@ -503,17 +453,17 @@ public class MMInventory : MM_Super
         }
         else if (EquippedToolList.RefreshToolInfo())
         {
-            if (EquippedToolList.SelectedObject.Id == ToolList.SelectedObject.Id &&
-                EquippedToolList.SelectedObject.Name == ToolList.SelectedObject.Name)
+            if (EquippedToolList.SelectedObject.Id == InventoryFrame.ToolList.SelectedObject.Id &&
+                EquippedToolList.SelectedObject.Name == InventoryFrame.ToolList.SelectedObject.Name)
                 return;     // Selected same item
-            KeepOnlyHighlightedSelected(ref EquippedToolList.SelectedButton);
+            MenuMaster.KeepHighlightedSelected(ref EquippedToolList.SelectedButton);
             SetupConfirmSwapButtons();
         }
         else if (Selection == Selections.CharacterEquipsList)
         {
             // Equip from blank slot
-            if (InventoryList == InventorySystem.ListType.Items) Equip(false, PartyList.SelectedObject.Items.Count);
-            else if (InventoryList == InventorySystem.ListType.Weapons) Equip(false, PartyList.SelectedObject.Weapons.Count);
+            if (InventoryFrame.CurrentInventoryList == InventorySystem.ListType.Items) Equip(false, PartyList.SelectedObject.Items.Count);
+            else if (InventoryFrame.CurrentInventoryList == InventorySystem.ListType.Weapons) Equip(false, PartyList.SelectedObject.Weapons.Count);
         }
     }
 
@@ -526,7 +476,7 @@ public class MMInventory : MM_Super
         Selection = Selections.ConfirmEquip;
         EquippedToolList.Selecting = false;
         ConfirmSwap.SetActive(true);
-        string txt = "Swap out\n<b>" + EquippedToolList.SelectedObject.Name + "</b>\nwith\n" + "<b>" + ToolList.SelectedObject.Name + "</b>?";
+        string txt = "Swap out\n<b>" + EquippedToolList.SelectedObject.Name + "</b>\nwith\n" + "<b>" + InventoryFrame.ToolList.SelectedObject.Name + "</b>?";
         ConfirmSwap.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = txt;
         EventSystem.current.SetSelectedGameObject(ConfirmSwap.transform.GetChild(1).gameObject);
     }
@@ -555,28 +505,28 @@ public class MMInventory : MM_Super
         if (Selection == Selections.EquippedDone) return;
         Selection = Selections.EquippedDone;
         DoneTimer = Time.realtimeSinceStartup + 1f;
-        if (InventoryList == InventorySystem.ListType.Items)
+        if (InventoryFrame.CurrentInventoryList == InventorySystem.ListType.Items)
         {
             if (switchOut)
             {
-                PartyList.SelectedObject.ReplaceItemWith(ToolList.SelectedObject as Item, slot);
+                PartyList.SelectedObject.ReplaceItemWith(InventoryFrame.ToolList.SelectedObject as Item, slot);
                 MenuManager.PartyInfo.Inventory.AddItem(EquippedToolList.SelectedObject as Item);
             }
-            else PartyList.SelectedObject.EquipItem(ToolList.SelectedObject as Item);
-            MenuManager.PartyInfo.Inventory.RemoveItem(ToolList.SelectedIndex);
-            ToolList.Refresh(MenuManager.PartyInfo.Inventory.Items);
+            else PartyList.SelectedObject.EquipItem(InventoryFrame.ToolList.SelectedObject as Item);
+            MenuManager.PartyInfo.Inventory.RemoveItem(InventoryFrame.ToolList.SelectedIndex);
+            InventoryFrame.Refresh(MenuManager.PartyInfo.Inventory.Items);
             EquippedToolList.Refresh(PartyList.SelectedObject.Items, BattleMaster.MAX_NUMBER_OF_ITEMS);
         }
-        else if (InventoryList == InventorySystem.ListType.Weapons)
+        else if (InventoryFrame.CurrentInventoryList == InventorySystem.ListType.Weapons)
         {
             if (switchOut)
             {
-                PartyList.SelectedObject.ReplaceWeaponWith(ToolList.SelectedObject as Weapon, slot);
+                PartyList.SelectedObject.ReplaceWeaponWith(InventoryFrame.ToolList.SelectedObject as Weapon, slot);
                 MenuManager.PartyInfo.Inventory.AddWeapon(EquippedToolList.SelectedObject as Weapon);
             }
-            else PartyList.SelectedObject.EquipWeapon(ToolList.SelectedObject as Weapon);
-            MenuManager.PartyInfo.Inventory.RemoveWeapon(ToolList.SelectedIndex);
-            ToolList.Refresh(MenuManager.PartyInfo.Inventory.Weapons);
+            else PartyList.SelectedObject.EquipWeapon(InventoryFrame.ToolList.SelectedObject as Weapon);
+            MenuManager.PartyInfo.Inventory.RemoveWeapon(InventoryFrame.ToolList.SelectedIndex);
+            InventoryFrame.Refresh(MenuManager.PartyInfo.Inventory.Weapons);
             EquippedToolList.Refresh(PartyList.SelectedObject.Weapons, BattleMaster.MAX_NUMBER_OF_WEAPONS);
         }
         ConfirmSwap.SetActive(false);

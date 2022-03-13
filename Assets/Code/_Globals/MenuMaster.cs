@@ -5,6 +5,7 @@ using System.Runtime.CompilerServices;
 using TMPro;
 using UnityEditor.PackageManager;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -29,6 +30,13 @@ public class MenuMaster : MonoBehaviour
     public static void SetupSelectionBufferInGameplay(float change = 1f)
     {
         SelectionTimerGP = Time.time + SELECTION_BUFFER_GP * change;
+    }
+
+    public static void KeepHighlightedSelected(ref ListSelectable selectedListBtn)
+    {
+        if (selectedListBtn) selectedListBtn.ClearHighlights();
+        selectedListBtn = EventSystem.current.currentSelectedGameObject.GetComponent<ListSelectable>();
+        selectedListBtn.KeepSelected();
     }
 
     public static void DisableSelection(ref GameObject button)

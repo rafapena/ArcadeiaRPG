@@ -38,13 +38,6 @@ public abstract class MM_Super : MonoBehaviour
 
     protected abstract void ReturnToInitialSetup();
 
-    protected void KeepOnlyHighlightedSelected(ref ListSelectable selectedListBtn)
-    {
-        if (selectedListBtn) selectedListBtn.ClearHighlights();
-        selectedListBtn = EventSystem.current.currentSelectedGameObject.GetComponent<ListSelectable>();
-        selectedListBtn.KeepSelected();
-    }
-
     private void SetDefaultSelectedButton()
     {
         EventSystem.current.SetSelectedGameObject(null);

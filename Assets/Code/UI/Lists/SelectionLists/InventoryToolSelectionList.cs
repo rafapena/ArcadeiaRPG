@@ -21,7 +21,6 @@ public class InventoryToolSelectionList : SelectionList_Super<ToolForInventory>
 {
     // Data tracker
     [HideInInspector] public InventorySystem ReferenceInventory;
-    public Gauge CarryTracker;
 
     // Hovering/Navigation
     public bool DisplayedToolInfo { get; private set; }
@@ -39,12 +38,6 @@ public class InventoryToolSelectionList : SelectionList_Super<ToolForInventory>
         NumberOfColumns = (int)(Container.GetComponent<RectTransform>().rect.width / GetComponent<GridLayoutGroup>().cellSize.x);
         NumberOfVisibleRows = (int)(Container.GetComponent<RectTransform>().rect.height / GetComponent<GridLayoutGroup>().cellSize.y);
         base.Awake();
-    }
-
-    public void LinkToInventory(InventorySystem inventory)
-    {
-        if (ReferenceInventory) return;
-        ReferenceInventory = inventory;
     }
 
     public void Refresh<T>(List<T> listData, int hardLimit = -1, bool customNavigation = false) where T : ToolForInventory
@@ -99,8 +92,7 @@ public class InventoryToolSelectionList : SelectionList_Super<ToolForInventory>
                 i++;
             }
 
-            // Setting up the capacity then reset right navigation to point to the top
-            if (ReferenceInventory) SetupCarryWeight();
+            // Reset right navigation to point to the top
             if (NavToRight) SetHorizontalPointer(transform.GetChild(NumberOfColumns - 1), NavToRight.transform);
         }
 
@@ -147,12 +139,6 @@ public class InventoryToolSelectionList : SelectionList_Super<ToolForInventory>
         entry.transform.GetChild(1).gameObject.SetActive(false);
         if (entry.transform.childCount > 2)
             entry.transform.GetChild(2).gameObject.SetActive(false);
-    }
-
-    public void SetupCarryWeight()
-    {
-        ReferenceInventory.UpdateNumberOfTools();
-        CarryTracker.Set(ReferenceInventory.CarryWeight, ReferenceInventory.WeightCapacity);
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

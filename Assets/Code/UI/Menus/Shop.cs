@@ -147,7 +147,7 @@ public class Shop : MonoBehaviour
         InventoryList = inventoryList;
         EventSystem.current.SetSelectedGameObject(ToolListTabs.transform.GetChild(tabIndex).gameObject);
         ReturnToInitialStep();
-        KeepOnlyHighlightedSelected(ref SelectedInventoryTab);
+        MenuMaster.KeepHighlightedSelected(ref SelectedInventoryTab);
         ToolList.Selecting = true;
         ToolList.Setup(toolList);
         if (ToolList.SelectedButton) ToolList.SelectedButton.ClearHighlights();
@@ -166,7 +166,7 @@ public class Shop : MonoBehaviour
         Selection = Selections.Usage;
         ToolList.Selecting = false;
         SelectingUsage.SetActive(true);
-        KeepOnlyHighlightedSelected(ref ToolList.SelectedButton);
+        MenuMaster.KeepHighlightedSelected(ref ToolList.SelectedButton);
         Sorter.Undo();
         if (SelectedUsageListBtn) SelectedUsageListBtn.ClearHighlights();
         SetupUsageButtons();
@@ -301,7 +301,7 @@ public class Shop : MonoBehaviour
     public void SetupDiscard()
     {
         Selection = Selections.Discard;
-        KeepOnlyHighlightedSelected(ref SelectedUsageListBtn);
+        MenuMaster.KeepHighlightedSelected(ref SelectedUsageListBtn);
         ConfirmDiscard.SetActive(true);
         DiscardLabel.text = "Discard\n" + ToolList.SelectedObject.Name + "?";
         EventSystem.current.SetSelectedGameObject(ConfirmDiscard.transform.GetChild(1).gameObject);
@@ -355,7 +355,7 @@ public class Shop : MonoBehaviour
 
     private void SetupTeammatesList()
     {
-        KeepOnlyHighlightedSelected(ref SelectedUsageListBtn);
+        MenuMaster.KeepHighlightedSelected(ref SelectedUsageListBtn);
         SelectingUsage.SetActive(false);
         ConfirmDiscard.SetActive(false);
         SelectingTeammate.Activate();
@@ -412,7 +412,7 @@ public class Shop : MonoBehaviour
             {
                 if (Selection == Selections.CharacterEquipsList) SetupEquippedTools();   // Can reclick another teammate, while selecting equipment from current teammate
                 PartyList.SelectedObject = SelectableTeammatesEquip[index];
-                KeepOnlyHighlightedSelected(ref PartyList.SelectedButton);
+                MenuMaster.KeepHighlightedSelected(ref PartyList.SelectedButton);
                 SetupCharacterEquipsList();
             }
         }
@@ -490,7 +490,7 @@ public class Shop : MonoBehaviour
             if (EquippedToolList.SelectedObject.Id == ToolList.SelectedObject.Id &&
                 EquippedToolList.SelectedObject.Name == ToolList.SelectedObject.Name)
                 return;     // Selected same item
-            KeepOnlyHighlightedSelected(ref EquippedToolList.SelectedButton);
+            MenuMaster.KeepHighlightedSelected(ref EquippedToolList.SelectedButton);
             SetupConfirmSwapButtons();
         }
         else if (Selection == Selections.CharacterEquipsList)

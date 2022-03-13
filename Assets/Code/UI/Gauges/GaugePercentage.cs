@@ -55,6 +55,6 @@ public class GaugePercentage : GaugeWithText
 
     private string CurrentBarPercentageText()
     {
-        return Percentage + "%";
+        return Math.Round(Bar.fillAmount * 100) + "%";
     }
 }

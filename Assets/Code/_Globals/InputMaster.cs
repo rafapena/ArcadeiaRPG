@@ -38,5 +38,5 @@ public class InputMaster
 
     private static bool ReadyForInput => MenuMaster.ReadyToSelectInMenu && MenuMaster.ReadyToSelectInGameplay && !SceneMaster.InMenu;
 
-    private static bool ReadyToGoBack => MenuMaster.ReadyToSelectInMenu && MenuMaster.ReadyToSelectInGameplay;
+    private static bool ReadyToGoBack => MenuMaster.ReadyToSelectInMenu;
 }
