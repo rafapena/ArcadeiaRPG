@@ -52,17 +52,21 @@ public class ToolListCollectionFrame : MonoBehaviour
 
     private void Start()
     {
-        int numberOfTabs = 0;
-        foreach (Transform t in Tabs.transform)
-            if (t.gameObject.activeSelf)
-                numberOfTabs++;
-
-        ListOptions = new IEnumerable<ToolForInventory>[numberOfTabs];
+        SetupListOptions();
         SortFunctions = new SortingFunc[]{
             SortByDefaultAscending, SortByDefaultDescending,
             SortByQuantityAscending, SortByQuantityDescending,
             SortByWeightAscending, SortByWeightDescending
         };
+    }
+
+    public void SetupListOptions()
+    {
+        int numberOfTabs = 0;
+        foreach (Transform t in Tabs.transform)
+            if (t.gameObject.activeSelf)
+                numberOfTabs++;
+        ListOptions = new IEnumerable<ToolForInventory>[numberOfTabs];
     }
 
     public void RegisterToolList<T>(int tabIndex, List<T> list) where T : ToolForInventory
@@ -83,7 +87,7 @@ public class ToolListCollectionFrame : MonoBehaviour
         if (!MenuMaster.ReadyToSelectInMenu) selected = false;
         else if (Input.GetKeyDown(KeyCode.Q)) LeftTab();
         else if (Input.GetKeyDown(KeyCode.E)) RightTab();
-        else if (Input.GetKeyDown(KeyCode.C)) ActivateSorter();
+        else if (Input.GetKeyDown(KeyCode.C) && SortButton.gameObject.activeSelf) ActivateSorter();
         else selected = false;
         return selected;
     }

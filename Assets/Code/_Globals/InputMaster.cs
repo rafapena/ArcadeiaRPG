@@ -14,7 +14,7 @@ public class InputMaster
 
     public static bool Interact()
     {
-        return ReadyForInput && Input.GetKeyDown(KeyCode.Z);
+        return ReadyForInput && (Input.GetKeyDown(KeyCode.Z) || Input.GetMouseButtonDown(0));
     }
 
     public static bool Pause()

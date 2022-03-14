@@ -17,6 +17,7 @@ public class InventorySystem : MonoBehaviour
     public List<Weapon> Weapons;
     public List<Item> KeyItems;
 
+    // Weight
     [HideInInspector] public int CarryWeight;
     public int WeightCapacity = 30;
 

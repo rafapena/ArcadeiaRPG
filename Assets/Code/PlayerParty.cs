@@ -25,6 +25,10 @@ public class PlayerParty : MonoBehaviour
     public InventorySystem Storage;
     public List<Objective> LoggedObjectives;
 
+    // Collected craftable items/weapons
+    public List<Item> CraftableItems;
+    public List<Weapon> CraftableWeapons;
+
     [HideInInspector] public float PreemptiveAttackChance;
     
 

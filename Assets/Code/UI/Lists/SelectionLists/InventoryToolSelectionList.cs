@@ -33,6 +33,9 @@ public class InventoryToolSelectionList : SelectionList_Super<ToolForInventory>
     protected int NumberOfVisibleRows;
     protected static Color CraftedBackgroundColor = new Color(0.7f, 0.9f, 1f, 0.7f);
 
+    // Other settings
+    public bool DisplayQuantity = true;
+
     protected override void Awake()
     {
         NumberOfColumns = (int)(Container.GetComponent<RectTransform>().rect.width / GetComponent<GridLayoutGroup>().cellSize.x);
@@ -113,7 +116,7 @@ public class InventoryToolSelectionList : SelectionList_Super<ToolForInventory>
         entry.transform.GetChild(1).gameObject.GetComponent<Image>().sprite = dataEntry.GetComponent<SpriteRenderer>().sprite;
         if (entry.transform.childCount > 2)
         {
-            entry.transform.GetChild(2).gameObject.SetActive(true);
+            entry.transform.GetChild(2).gameObject.SetActive(DisplayQuantity);
             entry.transform.GetChild(2).gameObject.GetComponent<TextMeshProUGUI>().text = dataEntry.Quantity.ToString();
         }
     }
@@ -199,5 +202,20 @@ public class InventoryToolSelectionList : SelectionList_Super<ToolForInventory>
         for (int i = NumberOfColumns - 1; i < NumberOfBlankSquares; i += NumberOfColumns)
             SetHorizontalPointer(transform.GetChild(i).transform, NavToRight.transform);
         SetHorizontalPointer(transform.GetChild(NumberOfColumns - 1), NavToRight.transform);
+    }
+
+    public static void CloneTo(GameObject dest, GameObject src, InventorySystem.ListType listType)
+    {
+        dest.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = src.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text;
+        dest.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = src.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text;
+        dest.transform.GetChild(2).GetComponent<Image>().sprite = src.transform.GetChild(2).GetComponent<Image>().sprite;
+        bool isWeapon = (listType == InventorySystem.ListType.Weapons);
+        dest.transform.GetChild(3).gameObject.SetActive(isWeapon);
+        dest.transform.GetChild(4).gameObject.SetActive(isWeapon);
+        dest.transform.GetChild(5).gameObject.SetActive(isWeapon);
+        dest.transform.GetChild(3).GetChild(0).GetComponent<TextMeshProUGUI>().text = src.transform.GetChild(3).GetChild(0).GetComponent<TextMeshProUGUI>().text;
+        dest.transform.GetChild(4).GetChild(0).GetComponent<TextMeshProUGUI>().text = src.transform.GetChild(4).GetChild(0).GetComponent<TextMeshProUGUI>().text;
+        dest.transform.GetChild(5).GetChild(0).GetComponent<TextMeshProUGUI>().text = src.transform.GetChild(5).GetChild(0).GetComponent<TextMeshProUGUI>().text;
+        dest.transform.GetChild(6).GetChild(0).GetComponent<TextMeshProUGUI>().text = src.transform.GetChild(6).GetChild(0).GetComponent<TextMeshProUGUI>().text;
     }
 }
