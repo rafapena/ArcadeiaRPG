@@ -69,10 +69,12 @@ public class MMEquips : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOpera
                 MenuManager.GoToMain();
                 break;
             case Selections.SelectTool:
-                if (!InventoryFrame.UndoSort()) UndoToolSelection();
+                if (InventoryFrame.ActivatedSorter) InventoryFrame.DeactivateSorter();
+                else UndoToolSelection();
                 break;
             case Selections.SelectToolSwap:
-                if (!InventoryFrame.UndoSort()) UndoToolSwap();
+                if (InventoryFrame.ActivatedSorter) InventoryFrame.DeactivateSorter();
+                else UndoToolSwap();
                 break;
         }
     }
@@ -179,7 +181,7 @@ public class MMEquips : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOpera
     public void SelectEquippedItem()
     {
         if (!EquippedItems.RefreshToolInfo()) return;
-        InventoryFrame.UndoSort(false);
+        InventoryFrame.DeactivateSorter();
         if (Selection == Selections.SelectTool) UnequipItem();
         else if (Selection == Selections.SelectToolSwap) SwapItem();
     }
@@ -187,7 +189,7 @@ public class MMEquips : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOpera
     public void SelectEquippedWeapon()
     {
         if (!EquippedWeapons.RefreshToolInfo()) return;
-        InventoryFrame.UndoSort(false);
+        InventoryFrame.DeactivateSorter();
         if (Selection == Selections.SelectTool) UnequipWeapon();
         else if (Selection == Selections.SelectToolSwap) SwapWeapon();
     }
@@ -213,13 +215,13 @@ public class MMEquips : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOpera
         }
         else if (InventoryFrame.CurrentInventoryList == InventorySystem.ListType.Items)
         {
-            InventoryFrame.UndoSort();
+            InventoryFrame.DeactivateSorter();
             if (PartyList.SelectedObject.Items.Count == BattleMaster.MAX_NUMBER_OF_ITEMS) SetupToolSwap(EquippedItems, true, false);
             else EquipItem();
         }
         else if (InventoryFrame.CurrentInventoryList == InventorySystem.ListType.Weapons)
         {
-            InventoryFrame.UndoSort();
+            InventoryFrame.DeactivateSorter();
             if (PartyList.SelectedObject.Weapons.Count == BattleMaster.MAX_NUMBER_OF_WEAPONS) SetupToolSwap(EquippedWeapons, false, true);
             else EquipWeapon();
         }
@@ -233,6 +235,11 @@ public class MMEquips : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOpera
 
     // Seleting from the inventory
     public void UndoSelectToolSuccess()
+    {
+        //
+    }
+
+    public void ActivateSorterSuccess()
     {
         //
     }
@@ -257,7 +264,6 @@ public class MMEquips : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOpera
         MenuManager.PartyInfo.Inventory.AddItem(EquippedItems.SelectedObject as Item);
         EquippedItems.Refresh(PartyList.SelectedObject.Items, BattleMaster.MAX_NUMBER_OF_ITEMS, true);
         InventoryFrame.SelectTab(0);
-        InventoryFrame.Refresh(MenuManager.PartyInfo.Inventory.Items);
     }
 
     private void UnequipWeapon()
@@ -266,7 +272,6 @@ public class MMEquips : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOpera
         MenuManager.PartyInfo.Inventory.AddWeapon(EquippedWeapons.SelectedObject as Weapon);
         EquippedWeapons.Refresh(PartyList.SelectedObject.Weapons, BattleMaster.MAX_NUMBER_OF_WEAPONS, true);
         InventoryFrame.SelectTab(1);
-        InventoryFrame.Refresh(GetWeapons());
     }
 
     private void EquipItem()
@@ -319,7 +324,6 @@ public class MMEquips : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOpera
         MenuManager.PartyInfo.Inventory.RemoveItem(it);
         EquippedItems.Refresh(PartyList.SelectedObject.Items, BattleMaster.MAX_NUMBER_OF_ITEMS, true);
         InventoryFrame.SelectTab(0);
-        InventoryFrame.Refresh(MenuManager.PartyInfo.Inventory.Items);
     }
 
     private void SwapWeapon()
@@ -331,7 +335,6 @@ public class MMEquips : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOpera
         MenuManager.PartyInfo.Inventory.RemoveWeapon(wp);
         EquippedWeapons.Refresh(PartyList.SelectedObject.Weapons, BattleMaster.MAX_NUMBER_OF_WEAPONS, true);
         InventoryFrame.SelectTab(1);
-        InventoryFrame.Refresh(GetWeapons());
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

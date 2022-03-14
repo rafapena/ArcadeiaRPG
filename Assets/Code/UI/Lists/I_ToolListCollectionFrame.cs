@@ -17,5 +17,7 @@ namespace Assets.Code.UI.Lists
         void SelectToolFailed();
 
         void UndoSelectToolSuccess();
+
+        void ActivateSorterSuccess();
     }
 }

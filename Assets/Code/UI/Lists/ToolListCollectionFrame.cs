@@ -6,6 +6,7 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using UnityEngine.AI;
 using UnityEditor.Tilemaps;
+using System.Linq;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using System.Threading;
@@ -16,6 +17,7 @@ public class ToolListCollectionFrame : MonoBehaviour
 {
     // Main frame GameObject
     public MenuFrame TargetFrame;
+    public GameObject ListBlocker;
 
     // Tabs
     public GameObject Tabs;
@@ -32,8 +34,13 @@ public class ToolListCollectionFrame : MonoBehaviour
     [HideInInspector] public InventorySystem ReferenceInventory;
 
     // Sorting
+    [HideInInspector] public bool ActivatedSorter;       // Using bool instead of activeSelf due to initializing phase
+    [HideInInspector] public int SavedSortSetting;
     public ListSelectable SortButton;
     public GameObject SortFrame;
+    public Transform SortTypesList;
+    delegate void SortingFunc();
+    private SortingFunc[] SortFunctions;
 
     // General functions
     public UnityEvent SelectTabSuccess;
@@ -41,14 +48,21 @@ public class ToolListCollectionFrame : MonoBehaviour
     public UnityEvent SelectToolSuccess;
     public UnityEvent SelectToolFailed;
     public UnityEvent UndoSelectToolSuccess;
+    public UnityEvent ActivateSorterSuccess;
 
     private void Start()
     {
         int numberOfTabs = 0;
         foreach (Transform t in Tabs.transform)
-            if (t.gameObject.GetComponent<Button>().interactable)
+            if (t.gameObject.activeSelf)
                 numberOfTabs++;
+
         ListOptions = new IEnumerable<ToolForInventory>[numberOfTabs];
+        SortFunctions = new SortingFunc[]{
+            SortByDefaultAscending, SortByDefaultDescending,
+            SortByQuantityAscending, SortByQuantityDescending,
+            SortByWeightAscending, SortByWeightDescending
+        };
     }
 
     public void RegisterToolList<T>(int tabIndex, List<T> list) where T : ToolForInventory
@@ -69,7 +83,7 @@ public class ToolListCollectionFrame : MonoBehaviour
         if (!MenuMaster.ReadyToSelectInMenu) selected = false;
         else if (Input.GetKeyDown(KeyCode.Q)) LeftTab();
         else if (Input.GetKeyDown(KeyCode.E)) RightTab();
-        else if (Input.GetKeyDown(KeyCode.C)) SetupSorting();
+        else if (Input.GetKeyDown(KeyCode.C)) ActivateSorter();
         else selected = false;
         return selected;
     }
@@ -77,12 +91,13 @@ public class ToolListCollectionFrame : MonoBehaviour
     public void SelectingToolList()
     {
         ToolList.Selecting = true;
-        UndoSort();
+        DeactivateSorter();
     }
 
     public void Refresh<T>(List<T> listData) where T : ToolForInventory
     {
         ToolList.Refresh(listData);
+        SortFunctions[SavedSortSetting].Invoke();
         RefreshCarryWeight();
     }
 
@@ -103,12 +118,12 @@ public class ToolListCollectionFrame : MonoBehaviour
 
     public void RightTab()
     {
-        if (CurrentTabIndex < ListOptions.Length - 2) SelectTab(CurrentTabIndex + 1);
+        if (CurrentTabIndex < ListOptions.Length - 1) SelectTab(CurrentTabIndex + 1);
     }
 
     public void SelectTab(int tabIndex)
     {
-        if (SortFrame.gameObject.activeSelf)
+        if (ListBlocker.activeSelf)
         {
             SelectTabFailed?.Invoke();
             return;
@@ -117,23 +132,29 @@ public class ToolListCollectionFrame : MonoBehaviour
         CurrentTabIndex = tabIndex;
         EventSystem.current.SetSelectedGameObject(Tabs.transform.GetChild(tabIndex).gameObject);
         MenuMaster.KeepHighlightedSelected(ref SelectedInventoryTab);
-        
+
         ToolList.Selecting = true;
-        switch (ListOptions[tabIndex].GetType().GetGenericArguments()[0].ToString())
-        {
-            case "Item":
-                CurrentInventoryList = InventorySystem.ListType.Items;
-                ToolList.Refresh(ListOptions[tabIndex] as List<Item>);
-                break;
-            case "Weapon":
-                CurrentInventoryList = InventorySystem.ListType.Weapons;
-                ToolList.Refresh(ListOptions[tabIndex] as List<Weapon>);
-                break;
-        }
+        ToolList.Refresh(ListOptions[tabIndex].ToList());
+        SetInventoryList(tabIndex);
+        SortFunctions[SavedSortSetting].Invoke();
         if (ToolList.SelectedButton) ToolList.SelectedButton.ClearHighlights();
+
         RefreshCarryWeight();
         SelectTabSuccess?.Invoke();
         EventSystem.current.SetSelectedGameObject(ToolList.transform.GetChild(0).gameObject);
+    }
+
+    private void SetInventoryList(int tab)
+    {
+        switch (ListOptions[tab].GetType().GetGenericArguments()[0].ToString())
+        {
+            case "Item":
+                CurrentInventoryList = InventorySystem.ListType.Items;
+                break;
+            case "Weapon":
+                CurrentInventoryList = InventorySystem.ListType.Weapons;
+                break;
+        }
     }
 
     public void SelectTool()
@@ -146,7 +167,7 @@ public class ToolListCollectionFrame : MonoBehaviour
         }
         ToolList.Selecting = false;
         MenuMaster.KeepHighlightedSelected(ref ToolList.SelectedButton);
-        UndoSort();
+        DeactivateSorter();
         SelectToolSuccess?.Invoke();
     }
 
@@ -169,129 +190,66 @@ public class ToolListCollectionFrame : MonoBehaviour
     /// -- Sorting --
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public void SetupSorting()
+    public void ActivateSorter()
     {
-        /*Selection = Selections.InventoryLists;
-        SelectingUsage.SetActive(false);
-        ConfirmDiscard.SetActive(false);
+        if (ActivatedSorter || ListBlocker.activeSelf) return;
+        ListBlocker.SetActive(true);
+        SortFrame.SetActive(true);
         ToolList.Selecting = false;
         ToolList.ClearSelections();
-        if (SelectedUsageListBtn) SelectedUsageListBtn.ClearHighlights();
-        Sorter.Setup(ToolList, MenuManager.PartyInfo.Inventory, InventoryList);*/
-    }
-
-    public bool UndoSort(bool selectToolList = true)
-    {
-        if (SortFrame.gameObject.activeSelf)
-        {
-            if (selectToolList) ToolList.Selecting = true;
-            SortFrame.SetActive(false);
-            return true;
-        }
-        return false;
-    }
-
-    /*
-    public ListSelectable SortButton;
-    private InventoryToolSelectionList TargetInventoryGUI;
-    private InventorySystem TargetInventory;
-    private InventorySystem.ListType InventoryList;
-    private List<ToolForInventory> ReferenceData;
-
-    [HideInInspector] public delegate void ExtraFunction();
-    private ExtraFunction ExtraFunc;
-
-    private void Awake()
-    {
-        ClearSelections();
-    }
-
-    public void ClearSelections()
-    {
-        gameObject.SetActive(false);
-    }
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// -- Sorting --
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    public void Setup(InventoryToolSelectionList tig, InventorySystem tinv, InventorySystem.ListType inventoryList)
-    {
-        TargetInventoryGUI = tig;
-        TargetInventory = tinv;
-        InventoryList = inventoryList;
-        gameObject.SetActive(true);
+        ActivateSorterSuccess?.Invoke();
         SortButton.KeepSelected();
-        GameObject firstButton = transform.GetChild(1).GetChild(0).gameObject;
-        EventSystem.current.SetSelectedGameObject(firstButton);
+        GameObject selectedButton = SortTypesList.GetChild(SavedSortSetting).gameObject;
+        EventSystem.current.SetSelectedGameObject(selectedButton);
+        ActivatedSorter = true;
     }
 
-    public void Undo()
+    public void DeactivateSorter()
     {
-        if (!gameObject.activeSelf) return;
-        gameObject.SetActive(false);
+        ListBlocker.SetActive(false);
+        SortFrame.SetActive(false);
+        if (!ActivatedSorter) return;
+        ToolList.Selecting = true;
         SortButton.ClearHighlights();
-        GameObject firstButton = TargetInventoryGUI.transform.GetChild(0).gameObject;
-        EventSystem.current.SetSelectedGameObject(firstButton);
+        GameObject firstEntry = ToolList.transform.GetChild(0).gameObject;
+        EventSystem.current.SetSelectedGameObject(firstEntry);
+        ActivatedSorter = false;
     }
 
     public void SortByDefaultAscending()
     {
-        GetList();
-        TargetInventoryGUI.Refresh(ReferenceData.OrderBy(t => t.Id).ToList());
-        ExtraFunc?.Invoke();
+        SortList(0, ListOptions[CurrentTabIndex].OrderBy(t => t.Id).ToList());
     }
 
     public void SortByDefaultDescending()
     {
-        GetList();
-        TargetInventoryGUI.Refresh(ReferenceData.OrderByDescending(t => t.Id).ToList());
-        ExtraFunc?.Invoke();
+        SortList(1, ListOptions[CurrentTabIndex].OrderByDescending(t => t.Id).ToList());
     }
 
     public void SortByQuantityAscending()
     {
-        GetList();
-        TargetInventoryGUI.Refresh(ReferenceData.OrderBy(t => t.Quantity).ToList());
-        ExtraFunc?.Invoke();
+        SortList(2, ListOptions[CurrentTabIndex].OrderBy(t => t.Quantity).ToList());
     }
 
     public void SortByQuantityDescending()
     {
-        GetList();
-        TargetInventoryGUI.Refresh(ReferenceData.OrderByDescending(t => t.Quantity).ToList());
-        ExtraFunc?.Invoke();
+        SortList(3, ListOptions[CurrentTabIndex].OrderByDescending(t => t.Quantity).ToList());
     }
 
     public void SortByWeightAscending()
     {
-        GetList();
-        TargetInventoryGUI.Refresh(ReferenceData.OrderBy(t => t.Weight).ToList());
-        ExtraFunc?.Invoke();
+        SortList(4, ListOptions[CurrentTabIndex].OrderBy(t => t.Weight).ToList());
     }
 
     public void SortByWeightDescending()
     {
-        GetList();
-        TargetInventoryGUI.Refresh(ReferenceData.OrderByDescending(t => t.Weight).ToList());
-        ExtraFunc?.Invoke();
+        SortList(5, ListOptions[CurrentTabIndex].OrderByDescending(t => t.Weight).ToList());
     }
 
-    private void GetList()
+    private void SortList<T>(int type, List<T> list) where T : ToolForInventory
     {
-        ReferenceData = new List<ToolForInventory>();
-        switch (InventoryList)
-        {
-            case InventorySystem.ListType.Items:
-                foreach (Item i in TargetInventory.Items) ReferenceData.Add(i);
-                break;
-            case InventorySystem.ListType.Weapons:
-                foreach (Weapon w in TargetInventory.Weapons) ReferenceData.Add(w);
-                break;
-            case InventorySystem.ListType.KeyItems:
-                foreach (Item i in TargetInventory.KeyItems) ReferenceData.Add(i);
-                break;
-        }
+        SavedSortSetting = type;
+        ToolList.Refresh(list);
+        DeactivateSorter();
     }
-    */
 }

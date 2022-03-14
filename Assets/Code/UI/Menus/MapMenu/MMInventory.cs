@@ -87,7 +87,11 @@ public class MMInventory : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOp
         switch (Selection)
         {
             case Selections.InventoryLists:
-                if (InventoryFrame.UndoSort()) break;
+                if (InventoryFrame.ActivatedSorter)
+                {
+                    InventoryFrame.DeactivateSorter();
+                    break;
+                }
                 Selection = Selections.None;
                 MenuManager.GoToMain();
                 break;
@@ -165,6 +169,14 @@ public class MMInventory : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOp
         foreach (Transform t0 in SelectingUsage.transform)
             foreach (Transform t in t0)
                 t.GetComponent<ListSelectable>().ClearHighlights();
+    }
+
+    public void ActivateSorterSuccess()
+    {
+        Selection = Selections.InventoryLists;
+        SelectingUsage.SetActive(false);
+        ConfirmDiscard.SetActive(false);
+        if (SelectedUsageListBtn) SelectedUsageListBtn.ClearHighlights();
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -267,7 +279,8 @@ public class MMInventory : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOp
     public void SetupDiscard()
     {
         Selection = Selections.Discard;
-        MenuMaster.KeepHighlightedSelected(ref SelectedUsageListBtn);
+        SelectingUsage.SetActive(false);
+        InventoryFrame.ListBlocker.SetActive(true);
         ConfirmDiscard.SetActive(true);
         DiscardLabel.text = "Discard\n" + InventoryFrame.ToolList.SelectedObject.Name + "?";
         EventSystem.current.SetSelectedGameObject(ConfirmDiscard.transform.GetChild(1).gameObject);
@@ -276,9 +289,9 @@ public class MMInventory : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOp
     public void UndoDiscard()
     {
         Selection = Selections.Usage;
+        InventoryFrame.ListBlocker.SetActive(false);
         ConfirmDiscard.SetActive(false);
-        SelectedUsageListBtn.ClearHighlights();
-        EventSystem.current.SetSelectedGameObject(SelectedUsageListBtn.gameObject);
+        InventoryFrame.UndoSelectTool();
     }
 
     public void DiscardTool()
@@ -295,7 +308,6 @@ public class MMInventory : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOp
                 break;
         }
         UndoDiscard();
-        InventoryFrame.UndoSelectTool();
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

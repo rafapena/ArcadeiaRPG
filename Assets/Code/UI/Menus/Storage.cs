@@ -61,7 +61,8 @@ public class Storage : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameO
         if (CollectionFrame.SelectTabInputs()) return;
         else if (InputMaster.GoingBack())
         {
-            if (ConfirmFrame.gameObject.activeSelf) UndoConfirmAmount();
+            if (CollectionFrame.ActivatedSorter) CollectionFrame.DeactivateSorter();
+            else if (ConfirmFrame.gameObject.activeSelf) UndoConfirmAmount();
             else SceneMaster.CloseStorage(PartyInfo);
         }
         else if (Input.GetKeyDown(KeyCode.V)) Swap();
@@ -82,7 +83,8 @@ public class Storage : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameO
 
     public void Swap()
     {
-        if (InventoryMode) SelectStorage();
+        if (CollectionFrame.ListBlocker.activeSelf) return;
+        else if (InventoryMode) SelectStorage();
         else SelectInventory();
     }
 
@@ -137,6 +139,7 @@ public class Storage : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameO
     {
         ConfirmFrame.Activate(1, InventoryMode ? GetMaxAmountToStorage() : CollectionFrame.ToolList.SelectedObject.Quantity);
         ConfirmText.text = InventoryMode ? "STORE?" : "TAKE OUT?";
+        CollectionFrame.ListBlocker.SetActive(true);
         TargetTool = GetTargetTool();
         TargetHoverFrame.SetActive(false);
         FrameGoTo.Deactivate();
@@ -149,6 +152,11 @@ public class Storage : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameO
     }
 
     public void UndoSelectToolSuccess()
+    {
+        CollectionFrame.ListBlocker.SetActive(false);
+    }
+
+    public void ActivateSorterSuccess()
     {
         //
     }
