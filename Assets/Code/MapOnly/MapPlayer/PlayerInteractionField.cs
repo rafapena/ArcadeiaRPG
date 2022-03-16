@@ -10,7 +10,7 @@ public class PlayerInteractionField : MonoBehaviour
 
     private void Update()
     {
-        if (!InputMaster.Interact()) return;
+        if (!InputMaster.Interact) return;
         foreach (ItemBox b in ItemsBoxesFound)
             if (b.CloseToPlayer) b.Open(Avatar);
         foreach (MapNPC n in NPCsFound)

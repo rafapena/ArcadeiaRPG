@@ -59,7 +59,7 @@ public class Storage : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameO
     void Update()
     {
         if (CollectionFrame.SelectTabInputs()) return;
-        else if (InputMaster.GoingBack())
+        else if (InputMaster.GoingBack)
         {
             if (CollectionFrame.ActivatedSorter) CollectionFrame.DeactivateSorter();
             else if (ConfirmFrame.gameObject.activeSelf) UndoConfirmAmount();
@@ -168,7 +168,7 @@ public class Storage : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameO
         TargetHoverFrame.SetActive(hoverFrame);
         if (hoverFrame)
         {
-            TargetHoverMessage.text = InventoryMode ? "STORED" : "HELD";
+            TargetHoverMessage.text = InventoryMode ? "STORED" : "CARRYING";
             TargetHoverNumber.text = (GetTargetTool()?.Quantity ?? 0).ToString();
         }
     }
@@ -200,20 +200,21 @@ public class Storage : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameO
     private void UpdateResultChecker(int amount)
     {
         ResultCheckFrame.SetActive(true);
-        int source = CollectionFrame.ToolList.SelectedObject.Quantity - amount;
+        ToolForInventory tool = CollectionFrame.ToolList.SelectedObject;
+        int source = tool.Quantity - amount;
         int target = (TargetTool?.Quantity ?? 0) + amount;
 
         if (InventoryMode)
         {
             ResultCheckInventory.text = source.ToString();
             ResultCheckStorage.text = target.ToString();
-            ResultCheckCarryWeight.Set(PartyInfo.Inventory.CarryWeight - amount, PartyInfo.Inventory.WeightCapacity);
+            ResultCheckCarryWeight.Set(PartyInfo.Inventory.CarryWeight - amount * tool.Weight, PartyInfo.Inventory.WeightCapacity);
         }
         else
         {
             ResultCheckInventory.text = target.ToString();
             ResultCheckStorage.text = source.ToString();
-            ResultCheckCarryWeight.Set(PartyInfo.Inventory.CarryWeight + amount, PartyInfo.Inventory.WeightCapacity);
+            ResultCheckCarryWeight.Set(PartyInfo.Inventory.CarryWeight + amount * tool.Weight, PartyInfo.Inventory.WeightCapacity);
         }
     }
 

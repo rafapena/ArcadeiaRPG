@@ -60,7 +60,7 @@ public class FileSelect : MonoBehaviour
 
     private void Update()
     {
-        bool goingBack = InputMaster.GoingBack();
+        bool goingBack = InputMaster.GoingBack;
         switch (Selection)
         {
             case Selections.Files:

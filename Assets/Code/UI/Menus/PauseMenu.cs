@@ -28,7 +28,7 @@ public class PauseMenu : MonoBehaviour
 
     private void Update()
     {
-        bool goingBack = InputMaster.GoingBack();
+        bool goingBack = InputMaster.GoingBack;
         switch (Selection)
         {
             case Selections.PauseMain:

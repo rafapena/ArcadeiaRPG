@@ -11,9 +11,6 @@ GameObject:
   - component: {fileID: 6903129807791125030}
   - component: {fileID: 469322707989360645}
   - component: {fileID: 1623505104987198706}
-  - component: {fileID: 360050413227866355}
-  - component: {fileID: -7494850155962657617}
-  - component: {fileID: -8897796485735226404}
   m_Layer: 0
   m_Name: PowerBar
   m_TagString: Untagged
@@ -126,11 +123,8 @@ MonoBehaviour:
   ChangedStatesGiveRate: []
   ChangedStatesReceiveRate: []
   Disabled: 0
-  DefaultPrice: 0
-  RequiredTools:
-  - {fileID: 360050413227866355}
-  - {fileID: -7494850155962657617}
-  - {fileID: -8897796485735226404}
+  DefaultPrice: 200
+  RequiredTools: []
   Quantity: 1
   Weight: 1
   UseCondition: 0
@@ -138,45 +132,3 @@ MonoBehaviour:
   Consumable: 1
   PermantentStatChanges: {fileID: 0}
   TurnsInto: {fileID: 0}
---- !u!114 &360050413227866355
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2005353765738473398}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 23a3e098df2f8f644a3784571143ca90, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Tool: {fileID: 7230775191068158404, guid: 77df0195c5c99154580a874268a423bc, type: 3}
-  Quantity: 3
---- !u!114 &-7494850155962657617
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2005353765738473398}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 23a3e098df2f8f644a3784571143ca90, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Tool: {fileID: 7230775191068158404, guid: db8c71b6c4218214086cf5982e9e2adb, type: 3}
-  Quantity: 1
---- !u!114 &-8897796485735226404
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2005353765738473398}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 23a3e098df2f8f644a3784571143ca90, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Tool: {fileID: 4959000729214192542, guid: f43fc6a9a0487964283e05224babca5a, type: 3}
-  Quantity: 1

@@ -10,7 +10,7 @@ public class Cutscene : MonoBehaviour
     public DialogueBubble[] Dialogue;
     private int CurrentBubble;
     public UnityEvent OnComplete;
-    public bool CurrentlyRunning;
+    private bool CurrentlyRunning;
     private bool InteractionBuffer;
 
     // Start is called before the first frame update
@@ -22,7 +22,7 @@ public class Cutscene : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (!Manager.ChoicesFrame.activeSelf && CurrentlyRunning && InputMaster.Interact())
+        if (!Manager.ChoicesFrame.activeSelf && CurrentlyRunning && InputMaster.Interact)
         {
             if (InteractionBuffer)
             {

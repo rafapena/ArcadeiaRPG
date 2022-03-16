@@ -12,8 +12,6 @@ GameObject:
   - component: {fileID: 8384673876078120243}
   - component: {fileID: 4959000729214192542}
   - component: {fileID: -6017910760070080988}
-  - component: {fileID: 4256073650094903080}
-  - component: {fileID: -6766202143850439021}
   m_Layer: 0
   m_Name: Mallet
   m_TagString: Untagged
@@ -126,10 +124,8 @@ MonoBehaviour:
   ChangedStatesGiveRate: []
   ChangedStatesReceiveRate: []
   Disabled: 0
-  DefaultPrice: 0
-  RequiredTools:
-  - {fileID: 4256073650094903080}
-  - {fileID: -6766202143850439021}
+  DefaultPrice: 300
+  RequiredTools: []
   Quantity: 1
   Weight: 2
   EquipBoosts: {fileID: -6017910760070080988}
@@ -160,31 +156,3 @@ MonoBehaviour:
   Eva: 0
   Crt: 0
   Cev: 0
---- !u!114 &4256073650094903080
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7569271499837528704}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 23a3e098df2f8f644a3784571143ca90, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Tool: {fileID: 3552097900181454016, guid: ffa9f6fe244c85248a1bb202285c251d, type: 3}
-  Quantity: 1
---- !u!114 &-6766202143850439021
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7569271499837528704}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 23a3e098df2f8f644a3784571143ca90, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Tool: {fileID: 7230775191068158404, guid: db8c71b6c4218214086cf5982e9e2adb, type: 3}
-  Quantity: 4

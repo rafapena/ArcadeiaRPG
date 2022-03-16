@@ -36,7 +36,7 @@ public class MapMenuManager : MonoBehaviour
 
     private void Update()
     {
-        if (InputMaster.GoingBack())
+        if (InputMaster.GoingBack)
         {
             if (Main.MainComponent.Activated) Main.GoBack();
             else if (Inventory.MainComponent.Activated) Inventory.GoBack();

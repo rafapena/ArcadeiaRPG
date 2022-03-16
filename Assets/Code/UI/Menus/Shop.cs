@@ -10,559 +10,271 @@ using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using System.Threading;
 
-public class Shop : MonoBehaviour
+public class Shop : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameOperations
 {
-    public enum Selections
-    {
-        None, Buy, Sell, ConfirmTransaction, TransactionDone
-    }
+    private enum Selections { None, Browsing, ConfirmingAmont, ConfirmedTransaction, SelectingEquips, ConfirmSwap }
 
-    /*
-    // Selection lists
-    public InventoryToolSelectionList ToolList;
-    public InventoryToolSelectionList EquippedToolList;
-    public PlayerSelectionList PartyList;
+    private Selections Selection;
 
-    // Child GameObjects;
-    public GameObject ToolListTabs;
-    public InventoryToolListSorter Sorter;
-    public GameObject SelectingUsage;
-    public GameObject ConfirmDiscard;
-    public MenuFrame SelectingTeammate;
-    public GameObject EquippedTools;
+    public ToolListCollectionFrame SellingFrame;
+    public MenuFrame BuyingFrame;
+    public InventoryToolSelectionList BuyingList;
+    public GameObject BuyingListBlock;
+    public TextMeshProUGUI CarryingAmount;
+    public TextMeshProUGUI GoldAmount;
+    public GameObject NotEnoughGoldText;
+
+    public ConfirmAmount ConfirmFrame;
+    public TextMeshProUGUI ConfirmText;
+    public GameObject ResultCheckFrame;
+    public TextMeshProUGUI ResultCheckCarrying;
+    public TextMeshProUGUI ResultCheckGold;
+    public Gauge ResultCheckCarryTracker;
+    public GameObject TransactionConfirmedFrame;
+    public GameObject EquipNowConfirmation;
+    public MenuFrame SelectEquipsFrame;
     public GameObject ConfirmSwap;
 
-    // General selection tracking
-    private Selections Selection;
-    private InventorySystem.ListType InventoryList;
-    public TextMeshProUGUI SelectTeammateLabel;
+    public GameObject CharacterEquipCheckFrame;
+    public Transform CharacterEquipCheckList;
 
-    // Keep track of selected content
-    private ListSelectable SelectedInventoryTab;
-    private ListSelectable SelectedUsageListBtn;
+    [HideInInspector] public PlayerParty PartyInfo;
+    [HideInInspector] public Shopkeeper Shopkeep;
 
-    // List of potential targets
-    private List<Battler> SelectableTeammatesUse;
-    private List<Battler> SelectableTeammatesEquip;
-    private bool SelectAllTeammates;
+    private ToolForInventory SelectedToolToInventory;
+    private bool DoneTransaction;
 
-    // Delay after an item/weapon has been used/equipped
-    private float DoneTimer;
+    private float JustBoughtTimer;
+    private float BOUGHT_TIME_BUFFER = 0.5f;
 
-    void Update()
+    private bool isBuying => SceneMaster.BuyingInShop;
+
+    private bool CannotPurchase => NotEnoughGoldText.activeSelf;
+
+    private void Start()
     {
+        PartyInfo = GameplayMaster.Party;
+        Shopkeep = GameplayMaster.Shop;
+        PartyInfo.Inventory.UpdateToCurrentWeight();
+        if (isBuying) BuyingFrame.Activate();
+        else
+        {
+            SellingFrame.TargetFrame.Activate();
+            SellingFrame.RegisterToolList(0, PartyInfo.Inventory.Items);
+            SellingFrame.RegisterToolList(1, PartyInfo.Inventory.Weapons);
+        }
+        Initialize();
+        NotEnoughGoldText.SetActive(false);
+        EventSystem.current.SetSelectedGameObject(BuyingList.transform.GetChild(0).gameObject);
+    }
+
+    private void Update()
+    {
+        bool select = InputMaster.ProceedInMenu;
+        bool back = InputMaster.GoingBack;
         switch (Selection)
         {
-            case Selections.InventoryLists:
-                if (Input.GetKeyDown(KeyCode.Alpha1)) SelectItemList();
-                else if (Input.GetKeyDown(KeyCode.Alpha2)) SelectWeaponList();
-                else if (Input.GetKeyDown(KeyCode.Alpha3)) SelectKeyItemList();
-                // else if (Input.GetKeyDown(KeyCode.C)) SetupSorting();
+            case Selections.Browsing:
+                if (!MenuMaster.ReadyToSelectInMenu) break;
+                else if (back) CloseShop();
+                else if (!isBuying) SellingFrame.SelectTabInputs();
                 break;
-            case Selections.UsageDone:
-            case Selections.EquippedDone:
-                if (Time.realtimeSinceStartup <= DoneTimer) return;
-                EventSystem.current.SetSelectedGameObject(ToolList.SelectedButton.gameObject);
-                ReturnToInitialStep();
-                Selection = Selections.InventoryLists;
-                break;
-        }
-    }
 
-    public void Open()
-    {
-        ToolList.LinkToInventory(MenuManager.PartyInfo.Inventory);
-        SelectItemList();
-    }
+            case Selections.ConfirmingAmont:
+                if (back)
+                {
+                    if (isBuying) UndoConfirmAmountBuying();
+                    else SellingFrame.UndoSelectTool();
+                }
+                break;
 
-    public void Close()
-    {
-        ReturnToInitialStep();
-    }
+            case Selections.ConfirmedTransaction:
+                if (!MenuMaster.ReadyToSelectInMenu) break;
+                else if (isBuying && SelectedToolToInventory is Weapon)
+                {
+                    if (!EquipNowConfirmation.gameObject.activeSelf) SetupEquipConfirmation();
+                    else break;
+                }
+                else if (Time.unscaledTime >= JustBoughtTimer && (select || back))
+                {
+                    if (isBuying) EventSystem.current.SetSelectedGameObject(BuyingList.SelectedButton.gameObject);
+                    Initialize();
+                }
+                break;
 
-    public void GoBack()
-    {
-        switch (Selection)
-        {
-            case Selections.Usage:
-                UndoSelectTool();
+            case Selections.SelectingEquips:
                 break;
-            case Selections.Discard:
-                UndoDiscard();
-                break;
-            case Selections.UseOnCharacter:
-            case Selections.EquipOnCharacter:
-                UndoSelectTeammate();
-                break;
-            case Selections.CharacterEquipsList:
-                UndoSelectEquippedTool();
-                break;
-            case Selections.ConfirmEquip:
-                UndoConfirmSwap();
+
+            case Selections.ConfirmSwap:
                 break;
         }
     }
 
-    protected override void ReturnToInitialStep()
+    private void CloseShop()
     {
-        ToolList.Selecting = true;
-        Sorter.Undo();
-        SelectingUsage.SetActive(false);
-        ConfirmDiscard.SetActive(false);
-        SelectingTeammate.Deactivate();
-        EquippedTools.SetActive(false);
-        ConfirmSwap.SetActive(false);
-        ToolList.ClearSelections();
-        PartyList.ClearSelections();
-        EquippedToolList.ClearSelections();
-        if (SelectedUsageListBtn)
-            SelectedUsageListBtn.ClearHighlights();
-        SelectableTeammatesUse = null;
-        SelectableTeammatesEquip = null;
+        Selection = Selections.None;
+        SceneMaster.CloseShop(DoneTransaction, PartyInfo, Shopkeep);
     }
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// -- Inventory Lists --
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    public void SelectItemList()
+    public void Initialize()
     {
-        SelectToolTab(InventorySystem.ListType.Items, MenuManager.PartyInfo.Inventory.Items, 0);
-    }
-
-    public void SelectWeaponList()
-    {
-        SelectToolTab(InventorySystem.ListType.Weapons, MenuManager.PartyInfo.Inventory.Weapons, 1);
-    }
-
-    public void SelectKeyItemList()
-    {
-        SelectToolTab(InventorySystem.ListType.KeyItems, MenuManager.PartyInfo.Inventory.KeyItems, 2);
-    }
-
-    private void SelectToolTab<T>(InventorySystem.ListType inventoryList, List<T> toolList, int tabIndex) where T : ToolForInventory
-    {
-        if (Sorter.gameObject.activeSelf) return;
-        Selection = Selections.InventoryLists;
-        InventoryList = inventoryList;
-        EventSystem.current.SetSelectedGameObject(ToolListTabs.transform.GetChild(tabIndex).gameObject);
-        ReturnToInitialStep();
-        MenuMaster.KeepHighlightedSelected(ref SelectedInventoryTab);
-        ToolList.Selecting = true;
-        ToolList.Setup(toolList);
-        if (ToolList.SelectedButton) ToolList.SelectedButton.ClearHighlights();
-        EventSystem.current.SetSelectedGameObject(ToolList.transform.GetChild(0).gameObject);
-    }
-
-    public void SelectTool()
-    {
-        ConfirmDiscard.SetActive(false);
-        if (!ToolList.SetupToolInfo())
+        if (isBuying)
         {
-            if (ToolList.SelectedButton) ToolList.SelectedButton.ClearHighlights();
-            SelectingUsage.SetActive(false);
-            return;
-        }
-        Selection = Selections.Usage;
-        ToolList.Selecting = false;
-        SelectingUsage.SetActive(true);
-        MenuMaster.KeepHighlightedSelected(ref ToolList.SelectedButton);
-        Sorter.Undo();
-        if (SelectedUsageListBtn) SelectedUsageListBtn.ClearHighlights();
-        SetupUsageButtons();
-    }
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// -- Sorting --
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    public void SetupSorting()
-    {
-        Selection = Selections.InventoryLists;
-        SelectingUsage.SetActive(false);
-        ConfirmDiscard.SetActive(false);
-        ToolList.Selecting = false;
-        ToolList.ClearSelections();
-        if (SelectedUsageListBtn) SelectedUsageListBtn.ClearHighlights();
-        Sorter.Setup(ToolList, MenuManager.PartyInfo.Inventory, InventoryList);
-    }
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// -- How will Tool be used + Setup background data for character list --
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    private void SetupUsageButtons()
-    {
-        SelectableTeammatesUse = new List<Battler>();
-        SelectableTeammatesEquip = new List<Battler>();
-        SelectAllTeammates = false;
-        Transform CurrentUsageList;
-        switch (InventoryList)
-        {
-            case InventorySystem.ListType.Items:
-                CurrentUsageList = SelectingUsage.transform.GetChild(0);
-                CurrentUsageList.GetChild(0).GetComponent<Button>().interactable = GetSelectableTeammatesForUsingItems();
-                CurrentUsageList.GetChild(1).GetComponent<Button>().interactable = GetSelectableTeammatesForEquippingItems();
-                break;
-            case InventorySystem.ListType.Weapons:
-                CurrentUsageList = SelectingUsage.transform.GetChild(1);
-                CurrentUsageList.GetChild(0).GetComponent<Button>().interactable = GetSelectableTeammatesForEquippingWeapons();
-                break;
-            default:
-                return;     // Key Items and anything else
-        }
-        SelectingUsage.transform.GetChild(0).gameObject.SetActive(false);
-        SelectingUsage.transform.GetChild(1).gameObject.SetActive(false);
-        CurrentUsageList.gameObject.SetActive(true);
-        for (int i = 0; i < CurrentUsageList.childCount; i++)
-        {
-            if (!CurrentUsageList.GetChild(i).GetComponent<Selectable>().interactable) continue;
-            EventSystem.current.SetSelectedGameObject(CurrentUsageList.GetChild(i).gameObject);
-            return;
-        }
-        EventSystem.current.SetSelectedGameObject(null);    // If everything in the usage list has been disabled
-    }
-
-    private bool GetSelectableTeammatesForUsingItems()
-    {
-        List<Battler> party = MenuManager.PartyInfo.GetWholeParty();
-        switch (ToolList.SelectedObject.Scope)
-        {
-            case Tool.ScopeType.OneTeammate:
-            case Tool.ScopeType.Self:
-                foreach (Battler p in party)
-                    if (!p.Unconscious) SelectableTeammatesUse.Add(p);
-                SelectAllTeammates = false;
-                break;
-
-            case Tool.ScopeType.OneKnockedOutTeammate:
-                foreach (Battler p in party)
-                    if (p.Unconscious) SelectableTeammatesUse.Add(p);
-                SelectAllTeammates = false;
-                break;
-
-            case Tool.ScopeType.AllTeammates:
-            case Tool.ScopeType.EveryoneButSelf:
-            case Tool.ScopeType.Everyone:
-                foreach (Battler p in party)
-                    if (!p.Unconscious) SelectableTeammatesUse.Add(p);
-                SelectAllTeammates = true;
-                break;
-
-            case Tool.ScopeType.AllKnockedOutTeammates:
-                foreach (Battler p in party)
-                    if (p.Unconscious) SelectableTeammatesUse.Add(p);
-                SelectAllTeammates = true;
-                break;
-        }
-        return SelectableTeammatesUse.Count > 0;
-    }
-
-    private bool GetSelectableTeammatesForEquippingItems()
-    {
-        foreach (BattlePlayer p in MenuManager.PartyInfo.AllPlayers)
-        {
-            bool matchClassExclusive = ToolList.SelectedObject.ClassExclusives.Count == 0 || ToolList.SelectedObject.ClassExclusives.Contains(p.Class);
-            if (matchClassExclusive) SelectableTeammatesEquip.Add(p);
-        }
-        return SelectableTeammatesEquip.Count > 0;
-    }
-
-    private bool GetSelectableTeammatesForEquippingWeapons()
-    {
-        Weapon selectedWeapon = ToolList.SelectedObject as Weapon;
-        foreach (BattlePlayer p in MenuManager.PartyInfo.AllPlayers)
-        {
-            bool matchClassExclusive = ToolList.SelectedObject.ClassExclusives.Count == 0 || ToolList.SelectedObject.ClassExclusives.Contains(p.Class);
-            bool isUsableWeaponType = p.Class.UsableWeapon1Type == selectedWeapon.WeaponType || p.Class.UsableWeapon2Type == selectedWeapon.WeaponType;
-            if (matchClassExclusive && isUsableWeaponType) SelectableTeammatesEquip.Add(p);
-        }
-        return SelectableTeammatesEquip.Count > 0;
-    }
-
-    public void UndoSelectTool()
-    {
-        Selection = Selections.InventoryLists;
-        SelectingUsage.SetActive(false);
-        ConfirmDiscard.SetActive(false);
-        ToolList.SelectedButton.ClearHighlights();
-        ToolList.Selecting = true;
-        if (SelectedUsageListBtn) SelectedUsageListBtn.ClearHighlights();
-        foreach (Transform t0 in SelectingUsage.transform)
-            foreach (Transform t in t0)
-                t.GetComponent<ListSelectable>().ClearHighlights();
-        EventSystem.current.SetSelectedGameObject(ToolList.SelectedButton.gameObject);
-    }
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// -- Discarding Inventory Tool --
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    public void SetupDiscard()
-    {
-        Selection = Selections.Discard;
-        MenuMaster.KeepHighlightedSelected(ref SelectedUsageListBtn);
-        ConfirmDiscard.SetActive(true);
-        DiscardLabel.text = "Discard\n" + ToolList.SelectedObject.Name + "?";
-        EventSystem.current.SetSelectedGameObject(ConfirmDiscard.transform.GetChild(1).gameObject);
-    }
-
-    public void UndoDiscard()
-    {
-        Selection = Selections.Usage;
-        ConfirmDiscard.SetActive(false);
-        SelectedUsageListBtn.ClearHighlights();
-        EventSystem.current.SetSelectedGameObject(SelectedUsageListBtn.gameObject);
-    }
-
-    public void DiscardTool()
-    {
-        switch (InventoryList)
-        {
-            case InventorySystem.ListType.Items:
-                MenuManager.PartyInfo.Inventory.RemoveItem(ToolList.SelectedIndex);
-                ToolList.Setup(MenuManager.PartyInfo.Inventory.Items);
-                break;
-            case InventorySystem.ListType.Weapons:
-                MenuManager.PartyInfo.Inventory.RemoveWeapon(ToolList.SelectedIndex);
-                ToolList.Setup(MenuManager.PartyInfo.Inventory.Weapons);
-                break;
-        }
-        UndoDiscard();
-        UndoSelectTool();
-    }
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// -- Select Teammate --
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    public void SetupUseOnCharacter()
-    {
-        Selection = Selections.UseOnCharacter;
-        SelectTeammateLabel.text = SelectAllTeammates ? ("USE " + ToolList.SelectedObject.Name.ToUpper() + " ON EVERYONE?") : ("USE " + ToolList.SelectedObject.Name.ToUpper() + " ON...");
-        PartyList.Setup(SelectableTeammatesUse);
-        SetupTeammatesList();
-    }
-
-    public void SetupEquipOnCharacter()
-    {
-        Selection = Selections.EquipOnCharacter;
-        SelectTeammateLabel.text = "EQUIP " + ToolList.SelectedObject.Name.ToUpper() + " ON...";
-        EquippedTools.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = (InventoryList == InventorySystem.ListType.Items) ? "EQUIPPED ITEMS" : "EQUIPPED WEAPONS";
-        PartyList.Setup(SelectableTeammatesEquip);
-        SetupTeammatesList();
-    }
-
-    private void SetupTeammatesList()
-    {
-        MenuMaster.KeepHighlightedSelected(ref SelectedUsageListBtn);
-        SelectingUsage.SetActive(false);
-        ConfirmDiscard.SetActive(false);
-        SelectingTeammate.Activate();
-        EventSystem.current.SetSelectedGameObject(PartyList.transform.GetChild(0).gameObject);
-        EquippedToolList.Selecting = false;
-        if (SelectAllTeammates && Selection == Selections.UseOnCharacter) PartyList.HighlightAll();
-        else PartyList.UnhighlightAll();
-    }
-
-    public void HoveringFromTeammates()
-    {
-        if (Selection != Selections.EquipOnCharacter) return;
-        SetupEquippedTools();
-    }
-
-    private void SetupEquippedTools()
-    {
-        int index = EventSystem.current.currentSelectedGameObject.GetComponent<ListSelectable>().Index;
-        EquippedTools.SetActive(true);
-        if (InventoryList == InventorySystem.ListType.Weapons) EquippedToolList.Setup(SelectableTeammatesEquip[index].Weapons, BattleMaster.MAX_NUMBER_OF_WEAPONS);
-        else if (InventoryList == InventorySystem.ListType.Items) EquippedToolList.Setup(SelectableTeammatesEquip[index].Items, BattleMaster.MAX_NUMBER_OF_ITEMS);
-    }
-
-    public void DeselectingTeammates()
-    {
-        if (Selection != Selections.EquipOnCharacter) return;
-        EquippedTools.SetActive(false);
-    }
-
-    public void UndoSelectTeammate()
-    {
-        Selection = Selections.Usage;
-        SelectingUsage.SetActive(true);
-        SelectingTeammate.Deactivate();
-        EquippedTools.SetActive(false);
-        SelectedUsageListBtn.ClearHighlights();
-        EventSystem.current.SetSelectedGameObject(SelectedUsageListBtn.gameObject);
-    }
-
-    public void SelectTeammate()
-    {
-        if (SelectAllTeammates && Selection == Selections.UseOnCharacter)
-        {
-            UseItemOnMultiple();
+            BuyingList.Refresh(Shopkeep.ToolsInStock);
+            BuyingList.Selecting = true;
         }
         else
         {
-            int index = EventSystem.current.currentSelectedGameObject.GetComponent<ListSelectable>().Index;
-            if (Selection == Selections.UseOnCharacter)
-            {
-                UseItemOnSingle(index);
-            }
-            else if (Selection == Selections.EquipOnCharacter || Selection == Selections.CharacterEquipsList)
-            {
-                if (Selection == Selections.CharacterEquipsList) SetupEquippedTools();   // Can reclick another teammate, while selecting equipment from current teammate
-                PartyList.SelectedObject = SelectableTeammatesEquip[index];
-                MenuMaster.KeepHighlightedSelected(ref PartyList.SelectedButton);
-                SetupCharacterEquipsList();
-            }
+            SellingFrame.SelectingToolList();
+            SellingFrame.InitializeSelection();
         }
-    }
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// -- Use item --
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    private void UseItem()
-    {
-        Selection = Selections.UsageDone;
-        DoneTimer = Time.realtimeSinceStartup + 1.5f;
-        EventSystem.current.SetSelectedGameObject(null);
-        Item it = ToolList.SelectedObject as Item;
-        if (it.Consumable)
-        {
-            MenuManager.PartyInfo.Inventory.RemoveItem(it);
-            ToolList.Setup(MenuManager.PartyInfo.Inventory.Items);
-        }
-    }
-    
-    private void UseItemOnSingle(int index)
-    {
-        UseItem();
-        UseItem(index);
-    }
-    
-    private void UseItemOnMultiple()
-    {
-        UseItem();
-        for (int i = 0; i < SelectableTeammatesUse.Count; i++) UseItem(i);
-    }
-
-    private void UseItem(int index)
-    {
-        PartyList.SelectedObject = SelectableTeammatesUse[index];
-        PartyList.SelectedObject.ReceiveToolEffects(PartyList.SelectedObject, ToolList.SelectedObject);
-        Gauge hpg = PartyList.transform.GetChild(index).GetChild(3).GetComponent<Gauge>();
-        Gauge spg = PartyList.transform.GetChild(index).GetChild(4).GetComponent<Gauge>();
-        hpg.SetAndAnimate(PartyList.SelectedObject.HP, PartyList.SelectedObject.Stats.MaxHP);
-        spg.SetAndAnimate(PartyList.SelectedObject.SP, BattleMaster.SP_CAP);
-    }
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// -- On Character Equipment List --
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    private void SetupCharacterEquipsList()
-    {
-        Selection = Selections.CharacterEquipsList;
-        EquippedToolList.Selecting = true;
-        EquippedTools.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "SELECT A SLOT";
-        EventSystem.current.SetSelectedGameObject(EquippedToolList.transform.GetChild(0).gameObject);
-    }
-
-    private void UndoSelectEquippedTool()
-    {
-        Selection = Selections.EquipOnCharacter;
-        EquippedToolList.Selecting = false;
-        EquippedTools.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = (InventoryList == InventorySystem.ListType.Items) ? "EQUIPPED ITEMS" : "EQUIPPED WEAPONS";
-        EquippedToolList.InfoFrame.SetActive(false);
-        PartyList.SelectedButton.ClearHighlights();
-        EventSystem.current.SetSelectedGameObject(PartyList.SelectedButton.gameObject);
-    }
-
-    public void SelectEquippedTool()
-    {
-        if (!EquippedToolList.Selecting)
-        {
-            return;
-        }
-        else if (EquippedToolList.SetupToolInfo())
-        {
-            if (EquippedToolList.SelectedObject.Id == ToolList.SelectedObject.Id &&
-                EquippedToolList.SelectedObject.Name == ToolList.SelectedObject.Name)
-                return;     // Selected same item
-            MenuMaster.KeepHighlightedSelected(ref EquippedToolList.SelectedButton);
-            SetupConfirmSwapButtons();
-        }
-        else if (Selection == Selections.CharacterEquipsList)
-        {
-            // Equip from blank slot
-            if (InventoryList == InventorySystem.ListType.Items) Equip(false, PartyList.SelectedObject.Items.Count);
-            else if (InventoryList == InventorySystem.ListType.Weapons) Equip(false, PartyList.SelectedObject.Weapons.Count);
-        }
-    }
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// -- Confirm swap or equip empty spot --
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    
-    private void SetupConfirmSwapButtons()
-    {
-        Selection = Selections.ConfirmEquip;
-        EquippedToolList.Selecting = false;
-        ConfirmSwap.SetActive(true);
-        string txt = "Swap out\n<b>" + EquippedToolList.SelectedObject.Name + "</b>\nwith\n" + "<b>" + ToolList.SelectedObject.Name + "</b>?";
-        ConfirmSwap.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = txt;
-        EventSystem.current.SetSelectedGameObject(ConfirmSwap.transform.GetChild(1).gameObject);
-    }
-
-    public void UndoConfirmSwap()
-    {
-        if (Selection == Selections.EquippedDone) return;
-        EquippedToolList.Selecting = true;
-        Selection = Selections.CharacterEquipsList;
+        Selection = Selections.Browsing;
+        BuyingListBlock.gameObject.SetActive(false);
+        CharacterEquipCheckFrame.SetActive(false);
+        GoldAmount.text = PartyInfo.Inventory.Gold.ToString();
+        ConfirmFrame.gameObject.SetActive(false);
+        ResultCheckFrame.SetActive(false);
+        TransactionConfirmedFrame.SetActive(false);
+        EquipNowConfirmation.SetActive(false);
+        SelectEquipsFrame.Deactivate();
         ConfirmSwap.SetActive(false);
-        if (EquippedToolList.SelectedButton)
-        {
-            EquippedToolList.SelectedButton.ClearHighlights();
-            EventSystem.current.SetSelectedGameObject(EquippedToolList.SelectedButton.gameObject);
-        }
     }
 
-    public void SwitchEquipment()
+    public void HoverOverTool()
     {
-        Equip(true, EquippedToolList.SelectedIndex);
+        if (isBuying)
+        {
+            BuyingList.HoverOverTool();         // Sets up the data below
+            if (BuyingList.DisplayedToolInfo)
+            {
+                SetupSelectToolToInventory();
+                CarryingAmount.text = (SelectedToolToInventory?.Quantity ?? 0).ToString();
+                NotEnoughGoldText.SetActive(PartyInfo.Inventory.Gold - BuyingList.SelectedObject.DefaultPrice < 0);
+            }
+            else
+            {
+                CarryingAmount.text = "";
+                NotEnoughGoldText.SetActive(false);
+            }
+        }
+        else SellingFrame.ToolList.HoverOverTool();
     }
 
-    // USE REPLACE INSTEAD
-    public void Equip(bool switchOut, int slot)
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// -- START - Selling menu only --
+
+    public void SelectTabSuccess()
     {
-        if (Selection == Selections.EquippedDone) return;
-        Selection = Selections.EquippedDone;
-        DoneTimer = Time.realtimeSinceStartup + 1f;
-        if (InventoryList == InventorySystem.ListType.Items)
-        {
-            if (switchOut)
-            {
-                PartyList.SelectedObject.ReplaceItemWith(ToolList.SelectedObject as Item, slot);
-                MenuManager.PartyInfo.Inventory.AddItem(EquippedToolList.SelectedObject as Item);
-            }
-            else PartyList.SelectedObject.EquipItem(ToolList.SelectedObject as Item);
-            MenuManager.PartyInfo.Inventory.RemoveItem(ToolList.SelectedIndex);
-            ToolList.Setup(MenuManager.PartyInfo.Inventory.Items);
-            EquippedToolList.Setup(PartyList.SelectedObject.Items, BattleMaster.MAX_NUMBER_OF_ITEMS);
-        }
-        else if (InventoryList == InventorySystem.ListType.Weapons)
-        {
-            if (switchOut)
-            {
-                PartyList.SelectedObject.ReplaceWeaponWith(ToolList.SelectedObject as Weapon, slot);
-                MenuManager.PartyInfo.Inventory.AddWeapon(EquippedToolList.SelectedObject as Weapon);
-            }
-            else PartyList.SelectedObject.EquipWeapon(ToolList.SelectedObject as Weapon);
-            MenuManager.PartyInfo.Inventory.RemoveWeapon(ToolList.SelectedIndex);
-            ToolList.Setup(MenuManager.PartyInfo.Inventory.Weapons);
-            EquippedToolList.Setup(PartyList.SelectedObject.Weapons, BattleMaster.MAX_NUMBER_OF_WEAPONS);
-        }
-        ConfirmSwap.SetActive(false);
-    }*/
+        //
+    }
+
+    public void SelectTabFailed()
+    {
+        //
+    }
+
+    public void SelectToolSuccess()
+    {
+        //
+    }
+
+    public void SelectToolFailed()
+    {
+        //
+    }
+
+    public void UndoSelectToolSuccess()
+    {
+        //
+    }
+
+    public void ActivateSorterSuccess()
+    {
+        //
+    }
+
+    /// -- Selling menu only - END --
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public void SelectToolBuying()
+    {
+        if (!MenuMaster.ReadyToSelectInMenu || !BuyingList.RefreshToolInfo() || CannotPurchase) return;
+        Selection = Selections.ConfirmingAmont;
+        BuyingList.Selecting = false;
+        BuyingListBlock.SetActive(true);
+        BuyingList.SelectedButton.KeepSelected();
+        SetupSelectToolToInventory();
+        ConfirmFrame.Activate(1, PartyInfo.Inventory.Gold / SelectedToolToInventory.DefaultPrice);
+        ConfirmText.text = "HOW MANY WILL YOU PURCHASE?";
+        UpdateResultChecker(ConfirmFrame.Amount);
+    }
+
+    private void SetupSelectToolToInventory()
+    {
+        if (BuyingList.SelectedObject is Item it) SelectedToolToInventory = PartyInfo.Inventory.Items.Find(x => x.Id == it.Id);
+        else if (BuyingList.SelectedObject is Weapon wp) SelectedToolToInventory = PartyInfo.Inventory.Weapons.Find(x => x.Id == wp.Id);
+    }
+
+    private void UndoConfirmAmountBuying()
+    {
+        Selection = Selections.Browsing;
+        BuyingListBlock.SetActive(false);
+        ResultCheckFrame.SetActive(false);
+        ConfirmFrame.Deactivate();
+        BuyingList.SelectedButton.ClearHighlights();
+        EventSystem.current.SetSelectedGameObject(BuyingList.SelectedButton.gameObject);
+    }
+
+    public void ConfirmAmountMoveUp()
+    {
+        UpdateResultChecker(ConfirmFrame.Amount);
+    }
+
+    public void ConfirmAmountMoveDown()
+    {
+        UpdateResultChecker(ConfirmFrame.Amount);
+    }
+
+    private void UpdateResultChecker(int amount)
+    {
+        ResultCheckFrame.SetActive(true);
+        int mod = isBuying ? 1 : -1;
+        ResultCheckCarrying.text = ((SelectedToolToInventory?.Quantity ?? 0) + amount * mod).ToString();
+        ResultCheckGold.text = (PartyInfo.Inventory.Gold - SelectedToolToInventory.DefaultPrice * amount * mod).ToString();
+        ResultCheckCarryTracker.Set(PartyInfo.Inventory.CarryWeight + amount * mod * SelectedToolToInventory.Weight, PartyInfo.Inventory.WeightCapacity);
+    }
+
+    public void ConfirmTransaction()
+    {
+        Selection = Selections.ConfirmedTransaction;
+        DoneTransaction = true;
+        ConfirmFrame.Deactivate();
+        ResultCheckFrame.SetActive(false);
+        if (isBuying) ConfirmPurchase();
+        else ConfirmSell();
+        JustBoughtTimer = Time.unscaledTime + BOUGHT_TIME_BUFFER;
+        TransactionConfirmedFrame.SetActive(true);
+        TransactionConfirmedFrame.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "PURCHASED " + SelectedToolToInventory.Name;
+        TransactionConfirmedFrame.transform.GetChild(1).GetComponent<Image>().sprite = SelectedToolToInventory.GetComponent<SpriteRenderer>().sprite;
+    }
+
+    private void ConfirmPurchase()
+    {
+        PartyInfo.Inventory.Gold -= ConfirmFrame.Amount * SelectedToolToInventory.DefaultPrice;
+        if (BuyingList.SelectedObject is Item it) PartyInfo.Inventory.AddItem(it, ConfirmFrame.Amount);
+        else if (BuyingList.SelectedObject is Weapon wp) PartyInfo.Inventory.AddWeapon(wp, ConfirmFrame.Amount);
+    }
+
+    private void ConfirmSell()
+    {
+        PartyInfo.Inventory.Gold += ConfirmFrame.Amount * SelectedToolToInventory.DefaultPrice;
+        if (BuyingList.SelectedObject is Item it) PartyInfo.Inventory.RemoveItem(it, ConfirmFrame.Amount);
+        else if (BuyingList.SelectedObject is Weapon wp) PartyInfo.Inventory.RemoveWeapon(wp, ConfirmFrame.Amount);
+    }
+
+    private void SetupEquipConfirmation()
+    {
+        EquipNowConfirmation.SetActive(true);
+        EventSystem.current.SetSelectedGameObject(EquipNowConfirmation.transform.GetChild(1).gameObject);
+    }
 }

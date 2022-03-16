@@ -10,10 +10,12 @@ public class SceneMaster : MonoBehaviour
     private static bool InMapMenu = false;
     private static bool InPauseMenu = false;
     private static bool InFileSelectMenu = false;
-    private static bool InShopMenu = false;
+    private static int InShopMenu = 0;
     private static bool InStorageMenu = false;
 
-    public static bool InMenu => InMapMenu || InPauseMenu || InFileSelectMenu || InShopMenu || InStorageMenu;
+    public static bool InMenu => InMapMenu || InPauseMenu || InFileSelectMenu || InShopMenu > 0 || InStorageMenu;
+
+    public static bool BuyingInShop => InShopMenu == 1;
 
     public static bool InCutscene { get; private set; } = false;
 
@@ -125,17 +127,26 @@ public class SceneMaster : MonoBehaviour
         if (!InMenu) Time.timeScale = 1;
     }
 
-    public static void OpenShop()
+    public static void OpenShop(bool onlyBuying, PlayerParty playerParty, Shopkeeper shop)
     {
-        //
+        GameplayMaster.Party = playerParty;
+        GameplayMaster.Shop = shop;
+        SceneManager.LoadScene(SHOP_SCENE, LoadSceneMode.Additive);
+        InShopMenu = onlyBuying ? 1 : 2;
+        Time.timeScale = 0;
     }
 
-    public static void CloseShop()
+    public static void CloseShop(bool doneTransaction, PlayerParty playerParty, Shopkeeper shop)
     {
-        //
+        MenuMaster.SetupSelectionBufferInGameplay(0.5f);
+        GameplayMaster.Party = playerParty;
+        GameplayMaster.Shop = shop;
+        SceneManager.UnloadSceneAsync(SHOP_SCENE);
+        InShopMenu = 0;
+        if (!InMenu) Time.timeScale = 1;
     }
 
-    public static void OpenStorage(PlayerParty playerParty = null)
+    public static void OpenStorage(PlayerParty playerParty)
     {
         GameplayMaster.Party = playerParty;
         SceneManager.LoadScene(STORAGE_SCENE, LoadSceneMode.Additive);

@@ -58,7 +58,7 @@ public class MainMenu : MonoBehaviour
                 PressAnyKeyInput.SetActive(false);
             }
         }
-        else if (InputMaster.GoingBack())
+        else if (InputMaster.GoingBack)
         {
             if (OptionsMenu.activeSelf) GoBackFromOptions();
             else if (DifficultySelect.activeSelf) UndoDifficultySelect();

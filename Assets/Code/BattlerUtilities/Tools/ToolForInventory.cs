@@ -4,7 +4,7 @@ using UnityEngine;
 public abstract class ToolForInventory : Tool
 {
     public int DefaultPrice;
-    public List<CraftToolQuantity> RequiredTools;
+    public List<ToolQuantity> RequiredTools;
     public int Quantity;
     public int Weight;
 

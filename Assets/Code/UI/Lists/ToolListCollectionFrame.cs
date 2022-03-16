@@ -50,23 +50,18 @@ public class ToolListCollectionFrame : MonoBehaviour
     public UnityEvent UndoSelectToolSuccess;
     public UnityEvent ActivateSorterSuccess;
 
-    private void Start()
-    {
-        SetupListOptions();
-        SortFunctions = new SortingFunc[]{
-            SortByDefaultAscending, SortByDefaultDescending,
-            SortByQuantityAscending, SortByQuantityDescending,
-            SortByWeightAscending, SortByWeightDescending
-        };
-    }
-
-    public void SetupListOptions()
+    private void Awake()
     {
         int numberOfTabs = 0;
         foreach (Transform t in Tabs.transform)
             if (t.gameObject.activeSelf)
                 numberOfTabs++;
         ListOptions = new IEnumerable<ToolForInventory>[numberOfTabs];
+        SortFunctions = new SortingFunc[]{
+            SortByDefaultAscending, SortByDefaultDescending,
+            SortByQuantityAscending, SortByQuantityDescending,
+            SortByWeightAscending, SortByWeightDescending
+        };
     }
 
     public void RegisterToolList<T>(int tabIndex, List<T> list) where T : ToolForInventory
@@ -163,7 +158,8 @@ public class ToolListCollectionFrame : MonoBehaviour
 
     public void SelectTool()
     {
-        if (!ToolList.RefreshToolInfo())
+        if (!MenuMaster.ReadyToSelectInMenu) return;
+        else if (!ToolList.RefreshToolInfo())
         {
             if (ToolList.SelectedButton) ToolList.SelectedButton.ClearHighlights();
             SelectToolFailed?.Invoke();

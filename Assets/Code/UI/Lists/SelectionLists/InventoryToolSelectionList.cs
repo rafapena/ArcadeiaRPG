@@ -19,6 +19,8 @@ using System.Linq;
 /// </summary>
 public class InventoryToolSelectionList : SelectionList_Super<ToolForInventory>
 {
+    public enum AdditionalDisplayAttributes { None, Quanitity, Price }
+
     // Data tracker
     [HideInInspector] public InventorySystem ReferenceInventory;
 
@@ -34,7 +36,8 @@ public class InventoryToolSelectionList : SelectionList_Super<ToolForInventory>
     protected static Color CraftedBackgroundColor = new Color(0.7f, 0.9f, 1f, 0.7f);
 
     // Other settings
-    public bool DisplayQuantity = true;
+    private const string COST_PREFIX = "<sprite=\"MenuIcons\" index=9> ";
+    public AdditionalDisplayAttributes AdditionalAttribute = AdditionalDisplayAttributes.Quanitity;
 
     protected override void Awake()
     {
@@ -116,8 +119,18 @@ public class InventoryToolSelectionList : SelectionList_Super<ToolForInventory>
         entry.transform.GetChild(1).gameObject.GetComponent<Image>().sprite = dataEntry.GetComponent<SpriteRenderer>().sprite;
         if (entry.transform.childCount > 2)
         {
-            entry.transform.GetChild(2).gameObject.SetActive(DisplayQuantity);
-            entry.transform.GetChild(2).gameObject.GetComponent<TextMeshProUGUI>().text = dataEntry.Quantity.ToString();
+            switch (AdditionalAttribute)
+            {
+                case AdditionalDisplayAttributes.None:
+                    entry.transform.GetChild(2).gameObject.SetActive(false);
+                    break;
+                case AdditionalDisplayAttributes.Quanitity:
+                    entry.transform.GetChild(2).gameObject.GetComponent<TextMeshProUGUI>().text = dataEntry.Quantity.ToString();
+                    break;
+                case AdditionalDisplayAttributes.Price:
+                    entry.transform.GetChild(2).gameObject.GetComponent<TextMeshProUGUI>().text = COST_PREFIX + dataEntry.DefaultPrice;
+                    break;
+            }
         }
     }
 

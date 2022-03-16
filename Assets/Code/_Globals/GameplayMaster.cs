@@ -34,6 +34,7 @@ public class GameplayMaster : MonoBehaviour
     public float InGameMinuteIncrementFrequency;
 
     public static PlayerParty Party;
+    public static Shopkeeper Shop;
 
     private void Awake()
     {

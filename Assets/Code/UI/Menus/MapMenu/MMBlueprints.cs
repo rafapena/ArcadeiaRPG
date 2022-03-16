@@ -53,7 +53,7 @@ public class MMBlueprints : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameO
                 CraftDoneSetup();
                 break;
             case Selections.CraftDone:
-                if (!Resetting && (Input.GetKeyDown(KeyCode.Z) || Input.GetMouseButtonDown(0) || InputMaster.GoingBack())) CraftDoneUndoSetup();
+                if (!Resetting && (InputMaster.ProceedInMenu || InputMaster.GoingBack)) CraftDoneUndoSetup();
                 else if (Resetting && Time.unscaledTime > DoneTimer) ResetFromCraftDone();
                 break;
         }
@@ -153,7 +153,7 @@ public class MMBlueprints : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameO
         else RequirementsFrame.Deactivate();
     }
 
-    public void RefreshRequirements(List<CraftToolQuantity> craftsList)
+    public void RefreshRequirements(List<ToolQuantity> craftsList)
     {
         MaterialsCheck.SetActive(false);
         for (int i = 0; i < RequirementsList.childCount; i++)
@@ -174,7 +174,7 @@ public class MMBlueprints : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameO
         }
     }
 
-    private int GetQuantityFromInventory(List<CraftToolQuantity> craftsList, int i)
+    private int GetQuantityFromInventory(List<ToolQuantity> craftsList, int i)
     {
         if (craftsList[i].Tool is Item it) return MenuManager.PartyInfo.Inventory.Items.Find(x => x.Id == it.Id)?.Quantity ?? 0;
         else if (craftsList[i].Tool is Weapon wp) return MenuManager.PartyInfo.Inventory.Weapons.Find(x => x.Id == wp.Id)?.Quantity ?? 0;
@@ -187,13 +187,14 @@ public class MMBlueprints : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameO
         DoneTimer = Time.unscaledTime + CRAFTING_TIME;
         ConfirmCraft.SetActive(false);
         CraftDoneBlock.SetActive(true);
+        if (Legend) Legend.SetActive(false);
         UpdateInventory();
     }
 
     private void UpdateInventory()
     {
         var tool = CollectionFrame.ToolList.SelectedObject;
-        foreach (CraftToolQuantity c in tool.RequiredTools)
+        foreach (ToolQuantity c in tool.RequiredTools)
         {
             if (c.Tool is Item it0) MenuManager.PartyInfo.Inventory.RemoveItem(it0, c.Quantity);
             else if (c.Tool is Weapon wp0) MenuManager.PartyInfo.Inventory.RemoveWeapon(wp0, c.Quantity);
@@ -230,6 +231,7 @@ public class MMBlueprints : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameO
     private void ResetFromCraftDone()
     {
         CraftDoneBlock.SetActive(false);
+        if (Legend) Legend.SetActive(true);
         CollectionFrame.UndoSelectTool();
         MenuMaster.SetupSelectionBufferInMenu();
         Resetting = false;
