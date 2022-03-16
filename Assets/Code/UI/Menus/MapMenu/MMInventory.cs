@@ -39,6 +39,7 @@ public class MMInventory : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOp
 
     // Keep track of selected content
     private ListSelectable SelectedUsageListBtn;
+    public GameObject[] DiscardButtons;
 
     // List of potential targets
     private List<Battler> SelectableTeammatesUse;
@@ -150,6 +151,11 @@ public class MMInventory : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOp
         Selection = Selections.Usage;
         ConfirmDiscard.SetActive(false);
         SelectingUsage.SetActive(true);
+        for (int i = 0; i < DiscardButtons.Length; i++)
+        {
+            if (InventoryFrame.ToolList.SelectedObject.CanRemove) MenuMaster.EnableSelection(ref DiscardButtons[i]);
+            else MenuMaster.DisableSelection(ref DiscardButtons[i]);
+        }
         if (SelectedUsageListBtn) SelectedUsageListBtn.ClearHighlights();
         SetupUsageButtons();
     }

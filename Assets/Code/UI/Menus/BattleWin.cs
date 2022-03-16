@@ -197,7 +197,8 @@ public class BattleWin : MonoBehaviour
     private void SetupGold()
     {
         GoldObtained.gameObject.SetActive(GoldEarned > 0);
-        GoldIncreaseSpeed = GoldEarned / 60;
+        int gsp = GoldEarned / 60;
+        GoldIncreaseSpeed = gsp < 1 ? 1 : gsp;
         NewGoldTotal = FinishedBattle.PlayerParty.Inventory.Gold + GoldEarned;
         UpdateGoldInfo();
     }

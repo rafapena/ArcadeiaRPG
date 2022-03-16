@@ -241,14 +241,13 @@ public class Storage : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameO
             case InventorySystem.ListType.Items:
                 SourceSystem.RemoveItem(CollectionFrame.ToolList.SelectedObject as Item, ConfirmFrame.Amount);
                 TargetSystem.AddItem((TargetTool ?? CollectionFrame.ToolList.SelectedObject) as Item, ConfirmFrame.Amount);
-                CollectionFrame.Refresh(SourceSystem.Items);
                 break;
             case InventorySystem.ListType.Weapons:
                 SourceSystem.RemoveWeapon(CollectionFrame.ToolList.SelectedObject as Weapon, ConfirmFrame.Amount);
                 TargetSystem.AddWeapon((TargetTool ?? CollectionFrame.ToolList.SelectedObject) as Weapon, ConfirmFrame.Amount);
-                CollectionFrame.Refresh(SourceSystem.Weapons);
                 break;
         }
+        CollectionFrame.Refresh();
         UndoConfirmAmount();
     }
 }

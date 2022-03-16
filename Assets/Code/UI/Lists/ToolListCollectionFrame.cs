@@ -90,6 +90,7 @@ public class ToolListCollectionFrame : MonoBehaviour
     public void SelectingToolList()
     {
         ToolList.Selecting = true;
+        ListBlocker.SetActive(false);
         DeactivateSorter();
     }
 
@@ -100,6 +101,11 @@ public class ToolListCollectionFrame : MonoBehaviour
         RefreshCarryWeight();
     }
 
+    public void Refresh()
+    {
+        Refresh(ListOptions[CurrentTabIndex].ToList());
+    }
+
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- Inventory Lists --
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -107,6 +113,7 @@ public class ToolListCollectionFrame : MonoBehaviour
     public void InitializeSelection()
     {
         if (!TargetFrame.Activated) TargetFrame.Activate();
+        ListBlocker.SetActive(false);
         SelectTab(0);
     }
 

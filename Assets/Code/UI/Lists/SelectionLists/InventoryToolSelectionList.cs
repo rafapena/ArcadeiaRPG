@@ -119,16 +119,18 @@ public class InventoryToolSelectionList : SelectionList_Super<ToolForInventory>
         entry.transform.GetChild(1).gameObject.GetComponent<Image>().sprite = dataEntry.GetComponent<SpriteRenderer>().sprite;
         if (entry.transform.childCount > 2)
         {
+            GameObject go = entry.transform.GetChild(2).gameObject;
+            go.SetActive(true);
             switch (AdditionalAttribute)
             {
                 case AdditionalDisplayAttributes.None:
-                    entry.transform.GetChild(2).gameObject.SetActive(false);
+                    go.SetActive(false);
                     break;
                 case AdditionalDisplayAttributes.Quanitity:
-                    entry.transform.GetChild(2).gameObject.GetComponent<TextMeshProUGUI>().text = dataEntry.Quantity.ToString();
+                    go.GetComponent<TextMeshProUGUI>().text = dataEntry.Quantity.ToString();
                     break;
                 case AdditionalDisplayAttributes.Price:
-                    entry.transform.GetChild(2).gameObject.GetComponent<TextMeshProUGUI>().text = COST_PREFIX + dataEntry.DefaultPrice;
+                    go.GetComponent<TextMeshProUGUI>().text = COST_PREFIX + dataEntry.DefaultPrice;
                     break;
             }
         }

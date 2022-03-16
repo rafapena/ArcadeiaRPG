@@ -8,6 +8,10 @@ public abstract class ToolForInventory : Tool
     public int Quantity;
     public int Weight;
 
+    public bool CanRemove => DefaultPrice > 0;
+
+    public int DefaultSellPrice => DefaultPrice / 2;
+
     public bool IsCraftable()
     {
         return RequiredTools.Count > 0;

@@ -16,14 +16,25 @@ public class Shop : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameOper
 
     private Selections Selection;
 
-    public ToolListCollectionFrame SellingFrame;
+    // Buying - general
     public MenuFrame BuyingFrame;
     public InventoryToolSelectionList BuyingList;
     public GameObject BuyingListBlock;
     public TextMeshProUGUI CarryingAmount;
-    public TextMeshProUGUI GoldAmount;
+    public TextMeshProUGUI GoldAmountBuying;
     public GameObject NotEnoughGoldText;
+    private ToolForInventory SelectedToolToInventory;
 
+    // Selling - general
+    public ToolListCollectionFrame SellingFrame;
+    public GameObject GoldAmountSellingFrame;
+    public TextMeshProUGUI GoldAmountSellingValue;
+    public GameObject AddedGoldFrame;
+    public GameObject AddedGoldIcon;
+    public TextMeshProUGUI AddedGoldValue;
+    public GameObject CannotSellMesssage;
+
+    // Confirming transaction
     public ConfirmAmount ConfirmFrame;
     public TextMeshProUGUI ConfirmText;
     public GameObject ResultCheckFrame;
@@ -31,21 +42,24 @@ public class Shop : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameOper
     public TextMeshProUGUI ResultCheckGold;
     public Gauge ResultCheckCarryTracker;
     public GameObject TransactionConfirmedFrame;
+
+    // Buying equipment
+    public GameObject CharacterEquipCheckFrame;
+    public Transform CharacterEquipCheckList;
     public GameObject EquipNowConfirmation;
     public MenuFrame SelectEquipsFrame;
     public GameObject ConfirmSwap;
 
-    public GameObject CharacterEquipCheckFrame;
-    public Transform CharacterEquipCheckList;
-
+    // Info for globals
     [HideInInspector] public PlayerParty PartyInfo;
     [HideInInspector] public Shopkeeper Shopkeep;
 
-    private ToolForInventory SelectedToolToInventory;
+    // Transactions
     private bool DoneTransaction;
-
-    private float JustBoughtTimer;
-    private float BOUGHT_TIME_BUFFER = 0.5f;
+    private float JustTransactedTimer;
+    private float TRANSACTED_TIME_BUFFER = 0.5f;
+    private int DisplayedGold;
+    private int DisplayedGoldChangeSpeed;
 
     private bool isBuying => SceneMaster.BuyingInShop;
 
@@ -56,22 +70,28 @@ public class Shop : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameOper
         PartyInfo = GameplayMaster.Party;
         Shopkeep = GameplayMaster.Shop;
         PartyInfo.Inventory.UpdateToCurrentWeight();
+        DisplayedGold = PartyInfo.Inventory.Gold;
         if (isBuying) BuyingFrame.Activate();
         else
         {
             SellingFrame.TargetFrame.Activate();
             SellingFrame.RegisterToolList(0, PartyInfo.Inventory.Items);
             SellingFrame.RegisterToolList(1, PartyInfo.Inventory.Weapons);
+            SellingFrame.InitializeSelection();
+            SellingFrame.TrackCarryWeight(PartyInfo.Inventory);
         }
         Initialize();
         NotEnoughGoldText.SetActive(false);
-        EventSystem.current.SetSelectedGameObject(BuyingList.transform.GetChild(0).gameObject);
+        if (isBuying) EventSystem.current.SetSelectedGameObject(BuyingList.transform.GetChild(0).gameObject);
     }
 
     private void Update()
     {
         bool select = InputMaster.ProceedInMenu;
         bool back = InputMaster.GoingBack;
+        if (isBuying) RefreshGoldDisplayBuying();
+        else RefreshGoldDisplaySelling();
+
         switch (Selection)
         {
             case Selections.Browsing:
@@ -95,11 +115,7 @@ public class Shop : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameOper
                     if (!EquipNowConfirmation.gameObject.activeSelf) SetupEquipConfirmation();
                     else break;
                 }
-                else if (Time.unscaledTime >= JustBoughtTimer && (select || back))
-                {
-                    if (isBuying) EventSystem.current.SetSelectedGameObject(BuyingList.SelectedButton.gameObject);
-                    Initialize();
-                }
+                else if (Time.unscaledTime >= JustTransactedTimer && (select || back)) ReturnToSelection();
                 break;
 
             case Selections.SelectingEquips:
@@ -116,6 +132,18 @@ public class Shop : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameOper
         SceneMaster.CloseShop(DoneTransaction, PartyInfo, Shopkeep);
     }
 
+    public void ReturnToSelection()
+    {
+        if (isBuying) EventSystem.current.SetSelectedGameObject(BuyingList.SelectedButton.gameObject);
+        else
+        {
+            SellingFrame.ToolList.SelectedButton.ClearHighlights();
+            SellingFrame.Refresh();
+            EventSystem.current.SetSelectedGameObject(SellingFrame.ToolList.SelectedButton.gameObject ?? SellingFrame.ToolList.transform.GetChild(0).gameObject);
+        }
+        Initialize();
+    }
+
     public void Initialize()
     {
         if (isBuying)
@@ -123,15 +151,11 @@ public class Shop : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameOper
             BuyingList.Refresh(Shopkeep.ToolsInStock);
             BuyingList.Selecting = true;
         }
-        else
-        {
-            SellingFrame.SelectingToolList();
-            SellingFrame.InitializeSelection();
-        }
+        else SellingFrame.SelectingToolList();
+
         Selection = Selections.Browsing;
         BuyingListBlock.gameObject.SetActive(false);
         CharacterEquipCheckFrame.SetActive(false);
-        GoldAmount.text = PartyInfo.Inventory.Gold.ToString();
         ConfirmFrame.gameObject.SetActive(false);
         ResultCheckFrame.SetActive(false);
         TransactionConfirmedFrame.SetActive(false);
@@ -140,24 +164,61 @@ public class Shop : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameOper
         ConfirmSwap.SetActive(false);
     }
 
-    public void HoverOverTool()
+    private void RefreshGoldDisplayBuying()
     {
-        if (isBuying)
+        int targetGold = PartyInfo.Inventory.Gold;
+        DisplayedGold = (DisplayedGold > targetGold) ? (DisplayedGold - DisplayedGoldChangeSpeed) : targetGold;
+        GoldAmountBuying.text = DisplayedGold.ToString();
+    }
+
+    private void RefreshGoldDisplaySelling()
+    {
+        int targetGold = PartyInfo.Inventory.Gold;
+        DisplayedGold = (DisplayedGold < targetGold) ? (DisplayedGold + DisplayedGoldChangeSpeed) : targetGold;
+        GoldAmountSellingValue.text = DisplayedGold.ToString();
+    }
+    
+    private void UpdateCarryingAmount()
+    {
+        CarryingAmount.text = (SelectedToolToInventory?.Quantity ?? 0).ToString();
+    }
+
+    public void HoverOverToolBuying()
+    {
+        BuyingList.HoverOverTool();         // Sets up the data below
+        if (BuyingList.DisplayedToolInfo)
         {
-            BuyingList.HoverOverTool();         // Sets up the data below
-            if (BuyingList.DisplayedToolInfo)
-            {
-                SetupSelectToolToInventory();
-                CarryingAmount.text = (SelectedToolToInventory?.Quantity ?? 0).ToString();
-                NotEnoughGoldText.SetActive(PartyInfo.Inventory.Gold - BuyingList.SelectedObject.DefaultPrice < 0);
-            }
-            else
-            {
-                CarryingAmount.text = "";
-                NotEnoughGoldText.SetActive(false);
-            }
+            SetupSelectToolToInventory();
+            UpdateCarryingAmount();
+            if (BuyingList.SelectedObject is Weapon wp) RefreshPartyMemberEquips(wp);
+            else CharacterEquipCheckFrame.SetActive(false);
+            NotEnoughGoldText.SetActive(PartyInfo.Inventory.Gold - BuyingList.SelectedObject.DefaultPrice < 0);
         }
-        else SellingFrame.ToolList.HoverOverTool();
+        else
+        {
+            CarryingAmount.text = "";
+            CharacterEquipCheckFrame.SetActive(false);
+            NotEnoughGoldText.SetActive(false);
+        }
+    }
+
+    public void HoverOverToolSelling()
+    {
+        SellingFrame.ToolList.HoverOverTool();          // Sets up the data below
+        if (SellingFrame.ToolList.DisplayedToolInfo)
+        {
+            AddedGoldFrame.SetActive(true);
+            bool canSell = SellingFrame.ToolList.SelectedObject.CanRemove;
+            AddedGoldIcon.SetActive(canSell);
+            AddedGoldValue.text = canSell ? ("+ " + SellingFrame.ToolList.SelectedObject.DefaultSellPrice) : "";
+            CannotSellMesssage.SetActive(!canSell);
+        }
+        else AddedGoldFrame.SetActive(false);
+    }
+
+    private void RefreshPartyMemberEquips(Weapon wp)
+    {
+        CharacterEquipCheckFrame.SetActive(true);
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -175,7 +236,17 @@ public class Shop : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameOper
 
     public void SelectToolSuccess()
     {
-        //
+        if (!SellingFrame.ToolList.SelectedObject.CanRemove)
+        {
+            SellingFrame.UndoSelectTool();
+            return;
+        }
+        Selection = Selections.ConfirmingAmont;
+        AddedGoldFrame.SetActive(false);
+        SellingFrame.ListBlocker.SetActive(true);
+        ConfirmFrame.Activate(1, SellingFrame.ToolList.SelectedObject.Quantity);
+        ConfirmText.text = "How many will you sell?";
+        UpdateResultChecker(ConfirmFrame.Amount);
     }
 
     public void SelectToolFailed()
@@ -185,7 +256,11 @@ public class Shop : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameOper
 
     public void UndoSelectToolSuccess()
     {
-        //
+        Selection = Selections.Browsing;
+        AddedGoldFrame.SetActive(true);
+        SellingFrame.ListBlocker.SetActive(false);
+        ConfirmFrame.Deactivate();
+
     }
 
     public void ActivateSorterSuccess()
@@ -205,7 +280,7 @@ public class Shop : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameOper
         BuyingList.SelectedButton.KeepSelected();
         SetupSelectToolToInventory();
         ConfirmFrame.Activate(1, PartyInfo.Inventory.Gold / SelectedToolToInventory.DefaultPrice);
-        ConfirmText.text = "HOW MANY WILL YOU PURCHASE?";
+        ConfirmText.text = "How many will you purchase?";
         UpdateResultChecker(ConfirmFrame.Amount);
     }
 
@@ -219,6 +294,7 @@ public class Shop : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameOper
     {
         Selection = Selections.Browsing;
         BuyingListBlock.SetActive(false);
+        BuyingList.Selecting = true;
         ResultCheckFrame.SetActive(false);
         ConfirmFrame.Deactivate();
         BuyingList.SelectedButton.ClearHighlights();
@@ -238,10 +314,19 @@ public class Shop : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameOper
     private void UpdateResultChecker(int amount)
     {
         ResultCheckFrame.SetActive(true);
-        int mod = isBuying ? 1 : -1;
-        ResultCheckCarrying.text = ((SelectedToolToInventory?.Quantity ?? 0) + amount * mod).ToString();
-        ResultCheckGold.text = (PartyInfo.Inventory.Gold - SelectedToolToInventory.DefaultPrice * amount * mod).ToString();
-        ResultCheckCarryTracker.Set(PartyInfo.Inventory.CarryWeight + amount * mod * SelectedToolToInventory.Weight, PartyInfo.Inventory.WeightCapacity);
+        if (isBuying)
+        {
+            ResultCheckCarrying.text = ((SelectedToolToInventory?.Quantity ?? 0) + amount).ToString();
+            ResultCheckGold.text = (PartyInfo.Inventory.Gold - SelectedToolToInventory.DefaultPrice * amount).ToString();
+            ResultCheckCarryTracker.Set(PartyInfo.Inventory.CarryWeight + amount * SelectedToolToInventory.Weight, PartyInfo.Inventory.WeightCapacity);
+        }
+        else
+        {
+            ToolForInventory tool = SellingFrame.ToolList.SelectedObject;
+            ResultCheckCarrying.text = (tool.Quantity - amount).ToString();
+            ResultCheckGold.text = (PartyInfo.Inventory.Gold + tool.DefaultSellPrice * amount).ToString();
+            ResultCheckCarryTracker.Set(PartyInfo.Inventory.CarryWeight - amount * tool.Weight, PartyInfo.Inventory.WeightCapacity);
+        }
     }
 
     public void ConfirmTransaction()
@@ -250,31 +335,51 @@ public class Shop : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameOper
         DoneTransaction = true;
         ConfirmFrame.Deactivate();
         ResultCheckFrame.SetActive(false);
+        TransactionConfirmedFrame.SetActive(true);
         if (isBuying) ConfirmPurchase();
         else ConfirmSell();
-        JustBoughtTimer = Time.unscaledTime + BOUGHT_TIME_BUFFER;
-        TransactionConfirmedFrame.SetActive(true);
-        TransactionConfirmedFrame.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "PURCHASED " + SelectedToolToInventory.Name;
-        TransactionConfirmedFrame.transform.GetChild(1).GetComponent<Image>().sprite = SelectedToolToInventory.GetComponent<SpriteRenderer>().sprite;
+        int gsp = System.Math.Abs(PartyInfo.Inventory.Gold - DisplayedGold) / 60;
+        DisplayedGoldChangeSpeed = gsp < 1 ? 1 : gsp;
+        JustTransactedTimer = Time.unscaledTime + TRANSACTED_TIME_BUFFER;
     }
 
     private void ConfirmPurchase()
     {
         PartyInfo.Inventory.Gold -= ConfirmFrame.Amount * SelectedToolToInventory.DefaultPrice;
-        if (BuyingList.SelectedObject is Item it) PartyInfo.Inventory.AddItem(it, ConfirmFrame.Amount);
-        else if (BuyingList.SelectedObject is Weapon wp) PartyInfo.Inventory.AddWeapon(wp, ConfirmFrame.Amount);
+        if (SelectedToolToInventory is Item it) PartyInfo.Inventory.AddItem(it, ConfirmFrame.Amount);
+        else if (SelectedToolToInventory is Weapon wp) PartyInfo.Inventory.AddWeapon(wp, ConfirmFrame.Amount);
+
+        TransactionConfirmedFrame.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "Purchased " + SelectedToolToInventory.Name;
+        TransactionConfirmedFrame.transform.GetChild(1).GetComponent<Image>().sprite = SelectedToolToInventory.GetComponent<SpriteRenderer>().sprite;
+        UpdateCarryingAmount();
     }
 
     private void ConfirmSell()
     {
-        PartyInfo.Inventory.Gold += ConfirmFrame.Amount * SelectedToolToInventory.DefaultPrice;
-        if (BuyingList.SelectedObject is Item it) PartyInfo.Inventory.RemoveItem(it, ConfirmFrame.Amount);
-        else if (BuyingList.SelectedObject is Weapon wp) PartyInfo.Inventory.RemoveWeapon(wp, ConfirmFrame.Amount);
+        ToolForInventory tool = SellingFrame.ToolList.SelectedObject;
+        
+        PartyInfo.Inventory.Gold += ConfirmFrame.Amount * tool.DefaultSellPrice;
+        if (tool is Item it) PartyInfo.Inventory.RemoveItem(it, ConfirmFrame.Amount);
+        else if (tool is Weapon wp) PartyInfo.Inventory.RemoveWeapon(wp, ConfirmFrame.Amount);
+
+        TransactionConfirmedFrame.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "Sold " + tool.Name;
+        TransactionConfirmedFrame.transform.GetChild(1).GetComponent<Image>().sprite = tool.GetComponent<SpriteRenderer>().sprite;
+        SellingFrame.Refresh();
+        SellingFrame.ListBlocker.SetActive(true);
     }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// -- Buying menu only - Equipment management --
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     private void SetupEquipConfirmation()
     {
         EquipNowConfirmation.SetActive(true);
         EventSystem.current.SetSelectedGameObject(EquipNowConfirmation.transform.GetChild(1).gameObject);
+    }
+
+    public void SetupSelectEquipsList()
+    {
+        SelectEquipsFrame.Activate();
     }
 }

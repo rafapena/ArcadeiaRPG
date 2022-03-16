@@ -47,4 +47,13 @@ public class MenuMaster : MonoBehaviour
         button.transform.GetChild(0).GetComponent<TextMeshProUGUI>().color = c;
         if (button.transform.childCount > 1) button.transform.GetChild(1).GetComponent<Image>().color = c;
     }
+
+    public static void EnableSelection(ref GameObject button)
+    {
+        Color c = Color.white;
+        c.a = 1f;
+        button.GetComponent<Button>().interactable = true;
+        button.transform.GetChild(0).GetComponent<TextMeshProUGUI>().color = c;
+        if (button.transform.childCount > 1) button.transform.GetChild(1).GetComponent<Image>().color = c;
+    }
 }
