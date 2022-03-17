@@ -136,11 +136,10 @@ public class SceneMaster : MonoBehaviour
         Time.timeScale = 0;
     }
 
-    public static void CloseShop(bool doneTransaction, PlayerParty playerParty, Shopkeeper shop)
+    public static void CloseShop(PlayerParty playerParty)
     {
         MenuMaster.SetupSelectionBufferInGameplay(0.5f);
         GameplayMaster.Party = playerParty;
-        GameplayMaster.Shop = shop;
         SceneManager.UnloadSceneAsync(SHOP_SCENE);
         InShopMenu = 0;
         if (!InMenu) Time.timeScale = 1;

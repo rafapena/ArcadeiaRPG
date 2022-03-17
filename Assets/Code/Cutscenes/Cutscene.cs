@@ -10,8 +10,12 @@ public class Cutscene : MonoBehaviour
     public DialogueBubble[] Dialogue;
     private int CurrentBubble;
     public UnityEvent OnComplete;
+    public Cutscene JumpToCutscene;
+
     private bool CurrentlyRunning;
     private bool InteractionBuffer;
+
+    private bool EndingCutscene => CurrentBubble < 0 || CurrentBubble >= Dialogue.Length;
 
     // Start is called before the first frame update
     void Start()
@@ -22,37 +26,42 @@ public class Cutscene : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (!Manager.ChoicesFrame.activeSelf && CurrentlyRunning && InputMaster.Interact)
+        if (Manager == null) return;
+        else if (!Manager.ChoicesFrame.activeSelf && CurrentlyRunning && InputMaster.Interact) CutsceneInteraction();
+        else if (Manager.ChoicesFrame.activeSelf) ManageChoicesFrame();
+    }
+
+    private void CutsceneInteraction()
+    {
+        if (InteractionBuffer)
         {
-            if (InteractionBuffer)
-            {
-                InteractionBuffer = false;
-                return;
-            }
-            DialogueBubble db = Dialogue[CurrentBubble];
-            if (Manager.CurrentlyPrinting())
-            {
-                Manager.ForceStop();
-            }
-            else if (db.HasChoices)
-            {
-                Manager.ForceStop();
-                db.SetupChoices(Manager);
-                Manager.ChoicesFrame.SetActive(true);
-            }
-            else NextPage();
+            InteractionBuffer = false;
+            return;
         }
-        else if (Manager.ChoicesFrame.activeSelf)
+        DialogueBubble db = Dialogue[CurrentBubble];
+        if (Manager.CurrentlyPrinting())
         {
-            DialogueBubble db = Dialogue[CurrentBubble];
-            string[] choices = { "W", "A", "S", "D" };
-            for (int i = 0; i < db.Choices.Length; i++)
-            {
-                if (Input.inputString.ToUpper() != choices[i]) continue;
-                SelectChoice(db.Choices[i]);
-                Manager.ChoicesFrame.SetActive(false);
-                break;
-            }
+            Manager.ForceStop();
+        }
+        else if (db.HasChoices)
+        {
+            Manager.ForceStop();
+            db.SetupChoices(Manager);
+            Manager.ChoicesFrame.SetActive(true);
+        }
+        else NextPage();
+    }
+
+    private void ManageChoicesFrame()
+    {
+        DialogueBubble db = Dialogue[CurrentBubble];
+        string[] choices = { "W", "A", "S", "D" };
+        for (int i = 0; i < db.Choices.Length; i++)
+        {
+            if (Input.inputString.ToUpper() != choices[i]) continue;
+            SelectChoice(db.Choices[i]);
+            Manager.ChoicesFrame.SetActive(false);
+            break;
         }
     }
 
@@ -61,37 +70,53 @@ public class Cutscene : MonoBehaviour
         Manager.Open();
         CurrentlyRunning = true;
         CurrentBubble = 0;
-        Dialogue[CurrentBubble].Display(Manager);
+        RefreshDialogue();
         InteractionBuffer = hadToInteract;
+    }
+
+    public void Open(CutsceneManager manager, bool hadToInteract = true)
+    {
+        Manager = manager;
+        Open(hadToInteract);
     }
 
     private void NextPage()
     {
-        JumpTo(Dialogue[CurrentBubble].JumpTo);
+        if (Dialogue[CurrentBubble].Jump == 0) Complete();
+        else Jump(Dialogue[CurrentBubble].Jump);
     }
 
     private void SelectChoice(DialogueChoice dc)
     {
-        JumpTo(dc.JumpTo);
-        dc.OnComplete?.Invoke();
+        dc.OnDecide?.Invoke();
+        if (dc.Jump == 0) Complete();
+        else Jump(dc.Jump);
     }
 
-    private void JumpTo(int jumpTo)
+    public void ForceJump(int jumpTo)
     {
-        CurrentBubble = (jumpTo >= 0) ? jumpTo : (CurrentBubble + 1);
-        if (CurrentBubble < Dialogue.Length)
-        {
-            Dialogue[CurrentBubble].Display(Manager);
-            Dialogue[CurrentBubble].OnComplete?.Invoke();
-        }
-        else Complete();
+        Jump(jumpTo);
+    }
+
+    private void Jump(int jump)
+    {
+        CurrentBubble += jump;
+        if (EndingCutscene) Complete();
+        else RefreshDialogue();
+    }
+
+    private void RefreshDialogue()
+    {
+        Dialogue[CurrentBubble].Display(Manager);
+        Dialogue[CurrentBubble].OnDisplay?.Invoke();
     }
 
     public void Complete()
     {
         OnComplete?.Invoke();
-        Manager.Close();
         CurrentlyRunning = false;
         CurrentBubble = 0;
+        if (JumpToCutscene != null) JumpToCutscene.Open(Manager, false);
+        else Manager.Close();
     }
 }

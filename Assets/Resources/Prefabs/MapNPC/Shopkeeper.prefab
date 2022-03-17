@@ -18,6 +18,10 @@ GameObject:
   - component: {fileID: 3050327594407396052}
   - component: {fileID: 3050327594407396055}
   - component: {fileID: 3050327594407396056}
+  - component: {fileID: 2192071810154038749}
+  - component: {fileID: 7245094968654762920}
+  - component: {fileID: 7189716080402013236}
+  - component: {fileID: 6729790079870671736}
   m_Layer: 0
   m_Name: Shopkeeper
   m_TagString: NPC
@@ -154,14 +158,15 @@ MonoBehaviour:
   CloseToPlayer: 0
   Interacting: 0
   Customer: {fileID: 0}
+  Image: {fileID: -8859260594094452424, guid: 00ccb3c494b812a468007d483a535d84, type: 3}
   ToolsInStock:
   - {fileID: 7230775191068158404, guid: 77df0195c5c99154580a874268a423bc, type: 3}
   - {fileID: 1623505104987198706, guid: db3b6b36abc81214a8b4f9956b5e567c, type: 3}
   - {fileID: 7230775191068158404, guid: db8c71b6c4218214086cf5982e9e2adb, type: 3}
   - {fileID: 4959000729214192542, guid: f43fc6a9a0487964283e05224babca5a, type: 3}
   - {fileID: 3552097900181454016, guid: ffa9f6fe244c85248a1bb202285c251d, type: 3}
-  TransactionMessage: Thank you 4 da bizness
-  OnlyBrowsedMessage: don jus brows u scrub
+  TransactionAddedJump: 0
+  OnlyBrowseAddedJump: 1
 --- !u!114 &2351462708553522979
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -178,6 +183,9 @@ MonoBehaviour:
   Dialogue:
   - {fileID: 3050327594407396051}
   - {fileID: 3050327594407396052}
+  - {fileID: 7245094968654762920}
+  - {fileID: 7189716080402013236}
+  - {fileID: 6729790079870671736}
   OnComplete:
     m_PersistentCalls:
       m_Calls: []
@@ -194,19 +202,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Text: Hi welcome to shop!!1!1!!
-  JumpTo: -1
-  LeftCharacter1: {fileID: -5534663259523322264, guid: 00ccb3c494b812a468007d483a535d84,
-    type: 3}
-  RightCharacter1: {fileID: 8335394971774786020, guid: 00ccb3c494b812a468007d483a535d84,
-    type: 3}
+  Jump: 1
+  LeftCharacter1: {fileID: 0}
+  RightCharacter1: {fileID: 0}
   LeftCharacter2: {fileID: 0}
   RightCharacter2: {fileID: 0}
   Name: Shopkeeper
   TalkingCharacter: 2
-  OnComplete:
+  Choices: []
+  OnDisplay:
     m_PersistentCalls:
       m_Calls: []
-  Choices: []
 --- !u!114 &3050327594407396052
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -220,21 +226,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Text: buy ore sell?????
-  JumpTo: -1
-  LeftCharacter1: {fileID: -5534663259523322264, guid: 00ccb3c494b812a468007d483a535d84,
-    type: 3}
+  Jump: 1
+  LeftCharacter1: {fileID: 0}
   RightCharacter1: {fileID: 0}
-  LeftCharacter2: {fileID: -6425729358132411953, guid: 00ccb3c494b812a468007d483a535d84,
-    type: 3}
+  LeftCharacter2: {fileID: 0}
   RightCharacter2: {fileID: 0}
-  Name: Jimmy James 2
-  TalkingCharacter: 1
-  OnComplete:
-    m_PersistentCalls:
-      m_Calls: []
+  Name: Shopkeeper
+  TalkingCharacter: 2
   Choices:
   - {fileID: 3050327594407396055}
   - {fileID: 3050327594407396056}
+  - {fileID: 2192071810154038749}
+  OnDisplay:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &3050327594407396055
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -248,7 +253,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Text: Buy
-  OnComplete:
+  Jump: 1
+  OnDecide:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 6481891294359204547}
@@ -262,7 +268,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
-  JumpTo: 1
 --- !u!114 &3050327594407396056
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -276,7 +281,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Text: Sell
-  OnComplete:
+  Jump: 1
+  OnDecide:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 6481891294359204547}
@@ -290,4 +296,92 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  JumpTo: 0
+--- !u!114 &2192071810154038749
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7231162840115527204}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90209c6a39bc52b48ad3ef95ec0e109b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Text: Leave
+  Jump: 3
+  OnDecide:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &7245094968654762920
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7231162840115527204}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8bfe9d831d760ee42bf47eabfdb639d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Text: ty for da bizniss
+  Jump: 0
+  LeftCharacter1: {fileID: 0}
+  RightCharacter1: {fileID: 0}
+  LeftCharacter2: {fileID: 0}
+  RightCharacter2: {fileID: 0}
+  Name: Shopkeeper
+  TalkingCharacter: 2
+  Choices: []
+  OnDisplay:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &7189716080402013236
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7231162840115527204}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8bfe9d831d760ee42bf47eabfdb639d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Text: don jus brows u scrub
+  Jump: 0
+  LeftCharacter1: {fileID: 0}
+  RightCharacter1: {fileID: 0}
+  LeftCharacter2: {fileID: 0}
+  RightCharacter2: {fileID: 0}
+  Name: Shopkeeper
+  TalkingCharacter: 2
+  Choices: []
+  OnDisplay:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &6729790079870671736
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7231162840115527204}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8bfe9d831d760ee42bf47eabfdb639d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Text: lmao u suk
+  Jump: 0
+  LeftCharacter1: {fileID: 0}
+  RightCharacter1: {fileID: 0}
+  LeftCharacter2: {fileID: 0}
+  RightCharacter2: {fileID: 0}
+  Name: Shopkeeper
+  TalkingCharacter: 2
+  Choices: []
+  OnDisplay:
+    m_PersistentCalls:
+      m_Calls: []

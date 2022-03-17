@@ -11,10 +11,18 @@ public class PlayerInteractionField : MonoBehaviour
     private void Update()
     {
         if (!InputMaster.Interact) return;
-        foreach (ItemBox b in ItemsBoxesFound)
-            if (b.CloseToPlayer) b.Open(Avatar);
+        foreach (ItemBox b in ItemsBoxesFound.FindAll(x => !x.IsOpened))
+        {
+            if (!b.CloseToPlayer) continue;
+            b.Open(Avatar);
+            return;
+        }
         foreach (MapNPC n in NPCsFound)
-            if (n.CloseToPlayer) n.InteractWith(Avatar);
+        {
+            if (!n.CloseToPlayer) continue;
+            n.InteractWith(Avatar);
+            return;
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D collision)

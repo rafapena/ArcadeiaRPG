@@ -15,6 +15,8 @@ public class ItemBox : MonoBehaviour
     private float UIPopupTimer;
     public float UIPopupTimeLimit;
 
+    public bool IsOpened => Opened;
+
     private void Start()
     {
         UIPopup.SetActive(false);

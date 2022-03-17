@@ -7,6 +7,6 @@ using UnityEngine.Events;
 public class DialogueChoice : MonoBehaviour
 {
     public string Text;
-    public UnityEvent OnComplete;
-    public int JumpTo;
+    public int Jump;
+    public UnityEvent OnDecide;
 }

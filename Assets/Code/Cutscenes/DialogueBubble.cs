@@ -11,8 +11,8 @@ public class DialogueBubble : MonoBehaviour
 {
     [TextArea] public string Text;
 
-    [Tooltip("Jump to dialogue bubble in cutscene\nIf value is -1 => Next bubble in the sequence\nIf value is > # of dialogue bubbles => End cutscene")]
-    public int JumpTo = -1;
+    [Tooltip("Skip dialogue bubbles in cutscene\nIf value is 0 => Immediately end cutscene")]
+    public int Jump = 1;
 
     public enum DialogueCharacter { None, Left1, Right1, Left2, Right2 }
 
@@ -24,8 +24,8 @@ public class DialogueBubble : MonoBehaviour
     public string Name;
     public DialogueCharacter TalkingCharacter;
 
-    public UnityEvent OnComplete;
     public DialogueChoice[] Choices;
+    public UnityEvent OnDisplay;
 
     public bool HasChoices => Choices.Length >= 2;
 

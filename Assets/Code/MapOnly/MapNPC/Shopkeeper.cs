@@ -5,9 +5,10 @@ using UnityEngine.SceneManagement;
 public class Shopkeeper : MapNPC
 {
     public PlayerParty Customer;
+    public Sprite Image;
     public List<ToolForInventory> ToolsInStock;
-    [TextArea] public string TransactionMessage;
-    [TextArea] public string OnlyBrowsedMessage;
+    public int TransactionAddedJump;
+    public int OnlyBrowseAddedJump;
 
     protected override void Awake()
     {
@@ -36,6 +37,6 @@ public class Shopkeeper : MapNPC
 
     public void CloseShop(bool doneTransaction)
     {
-        //
+        Cutscene.ForceJump(doneTransaction ? TransactionAddedJump : OnlyBrowseAddedJump);
     }
 }

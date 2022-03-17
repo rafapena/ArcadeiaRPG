@@ -129,7 +129,8 @@ public class Shop : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameOper
     private void CloseShop()
     {
         Selection = Selections.None;
-        SceneMaster.CloseShop(DoneTransaction, PartyInfo, Shopkeep);
+        Shopkeep.CloseShop(DoneTransaction);
+        SceneMaster.CloseShop(PartyInfo);
     }
 
     public void ReturnToSelection()
@@ -146,6 +147,7 @@ public class Shop : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameOper
 
     public void Initialize()
     {
+        Selection = Selections.Browsing;
         if (isBuying)
         {
             BuyingList.Refresh(Shopkeep.ToolsInStock);
@@ -153,9 +155,10 @@ public class Shop : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameOper
         }
         else SellingFrame.SelectingToolList();
 
-        Selection = Selections.Browsing;
         BuyingListBlock.gameObject.SetActive(false);
-        CharacterEquipCheckFrame.SetActive(false);
+        if (!(BuyingList.SelectedObject is Weapon))
+            CharacterEquipCheckFrame.SetActive(false);
+
         ConfirmFrame.gameObject.SetActive(false);
         ResultCheckFrame.SetActive(false);
         TransactionConfirmedFrame.SetActive(false);
@@ -281,6 +284,7 @@ public class Shop : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameOper
         SetupSelectToolToInventory();
         ConfirmFrame.Activate(1, PartyInfo.Inventory.Gold / SelectedToolToInventory.DefaultPrice);
         ConfirmText.text = "How many will you purchase?";
+        CharacterEquipCheckFrame.SetActive(false);
         UpdateResultChecker(ConfirmFrame.Amount);
     }
 
