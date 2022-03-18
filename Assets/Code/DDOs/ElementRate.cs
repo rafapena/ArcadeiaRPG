@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 
-public class ElementRate : MonoBehaviour
+[System.Serializable]
+public struct ElementRate
 {
     public BattleMaster.Elements Element;
     public int Rate;

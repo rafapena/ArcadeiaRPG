@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 1157716223317125595}
   - component: {fileID: 1791329435643984854}
-  - component: {fileID: -8743054890975507295}
   m_Layer: 0
   m_Name: Veteran
   m_TagString: Untagged
@@ -47,35 +46,21 @@ MonoBehaviour:
   Id: 1
   Name: Veteran
   Description: Balanced class who can utilize both physical and magaical weapons.
-  BaseStats: {fileID: -8743054890975507295}
+  BaseStats:
+    MaxHP: 70
+    Atk: 65
+    Def: 60
+    Map: 65
+    Mar: 60
+    Spd: 60
+    Tec: 60
+    Luk: 60
+    Acc: 100
+    Eva: 100
+    Crt: 100
+    Cev: 100
   UpgradedClass1: {fileID: 0}
   UpgradedClass2: {fileID: 0}
   UsableWeapon1Type: 1
   UsableWeapon2Type: 3
-  SoloSkillSet:
-  - {fileID: 4510640406153721997, guid: 9026f12c84400864f8e02f88fd4730e6, type: 3}
-  - {fileID: 7319605355004161415, guid: 67ef8c8e7715e294281e1e368b7eb879, type: 3}
---- !u!114 &-8743054890975507295
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4808169265435286164}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 266aef9b79cbf74438f340fe01139120, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  MaxHP: 60
-  Atk: 60
-  Def: 60
-  Map: 60
-  Mar: 60
-  Spd: 60
-  Tec: 60
-  Luk: 60
-  Acc: 100
-  Eva: 100
-  Crt: 100
-  Cev: 100
+  SkillSet: []

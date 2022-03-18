@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 
-public class StateRate : MonoBehaviour
+[System.Serializable]
+public struct StateRate
 {
     public State State;
     public int Rate;

@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 
-public abstract class PassiveEffect : BaseObject
+[System.Serializable]
+public struct PassiveEffect
 {
     public enum TurnSequence { ActionEnd, TurnEnd }
 
@@ -15,14 +16,12 @@ public abstract class PassiveEffect : BaseObject
     public int RemoveByHitChance;
     public int CounterRate;
     public int ReflectRate;
-    public int PhysicalDamageRate = 100;
-    public int MagicalDamageRate = 100;
+    public int PhysicalDamageRate;
+    public int MagicalDamageRate;
     public int ExtraTurns;
     public BattleMaster.ToolTypes[] DisabledToolTypes;
     public ElementRate[] ChangedElementRates;
     public StateRate[] ChangedStateRates;
 
     [HideInInspector] public int TurnsLeft;
-    private int[] ElementRates;
-    private int[] StateRates;
 }

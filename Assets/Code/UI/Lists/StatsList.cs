@@ -55,7 +55,7 @@ public class StatsList : MonoBehaviour
         int[] stats = new int[NUMBER_OF_STATS];
         foreach (PlayerRelation pr in player.Relations)
         {
-            if (pr == null || !pr.Player.NaturalStats) continue;
+            if (pr == null) continue;
             stats[0] += GetStatBoost(pr, pr.Player.NaturalStats.Atk);
             stats[1] += GetStatBoost(pr, pr.Player.NaturalStats.Def);
             stats[2] += GetStatBoost(pr, pr.Player.NaturalStats.Map);

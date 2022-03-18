@@ -17,25 +17,22 @@ public abstract class BattlerAI : Battler
             switch (ait.Move.GetType().Name)
             {
                 case "Weapon": Weapons.Add(ait.Move as Weapon); break;
-                case "SoloSkill": SoloSkills.Add(ait.Move as SoloSkill); break;
-                case "TeamSkill": TeamSkills.Add(ait.Move as TeamSkill); break;
-                case "Item": Items.Add(ait.Move as Item); break;
+                case "Skill": Skills.Add(ait.Move as Skill); break;
             }
         }
     }
 
     public override void StatConversion()
     {
-        Stats = gameObject.AddComponent<Stats>();
         if (Class) Stats.SetTo(Class.BaseStats);
         Stats.ConvertFromBaseToActual(Level);
         HP = Stats.MaxHP;
         SP = 100;
     }
 
-    protected override SoloSkill GetDefaultSoloSkill()
+    protected override Skill GetDefaultSkill()
     {
-        return SoloSkills[0];   // Always assume that AI has at least one Solo Skill
+        return Skills[0];   // Always assume that AI has at least one Solo Skill
     }
 
     public void MakeDecision(List<Battler> usersPartyMembers, List<Battler> opponentPartyMembers)
@@ -47,8 +44,7 @@ public abstract class BattlerAI : Battler
         if (t == null) return;
         switch (t.GetType().Name)
         {
-            case "SoloSkill": SelectedSoloSkill = t as SoloSkill; break;
-            case "TeamSkill": SelectedTeamSkill = t as TeamSkill; break;
+            case "Skill": SelectedSkill = t as Skill; break;
             case "Item": SelectedItem = t as Item; break;
         }
         SelectedTeamSkillPartners = SelectTeammates(usersPartyMembers, opponentPartyMembers);

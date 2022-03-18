@@ -18,7 +18,7 @@ public class MMSpecial : MM_Super
     public PlayerSelectionList PartyTargetsList;
     private ListSelectable SelectedSkillButton;
     private int SelectedSkillIndex;
-    private SoloSkill SelectedSkill;
+    private Skill SelectedSkill;
 
     // Child GameObjects
     public GameObject SkillInfo;
@@ -27,8 +27,7 @@ public class MMSpecial : MM_Super
     public TextMeshProUGUI NameLabel;
     public TextMeshProUGUI SoloLabel;
     public TextMeshProUGUI TeamLabel;
-    public GridLayoutGroup SoloSkillsList;
-    public GridLayoutGroup TeamSkillsList;
+    public GridLayoutGroup SkillsList;
     public GameObject CannotUseFrame;
     public TextMeshProUGUI CannotUseMessage;
     public GameObject PartyTargetFrame;
@@ -132,10 +131,10 @@ public class MMSpecial : MM_Super
         PartyUserList.UnhighlightAll();
         PartyUserList.SelectedButton.KeepSelected();
         SetupSkillList(PartyUserList.SelectedObject as BattlePlayer);
-        bool hasAnySkill = PartyUserList.SelectedObject.SoloSkills.Count > 0 || PartyUserList.SelectedObject.TeamSkills.Count > 0;
+        bool hasAnySkill = PartyUserList.SelectedObject.Skills.Count > 0;
         SkillInfo.SetActive(hasAnySkill);
         CannotUseFrame.SetActive(false);
-        if (hasAnySkill) EventSystem.current.SetSelectedGameObject(SoloSkillsList.transform.GetChild(0).gameObject);
+        if (hasAnySkill) EventSystem.current.SetSelectedGameObject(SkillsList.transform.GetChild(0).gameObject);
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -144,22 +143,18 @@ public class MMSpecial : MM_Super
 
     private void SetupSkillList(BattlePlayer p)
     {
-        bool hasSoloSkills = p.SoloSkills.Count > 0;
-        bool hasTeamSkills = p.TeamSkills.Count > 0;
-        bool hasAnySkills = hasSoloSkills || hasTeamSkills;
+        bool hasSkills = p.Skills.Count > 0;
+        bool hasAnySkills = hasSkills;
         if (!hasAnySkills) NoSkillsLabel.text = p.Name.ToUpper() + " DOES NOT HAVE ANY SKILLS YET";
 
         NameLabel.text = p.Name.ToUpper();
         NoSkillsLabel.gameObject.SetActive(!hasAnySkills);
-        SoloLabel.gameObject.SetActive(hasSoloSkills);
-        TeamLabel.gameObject.SetActive(hasTeamSkills);
-        SoloSkillsList.gameObject.SetActive(hasSoloSkills);
-        TeamSkillsList.gameObject.SetActive(hasTeamSkills);
-        if (hasSoloSkills) SetupOneSkillList(SoloSkillsList, p.SoloSkills);
-        if (hasTeamSkills) SetupOneSkillList(TeamSkillsList, p.TeamSkills);
+        SoloLabel.gameObject.SetActive(hasSkills);
+        SkillsList.gameObject.SetActive(hasSkills);
+        if (hasSkills) SetupSkillList(SkillsList, p.Skills);
     }
 
-    private void SetupOneSkillList<T>(GridLayoutGroup skillsListGUI, List<T> skillsListData) where T : SoloSkill
+    private void SetupSkillList<T>(GridLayoutGroup skillsListGUI, List<T> skillsListData) where T : Skill
     {
         int i = 0;
         for (; i < skillsListData.Count; i++)
@@ -172,17 +167,12 @@ public class MMSpecial : MM_Super
         for (; i < skillsListGUI.transform.childCount; i++) skillsListGUI.transform.GetChild(i).gameObject.SetActive(false);
     }
 
-    public void SetupSoloSkill()
+    public void SetupSkill()
     {
-        SetupSkill(PartyUserList.SelectedObject.SoloSkills);
+        SetupSkill(PartyUserList.SelectedObject.Skills);
     }
 
-    public void SetupTeamSkill()
-    {
-        SetupSkill(PartyUserList.SelectedObject.TeamSkills);
-    }
-
-    private void SetupSkill<T>(List<T> skillsList) where T : SoloSkill
+    private void SetupSkill<T>(List<T> skillsList) where T : Skill
     {
         if (Selection != Selections.SelectSkill) return;
         ListSelectable btn = EventSystem.current.currentSelectedGameObject.GetComponent<ListSelectable>();    

@@ -27,14 +27,10 @@ public class ResourcesMaster : MonoBehaviour
     public static Item[] Items { get; private set; }
     
     public static Objective[] Objectives { get; private set; }
-
-    public static PassiveSkill[] PassiveSkills { get; private set; }
     
-    public static SoloSkill[] SoloSkills { get; private set; }
+    public static Skill[] Skills { get; private set; }
     
     public static State[] States { get; private set; }
-    
-    public static TeamSkill[] TeamSkills { get; private set; }
     
     public static Weapon[] Weapons { get; private set; }
 
@@ -63,13 +59,11 @@ public class ResourcesMaster : MonoBehaviour
         Classes = SortById(Resources.LoadAll<BattlerClass>("Prefabs/BattlerClasses"));
         Enemies = SortById(Resources.LoadAll<BattleEnemy>("Prefabs/BattleEnemies"));
         EnemyParties = SortById(Resources.LoadAll<EnemyParty>("Prefabs/EnemyParties"));
-        Environments = SortById(Resources.LoadAll<Environment>("Prefabs/Environments"));
+        //Environments = SortById(Resources.LoadAll<Environment>("Prefabs/Environments"));
         Items = SortById(Resources.LoadAll<Item>("Prefabs/Items"));
         Objectives = SortById(Resources.LoadAll<Objective>("Prefabs/Objectives"));
-        PassiveSkills = SortById(Resources.LoadAll<PassiveSkill>("Prefabs/PassiveSkills"));
-        SoloSkills = SortById(Resources.LoadAll<SoloSkill>("Prefabs/SoloSkills"));
+        Skills = SortById(Resources.LoadAll<Skill>("Prefabs/Skills"));
         States = SortById(Resources.LoadAll<State>("Prefabs/States"));
-        TeamSkills = SortById(Resources.LoadAll<TeamSkill>("Prefabs/TeamSkills"));
         Weapons = SortById(Resources.LoadAll<Weapon>("Prefabs/Weapons"));
     }
 

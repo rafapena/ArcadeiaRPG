@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 3957778834778998836}
   - component: {fileID: 7961651032974854018}
-  - component: {fileID: 7015841975370810414}
   m_Layer: 0
   m_Name: Challenger
   m_TagString: Untagged
@@ -47,33 +46,21 @@ MonoBehaviour:
   Id: 2
   Name: Challenger
   Description: Hard-hitter with low speed and tech
-  BaseStats: {fileID: 7015841975370810414}
+  BaseStats:
+    MaxHP: 55
+    Atk: 50
+    Def: 35
+    Map: 15
+    Mar: 10
+    Spd: 20
+    Tec: 10
+    Luk: 20
+    Acc: 100
+    Eva: 100
+    Crt: 100
+    Cev: 100
   UpgradedClass1: {fileID: 0}
   UpgradedClass2: {fileID: 0}
   UsableWeapon1Type: 2
   UsableWeapon2Type: 0
-  SoloSkillSet: []
---- !u!114 &7015841975370810414
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6768939212969032023}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 266aef9b79cbf74438f340fe01139120, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  MaxHP: 55
-  Atk: 50
-  Def: 30
-  Map: 15
-  Mar: 10
-  Spd: 10
-  Tec: 20
-  Luk: 20
-  Acc: 100
-  Eva: 100
-  Crt: 100
-  Cev: 100
+  SkillSet: []

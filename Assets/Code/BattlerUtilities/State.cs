@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 
-public class State : PassiveEffect
+public class State : BaseObject
 {
+    public PassiveEffect Effect;
     public bool KeepAfterBattle;
     public int MaxStack = 1;
     public int ContactSpreadRate;

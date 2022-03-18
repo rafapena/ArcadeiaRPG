@@ -15,8 +15,8 @@ public class BattlePlayer : Battler
     public List<SkillLearnLevel> SkillSet;
     public PreExistingRelation[] PreExistingRelations;
 
-    [HideInInspector] public SoloSkill AttackSkill;
-    [HideInInspector] public List<SoloSkill> MapUsableSkills;
+    [HideInInspector] public Skill AttackSkill;
+    [HideInInspector] public List<Skill> MapUsableSkills;
     [HideInInspector] public List<PlayerRelation> Relations;
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -26,7 +26,7 @@ public class BattlePlayer : Battler
     protected new void Awake()
     {
         base.Awake();
-        AttackSkill = Resources.Load<SoloSkill>("Prefabs/SoloSkills/Attack");
+        AttackSkill = Resources.Load<Skill>("Prefabs/Skills/Attack");
     }
 
     protected override void Start()
@@ -34,9 +34,9 @@ public class BattlePlayer : Battler
         base.Start();
     }
     
-    protected override SoloSkill GetDefaultSoloSkill()
+    protected override Skill GetDefaultSkill()
     {
-        SoloSkill sk = AttackSkill;
+        Skill sk = AttackSkill;
         sk.ConvertToWeaponSettings(SelectedWeapon);
         return sk;
     }
@@ -49,7 +49,6 @@ public class BattlePlayer : Battler
 
     public override void StatConversion()
     {
-        Stats = gameObject.AddComponent<Stats>();
         Stats.SetTo(Class.BaseStats);
         Stats.ConvertFromBaseToActual(Level, NaturalStats);
         HP = Stats.MaxHP;
@@ -58,13 +57,9 @@ public class BattlePlayer : Battler
 
     public void AddLearnedSkills()
     {
-        foreach (SkillLearnLevel sll in SkillSet)
+        for (int i = 0; i < Class.SkillSet.Count; i++)
         {
-            if (Level >= sll.LearnLevel) TeamSkills.Add(sll.Skill);
-        }
-        for (int i = 0; i < Class.SoloSkillSet.Count; i++)
-        {
-            if (Level >= (i + 1) * 5) SoloSkills.Add(Class.SoloSkillSet[i]);
+            if (Level >= (i + 1) * 5) Skills.Add(Class.SkillSet[i]);
         }
     }
 

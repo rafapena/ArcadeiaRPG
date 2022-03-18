@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 
-public class ItemDropRate : MonoBehaviour
+[System.Serializable]
+public struct ItemDropRate
 {
     public ToolForInventory ItemDropped;
     public float Rate;

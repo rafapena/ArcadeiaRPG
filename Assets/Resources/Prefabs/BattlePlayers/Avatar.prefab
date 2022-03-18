@@ -918,14 +918,6 @@ GameObject:
   - component: {fileID: 8564797191916981559}
   - component: {fileID: 5525814732168231389}
   - component: {fileID: 4298201553111633178}
-  - component: {fileID: -1661851768111992753}
-  - component: {fileID: 420698567687869480}
-  - component: {fileID: 972542898174788101}
-  - component: {fileID: 659829131407068566}
-  - component: {fileID: 9150242368358636562}
-  - component: {fileID: 2389618117010732945}
-  - component: {fileID: -558388285361851283}
-  - component: {fileID: -4338337135201812738}
   m_Layer: 9
   m_Name: Avatar
   m_TagString: Untagged
@@ -1045,16 +1037,38 @@ MonoBehaviour:
   Class: {fileID: 1791329435643984854, guid: 0c755c9bf65f36a4daba5c184e8a7aaa, type: 3}
   HP: 0
   SP: 0
-  Stats: {fileID: 0}
-  StatBoosts: {fileID: 0}
-  SoloSkills: []
-  TeamSkills: []
+  Stats:
+    MaxHP: 0
+    Atk: 0
+    Def: 0
+    Map: 0
+    Mar: 0
+    Spd: 0
+    Tec: 0
+    Luk: 0
+    Acc: 0
+    Eva: 0
+    Crt: 0
+    Cev: 0
+  StatBoosts:
+    MaxHP: 0
+    Atk: 0
+    Def: 0
+    Map: 0
+    Mar: 0
+    Spd: 0
+    Tec: 0
+    Luk: 0
+    Acc: 0
+    Eva: 0
+    Crt: 0
+    Cev: 0
+  Skills: []
   Weapons:
   - {fileID: 3552097900181454016, guid: ffa9f6fe244c85248a1bb202285c251d, type: 3}
   Items: []
   PassiveSkills: []
-  SelectedSoloSkill: {fileID: 0}
-  SelectedTeamSkill: {fileID: 0}
+  SelectedSkill: {fileID: 0}
   SelectedWeapon: {fileID: 0}
   SelectedItem: {fileID: 0}
   SelectedTeamSkillPartners: []
@@ -1065,14 +1079,26 @@ MonoBehaviour:
   HitWeakness: 0
   HitResistant: 0
   ChangedElementRates:
-  - {fileID: 972542898174788101}
-  - {fileID: 659829131407068566}
-  ChangedStateRates:
-  - {fileID: 9150242368358636562}
-  - {fileID: 2389618117010732945}
+  - Element: 1
+    Rate: 80
+  - Element: 2
+    Rate: 120
+  ChangedStateRates: []
   ComboDifficulty: 100
   Flying: 0
-  StatModifiers: {fileID: 0}
+  StatModifiers:
+    MaxHP: 0
+    Atk: 0
+    Def: 0
+    Map: 0
+    Mar: 0
+    Spd: 0
+    Tec: 0
+    Luk: 0
+    Acc: 0
+    Eva: 0
+    Crt: 0
+    Cev: 0
   Unconscious: 0
   Petrified: 0
   CannotMove: 0
@@ -1089,7 +1115,19 @@ MonoBehaviour:
   SPToConsumeThisTurn: 0
   IsCharging: 0
   FaceImage: {fileID: 0}
-  NaturalStats: {fileID: -1661851768111992753}
+  NaturalStats:
+    MaxHP: 0
+    Atk: 0
+    Def: 0
+    Map: 0
+    Mar: 0
+    Spd: 0
+    Tec: 0
+    Luk: 0
+    Acc: 0
+    Eva: 0
+    Crt: 0
+    Cev: 0
   Companionship: 100
   SavePartnerRate: 100
   CounterattackRate: 100
@@ -1097,135 +1135,10 @@ MonoBehaviour:
   ClassSet:
   - {fileID: 94577713347072007, guid: aa68b1ce7e43d254d88764b2f4504a91, type: 3}
   - {fileID: 1791329435643984854, guid: 0c755c9bf65f36a4daba5c184e8a7aaa, type: 3}
-  SkillSet:
-  - {fileID: 420698567687869480}
-  PreExistingRelations:
-  - {fileID: -558388285361851283}
-  - {fileID: -4338337135201812738}
+  SkillSet: []
+  PreExistingRelations: []
   AttackSkill: {fileID: 0}
   MapUsableSkills: []
---- !u!114 &-1661851768111992753
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5149667342464974805}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 266aef9b79cbf74438f340fe01139120, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  MaxHP: 0
-  Atk: 0
-  Def: 0
-  Map: 0
-  Mar: 0
-  Spd: 0
-  Tec: 0
-  Luk: 0
-  Acc: 100
-  Eva: 100
-  Crt: 100
-  Cev: 100
---- !u!114 &420698567687869480
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5149667342464974805}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 978a76f5d903a0d439777b590d396dea, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Skill: {fileID: 2134449432004664704, guid: 8dd68cadd7302554498dceb1e20040be, type: 3}
-  LearnLevel: 8
---- !u!114 &972542898174788101
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5149667342464974805}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5cde58e9e82c79141a51066ec6ab92b3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Element: 2
-  Rate: 120
---- !u!114 &659829131407068566
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5149667342464974805}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5cde58e9e82c79141a51066ec6ab92b3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Element: 1
-  Rate: 80
---- !u!114 &9150242368358636562
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5149667342464974805}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ead5a948c0c03ee4db894065160911e4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  State: {fileID: -3619838760116883592, guid: bfb92392437e0f745814f8ea718f2ae8, type: 3}
-  Rate: 20
---- !u!114 &2389618117010732945
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5149667342464974805}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ead5a948c0c03ee4db894065160911e4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  State: {fileID: 3779496790374096947, guid: bd7eb85fa4a761a4d9789a5478bae024, type: 3}
-  Rate: 150
---- !u!114 &-558388285361851283
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5149667342464974805}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f5d2003acd58baf4c823e527c3d6dcd3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Player: {fileID: 7185878704187127010, guid: ae89b416acec17f48b3121ff5475b448, type: 3}
-  Level: 3
---- !u!114 &-4338337135201812738
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5149667342464974805}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f5d2003acd58baf4c823e527c3d6dcd3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Player: {fileID: 2945622617598325490, guid: 6d9f2dda27a03f14990a0bcd0bc6258d, type: 3}
-  Level: 2
 --- !u!1 &5423001180570012798
 GameObject:
   m_ObjectHideFlags: 0

@@ -10,9 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 7945781701977396289}
   - component: {fileID: 3950989288118688759}
-  - component: {fileID: 4176116305698887771}
   m_Layer: 0
-  m_Name: Practitioner
+  m_Name: Nurse
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -47,34 +46,21 @@ MonoBehaviour:
   Id: 3
   Name: Practitioner
   Description: Healer class
-  BaseStats: {fileID: 4176116305698887771}
+  BaseStats:
+    MaxHP: 20
+    Atk: 10
+    Def: 15
+    Map: 35
+    Mar: 50
+    Spd: 30
+    Tec: 25
+    Luk: 45
+    Acc: 100
+    Eva: 100
+    Crt: 100
+    Cev: 100
   UpgradedClass1: {fileID: 0}
   UpgradedClass2: {fileID: 0}
   UsableWeapon1Type: 3
   UsableWeapon2Type: 1
-  SoloSkillSet:
-  - {fileID: 4510640406153721997, guid: 9026f12c84400864f8e02f88fd4730e6, type: 3}
---- !u!114 &4176116305698887771
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 385575519008957730}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 266aef9b79cbf74438f340fe01139120, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  MaxHP: 30
-  Atk: 30
-  Def: 30
-  Map: 25
-  Mar: 25
-  Spd: 30
-  Tec: 30
-  Luk: 30
-  Acc: 100
-  Eva: 100
-  Crt: 100
-  Cev: 100
+  SkillSet: []

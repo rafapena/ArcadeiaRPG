@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 
-public class SummonBattler : MonoBehaviour
+[System.Serializable]
+public struct SummonBattler
 {
     public Battler Summon;
     public int Chance;

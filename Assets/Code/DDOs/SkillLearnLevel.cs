@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 
-public class SkillLearnLevel : MonoBehaviour
+[System.Serializable]
+public struct SkillLearnLevel
 {
-    public TeamSkill Skill;
+    public Skill LearnedSkill;
     public int LearnLevel;
 }

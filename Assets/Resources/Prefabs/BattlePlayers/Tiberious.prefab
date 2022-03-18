@@ -806,7 +806,6 @@ GameObject:
   - component: {fileID: 159440680602297931}
   - component: {fileID: 4054810757008954017}
   - component: {fileID: 5714065535808972390}
-  - component: {fileID: 5549083464378345914}
   m_Layer: 9
   m_Name: Tiberious
   m_TagString: Untagged
@@ -926,16 +925,38 @@ MonoBehaviour:
   Class: {fileID: 7961651032974854018, guid: 610101ab8a46668429ef5349b47a010b, type: 3}
   HP: 0
   SP: 0
-  Stats: {fileID: 0}
-  StatBoosts: {fileID: 0}
-  SoloSkills: []
-  TeamSkills: []
+  Stats:
+    MaxHP: 0
+    Atk: 0
+    Def: 0
+    Map: 0
+    Mar: 0
+    Spd: 0
+    Tec: 0
+    Luk: 0
+    Acc: 0
+    Eva: 0
+    Crt: 0
+    Cev: 0
+  StatBoosts:
+    MaxHP: 0
+    Atk: 0
+    Def: 0
+    Map: 0
+    Mar: 0
+    Spd: 0
+    Tec: 0
+    Luk: 0
+    Acc: 0
+    Eva: 0
+    Crt: 0
+    Cev: 0
+  Skills: []
   Weapons:
   - {fileID: 4959000729214192542, guid: f43fc6a9a0487964283e05224babca5a, type: 3}
   Items: []
   PassiveSkills: []
-  SelectedSoloSkill: {fileID: 0}
-  SelectedTeamSkill: {fileID: 0}
+  SelectedSkill: {fileID: 0}
   SelectedWeapon: {fileID: 0}
   SelectedItem: {fileID: 0}
   SelectedTeamSkillPartners: []
@@ -949,7 +970,19 @@ MonoBehaviour:
   ChangedStateRates: []
   ComboDifficulty: 100
   Flying: 0
-  StatModifiers: {fileID: 0}
+  StatModifiers:
+    MaxHP: 0
+    Atk: 0
+    Def: 0
+    Map: 0
+    Mar: 0
+    Spd: 0
+    Tec: 0
+    Luk: 0
+    Acc: 0
+    Eva: 0
+    Crt: 0
+    Cev: 0
   Unconscious: 0
   Petrified: 0
   CannotMove: 0
@@ -966,7 +999,19 @@ MonoBehaviour:
   SPToConsumeThisTurn: 0
   IsCharging: 0
   FaceImage: {fileID: 0}
-  NaturalStats: {fileID: 5549083464378345914}
+  NaturalStats:
+    MaxHP: 0
+    Atk: 0
+    Def: 0
+    Map: 0
+    Mar: 0
+    Spd: 0
+    Tec: 0
+    Luk: 0
+    Acc: 0
+    Eva: 0
+    Crt: 0
+    Cev: 0
   Companionship: 100
   SavePartnerRate: 100
   CounterattackRate: 100
@@ -974,33 +1019,9 @@ MonoBehaviour:
   ClassSet:
   - {fileID: 7961651032974854018, guid: 610101ab8a46668429ef5349b47a010b, type: 3}
   SkillSet: []
+  PreExistingRelations: []
   AttackSkill: {fileID: 0}
   MapUsableSkills: []
-  Relations: []
---- !u!114 &5549083464378345914
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3719266268860093609}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 266aef9b79cbf74438f340fe01139120, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  MaxHP: 1
-  Atk: 2
-  Def: 1
-  Map: -1
-  Mar: 0
-  Spd: 1
-  Tec: -1
-  Luk: -2
-  Acc: 100
-  Eva: 100
-  Crt: 100
-  Cev: 100
 --- !u!1 &3869878512593645045
 GameObject:
   m_ObjectHideFlags: 0

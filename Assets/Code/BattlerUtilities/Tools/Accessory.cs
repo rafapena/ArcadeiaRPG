@@ -1,7 +1,9 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
-public class PassiveSkill : PassiveEffect
+public class Accessory : ToolForInventory
 {
+    public PassiveEffect Effect;
     public int HPMin;
     public int HPMax = 100;
     public int SPMin;

@@ -27,16 +27,12 @@ public abstract class Battler : BaseObject
     [HideInInspector] public int SP;
     public Stats Stats;
     [HideInInspector] public Stats StatBoosts;
-    [HideInInspector] public List<SoloSkill> SoloSkills;
-    [HideInInspector] public List<TeamSkill> TeamSkills;
+    [HideInInspector] public List<Skill> Skills;
     public List<Weapon> Weapons;
-    public List<Item> Items;
-    public List<PassiveSkill> PassiveSkills;
 
     // Overall battle info
     [HideInInspector] public Tool SelectedToolMove { get; private set; }
-    [HideInInspector] public SoloSkill SelectedSoloSkill;
-    [HideInInspector] public TeamSkill SelectedTeamSkill;
+    [HideInInspector] public Skill SelectedSkill;
     [HideInInspector] public Weapon SelectedWeapon;
     [HideInInspector] public Item SelectedItem;
     [HideInInspector] public List<Battler> SelectedTeamSkillPartners;
@@ -45,9 +41,9 @@ public abstract class Battler : BaseObject
 
     // Action execution info
     [HideInInspector] public bool ExecutedAction;
-    public bool HitCritical;
-    public bool HitWeakness;
-    public bool HitResistant;
+    [HideInInspector] public bool HitCritical;
+    [HideInInspector] public bool HitWeakness;
+    [HideInInspector] public bool HitResistant;
 
     // PassiveEffect dependent info
     public ElementRate[] ChangedElementRates;
@@ -164,8 +160,7 @@ public abstract class Battler : BaseObject
 
     public void ClearTurnChoices()
     {
-        SelectedSoloSkill = null;
-        SelectedTeamSkill = null;
+        SelectedSkill = null;
         SelectedItem = null;
         if (SelectedTeamSkillPartners != null) SelectedTeamSkillPartners.Clear();
         if (SelectedTargets != null) SelectedTargets.Clear();
@@ -177,27 +172,6 @@ public abstract class Battler : BaseObject
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- Equip Management --
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    public int EquipItem(Item item)
-    {
-        if (!item) return -1;
-        Items.Add(item);
-        return Items.Count - 1;
-    }
-
-    public Item UnequipItem(int index)
-    {
-        if (index < 0 || index >= Items.Count) return null;
-        Item item = Items[index];
-        Items.RemoveAt(index);
-        return item;
-    }
-
-    public void ReplaceItemWith(Item item, int index)
-    {
-        if (index < 0 || index >= Items.Count || !item) return;
-        Items[index] = item;
-    }
 
     public int EquipWeapon(Weapon weapon)
     {
@@ -316,30 +290,28 @@ public abstract class Battler : BaseObject
     /// -- Tool Pre-Actions --
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private void RedirectUnconsciousSelectedPartners(List<Battler> usersParty, List<Battler> opponentParty, TeamSkill ts)
+    private void RedirectUnconsciousSelectedPartners(List<Battler> usersParty, List<Battler> opponentParty)
     {
         for (int i = SelectedTeamSkillPartners.Count - 1; i >= 0; i--)
         {
             if (SelectedTeamSkillPartners[i].Unconscious)
                 SelectedTeamSkillPartners.RemoveAt(i);
         }
-        if (SelectedTeamSkillPartners.Count == ts.NumberOfTeammates - 1) return;
         for (int i = 0; i < usersParty.Count; i++)
         {
             Battler p = SelectedTeamSkillPartners[i];
             if (!p.Unconscious && p.GetType().Name == GetType().Name)
                 SelectedTeamSkillPartners.Add(p);
         }
-        if (SelectedTeamSkillPartners.Count == ts.NumberOfTeammates - 1) return;
         DefaultToAttackRandom();
     }
 
-    protected abstract SoloSkill GetDefaultSoloSkill();
+    protected abstract Skill GetDefaultSkill();
 
     private void DefaultToAttackRandom()
     {
         ClearTurnChoices();
-        SelectedSoloSkill = GetDefaultSoloSkill();
+        SelectedSkill = GetDefaultSkill();
         SelectedToolMove = GetSelectedToolMove();
     }
 
@@ -425,9 +397,6 @@ public abstract class Battler : BaseObject
         SelectedToolMove = GetSelectedToolMove();
         if (!SelectedToolMove) return;
 
-        if (SelectedToolMove.GetType().Name == "TeamSkill")
-            RedirectUnconsciousSelectedPartners(usersParty, opponentParty, SelectedToolMove as TeamSkill);
-
         if (SelectedToolMove.RandomTarget)
         {
             SelectedTargets.Clear();
@@ -438,24 +407,17 @@ public abstract class Battler : BaseObject
         else RedirectUnconsciousTargets(usersParty, opponentParty);
 
         if (SelectedTargets.Count == 0) DefaultToAttackRandom();
-        if (SPToConsumeThisTurn > SP) SelectedSoloSkill = GetDefaultSoloSkill();
+        if (SPToConsumeThisTurn > SP) SelectedSkill = GetDefaultSkill();
         
         ExecuteTool();
     }
 
     public Tool GetSelectedToolMove()
     {
-        if (SelectedSoloSkill)
+        if (SelectedSkill)
         {
-            if (SelectedSoloSkill.WeaponDependent)
-                SelectedSoloSkill.ConvertToWeaponSettings(SelectedWeapon);
-            return SelectedSoloSkill;
-        }
-        if (SelectedTeamSkill)
-        {
-            if (SelectedTeamSkill.WeaponDependent)
-                SelectedTeamSkill.ConvertToWeaponSettings(SelectedWeapon);
-            return SelectedTeamSkill;
+            if (SelectedSkill.WeaponDependent) SelectedSkill.ConvertToWeaponSettings(SelectedWeapon);
+            return SelectedSkill;
         }
         if (SelectedItem) return SelectedItem;
         return null;
@@ -485,13 +447,12 @@ public abstract class Battler : BaseObject
     {
         switch (SelectedToolMove.GetType().Name)
         {
-            case "SoloSkill": ExecuteSkill(SelectedSoloSkill); break;
-            case "TeamSkill": ExecuteSkill(SelectedTeamSkill); break;
+            case "Skill": ExecuteSkill(SelectedSkill); break;
             case "Item": ExecuteItem(); break;
         }
     }
 
-    private S ExecuteSkill<S>(S skill) where S : SoloSkill
+    private S ExecuteSkill<S>(S skill) where S : Skill
     {
         skill.StartCharge();
         IsCharging = (skill.ChargeCount > 0);
@@ -504,12 +465,6 @@ public abstract class Battler : BaseObject
         //sk.SummonPlayers();
         //sk.SummonEnemies();
         //ApplyToolEffectsPerTarget(sk, ExecuteSteal);
-        if (skill.GetType().Name == "TeamSkill")
-        {
-            TeamSkill ts = skill as TeamSkill;
-            foreach (Battler b in SelectedTeamSkillPartners)
-                if (ts.ShareTurns) b.ExecutedAction = true;
-        }
         ShootProjectile();
         return skill;
     }
@@ -524,9 +479,9 @@ public abstract class Battler : BaseObject
     private Item ExecuteItem()
     {
         Item it = SelectedItem;
-        if (it.PermantentStatChanges) Stats.Add(it.PermantentStatChanges);
-        if (it.TurnsInto) Items[Items.FindIndex(x => x.Id == it.Id)] = Instantiate(it.TurnsInto, gameObject.transform);
-        else if (it.Consumable) Items.Remove(it);
+        Stats.Add(it.PermantentStatChanges);
+        //if (it.TurnsInto) Items[Items.FindIndex(x => x.Id == it.Id)] = Instantiate(it.TurnsInto, gameObject.transform);
+        //else if (it.Consumable) Items.Remove(it);
         ShootProjectile();
         return it;
     }

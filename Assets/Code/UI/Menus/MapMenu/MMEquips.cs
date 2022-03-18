@@ -115,7 +115,6 @@ public class MMEquips : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOpera
         EquippedToolsOwner.text = PartyList.SelectedObject.Name.ToUpper();
         EquippedToolsFrame.SetActive(true);
         EquippedWeapons.Refresh(PartyList.SelectedObject.Weapons, BattleMaster.MAX_NUMBER_OF_WEAPONS, true);
-        EquippedItems.Refresh(PartyList.SelectedObject.Items, BattleMaster.MAX_NUMBER_OF_ITEMS, true);
         StatsList.Setup(PartyList.SelectedObject as BattlePlayer);
         StatsList.gameObject.SetActive(true);
     }
@@ -179,14 +178,6 @@ public class MMEquips : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOpera
         if (Selection == Selections.SelectTool) InventoryFrame.ToolList.InfoFrame.SetActive(false);
     }
 
-    public void SelectEquippedItem()
-    {
-        if (!EquippedItems.RefreshToolInfo()) return;
-        InventoryFrame.DeactivateSorter();
-        if (Selection == Selections.SelectTool) UnequipItem();
-        else if (Selection == Selections.SelectToolSwap) SwapItem();
-    }
-
     public void SelectEquippedWeapon()
     {
         if (!EquippedWeapons.RefreshToolInfo()) return;
@@ -213,12 +204,6 @@ public class MMEquips : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOpera
         {
             if (InventoryFrame.CurrentInventoryList == InventorySystem.ListType.Items) SetupToolSwap(EquippedItems, true, false);
             else if (InventoryFrame.CurrentInventoryList == InventorySystem.ListType.Weapons) SetupToolSwap(EquippedWeapons, false, true);
-        }
-        else if (InventoryFrame.CurrentInventoryList == InventorySystem.ListType.Items)
-        {
-            InventoryFrame.DeactivateSorter();
-            if (PartyList.SelectedObject.Items.Count == BattleMaster.MAX_NUMBER_OF_ITEMS) SetupToolSwap(EquippedItems, true, false);
-            else EquipItem();
         }
         else if (InventoryFrame.CurrentInventoryList == InventorySystem.ListType.Weapons)
         {
@@ -259,29 +244,12 @@ public class MMEquips : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOpera
     /// -- Equip/Unequip Items --
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private void UnequipItem()
-    {
-        PartyList.SelectedObject.UnequipItem(EquippedItems.SelectedIndex);
-        MenuManager.PartyInfo.Inventory.AddItem(EquippedItems.SelectedObject as Item);
-        EquippedItems.Refresh(PartyList.SelectedObject.Items, BattleMaster.MAX_NUMBER_OF_ITEMS, true);
-        InventoryFrame.SelectTab(0);
-    }
-
     private void UnequipWeapon()
     {
         PartyList.SelectedObject.UnequipWeapon(EquippedWeapons.SelectedIndex);
         MenuManager.PartyInfo.Inventory.AddWeapon(EquippedWeapons.SelectedObject as Weapon);
         EquippedWeapons.Refresh(PartyList.SelectedObject.Weapons, BattleMaster.MAX_NUMBER_OF_WEAPONS, true);
         InventoryFrame.SelectTab(1);
-    }
-
-    private void EquipItem()
-    {
-        Item it = InventoryFrame.ToolList.SelectedObject as Item;
-        PartyList.SelectedObject.EquipItem(it);
-        MenuManager.PartyInfo.Inventory.RemoveItem(it);
-        EquippedItems.Refresh(PartyList.SelectedObject.Items, BattleMaster.MAX_NUMBER_OF_ITEMS);
-        InventoryFrame.Refresh(MenuManager.PartyInfo.Inventory.Items);
     }
 
     private void EquipWeapon()
@@ -314,17 +282,6 @@ public class MMEquips : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOpera
         InventoryFrame.ToolList.Selecting = true;
         InventoryFrame.ToolList.SelectedButton.ClearHighlights();
         EventSystem.current.SetSelectedGameObject(InventoryFrame.ToolList.SelectedButton.gameObject);
-    }
-
-    private void SwapItem()
-    {
-        Selection = Selections.SelectTool;
-        Item it = InventoryFrame.ToolList.SelectedObject as Item;
-        PartyList.SelectedObject.ReplaceItemWith(it, EquippedItems.SelectedIndex);
-        MenuManager.PartyInfo.Inventory.AddItem(EquippedItems.SelectedObject as Item);
-        MenuManager.PartyInfo.Inventory.RemoveItem(it);
-        EquippedItems.Refresh(PartyList.SelectedObject.Items, BattleMaster.MAX_NUMBER_OF_ITEMS, true);
-        InventoryFrame.SelectTab(0);
     }
 
     private void SwapWeapon()

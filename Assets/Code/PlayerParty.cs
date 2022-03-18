@@ -117,11 +117,8 @@ public class PlayerParty : MonoBehaviour
         b.StatConversion();
         b.HP = PlayerPrefs.GetInt(bt + "HP_" + file);
         b.SP = PlayerPrefs.GetInt(bt + "SP_" + file);
-        b.SoloSkills = LoadBattlersList(file, b, ResourcesMaster.SoloSkills, bt);
-        b.TeamSkills = LoadBattlersList(file, b, ResourcesMaster.TeamSkills, bt);
+        b.Skills = LoadBattlersList(file, b, ResourcesMaster.Skills, bt);
         b.Weapons = LoadBattlersList(file, b, ResourcesMaster.Weapons, bt);
-        b.Items = LoadBattlersList(file, b, ResourcesMaster.Items, bt);
-        b.PassiveSkills = LoadBattlersList(file, b, ResourcesMaster.PassiveSkills, bt);
         b.States = LoadBattlersList(file, b, ResourcesMaster.States, bt);
         string sw = bt + "SelectedWeapon_" + file;
         if (PlayerPrefs.HasKey(sw)) b.SelectedWeapon = b.Weapons.Find(x => x.Id == PlayerPrefs.GetInt(sw));

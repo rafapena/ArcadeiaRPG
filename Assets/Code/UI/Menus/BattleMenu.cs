@@ -50,7 +50,6 @@ public class BattleMenu : MonoBehaviour
 
     // Constants
     private readonly int MAX_NUMBER_OF_SOLO_SKILLS = 3;
-    private readonly int MAX_NUMBER_OF_TEAM_SKILLS = 3;
 
     private void Start()
     {
@@ -129,8 +128,7 @@ public class BattleMenu : MonoBehaviour
         ResetChoices();
         Selection = 0;
         SelectedAction = SelectedActions.None;
-        GrayOutIconSelection(SelectActionList.transform.GetChild(1).gameObject, CP.SoloSkills.Count == 0 && CP.TeamSkills.Count == 0);
-        GrayOutIconSelection(SelectActionList.transform.GetChild(2).gameObject, CP.Items.Count == 0);
+        GrayOutIconSelection(SelectActionList.transform.GetChild(1).gameObject, CP.Skills.Count == 0);
         CharacterInfo.Activate();
         CommonActionsFrame.Activate();
         CommonActionsFrame.transform.GetChild(0).gameObject.SetActive(CurrentPlayer == 0);
@@ -174,7 +172,7 @@ public class BattleMenu : MonoBehaviour
         switch (KeyPressed)
         {
             case "A":
-                CP.SelectedSoloSkill = CP.AttackSkill;
+                CP.SelectedSkill = CP.AttackSkill;
                 SelectedTool = CP.SelectedWeapon;
                 SelectedAction = SelectedActions.Attack;
                 CSelected.SetActive(true);
@@ -223,15 +221,14 @@ public class BattleMenu : MonoBehaviour
         SelectToolList.SetActive(true);
         ConfirmToolFrame.Deactivate();
         SelectTargetInTeam.SetActive(false);
-        DisableToolReasons = new string[MAX_NUMBER_OF_SOLO_SKILLS + MAX_NUMBER_OF_TEAM_SKILLS];
+        DisableToolReasons = new string[MAX_NUMBER_OF_SOLO_SKILLS];
         for (int i = 0; i < DisableToolReasons.Length; i++)
             DisableToolReasons[i] = "";
-        SetupForSkillSelectIcons(CP.SoloSkills, 0, MAX_NUMBER_OF_SOLO_SKILLS);
-        SetupForSkillSelectIcons(CP.TeamSkills, MAX_NUMBER_OF_SOLO_SKILLS, MAX_NUMBER_OF_TEAM_SKILLS);
+        SetupForSkillSelectIcons(CP.Skills, 0, MAX_NUMBER_OF_SOLO_SKILLS);
     }
 
-    // SoloSkill and TeamSkill have different lists, but share the same set of icons on the UI
-    private void SetupForSkillSelectIcons<T>(List<T> skillList, int start, int maxListCount) where T : SoloSkill
+    // Skill and TeamSkill have different lists, but share the same set of icons on the UI
+    private void SetupForSkillSelectIcons<T>(List<T> skillList, int start, int maxListCount) where T : Skill
     {
         int i = 0;
         int sLimit = skillList.Count < maxListCount ? skillList.Count : maxListCount;
@@ -253,8 +250,6 @@ public class BattleMenu : MonoBehaviour
                 DisableToolReasons[iconI] = "A " + System.Enum.GetName(typeof(BattleMaster.WeaponTypes), skill.WeaponExclusives[0]) + " is required to use this";
             else if (!skill.UsedByClassUser(CP))
                 DisableToolReasons[iconI] = "Must be at class " + skill.ClassExclusives[0].Name + " to use this";
-            else if (skill.GetType().Name == "TeamSkill" && LowTeamSkillSP(skill as TeamSkill) || !skill.EnoughSPFrom(CP))
-                DisableToolReasons[iconI] = "Not enough SP";
             GrayOutIconSelection(t.gameObject, DisableToolReasons[iconI].Length > 0);
         }
         for (; i < maxListCount; i++)
@@ -262,17 +257,6 @@ public class BattleMenu : MonoBehaviour
             int iconI = start + i;
             SelectToolList.transform.GetChild(iconI).gameObject.SetActive(false);
         }
-    }
-
-    private bool LowTeamSkillSP(TeamSkill skill)
-    {
-        int potentialPlayers = 0;
-        foreach (BattlePlayer p in CurrentBattle.PlayerParty.Players)
-        {
-            int netSP = skill.SPConsume - GetCutRelationSP(p);
-            if (netSP <= CP.SP) potentialPlayers++;
-        }
-        return potentialPlayers < skill.NumberOfTeammates + 1;
     }
 
     private void SelectSkill()
@@ -285,42 +269,27 @@ public class BattleMenu : MonoBehaviour
         }
         switch (KeyPressed)
         {
-            case "A": ConfirmSoloSkillSelection(CP.SoloSkills, 0, 0); break;
-            case "S": ConfirmSoloSkillSelection(CP.SoloSkills, 1, 1); break;
-            case "D": ConfirmSoloSkillSelection(CP.SoloSkills, 2, 2); break;
-            case "Z": ConfirmTeamSkillSelection(CP.TeamSkills, 0, 3); break;
-            case "X": ConfirmTeamSkillSelection(CP.TeamSkills, 1, 4); break;
-            case "C": ConfirmTeamSkillSelection(CP.TeamSkills, 2, 5); break;
+            case "A": ConfirmSkillSelection(CP.Skills, 0, 0); break;
+            case "S": ConfirmSkillSelection(CP.Skills, 1, 1); break;
+            case "D": ConfirmSkillSelection(CP.Skills, 2, 2); break;
             case "Q":
                 CP.SelectedWeapon = GetNextWeapon();
                 SetWeaponOnMenuAndCharacter();
                 for (int i = 0; i < DisableToolReasons.Length; i++)
                     DisableToolReasons[i] = "";
-                SetupForSkillSelectIcons(CP.SoloSkills, 0, MAX_NUMBER_OF_SOLO_SKILLS);
-                SetupForSkillSelectIcons(CP.TeamSkills, MAX_NUMBER_OF_SOLO_SKILLS, MAX_NUMBER_OF_TEAM_SKILLS);
+                SetupForSkillSelectIcons(CP.Skills, 0, MAX_NUMBER_OF_SOLO_SKILLS);
                 SetConfirmUsability(7, ConfirmToolMenuIndex);
                 break;
         }
     }
 
-    private void ConfirmSoloSkillSelection(List<SoloSkill> soloSkills, int skillListIndex, int toolConfirmIndex)
+    private void ConfirmSkillSelection(List<Skill> Skills, int skillListIndex, int toolConfirmIndex)
     {
-        if (skillListIndex >= soloSkills.Count) return;
-        CP.SelectedSoloSkill = ConfirmGenericToolSelection(soloSkills, skillListIndex, toolConfirmIndex);
-        CP.SelectedTeamSkill = null;
-        if (!CP.SelectedSoloSkill) return;
+        if (skillListIndex >= Skills.Count) return;
+        CP.SelectedSkill = ConfirmGenericToolSelection(Skills, skillListIndex, toolConfirmIndex);
+        if (!CP.SelectedSkill) return;
         ConfirmToolFrame.transform.GetChild(6).gameObject.SetActive(true);
         ConfirmToolFrame.transform.GetChild(6).GetChild(0).GetComponent<TextMeshProUGUI>().text = "1";
-    }
-
-    private void ConfirmTeamSkillSelection(List<TeamSkill> teamSkills, int skillListIndex, int toolConfirmIndex)
-    {
-        if (skillListIndex >= teamSkills.Count) return;
-        CP.SelectedSoloSkill = null;
-        CP.SelectedTeamSkill = ConfirmGenericToolSelection(teamSkills, skillListIndex, toolConfirmIndex);
-        if (!CP.SelectedTeamSkill) return;
-        ConfirmToolFrame.transform.GetChild(6).gameObject.SetActive(true);
-        ConfirmToolFrame.transform.GetChild(6).GetChild(0).GetComponent<TextMeshProUGUI>().text = CP.SelectedTeamSkill.NumberOfTeammates.ToString();
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -348,7 +317,7 @@ public class BattleMenu : MonoBehaviour
 
     private void SetupForItemSelectIcons()
     {
-        int i = 0;
+        /*int i = 0;
         int iLimit = (CP.Items.Count < BattleMaster.MAX_NUMBER_OF_ITEMS) ? CP.Items.Count : BattleMaster.MAX_NUMBER_OF_ITEMS;
         for (; i < iLimit; i++)
         {
@@ -363,12 +332,12 @@ public class BattleMenu : MonoBehaviour
             else if (nc) DisableToolReasons[i] = "Must be at class " + CP.Items[i].ClassExclusives[0].Name + " to use this";
         }
         for (; i < BattleMaster.MAX_NUMBER_OF_ITEMS; i++)
-            SelectToolList.transform.GetChild(i).gameObject.SetActive(false);
+            SelectToolList.transform.GetChild(i).gameObject.SetActive(false);*/
     }
 
     private void SelectItem()
     {
-        if (!MenuMaster.ReadyToSelectInMenu) return;
+        /*if (!MenuMaster.ReadyToSelectInMenu) return;
         if (Input.GetKeyDown(KeyCode.Backspace))
         {
             SetupForSelectAction();
@@ -382,7 +351,7 @@ public class BattleMenu : MonoBehaviour
             case "Z": ConfirmItemSelection(CP.Items, 3, 3); break;
             case "X": ConfirmItemSelection(CP.Items, 4, 4); break;
             case "C": ConfirmItemSelection(CP.Items, 5, 5); break;
-        }
+        }*/
     }
 
     private void ConfirmItemSelection(List<Item> items, int itemListIndex, int toolConfirmIndex)
@@ -475,25 +444,15 @@ public class BattleMenu : MonoBehaviour
         {
             CSelected.GetComponent<Image>().sprite = CP.SelectedItem.GetComponent<SpriteRenderer>().sprite;
             SelectedTool = CP.SelectedItem;
-            CP.SelectedSoloSkill = null;
-            CP.SelectedTeamSkill = null;
+            CP.SelectedSkill = null;
             SetupForSelectTarget();
         }
-        else if (CP.SelectedSoloSkill)
+        else if (CP.SelectedSkill)
         {
-            CSelected.GetComponent<Image>().sprite = CP.SelectedSoloSkill.GetComponent<SpriteRenderer>().sprite;
+            CSelected.GetComponent<Image>().sprite = CP.SelectedSkill.GetComponent<SpriteRenderer>().sprite;
             CP.SelectedItem = null;
-            SelectedTool = CP.SelectedSoloSkill;
-            CP.SelectedTeamSkill = null;
+            SelectedTool = CP.SelectedSkill;
             SetupForSelectTarget();
-        }
-        else if (CP.SelectedTeamSkill)
-        {
-            CSelected.GetComponent<Image>().sprite = CP.SelectedTeamSkill.GetComponent<SpriteRenderer>().sprite;
-            CP.SelectedItem = null;
-            CP.SelectedSoloSkill = null;
-            SelectedTool = CP.SelectedTeamSkill;
-            SetupForSelectTeammates();
         }
         return tool;
     }
@@ -512,7 +471,6 @@ public class BattleMenu : MonoBehaviour
         ConfirmToolFrame.Deactivate();
         SelectTargetInTeam.SetActive(true);
         CP.SelectedTeamSkillPartners = new List<Battler>();
-        UpdateSelectTeammatesText();
         int i = 0;
         string[] plc = new string[] { "A", "S", "D", "F" };
         for (; i < CurrentBattle.PlayerParty.Players.Count; i++)
@@ -527,14 +485,14 @@ public class BattleMenu : MonoBehaviour
         if (!go.activeSelf) return;
 
         int crsp = GetCutRelationSP(p);
-        int netSPConsume = CP.SelectedTeamSkill.SPConsume - crsp;
+        int netSPConsume = CP.SelectedSkill.SPConsume - crsp;
         if (netSPConsume < 0) netSPConsume = 0;
         Color disabler = new Color(1, 1, 1, netSPConsume > CP.SP ? DISABLED_TRANSPARENCY : 1);
 
         go.transform.GetChild(0).GetComponent<Image>().sprite = UIMaster.LetterCommands[letterCommand];
         go.transform.GetChild(0).GetComponent<Image>().color = disabler;
         go.transform.GetChild(1).gameObject.SetActive(crsp > 0);
-        go.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = CP.SelectedTeamSkill.SPConsume + "SP";
+        go.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = CP.SelectedSkill.SPConsume + "SP";
         go.transform.GetChild(2).gameObject.SetActive(crsp > 0);
         go.transform.GetChild(2).GetComponent<TextMeshProUGUI>().text = "-" + crsp + "SP";
         go.transform.GetChild(3).gameObject.SetActive(true);
@@ -577,21 +535,8 @@ public class BattleMenu : MonoBehaviour
         if (!go.activeSelf || go.transform.GetChild(3).GetComponent<TextMeshProUGUI>().color.a == DISABLED_TRANSPARENCY) return;
         CP.SelectedTeamSkillPartners.Add(CurrentBattle.PlayerParty.Players[playerIndex]);
         go.SetActive(false);
-        if (CP.SelectedTeamSkillPartners.Count == CP.SelectedTeamSkill.NumberOfTeammates)
-        {
-            HideKeyboardChoiceButtons();
-            SetupForSelectTarget();
-        }
-        else UpdateSelectTeammatesText();
-    }
-
-    private void UpdateSelectTeammatesText()
-    {
-        int currSelectedTeammates = CP.SelectedTeamSkillPartners.Count;
-        int maxSelectedTeammates = CP.SelectedTeamSkill.NumberOfTeammates;
-        string text = maxSelectedTeammates == 1 ? "SELECT 1 TO ASSIST" : "SELECT " + (maxSelectedTeammates - currSelectedTeammates) + " MORE TO ASSIST";
-        SelectTargetInTeam.transform.GetChild(4).GetComponent<TextMeshProUGUI>().text = text;
-        SelectTargetInTeam.transform.GetChild(4).gameObject.SetActive(true);
+        HideKeyboardChoiceButtons();
+        SetupForSelectTarget();
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -903,18 +848,7 @@ public class BattleMenu : MonoBehaviour
     
     private void SetSPConsumption()
     {
-        if (CP.SelectedTeamSkill)
-        {
-            int loseMostSP = GetCutRelationSP(CP.SelectedTeamSkillPartners[0]);
-            for (int i = 1; i < CP.SelectedTeamSkillPartners.Count; i++)
-            {
-                int spToUse = GetCutRelationSP(CP.SelectedTeamSkillPartners[i]);
-                if (spToUse < loseMostSP) loseMostSP = spToUse;
-            }
-            CP.SPToConsumeThisTurn = CP.SelectedTeamSkill.SPConsume - loseMostSP;
-        }
-        else if (CP.SelectedSoloSkill)
-            CP.SPToConsumeThisTurn = CP.SelectedSoloSkill.SPConsume;
+        CP.SPToConsumeThisTurn = CP.SelectedSkill.SPConsume;
     }
 
     public void EndTurn()
@@ -1021,8 +955,7 @@ public class BattleMenu : MonoBehaviour
         Selection = Selections.Animating;
         for (int i = 0; i < CurrentBattle.PlayerParty.Players.Count; i++)
         {
-            CurrentBattle.PlayerParty.Players[i].SelectedSoloSkill = null;
-            CurrentBattle.PlayerParty.Players[i].SelectedTeamSkill = null;
+            CurrentBattle.PlayerParty.Players[i].SelectedSkill = null;
             CurrentBattle.PlayerParty.Players[i].SelectedItem = null;
         }
     }

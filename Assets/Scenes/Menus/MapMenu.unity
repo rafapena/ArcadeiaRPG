@@ -7483,8 +7483,7 @@ MonoBehaviour:
   NameLabel: {fileID: 313882483}
   SoloLabel: {fileID: 1287419035}
   TeamLabel: {fileID: 867491031}
-  SoloSkillsList: {fileID: 952439508}
-  TeamSkillsList: {fileID: 2025748931}
+  SkillsList: {fileID: 0}
   CannotUseFrame: {fileID: 1627370665}
   CannotUseMessage: {fileID: 2062080452}
   PartyTargetFrame: {fileID: 549748460}
@@ -45736,7 +45735,7 @@ PrefabInstance:
     - target: {fileID: 2009013377374198467, guid: a3103adb4645e8e47b4e84fbd1789214,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0.57
+      value: 0.00015068
       objectReference: {fileID: 0}
     - target: {fileID: 2009013377374198467, guid: a3103adb4645e8e47b4e84fbd1789214,
         type: 3}
@@ -45746,7 +45745,7 @@ PrefabInstance:
     - target: {fileID: 2009013377374198467, guid: a3103adb4645e8e47b4e84fbd1789214,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 1121.3428
+      value: 1172.9998
       objectReference: {fileID: 0}
     - target: {fileID: 2009013377374198467, guid: a3103adb4645e8e47b4e84fbd1789214,
         type: 3}
@@ -65016,7 +65015,7 @@ MonoBehaviour:
   Level: {fileID: 1674458252}
   StatsList: {fileID: 1802054106}
   RelationsList: {fileID: 1849248402}
-  SoloSkillList: {fileID: 817843007}
+  SkillList: {fileID: 0}
   TeamSkillList: {fileID: 1033800226}
   WeaponsList: {fileID: 1830639530}
   ItemsList: {fileID: 890394110}
@@ -69158,6 +69157,26 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1593529089059966452, guid: 193dab324b8862a41a39e28a8edd2ee1,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1904765903392548467, guid: 193dab324b8862a41a39e28a8edd2ee1,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1904765903423702833, guid: 193dab324b8862a41a39e28a8edd2ee1,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1904765904033319090, guid: 193dab324b8862a41a39e28a8edd2ee1,
+        type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1904765904211007582, guid: 193dab324b8862a41a39e28a8edd2ee1,
         type: 3}
       propertyPath: m_Enabled
       value: 1

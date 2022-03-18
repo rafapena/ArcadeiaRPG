@@ -361,7 +361,6 @@ public class MMInventory : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOp
         int index = EventSystem.current.currentSelectedGameObject.GetComponent<ListSelectable>().Index;
         EquippedTools.SetActive(true);
         if (InventoryFrame.CurrentInventoryList == InventorySystem.ListType.Weapons) EquippedToolList.Refresh(SelectableTeammatesEquip[index].Weapons, BattleMaster.MAX_NUMBER_OF_WEAPONS);
-        else if (InventoryFrame.CurrentInventoryList == InventorySystem.ListType.Items) EquippedToolList.Refresh(SelectableTeammatesEquip[index].Items, BattleMaster.MAX_NUMBER_OF_ITEMS);
     }
 
     public void DeselectingTeammates()
@@ -481,8 +480,7 @@ public class MMInventory : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOp
         else if (Selection == Selections.CharacterEquipsList)
         {
             // Equip from blank slot
-            if (InventoryFrame.CurrentInventoryList == InventorySystem.ListType.Items) Equip(false, PartyList.SelectedObject.Items.Count);
-            else if (InventoryFrame.CurrentInventoryList == InventorySystem.ListType.Weapons) Equip(false, PartyList.SelectedObject.Weapons.Count);
+            if (InventoryFrame.CurrentInventoryList == InventorySystem.ListType.Weapons) Equip(false, PartyList.SelectedObject.Weapons.Count);
         }
     }
 
@@ -524,19 +522,7 @@ public class MMInventory : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOp
         if (Selection == Selections.EquippedDone) return;
         Selection = Selections.EquippedDone;
         DoneTimer = Time.realtimeSinceStartup + 1f;
-        if (InventoryFrame.CurrentInventoryList == InventorySystem.ListType.Items)
-        {
-            if (switchOut)
-            {
-                PartyList.SelectedObject.ReplaceItemWith(InventoryFrame.ToolList.SelectedObject as Item, slot);
-                MenuManager.PartyInfo.Inventory.AddItem(EquippedToolList.SelectedObject as Item);
-            }
-            else PartyList.SelectedObject.EquipItem(InventoryFrame.ToolList.SelectedObject as Item);
-            MenuManager.PartyInfo.Inventory.RemoveItem(InventoryFrame.ToolList.SelectedIndex);
-            InventoryFrame.Refresh(MenuManager.PartyInfo.Inventory.Items);
-            EquippedToolList.Refresh(PartyList.SelectedObject.Items, BattleMaster.MAX_NUMBER_OF_ITEMS);
-        }
-        else if (InventoryFrame.CurrentInventoryList == InventorySystem.ListType.Weapons)
+        if (InventoryFrame.CurrentInventoryList == InventorySystem.ListType.Weapons)
         {
             if (switchOut)
             {

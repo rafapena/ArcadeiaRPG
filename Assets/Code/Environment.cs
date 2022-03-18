@@ -1,7 +1,9 @@
 ﻿using UnityEngine;
 
-public class Environment : PassiveEffect
+public class Environment
 {
+    public PassiveEffect Effect;
+
     private void Start()
     {
         

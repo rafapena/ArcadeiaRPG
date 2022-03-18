@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
 
 // Not to be used for the inventory system
-public class ToolQuantity : MonoBehaviour
+[System.Serializable]
+public struct ToolQuantity
 {
     public ToolForInventory Tool;
-    public int Quantity = 1;
+    public int Quantity;
 }

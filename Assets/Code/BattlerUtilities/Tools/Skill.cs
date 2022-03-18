@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class SoloSkill : Tool
+public class Skill : Tool
 {
     public int SPConsume;
     public int Charge;

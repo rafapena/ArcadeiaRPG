@@ -1,7 +1,8 @@
 ﻿using System;
 using UnityEngine;
 
-public class PreExistingRelation : MonoBehaviour
+[System.Serializable]
+public struct PreExistingRelation
 {
     public BattlePlayer Player;
     public PlayerRelation.RelationLevels RelationLevel;

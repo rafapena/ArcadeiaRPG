@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 6467640080463945649}
   - component: {fileID: 94577713347072007}
-  - component: {fileID: 1040386050208207787}
   m_Layer: 0
   m_Name: Rookie
   m_TagString: Untagged
@@ -47,34 +46,22 @@ MonoBehaviour:
   Id: 0
   Name: Rookie
   Description: Balanced class.
-  BaseStats: {fileID: 1040386050208207787}
+  BaseStats:
+    MaxHP: 35
+    Atk: 35
+    Def: 30
+    Map: 25
+    Mar: 25
+    Spd: 30
+    Tec: 30
+    Luk: 30
+    Acc: 100
+    Eva: 100
+    Crt: 100
+    Cev: 100
   UpgradedClass1: {fileID: 1791329435643984854, guid: 0c755c9bf65f36a4daba5c184e8a7aaa,
     type: 3}
   UpgradedClass2: {fileID: 0}
   UsableWeapon1Type: 1
   UsableWeapon2Type: 0
-  SoloSkillSet: []
---- !u!114 &1040386050208207787
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3665205357968699090}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 266aef9b79cbf74438f340fe01139120, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  MaxHP: 30
-  Atk: 30
-  Def: 30
-  Map: 25
-  Mar: 25
-  Spd: 30
-  Tec: 30
-  Luk: 30
-  Acc: 100
-  Eva: 100
-  Crt: 100
-  Cev: 100
+  SkillSet: []

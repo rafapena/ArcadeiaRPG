@@ -16,7 +16,7 @@ public class MMStats : MM_Super
     public StatsList StatsList;
 
     public Transform RelationsList;
-    public Transform SoloSkillList;
+    public Transform SkillList;
     public Transform TeamSkillList;
     public Transform WeaponsList;
     public Transform ItemsList;
@@ -94,7 +94,6 @@ public class MMStats : MM_Super
         SetupSkills();
         SetupEquipment();
         SetupRates();
-        SetupPassiveSkills();
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -144,17 +143,15 @@ public class MMStats : MM_Super
 
     public void SetupSkills()
     {
-        bool moreThanZero = SelectedPlayer.SoloSkills.Count > 0 || SelectedPlayer.TeamSkills.Count > 0;
-        SoloSkillList.parent.gameObject.SetActive(moreThanZero);
+        bool moreThanZero = SelectedPlayer.Skills.Count > 0;
+        SkillList.parent.gameObject.SetActive(moreThanZero);
         if (!moreThanZero) return;
-        SetupTools(SoloSkillList, SelectedPlayer.SoloSkills);
-        SetupTools(TeamSkillList, SelectedPlayer.TeamSkills);
+        SetupTools(SkillList, SelectedPlayer.Skills);
     }
 
     public void SetupEquipment()
     {
         SetupTools(WeaponsList, SelectedPlayer.Weapons);
-        SetupTools(ItemsList, SelectedPlayer.Items);
     }
 
     public void SetupRates()
@@ -196,13 +193,6 @@ public class MMStats : MM_Super
         WeaknessesList.parent.gameObject.SetActive(i != 0 || i0 != 0);
         for (; i < WeaknessesList.childCount; i++) WeaknessesList.GetChild(i).gameObject.SetActive(false);
         for (; i0 < StrengthsList.childCount; i0++) StrengthsList.GetChild(i0).gameObject.SetActive(false);
-    }
-
-    public void SetupPassiveSkills()
-    {
-        SetupTools(PassiveSkillsList, SelectedPlayer.PassiveSkills);
-        if (SelectedPlayer.PassiveSkills.Count == 0)
-            PassiveSkillsList.gameObject.SetActive(false);
     }
 
     private void SetupTools<T>(Transform listGO, List<T> listData) where T : BaseObject

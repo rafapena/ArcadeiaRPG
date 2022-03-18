@@ -103,11 +103,8 @@ public class SaveData
         PlayerPrefs.SetInt(bt + "Id_" + File, b.Id);
         PlayerPrefs.SetInt(bt + "HP_" + File, b.HP);
         PlayerPrefs.SetInt(bt + "SP_" + File, b.SP);
-        SaveBattlersList(b.SoloSkills, bt);
-        SaveBattlersList(b.TeamSkills, bt);
+        SaveBattlersList(b.Skills, bt);
         SaveBattlersList(b.Weapons, bt);
-        SaveBattlersList(b.Items, bt);
-        SaveBattlersList(b.PassiveSkills, bt);
         SaveBattlersList(b.States, bt);
         if (b.Weapons.Count > 0) PlayerPrefs.SetInt(bt + "SelectedWeapon_" + File, b.SelectedWeapon.Id);
         BattlePlayer p = b as BattlePlayer;
@@ -180,11 +177,9 @@ public class SaveData
         PlayerPrefs.DeleteKey(bt + "Id_" + File);
         PlayerPrefs.DeleteKey(bt + "HP_" + File);
         PlayerPrefs.DeleteKey(bt + "SP_" + File);
-        DeleteBattlerList<SoloSkill>(bt);
-        DeleteBattlerList<TeamSkill>(bt);
+        DeleteBattlerList<Skill>(bt);
         DeleteBattlerList<Weapon>(bt);
         DeleteBattlerList<Item>(bt);
-        DeleteBattlerList<PassiveSkill>(bt);
         DeleteBattlerList<State>(bt);
         for (int i = 0; i < ResourcesMaster.Players.Length; i++) PlayerPrefs.DeleteKey(bt + "Relation" + i + "_" + File);
     }
