@@ -82,25 +82,27 @@ public class Cutscene : MonoBehaviour
 
     private void NextPage()
     {
-        if (Dialogue[CurrentBubble].Jump == 0) Complete();
-        else Jump(Dialogue[CurrentBubble].Jump);
+        DialogueBubble db = Dialogue[CurrentBubble];
+        if (db.Jump == 0) Complete();
+        else Jump(db.Jump, db.Condition);
     }
 
     private void SelectChoice(DialogueChoice dc)
     {
-        dc.OnDecide?.Invoke();
         if (dc.Jump == 0) Complete();
-        else Jump(dc.Jump);
+        else Jump(dc.Jump, dc.Condition, dc.OnDecide);
     }
 
     public void ForceJump(int jumpTo)
     {
-        Jump(jumpTo);
+        Jump(jumpTo, "");
     }
 
-    private void Jump(int jump)
+    private void Jump(int jump, string condition, UnityEvent e = null)
     {
-        CurrentBubble += jump;
+        int failedJump = Manager.CheckDialogueCondition(condition);
+        CurrentBubble += (failedJump == 0) ? jump : failedJump;
+        if (failedJump == 0) e?.Invoke();
         if (EndingCutscene) Complete();
         else RefreshDialogue();
     }

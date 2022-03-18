@@ -96,6 +96,7 @@ public class Shop : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameOper
         {
             case Selections.Browsing:
                 if (!MenuMaster.ReadyToSelectInMenu) break;
+                else if (back && !isBuying && SellingFrame.ActivatedSorter) SellingFrame.DeactivateSorter();
                 else if (back) CloseShop();
                 else if (!isBuying) SellingFrame.SelectTabInputs();
                 break;
@@ -246,6 +247,7 @@ public class Shop : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameOper
         }
         Selection = Selections.ConfirmingAmont;
         AddedGoldFrame.SetActive(false);
+        ResultCheckFrame.SetActive(true);
         SellingFrame.ListBlocker.SetActive(true);
         ConfirmFrame.Activate(1, SellingFrame.ToolList.SelectedObject.Quantity);
         ConfirmText.text = "How many will you sell?";
@@ -261,6 +263,7 @@ public class Shop : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameOper
     {
         Selection = Selections.Browsing;
         AddedGoldFrame.SetActive(true);
+        ResultCheckFrame.SetActive(false);
         SellingFrame.ListBlocker.SetActive(false);
         ConfirmFrame.Deactivate();
 
@@ -268,7 +271,7 @@ public class Shop : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameOper
 
     public void ActivateSorterSuccess()
     {
-        //
+        AddedGoldFrame.SetActive(false);
     }
 
     /// -- Selling menu only - END --
@@ -317,7 +320,6 @@ public class Shop : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameOper
 
     private void UpdateResultChecker(int amount)
     {
-        ResultCheckFrame.SetActive(true);
         if (isBuying)
         {
             ResultCheckCarrying.text = ((SelectedToolToInventory?.Quantity ?? 0) + amount).ToString();

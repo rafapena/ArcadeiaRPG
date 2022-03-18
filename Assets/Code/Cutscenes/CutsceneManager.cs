@@ -44,6 +44,7 @@ public class CutsceneManager : MonoBehaviour
     public void Close()
     {
         SceneMaster.CloseCutscene(Player);
+        HideGold();
         gameObject.SetActive(false);
         ChoicesFrame.SetActive(false);
     }
@@ -53,6 +54,10 @@ public class CutsceneManager : MonoBehaviour
         FullText = s;
         StartCoroutine(PrintText());
     }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// -- Printing --
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     IEnumerator PrintText()
     {
@@ -75,6 +80,10 @@ public class CutsceneManager : MonoBehaviour
     {
         IsPrintingDialogue = false;
     }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// -- Character sprites --
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public void ActivateCharacter(int index, Sprite sp)
     {
@@ -109,6 +118,54 @@ public class CutsceneManager : MonoBehaviour
         NameFrameL.SetActive(false);
         NameFrameR.SetActive(false);
     }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// -- Conditions --
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public int CheckDialogueCondition(string condition)
+    {
+        if (condition.Length == 0) return 0;
+
+        string[] components = condition.Split('_');
+        int jumpToIfFailed = int.Parse(components[0]);
+        string cond = components[1];
+        int val = int.Parse(components[2]);
+        bool mustBeFalse = condition[3] == '!';
+
+        bool metCondition = mustBeFalse ? !CheckCondition(cond, val) : CheckCondition(cond, val);
+        return metCondition ? 0 : jumpToIfFailed;
+    }
+
+    private bool CheckCondition(string cond, int val)
+    {
+        switch (cond)
+        {
+            case "G":
+                return Player.Party.Inventory.Gold >= val;
+            case "I":
+                return Player.Party.Inventory.Items.Find(x => x.Id == val) != null;
+            case "W":
+                return Player.Party.Inventory.Weapons.Find(x => x.Id == val) != null;
+            case "A":
+                return Player.Party.Inventory.Weapons.Find(x => x.Id == val) != null;
+            case "C":
+                return Player.Party.Inventory.CarryWeight >= val;
+            case "M":
+                return Player.Party.Inventory.WeightCapacity >= val;
+            case "P":
+                return Player.Party.AllPlayers.Find(x => x.Id == val) != null;
+            case "T":
+                return Player.Party.Allies.Find(x => x.Id == val) != null;
+            default:
+                return true;
+        }
+    }
+
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// -- Gold management --
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public void DisplayGold()
     {

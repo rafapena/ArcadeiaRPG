@@ -10,6 +10,7 @@ using UnityEngine.Events;
 public class DialogueBubble : MonoBehaviour
 {
     [TextArea] public string Text;
+    public string Condition;
 
     [Tooltip("Skip dialogue bubbles in cutscene\nIf value is 0 => Immediately end cutscene")]
     public int Jump = 1;

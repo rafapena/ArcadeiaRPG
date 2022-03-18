@@ -208,7 +208,7 @@ PrefabInstance:
     - target: {fileID: 4396328673119153572, guid: af77d63cf551c134395f1102a58de3a7,
         type: 3}
       propertyPath: m_RootOrder
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4396328673119153572, guid: af77d63cf551c134395f1102a58de3a7,
         type: 3}
@@ -891,6 +891,7 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
+  - {fileID: 560673482925238729}
   - {fileID: 46166939}
   - {fileID: 383864245}
   - {fileID: 1883921336354325513}
@@ -952,7 +953,7 @@ PrefabInstance:
     - target: {fileID: 8628177192529692289, guid: 8f4622529365cc54ebed7a59508bf7ed,
         type: 3}
       propertyPath: m_RootOrder
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 8628177192529692289, guid: 8f4622529365cc54ebed7a59508bf7ed,
         type: 3}
@@ -7226,6 +7227,12 @@ Transform:
   m_Father: {fileID: 330945406}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 2524.336}
+--- !u!4 &560673482925238729 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 4412767275377643098, guid: 66aa77fdbfbcaa34d81ded477af82b46,
+    type: 3}
+  m_PrefabInstance: {fileID: 4249891695529240467}
+  m_PrefabAsset: {fileID: 0}
 --- !u!4 &882260577015024800
 Transform:
   m_ObjectHideFlags: 0
@@ -7279,6 +7286,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Text: jkl
+  Condition: 
   Jump: 1
   LeftCharacter1: {fileID: 0}
   RightCharacter1: {fileID: 0}
@@ -7303,6 +7311,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Text: ghi
+  Condition: 
   Jump: 1
   LeftCharacter1: {fileID: 0}
   RightCharacter1: {fileID: 0}
@@ -7328,7 +7337,7 @@ Transform:
   - {fileID: 5513293090929997448}
   - {fileID: 882260577015024800}
   m_Father: {fileID: 378500276}
-  m_RootOrder: 2
+  m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &1986673273748538556
 MonoBehaviour:
@@ -7343,6 +7352,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Text: You want sum money?
+  Condition: 
   Jump: 1
   LeftCharacter1: {fileID: 0}
   RightCharacter1: {fileID: 0}
@@ -7539,6 +7549,75 @@ MonoBehaviour:
   Cutscene: {fileID: 8915702682409307594}
   CloseToPlayer: 0
   Interacting: 0
+--- !u!1001 &4249891695529240467
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    m_TransformParent: {fileID: 378500276}
+    m_Modifications:
+    - target: {fileID: 4412767275377643098, guid: 66aa77fdbfbcaa34d81ded477af82b46,
+        type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 1.68
+      objectReference: {fileID: 0}
+    - target: {fileID: 4412767275377643098, guid: 66aa77fdbfbcaa34d81ded477af82b46,
+        type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.13
+      objectReference: {fileID: 0}
+    - target: {fileID: 4412767275377643098, guid: 66aa77fdbfbcaa34d81ded477af82b46,
+        type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4412767275377643098, guid: 66aa77fdbfbcaa34d81ded477af82b46,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4412767275377643098, guid: 66aa77fdbfbcaa34d81ded477af82b46,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4412767275377643098, guid: 66aa77fdbfbcaa34d81ded477af82b46,
+        type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4412767275377643098, guid: 66aa77fdbfbcaa34d81ded477af82b46,
+        type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4412767275377643098, guid: 66aa77fdbfbcaa34d81ded477af82b46,
+        type: 3}
+      propertyPath: m_RootOrder
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4412767275377643098, guid: 66aa77fdbfbcaa34d81ded477af82b46,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4412767275377643098, guid: 66aa77fdbfbcaa34d81ded477af82b46,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4412767275377643098, guid: 66aa77fdbfbcaa34d81ded477af82b46,
+        type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7234445240288730586, guid: 66aa77fdbfbcaa34d81ded477af82b46,
+        type: 3}
+      propertyPath: m_Name
+      value: Crafter
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 66aa77fdbfbcaa34d81ded477af82b46, type: 3}
 --- !u!1 &4301620202279493289
 GameObject:
   m_ObjectHideFlags: 0
@@ -7554,6 +7633,7 @@ GameObject:
   - component: {fileID: 4301620202279493290}
   - component: {fileID: 4301620202279493292}
   - component: {fileID: 4301620202279493293}
+  - component: {fileID: 4301620202279493294}
   m_Layer: 0
   m_Name: Cutscene1
   m_TagString: Untagged
@@ -7575,6 +7655,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Text: Lose money
   Jump: 1
+  Condition: 3_G_500_?
   OnDecide:
     m_PersistentCalls:
       m_Calls:
@@ -7584,7 +7665,7 @@ MonoBehaviour:
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: -100
+          m_IntArgument: -500
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
@@ -7603,6 +7684,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Text: Get money
   Jump: 1
+  Condition: 
   OnDecide:
     m_PersistentCalls:
       m_Calls:
@@ -7612,7 +7694,7 @@ MonoBehaviour:
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 100
+          m_IntArgument: 500
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 0
@@ -7629,7 +7711,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8bfe9d831d760ee42bf47eabfdb639d0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Text: ok
+  Text: ok!!!
+  Condition: 
   Jump: 1
   LeftCharacter1: {fileID: 0}
   RightCharacter1: {fileID: 0}
@@ -7654,7 +7737,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Text: tis done
-  Jump: 1
+  Condition: 
+  Jump: 0
   LeftCharacter1: {fileID: 0}
   RightCharacter1: {fileID: 0}
   LeftCharacter2: {fileID: 0}
@@ -7676,6 +7760,31 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+--- !u!114 &4301620202279493294
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4301620202279493289}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8bfe9d831d760ee42bf47eabfdb639d0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Text: NOT ENOUGH MONEY WTF
+  Condition: 
+  Jump: 1
+  LeftCharacter1: {fileID: 0}
+  RightCharacter1: {fileID: 0}
+  LeftCharacter2: {fileID: 0}
+  RightCharacter2: {fileID: 0}
+  Name: bob jr
+  TalkingCharacter: 0
+  Choices: []
+  OnDisplay:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &4863234013413463945
 GameObject:
   m_ObjectHideFlags: 0
@@ -8832,6 +8941,7 @@ MonoBehaviour:
   - {fileID: 1986673273748538556}
   - {fileID: 4301620202279493292}
   - {fileID: 4301620202279493293}
+  - {fileID: 4301620202279493294}
   OnComplete:
     m_PersistentCalls:
       m_Calls: []
