@@ -25,6 +25,7 @@ public abstract class Tool : BaseObject
     public BattleMaster.Elements Element;
     public bool AlwaysHits;
     public int Power = 10;
+    public int Range = 50;
     public int Accuracy = 100;
     public int CritcalRate = 2;
     public int Variance;

@@ -42,6 +42,7 @@ public class MMBlueprints : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameO
 
     protected override void Update()
     {
+        if (!MainComponent.Activated) return;
         base.Update();
         switch (Selection)
         {

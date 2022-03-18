@@ -38,6 +38,6 @@ public class MapNPC : MapExplorer
     {
         if (Interacting) return;
         Interacting = true;
-        Cutscene.Open();
+        Cutscene.Open(interactor);
     }
 }

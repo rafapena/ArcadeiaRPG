@@ -6,6 +6,8 @@ using UnityEngine.UI;
 
 public class CutsceneManager : MonoBehaviour
 {
+    public MapPlayer Player;
+
     public DialoguePortrait[] Characters;
 
     public GameObject DialogueFrame;
@@ -17,21 +19,31 @@ public class CutsceneManager : MonoBehaviour
     public GameObject ChoicesFrame;
     public GameObject ChoicesList;
 
-    private Vector2 NameFrameDefaultPosition;
+    public MenuFrame GoldFrame;
+    public TextMeshProUGUI GoldAmount;
+    private int DisplayedGold;
+    private int GoldChangeSpeed;
 
     private string FullText;
     private bool IsPrintingDialogue = false;
 
-    public void Open()
+    private void Update()
+    {
+        UpdateGoldDisplay();
+    }
+
+    public void Open(MapPlayer player)
     {
         SceneMaster.OpenCutscene();
+        Player = player;
+        DisplayedGold = player.Party.Inventory.Gold;
         gameObject.SetActive(true);
         ChoicesFrame.SetActive(false);
     }
 
     public void Close()
     {
-        SceneMaster.CloseCutscene();
+        SceneMaster.CloseCutscene(Player);
         gameObject.SetActive(false);
         ChoicesFrame.SetActive(false);
     }
@@ -96,5 +108,33 @@ public class CutsceneManager : MonoBehaviour
         foreach (var c in Characters) c.Image.color = DialoguePortrait.HighlightedColor;
         NameFrameL.SetActive(false);
         NameFrameR.SetActive(false);
+    }
+
+    public void DisplayGold()
+    {
+        GoldFrame.Activate();
+    }
+
+    public void HideGold()
+    {
+        GoldFrame.Deactivate();
+    }
+
+    public void ChangeGold(int amount)
+    {
+        Player.Party.Inventory.Gold += amount;
+        if (Player.Party.Inventory.Gold <= 0) Player.Party.Inventory.Gold = 0;
+        GoldChangeSpeed = amount / 60 + (amount > 0 ? 1 : -1);
+    }
+
+    private void UpdateGoldDisplay()
+    {
+        GoldAmount.text = DisplayedGold.ToString();
+        DisplayedGold += GoldChangeSpeed;
+        if (GoldChangeSpeed < 0 && DisplayedGold < Player.Party.Inventory.Gold || GoldChangeSpeed > 0 && DisplayedGold > Player.Party.Inventory.Gold)
+        {
+            DisplayedGold = Player.Party.Inventory.Gold;
+            GoldChangeSpeed = 0;
+        }
     }
 }

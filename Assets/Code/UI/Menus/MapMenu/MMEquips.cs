@@ -36,6 +36,7 @@ public class MMEquips : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOpera
 
     protected override void Update()
     {
+        if (!MainComponent.Activated) return;
         base.Update();
         if (Selection == Selections.SelectTool || Selection == Selections.SelectToolSwap)
         {

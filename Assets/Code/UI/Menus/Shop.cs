@@ -340,29 +340,30 @@ public class Shop : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameOper
         ConfirmFrame.Deactivate();
         ResultCheckFrame.SetActive(false);
         TransactionConfirmedFrame.SetActive(true);
-        if (isBuying) ConfirmPurchase();
-        else ConfirmSell();
-        int gsp = System.Math.Abs(PartyInfo.Inventory.Gold - DisplayedGold) / 60;
-        DisplayedGoldChangeSpeed = gsp < 1 ? 1 : gsp;
+        int total = isBuying ? ConfirmPurchase() : ConfirmSell();
+        DisplayedGoldChangeSpeed = total / 60 + 1;
         JustTransactedTimer = Time.unscaledTime + TRANSACTED_TIME_BUFFER;
     }
 
-    private void ConfirmPurchase()
+    private int ConfirmPurchase()
     {
-        PartyInfo.Inventory.Gold -= ConfirmFrame.Amount * SelectedToolToInventory.DefaultPrice;
+        int total = ConfirmFrame.Amount * SelectedToolToInventory.DefaultPrice;
+        PartyInfo.Inventory.Gold -= total;
         if (SelectedToolToInventory is Item it) PartyInfo.Inventory.AddItem(it, ConfirmFrame.Amount);
         else if (SelectedToolToInventory is Weapon wp) PartyInfo.Inventory.AddWeapon(wp, ConfirmFrame.Amount);
 
         TransactionConfirmedFrame.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "Purchased " + SelectedToolToInventory.Name;
         TransactionConfirmedFrame.transform.GetChild(1).GetComponent<Image>().sprite = SelectedToolToInventory.GetComponent<SpriteRenderer>().sprite;
         UpdateCarryingAmount();
+        return total;
     }
 
-    private void ConfirmSell()
+    private int ConfirmSell()
     {
         ToolForInventory tool = SellingFrame.ToolList.SelectedObject;
-        
-        PartyInfo.Inventory.Gold += ConfirmFrame.Amount * tool.DefaultSellPrice;
+
+        int total = ConfirmFrame.Amount * tool.DefaultSellPrice;
+        PartyInfo.Inventory.Gold += total;
         if (tool is Item it) PartyInfo.Inventory.RemoveItem(it, ConfirmFrame.Amount);
         else if (tool is Weapon wp) PartyInfo.Inventory.RemoveWeapon(wp, ConfirmFrame.Amount);
 
@@ -370,6 +371,7 @@ public class Shop : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameOper
         TransactionConfirmedFrame.transform.GetChild(1).GetComponent<Image>().sprite = tool.GetComponent<SpriteRenderer>().sprite;
         SellingFrame.Refresh();
         SellingFrame.ListBlocker.SetActive(true);
+        return total;
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

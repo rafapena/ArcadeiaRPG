@@ -51,6 +51,7 @@ public class MMInventory : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOp
 
     protected override void Update()
     {
+        if (!MainComponent.Activated) return;
         base.Update();
         switch (Selection)
         {

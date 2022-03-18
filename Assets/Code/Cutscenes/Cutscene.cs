@@ -65,9 +65,9 @@ public class Cutscene : MonoBehaviour
         }
     }
 
-    public void Open(bool hadToInteract = true)
+    public void Open(MapPlayer player, bool hadToInteract = true)
     {
-        Manager.Open();
+        Manager.Open(player);
         CurrentlyRunning = true;
         CurrentBubble = 0;
         RefreshDialogue();
@@ -77,7 +77,7 @@ public class Cutscene : MonoBehaviour
     public void Open(CutsceneManager manager, bool hadToInteract = true)
     {
         Manager = manager;
-        Open(hadToInteract);
+        Open(manager.Player, hadToInteract);
     }
 
     private void NextPage()

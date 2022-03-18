@@ -177,8 +177,9 @@ public class SceneMaster : MonoBehaviour
         InCutscene = true;
     }
 
-    public static void CloseCutscene()
+    public static void CloseCutscene(MapPlayer player)
     {
+        GameplayMaster.Party = player.Party;
         MenuMaster.SetupSelectionBufferInGameplay();
         InCutscene = false;
     }

@@ -30,6 +30,7 @@ public class MMMap : MM_Super, IDragHandler
 
     protected override void Update()
     {
+        if (!MainComponent.Activated) return;
         base.Update();
         if (Selection != Selections.MoveMap) return;
         else if (Input.GetKeyDown(KeyCode.LeftArrow)) MoveLocation(-1);

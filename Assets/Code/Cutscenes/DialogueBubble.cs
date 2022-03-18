@@ -39,20 +39,18 @@ public class DialogueBubble : MonoBehaviour
 
     private void EstablishCharacters(CutsceneManager cm)
     {
-        if (LeftCharacter1 != null) cm.ActivateCharacter(0, LeftCharacter1);
-        else cm.DeactivateCharacter(0);
-
-        if (RightCharacter1 != null) cm.ActivateCharacter(1, RightCharacter1);
-        else cm.DeactivateCharacter(1);
-
-        if (LeftCharacter2 != null) cm.ActivateCharacter(2, LeftCharacter2);
-        else cm.DeactivateCharacter(2);
-
-        if (RightCharacter2 != null) cm.ActivateCharacter(3, RightCharacter2);
-        else cm.DeactivateCharacter(3);
-
+        EstablishCharacter(0, LeftCharacter1, cm);
+        EstablishCharacter(1, RightCharacter1, cm);
+        EstablishCharacter(2, LeftCharacter2, cm);
+        EstablishCharacter(3, RightCharacter2, cm);
         if (TalkingCharacter == DialogueCharacter.None) cm.HighlightAll();
         else cm.HighlightCharacter((int)TalkingCharacter - 1);
+    }
+
+    private void EstablishCharacter(int index, Sprite character, CutsceneManager cm)
+    {
+        if (character != null) cm.ActivateCharacter(index, character);
+        else cm.DeactivateCharacter(index);
     }
 
     public void SetupChoices(CutsceneManager cm)

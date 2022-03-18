@@ -197,7 +197,7 @@ public class InventoryToolSelectionList : SelectionList_Super<ToolForInventory>
         InfoFrame.transform.GetChild(4).gameObject.SetActive(isWeapon);
         InfoFrame.transform.GetChild(5).gameObject.SetActive(isWeapon);
         InfoFrame.transform.GetChild(3).GetChild(0).GetComponent<TextMeshProUGUI>().text = SelectedObject.Power.ToString();
-        InfoFrame.transform.GetChild(4).GetChild(0).GetComponent<TextMeshProUGUI>().text = SelectedObject.ConsecutiveActs.ToString();
+        InfoFrame.transform.GetChild(4).GetChild(0).GetComponent<TextMeshProUGUI>().text = SelectedObject.Range + "%";
         InfoFrame.transform.GetChild(5).GetChild(0).GetComponent<TextMeshProUGUI>().text = "+" + SelectedObject.CritcalRate + "%";
 
         InfoFrame.transform.GetChild(6).GetChild(0).GetComponent<TextMeshProUGUI>().text = SelectedObject.Weight.ToString();

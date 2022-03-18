@@ -51,6 +51,7 @@ public class MMSpecial : MM_Super
 
     protected override void Update()
     {
+        if (!MainComponent.Activated) return;
         base.Update();
         if (Selection == Selections.UsageDone && Time.realtimeSinceStartup > DoneTimer)
         {
