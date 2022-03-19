@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 3248169618960043792}
   - component: {fileID: 8384673876078120243}
   - component: {fileID: 3552097900181454016}
-  - component: {fileID: -726947160054599425}
   m_Layer: 0
   m_Name: SmallSword
   m_TagString: Untagged
@@ -114,6 +113,7 @@ MonoBehaviour:
   Element: 0
   AlwaysHits: 0
   Power: 10
+  Range: 3
   Accuracy: 100
   CritcalRate: 2
   Variance: 10
@@ -128,31 +128,18 @@ MonoBehaviour:
   RequiredTools: []
   Quantity: 0
   Weight: 2
-  EquipBoosts: {fileID: -726947160054599425}
+  EquipBoosts:
+    MaxHP: 0
+    Atk: 0
+    Def: 0
+    Map: 0
+    Mar: 0
+    Spd: 0
+    Tec: 0
+    Luk: 0
+    Acc: 0
+    Eva: 0
+    Crt: 0
+    Cev: 0
   WeaponType: 1
-  Range: 3
   CollideRange: 1
---- !u!114 &-726947160054599425
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7569271499837528704}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 266aef9b79cbf74438f340fe01139120, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  MaxHP: 0
-  Atk: 3
-  Def: 0
-  Map: 0
-  Mar: 0
-  Spd: 0
-  Tec: 0
-  Luk: 0
-  Acc: 0
-  Eva: 0
-  Crt: 0
-  Cev: 0

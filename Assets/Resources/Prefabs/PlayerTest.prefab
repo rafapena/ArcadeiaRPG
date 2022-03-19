@@ -168,9 +168,6 @@ GameObject:
   - component: {fileID: 8854167014643114192}
   - component: {fileID: 8854167014643114191}
   - component: {fileID: 8854167014643114187}
-  - component: {fileID: 8854167014643114186}
-  - component: {fileID: 8854167014643114189}
-  - component: {fileID: 8854167014643114188}
   - component: {fileID: 8854167014643114184}
   - component: {fileID: 5726009491312351033}
   m_Layer: 9
@@ -372,48 +369,6 @@ MonoBehaviour:
   CraftableWeapons:
   - {fileID: 4959000729214192542, guid: f43fc6a9a0487964283e05224babca5a, type: 3}
   PreemptiveAttackChance: 0
---- !u!114 &8854167014643114186
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8854167014643114197}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f5d2003acd58baf4c823e527c3d6dcd3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Player: {fileID: 0}
-  RelationLevel: 0
---- !u!114 &8854167014643114189
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8854167014643114197}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f5d2003acd58baf4c823e527c3d6dcd3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Player: {fileID: 0}
-  RelationLevel: 0
---- !u!114 &8854167014643114188
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8854167014643114197}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f5d2003acd58baf4c823e527c3d6dcd3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Player: {fileID: 0}
-  RelationLevel: 0
 --- !u!114 &8854167014643114184
 MonoBehaviour:
   m_ObjectHideFlags: 0

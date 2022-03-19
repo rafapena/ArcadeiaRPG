@@ -407,9 +407,6 @@ GameObject:
   - component: {fileID: 3433565585831540351}
   - component: {fileID: 1061896022351797397}
   - component: {fileID: 817317665460558166}
-  - component: {fileID: 4661654898701969777}
-  - component: {fileID: 2413003443368104337}
-  - component: {fileID: 6077460687212625879}
   m_Layer: 10
   m_Name: enemy1
   m_TagString: Untagged
@@ -532,15 +529,35 @@ MonoBehaviour:
   Class: {fileID: 0}
   HP: 0
   SP: 0
-  Stats: {fileID: 4661654898701969777}
-  StatBoosts: {fileID: 0}
-  SoloSkills: []
-  TeamSkills: []
+  Stats:
+    MaxHP: 0
+    Atk: 0
+    Def: 0
+    Map: 0
+    Mar: 0
+    Spd: 0
+    Tec: 0
+    Luk: 0
+    Acc: 0
+    Eva: 0
+    Crt: 0
+    Cev: 0
+  StatBoosts:
+    MaxHP: 0
+    Atk: 0
+    Def: 0
+    Map: 0
+    Mar: 0
+    Spd: 0
+    Tec: 0
+    Luk: 0
+    Acc: 0
+    Eva: 0
+    Crt: 0
+    Cev: 0
+  Skills: []
   Weapons: []
-  Items: []
-  PassiveSkills: []
-  SelectedSoloSkill: {fileID: 0}
-  SelectedTeamSkill: {fileID: 0}
+  SelectedSkill: {fileID: 0}
   SelectedWeapon: {fileID: 0}
   SelectedItem: {fileID: 0}
   SelectedTeamSkillPartners: []
@@ -554,7 +571,19 @@ MonoBehaviour:
   ChangedStateRates: []
   ComboDifficulty: 0
   Flying: 0
-  StatModifiers: {fileID: 0}
+  StatModifiers:
+    MaxHP: 0
+    Atk: 0
+    Def: 0
+    Map: 0
+    Mar: 0
+    Spd: 0
+    Tec: 0
+    Luk: 0
+    Acc: 0
+    Eva: 0
+    Crt: 0
+    Cev: 0
   Unconscious: 0
   Petrified: 0
   CannotMove: 0
@@ -570,82 +599,13 @@ MonoBehaviour:
   Waiting: 0
   SPToConsumeThisTurn: 0
   IsCharging: 0
-  ToolAI:
-  - {fileID: 2413003443368104337}
+  ToolAI: []
   Exp: 100
   Gold: 300
-  DroppedItems:
-  - {fileID: 6077460687212625879}
+  DroppedItems: []
   MultiplyHP: 1
   ExtraTurns: 0
   IsSummon: 0
---- !u!114 &4661654898701969777
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4358518413735402372}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 266aef9b79cbf74438f340fe01139120, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  MaxHP: 30
-  Atk: 30
-  Def: 30
-  Map: 30
-  Mar: 30
-  Spd: 30
-  Tec: 30
-  Luk: 30
-  Acc: 100
-  Eva: 100
-  Crt: 100
-  Cev: 100
---- !u!114 &2413003443368104337
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4358518413735402372}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cc89f1065ebaaa846829fa5f5027360d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Move: {fileID: 3297598885578702653, guid: dcb917dcac2f1eb4395fd9bf9871dae5, type: 3}
-  Priority: 0
-  Quantity: 0
-  HPLow: 0
-  HPHigh: 0
-  SPLow: 0
-  SPHigh: 0
-  AllyCondition: 0
-  FoeCondition: 0
-  UserCondition: 0
-  TargetToolElement: 0
-  ActiveStates: []
-  InactiveStates: []
-  TargetElementRate: []
-  TargetStateRates: []
-  TargetStatConditions: {fileID: 0}
---- !u!114 &6077460687212625879
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4358518413735402372}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4c20bd4fec9f5c845af3d71feef5259d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ItemDropped: {fileID: 7230775191068158404, guid: 77df0195c5c99154580a874268a423bc,
-    type: 3}
-  Rate: 80
 --- !u!1 &5167019645116249668
 GameObject:
   m_ObjectHideFlags: 0

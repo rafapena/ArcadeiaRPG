@@ -407,7 +407,6 @@ GameObject:
   - component: {fileID: 3433565585831540351}
   - component: {fileID: 1061896022351797397}
   - component: {fileID: 307554375047437259}
-  - component: {fileID: 4661654898701969777}
   m_Layer: 0
   m_Name: DuckSummon
   m_TagString: Untagged
@@ -530,15 +529,35 @@ MonoBehaviour:
   Class: {fileID: 0}
   HP: 0
   SP: 0
-  Stats: {fileID: 4661654898701969777}
-  StatBoosts: {fileID: 0}
-  SoloSkills: []
-  TeamSkills: []
+  Stats:
+    MaxHP: 0
+    Atk: 0
+    Def: 0
+    Map: 0
+    Mar: 0
+    Spd: 0
+    Tec: 0
+    Luk: 0
+    Acc: 0
+    Eva: 0
+    Crt: 0
+    Cev: 0
+  StatBoosts:
+    MaxHP: 0
+    Atk: 0
+    Def: 0
+    Map: 0
+    Mar: 0
+    Spd: 0
+    Tec: 0
+    Luk: 0
+    Acc: 0
+    Eva: 0
+    Crt: 0
+    Cev: 0
+  Skills: []
   Weapons: []
-  Items: []
-  PassiveSkills: []
-  SelectedSoloSkill: {fileID: 0}
-  SelectedTeamSkill: {fileID: 0}
+  SelectedSkill: {fileID: 0}
   SelectedWeapon: {fileID: 0}
   SelectedItem: {fileID: 0}
   SelectedTeamSkillPartners: []
@@ -552,7 +571,19 @@ MonoBehaviour:
   ChangedStateRates: []
   ComboDifficulty: 100
   Flying: 0
-  StatModifiers: {fileID: 0}
+  StatModifiers:
+    MaxHP: 0
+    Atk: 0
+    Def: 0
+    Map: 0
+    Mar: 0
+    Spd: 0
+    Tec: 0
+    Luk: 0
+    Acc: 0
+    Eva: 0
+    Crt: 0
+    Cev: 0
   Unconscious: 0
   Petrified: 0
   CannotMove: 0
@@ -570,30 +601,6 @@ MonoBehaviour:
   IsCharging: 0
   ToolAI: []
   IsSummon: 1
---- !u!114 &4661654898701969777
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4358518413735402372}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 266aef9b79cbf74438f340fe01139120, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  MaxHP: 30
-  Atk: 30
-  Def: 30
-  Map: 30
-  Mar: 30
-  Spd: 30
-  Tec: 30
-  Luk: 30
-  Acc: 100
-  Eva: 100
-  Crt: 100
-  Cev: 100
 --- !u!1 &5167019645116249668
 GameObject:
   m_ObjectHideFlags: 0

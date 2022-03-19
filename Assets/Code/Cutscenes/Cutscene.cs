@@ -67,11 +67,15 @@ public class Cutscene : MonoBehaviour
 
     public void Open(MapPlayer player, bool hadToInteract = true)
     {
-        Manager.Open(player);
-        CurrentlyRunning = true;
-        CurrentBubble = 0;
-        RefreshDialogue();
-        InteractionBuffer = hadToInteract;
+        try
+        {
+            Manager.Open(player);
+            CurrentlyRunning = true;
+            CurrentBubble = 0;
+            RefreshDialogue();
+            InteractionBuffer = hadToInteract;
+        }
+        catch { }
     }
 
     public void Open(CutsceneManager manager, bool hadToInteract = true)
