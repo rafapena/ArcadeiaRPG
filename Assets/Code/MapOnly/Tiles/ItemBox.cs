@@ -1,12 +1,10 @@
-﻿using System;
-using TMPro;
+﻿using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class ItemBox : MonoBehaviour
 {
     public int Id;
-    public IToolForInventory[] StoredTools;
     public Sprite OpenedSprite;
     private bool Opened;
     [HideInInspector] public bool CloseToPlayer;
@@ -15,11 +13,17 @@ public class ItemBox : MonoBehaviour
     private float UIPopupTimer;
     public float UIPopupTimeLimit;
 
+    public Item[] StoredItems;
+    public Weapon[] StoredWeapons;
+    public Accessory[] StoredAccessories;
+    private IToolForInventory[] StoredTools;
+
     public bool IsOpened => Opened;
 
     private void Start()
     {
         UIPopup.SetActive(false);
+        StoredTools = MenuMaster.GroupInventoryToolsToArray(StoredItems, StoredWeapons, StoredAccessories);
     }
 
     private void Update()
@@ -33,8 +37,7 @@ public class ItemBox : MonoBehaviour
         opener.PointToDirectionOf(this);
         SetOpen();
         DisplayObtainedTools();
-        foreach (IToolForInventory t in StoredTools)
-            opener.Party.Inventory.Add(t);
+        foreach (var tool in StoredTools) opener.Party.Inventory.Add(tool);
     }
 
     public void SetOpen()
@@ -48,7 +51,7 @@ public class ItemBox : MonoBehaviour
         UIPopup.SetActive(true);
         UIPopupTimer = Time.unscaledTime + UIPopupTimeLimit;
         Transform list = UIPopup.transform.GetChild(0);
-        int limit = Math.Min(StoredTools.Length, 3);
+        int limit = System.Math.Min(StoredTools.Length, 3);
         int i = 0;
         for (; i < limit; i++)
         {

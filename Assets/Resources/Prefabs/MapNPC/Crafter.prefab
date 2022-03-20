@@ -12,16 +12,8 @@ GameObject:
   - component: {fileID: 1531865152936168187}
   - component: {fileID: 3047946766088564043}
   - component: {fileID: 1428346573828293799}
-  - component: {fileID: 6470516105009025341}
+  - component: {fileID: 1914083133897695949}
   - component: {fileID: 2350240225161313501}
-  - component: {fileID: 3056634759653515565}
-  - component: {fileID: 3056634759653515562}
-  - component: {fileID: 3056634759653515561}
-  - component: {fileID: 3056634759653515558}
-  - component: {fileID: 2185482107728094755}
-  - component: {fileID: 7256449824551661654}
-  - component: {fileID: 7203693941541928906}
-  - component: {fileID: 6726880017937627270}
   m_Layer: 0
   m_Name: Crafter
   m_TagString: NPC
@@ -140,7 +132,7 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
---- !u!114 &6470516105009025341
+--- !u!114 &1914083133897695949
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -149,7 +141,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 7234445240288730586}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a33bcaa147842d44180d772a5629b2df, type: 3}
+  m_Script: {fileID: 11500000, guid: fdb42366f3107b64b836295f5cd0cdd9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   Figure: {fileID: 0}
@@ -158,13 +150,7 @@ MonoBehaviour:
   CloseToPlayer: 0
   Interacting: 0
   Customer: {fileID: 0}
-  Image: {fileID: -8859260594094452424, guid: 00ccb3c494b812a468007d483a535d84, type: 3}
-  ToolsInStock:
-  - {fileID: 7230775191068158404, guid: 77df0195c5c99154580a874268a423bc, type: 3}
-  - {fileID: 1623505104987198706, guid: db3b6b36abc81214a8b4f9956b5e567c, type: 3}
-  - {fileID: 7230775191068158404, guid: db8c71b6c4218214086cf5982e9e2adb, type: 3}
-  - {fileID: 4959000729214192542, guid: f43fc6a9a0487964283e05224babca5a, type: 3}
-  - {fileID: 3552097900181454016, guid: ffa9f6fe244c85248a1bb202285c251d, type: 3}
+  Image: {fileID: 0}
   TransactionAddedJump: 0
   OnlyBrowseAddedJump: 1
 --- !u!114 &2350240225161313501
@@ -181,216 +167,82 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Manager: {fileID: 0}
   Dialogue:
-  - {fileID: 3056634759653515565}
-  - {fileID: 3056634759653515562}
-  - {fileID: 7256449824551661654}
-  - {fileID: 7203693941541928906}
-  - {fileID: 6726880017937627270}
+  - Text: Hi, I craft stuff
+    Condition: 
+    Jump: 1
+    LeftCharacter1: {fileID: 0}
+    RightCharacter1: {fileID: 0}
+    LeftCharacter2: {fileID: 0}
+    RightCharacter2: {fileID: 0}
+    Name: Crafter
+    TalkingCharacter: 2
+    Choices:
+    - Text: Yes
+      Jump: 1
+      Condition: 
+      OnDecide:
+        m_PersistentCalls:
+          m_Calls:
+          - m_Target: {fileID: 1914083133897695949}
+            m_MethodName: OpenWorkshop
+            m_Mode: 1
+            m_Arguments:
+              m_ObjectArgument: {fileID: 0}
+              m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+              m_IntArgument: 0
+              m_FloatArgument: 0
+              m_StringArgument: 
+              m_BoolArgument: 0
+            m_CallState: 2
+    - Text: Leave
+      Jump: 3
+      Condition: 
+      OnDecide:
+        m_PersistentCalls:
+          m_Calls: []
+    OnDisplay:
+      m_PersistentCalls:
+        m_Calls: []
+  - Text: Okay thanks bye
+    Condition: 
+    Jump: 0
+    LeftCharacter1: {fileID: 0}
+    RightCharacter1: {fileID: 0}
+    LeftCharacter2: {fileID: 0}
+    RightCharacter2: {fileID: 0}
+    Name: Crafter
+    TalkingCharacter: 2
+    Choices: []
+    OnDisplay:
+      m_PersistentCalls:
+        m_Calls: []
+  - Text: Didn't craft stuff...
+    Condition: 
+    Jump: 0
+    LeftCharacter1: {fileID: 0}
+    RightCharacter1: {fileID: 0}
+    LeftCharacter2: {fileID: 0}
+    RightCharacter2: {fileID: 0}
+    Name: Crafter
+    TalkingCharacter: 2
+    Choices: []
+    OnDisplay:
+      m_PersistentCalls:
+        m_Calls: []
+  - Text: bye
+    Condition: 
+    Jump: 0
+    LeftCharacter1: {fileID: 0}
+    RightCharacter1: {fileID: 0}
+    LeftCharacter2: {fileID: 0}
+    RightCharacter2: {fileID: 0}
+    Name: Crafter
+    TalkingCharacter: 2
+    Choices: []
+    OnDisplay:
+      m_PersistentCalls:
+        m_Calls: []
   OnComplete:
     m_PersistentCalls:
       m_Calls: []
   JumpToCutscene: {fileID: 0}
---- !u!114 &3056634759653515565
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7234445240288730586}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8bfe9d831d760ee42bf47eabfdb639d0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Text: Hi welcome to shop!!1!1!!
-  Condition: 
-  Jump: 1
-  LeftCharacter1: {fileID: 0}
-  RightCharacter1: {fileID: 0}
-  LeftCharacter2: {fileID: 0}
-  RightCharacter2: {fileID: 0}
-  Name: Shopkeeper
-  TalkingCharacter: 2
-  Choices: []
-  OnDisplay:
-    m_PersistentCalls:
-      m_Calls: []
---- !u!114 &3056634759653515562
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7234445240288730586}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8bfe9d831d760ee42bf47eabfdb639d0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Text: buy ore sell?????
-  Condition: 
-  Jump: 1
-  LeftCharacter1: {fileID: 0}
-  RightCharacter1: {fileID: 0}
-  LeftCharacter2: {fileID: 0}
-  RightCharacter2: {fileID: 0}
-  Name: Shopkeeper
-  TalkingCharacter: 2
-  Choices:
-  - {fileID: 3056634759653515561}
-  - {fileID: 3056634759653515558}
-  - {fileID: 2185482107728094755}
-  OnDisplay:
-    m_PersistentCalls:
-      m_Calls: []
---- !u!114 &3056634759653515561
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7234445240288730586}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 90209c6a39bc52b48ad3ef95ec0e109b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Text: Buy
-  Jump: 1
-  Condition: 
-  OnDecide:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 6470516105009025341}
-        m_MethodName: OpenShop
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 1
-        m_CallState: 2
---- !u!114 &3056634759653515558
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7234445240288730586}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 90209c6a39bc52b48ad3ef95ec0e109b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Text: Sell
-  Jump: 1
-  Condition: 
-  OnDecide:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 6470516105009025341}
-        m_MethodName: OpenShop
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
---- !u!114 &2185482107728094755
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7234445240288730586}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 90209c6a39bc52b48ad3ef95ec0e109b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Text: Leave
-  Jump: 3
-  Condition: 
-  OnDecide:
-    m_PersistentCalls:
-      m_Calls: []
---- !u!114 &7256449824551661654
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7234445240288730586}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8bfe9d831d760ee42bf47eabfdb639d0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Text: ty for da bizniss
-  Condition: 
-  Jump: 0
-  LeftCharacter1: {fileID: 0}
-  RightCharacter1: {fileID: 0}
-  LeftCharacter2: {fileID: 0}
-  RightCharacter2: {fileID: 0}
-  Name: Shopkeeper
-  TalkingCharacter: 2
-  Choices: []
-  OnDisplay:
-    m_PersistentCalls:
-      m_Calls: []
---- !u!114 &7203693941541928906
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7234445240288730586}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8bfe9d831d760ee42bf47eabfdb639d0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Text: don jus brows u scrub
-  Condition: 
-  Jump: 0
-  LeftCharacter1: {fileID: 0}
-  RightCharacter1: {fileID: 0}
-  LeftCharacter2: {fileID: 0}
-  RightCharacter2: {fileID: 0}
-  Name: Shopkeeper
-  TalkingCharacter: 2
-  Choices: []
-  OnDisplay:
-    m_PersistentCalls:
-      m_Calls: []
---- !u!114 &6726880017937627270
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7234445240288730586}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8bfe9d831d760ee42bf47eabfdb639d0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Text: lmao u suk
-  Condition: 
-  Jump: 0
-  LeftCharacter1: {fileID: 0}
-  RightCharacter1: {fileID: 0}
-  LeftCharacter2: {fileID: 0}
-  RightCharacter2: {fileID: 0}
-  Name: Shopkeeper
-  TalkingCharacter: 2
-  Choices: []
-  OnDisplay:
-    m_PersistentCalls:
-      m_Calls: []

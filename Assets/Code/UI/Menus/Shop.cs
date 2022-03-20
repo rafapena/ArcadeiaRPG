@@ -75,9 +75,9 @@ public class Shop : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameOper
         else
         {
             SellingFrame.TargetFrame.Activate();
-            SellingFrame.RegisterToolList(0, PartyInfo.Inventory.Items.FindAll(x => !x.IsKey));
-            SellingFrame.RegisterToolList(1, PartyInfo.Inventory.Weapons);
-            SellingFrame.RegisterToolList(2, PartyInfo.Inventory.Accessories);
+            SellingFrame.SetToolListOnTab(0, PartyInfo.Inventory.Items.FindAll(x => !x.IsKey));
+            SellingFrame.SetToolListOnTab(1, PartyInfo.Inventory.Weapons);
+            SellingFrame.SetToolListOnTab(2, PartyInfo.Inventory.Accessories);
             SellingFrame.InitializeSelection();
             SellingFrame.TrackCarryWeight(PartyInfo.Inventory);
         }
@@ -141,7 +141,6 @@ public class Shop : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameOper
         else
         {
             SellingFrame.ToolList.SelectedButton.ClearHighlights();
-            SellingFrame.Refresh();
             EventSystem.current.SetSelectedGameObject(SellingFrame.ToolList.SelectedButton.gameObject ?? SellingFrame.ToolList.transform.GetChild(0).gameObject);
         }
         Initialize();
@@ -152,7 +151,7 @@ public class Shop : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameOper
         Selection = Selections.Browsing;
         if (isBuying)
         {
-            BuyingList.Refresh(Shopkeep.ToolsInStock);
+            BuyingList.Refresh(Shopkeep.GetAllToolsInStock());
             BuyingList.Selecting = true;
         }
         else SellingFrame.SelectingToolList();
@@ -296,6 +295,7 @@ public class Shop : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameOper
     {
         if (BuyingList.SelectedObject is Item it) SelectedToolToInventory = PartyInfo.Inventory.Items.Find(x => x.Id == it.Id);
         else if (BuyingList.SelectedObject is Weapon wp) SelectedToolToInventory = PartyInfo.Inventory.Weapons.Find(x => x.Id == wp.Id);
+        else if (BuyingList.SelectedObject is Accessory ac) SelectedToolToInventory = PartyInfo.Inventory.Accessories.Find(x => x.Id == ac.Id);
     }
 
     private void UndoConfirmAmountBuying()
@@ -366,11 +366,22 @@ public class Shop : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameOper
         int total = ConfirmFrame.Amount * tool.SellPrice;
         PartyInfo.Inventory.Gold += total;
         PartyInfo.Inventory.Remove(tool, ConfirmFrame.Amount);
-
         TransactionConfirmedFrame.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "Sold " + tool.Info.Name;
         TransactionConfirmedFrame.transform.GetChild(1).GetComponent<Image>().sprite = tool.Info.GetComponent<SpriteRenderer>().sprite;
-        SellingFrame.Refresh();
+        
         SellingFrame.ListBlocker.SetActive(true);
+        switch (SellingFrame.CurrentInventoryList)
+        {
+            case InventorySystem.ListType.Items:
+                SellingFrame.Refresh(PartyInfo.Inventory.Items.FindAll(x => !x.IsKey));
+                break;
+            case InventorySystem.ListType.Weapons:
+                SellingFrame.Refresh(PartyInfo.Inventory.Weapons);
+                break;
+            case InventorySystem.ListType.Accessories:
+                SellingFrame.Refresh(PartyInfo.Inventory.Accessories);
+                break;
+        }
         return total;
     }
 

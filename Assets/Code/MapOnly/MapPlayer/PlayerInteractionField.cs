@@ -43,11 +43,13 @@ public class PlayerInteractionField : MonoBehaviour
                 ItemBox b = collision.gameObject.GetComponent<ItemBox>();
                 b.CloseToPlayer = nearby;
                 if (nearby) ItemsBoxesFound.Add(b);
+                else ItemsBoxesFound.Remove(b);
                 break;
             case "NPC":
                 MapNPC n = collision.gameObject.GetComponent<MapNPC>();
                 n.CloseToPlayer = nearby;
                 if (nearby) NPCsFound.Add(n);
+                else NPCsFound.Remove(n);
                 break;
         }
     }

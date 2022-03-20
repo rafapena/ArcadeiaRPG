@@ -1,10 +1,8 @@
 ﻿using UnityEngine;
 using UnityEngine.Events;
 
-/// <summary>
-/// Administrates the game's cutscenes
-/// </summary>
-public class DialogueChoice : MonoBehaviour
+[System.Serializable]
+public struct DialogueChoice
 {
     public string Text;
     public int Jump;

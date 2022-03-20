@@ -72,10 +72,10 @@ public class MMInventory : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOp
     public override void Open()
     {
         base.Open();
-        InventoryFrame.RegisterToolList(0, MenuManager.PartyInfo.Inventory.Items.FindAll(x => !x.IsKey));
-        InventoryFrame.RegisterToolList(1, MenuManager.PartyInfo.Inventory.Weapons);
-        InventoryFrame.RegisterToolList(2, MenuManager.PartyInfo.Inventory.Accessories);
-        InventoryFrame.RegisterToolList(3, MenuManager.PartyInfo.Inventory.Items.FindAll(x => x.IsKey));
+        InventoryFrame.SetToolListOnTab(0, GetInventoryItems(false));
+        InventoryFrame.SetToolListOnTab(1, MenuManager.PartyInfo.Inventory.Weapons);
+        InventoryFrame.SetToolListOnTab(2, MenuManager.PartyInfo.Inventory.Accessories);
+        InventoryFrame.SetToolListOnTab(3, GetInventoryItems(true));
         InventoryFrame.TrackCarryWeight(MenuManager.PartyInfo.Inventory);
         InventoryFrame.InitializeSelection();
     }
@@ -132,6 +132,11 @@ public class MMInventory : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOp
             SelectedUsageListBtn.ClearHighlights();
         SelectableTeammatesUse = null;
         SelectableTeammatesEquip = null;
+    }
+
+    private List<Item> GetInventoryItems(bool isKey)
+    {
+        return MenuManager.PartyInfo.Inventory.Items.FindAll(x => x.IsKey == isKey);
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -320,15 +325,17 @@ public class MMInventory : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOp
         {
             case InventorySystem.ListType.Items:
                 MenuManager.PartyInfo.Inventory.Remove<Item>(InventoryFrame.ToolList.SelectedIndex);
+                InventoryFrame.Refresh(GetInventoryItems(false));
                 break;
             case InventorySystem.ListType.Weapons:
                 MenuManager.PartyInfo.Inventory.Remove<Weapon>(InventoryFrame.ToolList.SelectedIndex);
+                InventoryFrame.Refresh(MenuManager.PartyInfo.Inventory.Weapons);
                 break;
             case InventorySystem.ListType.Accessories:
                 MenuManager.PartyInfo.Inventory.Remove<Accessory>(InventoryFrame.ToolList.SelectedIndex);
+                InventoryFrame.Refresh(MenuManager.PartyInfo.Inventory.Accessories);
                 break;
         }
-        InventoryFrame.Refresh();
         UndoDiscard();
     }
 
@@ -455,7 +462,7 @@ public class MMInventory : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOp
         if (it.Consumable)
         {
             MenuManager.PartyInfo.Inventory.Remove(it);
-            InventoryFrame.Refresh();
+            InventoryFrame.Refresh(GetInventoryItems(false));
         }
     }
     
@@ -574,14 +581,15 @@ public class MMInventory : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOp
         {
             case InventorySystem.ListType.Weapons:
                 MenuManager.PartyInfo.Inventory.Remove<Weapon>(InventoryFrame.ToolList.SelectedIndex);
+                InventoryFrame.Refresh(MenuManager.PartyInfo.Inventory.Weapons);
                 EquippedToolList.Refresh(PartyList.SelectedObject.Weapons, BattleMaster.MAX_NUMBER_OF_WEAPONS);
                 break;
             case InventorySystem.ListType.Accessories:
                 MenuManager.PartyInfo.Inventory.Remove<Accessory>(InventoryFrame.ToolList.SelectedIndex);
+                InventoryFrame.Refresh(MenuManager.PartyInfo.Inventory.Accessories);
                 EquippedToolList.Refresh(PartyList.SelectedObject.Accessories, BattleMaster.MAX_NUMBER_OF_ACCESSORIES);
                 break;
         }
-        InventoryFrame.Refresh();
         ConfirmSwap.SetActive(false);
     }
 }

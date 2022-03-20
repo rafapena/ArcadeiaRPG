@@ -12,7 +12,6 @@ public class Cutscene : MonoBehaviour
     public UnityEvent OnComplete;
     public Cutscene JumpToCutscene;
 
-    private bool CurrentlyRunning;
     private bool InteractionBuffer;
 
     private bool EndingCutscene => CurrentBubble < 0 || CurrentBubble >= Dialogue.Length;
@@ -27,7 +26,7 @@ public class Cutscene : MonoBehaviour
     void Update()
     {
         if (!SceneMaster.InCutscene || Manager == null) return;
-        else if (!Manager.ChoicesFrame.activeSelf && CurrentlyRunning && InputMaster.Interact) CutsceneInteraction();
+        else if (!Manager.ChoicesFrame.activeSelf && InputMaster.Interact) CutsceneInteraction();
         else if (Manager.ChoicesFrame.activeSelf) ManageChoicesFrame();
     }
 
@@ -70,7 +69,7 @@ public class Cutscene : MonoBehaviour
         try
         {
             Manager.Open(player);
-            CurrentlyRunning = true;
+            enabled = true;
             CurrentBubble = 0;
             RefreshDialogue();
             InteractionBuffer = hadToInteract;
@@ -120,9 +119,9 @@ public class Cutscene : MonoBehaviour
     public void Complete()
     {
         OnComplete?.Invoke();
-        CurrentlyRunning = false;
         CurrentBubble = 0;
         if (JumpToCutscene != null) JumpToCutscene.Open(Manager, false);
         else Manager.Close();
+        enabled = false;
     }
 }

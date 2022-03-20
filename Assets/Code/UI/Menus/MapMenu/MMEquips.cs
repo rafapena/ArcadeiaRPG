@@ -142,7 +142,8 @@ public class MMEquips : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOpera
     private void SetupToolSelection()
     {
         Selection = Selections.SelectTool;
-        RegisterLists();
+        InventoryFrame.SetToolListOnTab(0, GetWeapons());
+        InventoryFrame.SetToolListOnTab(1, MenuManager.PartyInfo.Inventory.Accessories);
         InventoryFrame.InitializeSelection();
         EquippedAccessories.Selecting = true;
         EquippedWeapons.Selecting = true;
@@ -150,11 +151,10 @@ public class MMEquips : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOpera
         EventSystem.current.SetSelectedGameObject(EquippedWeapons.transform.GetChild(0).gameObject);
     }
 
-    private void RegisterLists()
+    private List<Weapon> GetWeapons()
     {
         BattlerClass bc = PartyList.SelectedObject.Class;
-        InventoryFrame.RegisterToolList(0, MenuManager.PartyInfo.Inventory.Weapons.FindAll(w => w.WeaponType == bc.UsableWeapon1Type || w.WeaponType == bc.UsableWeapon2Type));
-        InventoryFrame.RegisterToolList(1, MenuManager.PartyInfo.Inventory.Accessories);
+        return MenuManager.PartyInfo.Inventory.Weapons.FindAll(w => w.WeaponType == bc.UsableWeapon1Type || w.WeaponType == bc.UsableWeapon2Type);
     }
 
     public void UndoToolSelection()
@@ -263,8 +263,8 @@ public class MMEquips : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOpera
         IToolForInventory wp = PartyList.SelectedObject.Unequip<Weapon>(EquippedWeapons.SelectedIndex);
         MenuManager.PartyInfo.Inventory.Add(wp);
         EquippedWeapons.Refresh(PartyList.SelectedObject.Weapons, BattleMaster.MAX_NUMBER_OF_WEAPONS, true);
-        RegisterLists();
         InventoryFrame.SelectTab(0);
+        InventoryFrame.Refresh(GetWeapons());
     }
 
     private void EquipWeapon()
@@ -273,8 +273,7 @@ public class MMEquips : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOpera
         PartyList.SelectedObject.Equip(wp);
         MenuManager.PartyInfo.Inventory.Remove(wp);
         EquippedWeapons.Refresh(PartyList.SelectedObject.Weapons, BattleMaster.MAX_NUMBER_OF_WEAPONS, true);
-        RegisterLists();
-        InventoryFrame.Refresh();
+        InventoryFrame.Refresh(GetWeapons());
     }
 
     private void UnequipAccessory()
@@ -283,6 +282,7 @@ public class MMEquips : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOpera
         MenuManager.PartyInfo.Inventory.Add(ac);
         EquippedAccessories.Refresh(PartyList.SelectedObject.Accessories, BattleMaster.MAX_NUMBER_OF_ACCESSORIES, true);
         InventoryFrame.SelectTab(1);
+        InventoryFrame.Refresh(MenuManager.PartyInfo.Inventory.Accessories);
     }
 
     private void EquipAccessory()
@@ -291,7 +291,7 @@ public class MMEquips : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOpera
         PartyList.SelectedObject.Equip(ac);
         MenuManager.PartyInfo.Inventory.Remove(ac);
         EquippedAccessories.Refresh(PartyList.SelectedObject.Accessories, BattleMaster.MAX_NUMBER_OF_ACCESSORIES, true);
-        InventoryFrame.Refresh();
+        InventoryFrame.Refresh(MenuManager.PartyInfo.Inventory.Accessories);
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

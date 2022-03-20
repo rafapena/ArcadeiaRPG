@@ -3,10 +3,8 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-/// <summary>
-/// Administrates the game's cutscenes
-/// </summary>
-public class DialoguePortrait : MonoBehaviour
+[System.Serializable]
+public struct DialoguePortrait
 {
     public MenuFrame Frame;
     public Image Image;

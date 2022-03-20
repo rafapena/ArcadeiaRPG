@@ -64,7 +64,7 @@ public class ToolListCollectionFrame : MonoBehaviour
         };
     }
 
-    public void RegisterToolList<T>(int tabIndex, List<T> list) where T : IToolForInventory
+    public void SetToolListOnTab<T>(int tabIndex, List<T> list) where T : IToolForInventory
     {
         if (tabIndex >= ListOptions.Length || tabIndex < 0 || list == null) return;
         ListOptions[tabIndex] = (IEnumerable<IToolForInventory>)list;
@@ -96,14 +96,10 @@ public class ToolListCollectionFrame : MonoBehaviour
 
     public void Refresh<T>(List<T> listData) where T : IToolForInventory
     {
+        ListOptions[CurrentTabIndex] = (IEnumerable<IToolForInventory>)listData;
         ToolList.Refresh(listData);
         SortFunctions[SavedSortSetting].Invoke();
         RefreshCarryWeight();
-    }
-
-    public void Refresh()
-    {
-        Refresh(ListOptions[CurrentTabIndex].ToList());
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

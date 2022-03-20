@@ -116,15 +116,16 @@ public class InventorySystem : MonoBehaviour
     private T AddInventoryTool<T>(ref List<T> toolList, T newTool, int amount) where T : IToolForInventory
     {
         CarryWeight += newTool.Weight * amount;
-        if (toolList.Find(t => t.Info.Id == newTool.Info.Id) == null)
+        T tool = toolList.Find(t => t.Info.Id == newTool.Info.Id);
+        if (tool == null)
         {
-            newTool = (T)InitializeTool(newTool, Player ? Player.ItemsListDump : null);
-            newTool.Quantity = amount;
-            newTool.Info.gameObject.GetComponent<Renderer>().enabled = false;
-            toolList.Add(newTool);
+            tool = (T)InitializeTool(newTool, Player ? Player.ItemsListDump : null);
+            tool.Quantity = amount;
+            tool.Info.gameObject.GetComponent<Renderer>().enabled = false;
+            toolList.Add(tool);
         }
-        else newTool.Quantity += amount;
-        return newTool;
+        else tool.Quantity += amount;
+        return tool;
     }
 
     private T RemoveInventoryToolByIndex<T>(ref List<T> toolList, int index, int amount) where T : IToolForInventory

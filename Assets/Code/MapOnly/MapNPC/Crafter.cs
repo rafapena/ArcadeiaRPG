@@ -2,16 +2,12 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class Shopkeeper : MapNPC
+public class Crafter : MapNPC
 {
     public PlayerParty Customer;
     public Sprite Image;
     public int TransactionAddedJump;
     public int OnlyBrowseAddedJump;
-
-    public Item[] ItemsInStock;
-    public Weapon[] WeaponsInStock;
-    public Accessory[] AccessoriesInStock;
 
     protected override void Awake()
     {
@@ -28,22 +24,17 @@ public class Shopkeeper : MapNPC
         base.Update();
     }
 
-    public List<IToolForInventory> GetAllToolsInStock()
-    {
-        return MenuMaster.GroupInventoryToolsToList(ItemsInStock, WeaponsInStock, AccessoriesInStock);
-    }
-
     protected override void AnimateDirection()
     {
         //
     }
 
-    public void OpenShop(bool onlyBuying)
+    public void OpenWorkshop()
     {
-        SceneMaster.OpenShop(onlyBuying, Customer, this);
+        SceneMaster.OpenCraftingMenu(Customer, this);
     }
 
-    public void CloseShop(bool doneTransaction)
+    public void CloseWorkshop(bool doneTransaction)
     {
         Cutscene.ForceJump(doneTransaction ? TransactionAddedJump : OnlyBrowseAddedJump);
     }

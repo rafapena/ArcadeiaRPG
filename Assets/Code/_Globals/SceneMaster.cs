@@ -11,9 +11,10 @@ public class SceneMaster : MonoBehaviour
     private static bool InPauseMenu = false;
     private static bool InFileSelectMenu = false;
     private static int InShopMenu = 0;
+    private static bool InCraftingMenu = false;
     private static bool InStorageMenu = false;
 
-    public static bool InMenu => InMapMenu || InPauseMenu || InFileSelectMenu || InShopMenu > 0 || InStorageMenu;
+    public static bool InMenu => InMapMenu || InPauseMenu || InFileSelectMenu || InShopMenu > 0 || InStorageMenu || InCraftingMenu;
 
     public static bool BuyingInShop => InShopMenu == 1;
 
@@ -29,7 +30,7 @@ public class SceneMaster : MonoBehaviour
     public const string FILE_SELECT_MENU_SCENE = "FileSelect";
     public const string SHOP_SCENE = "Shop";
     public const string STORAGE_SCENE = "Storage";
-    public const string CRAFTING_SCENE = "CraftingMenu";
+    public const string CRAFTING_SCENE = "Blueprints";
     public const string BATTLE_SCENE = "Battle";
     public const string GAME_OVER_SCENE = "GameOver";
     public const string SCREEN_TRANSITION_SCENE = "ScreenTransition";
@@ -162,14 +163,21 @@ public class SceneMaster : MonoBehaviour
         if (!InMenu) Time.timeScale = 1;
     }
 
-    public static void OpenCraftingMenu()
+    public static void OpenCraftingMenu(PlayerParty playerParty, Crafter crafter)
     {
-        //
+        GameplayMaster.Party = playerParty;
+        SceneManager.LoadScene(CRAFTING_SCENE, LoadSceneMode.Additive);
+        InCraftingMenu = true;
+        Time.timeScale = 0;
     }
 
-    public static void CloseCraftingMenu()
+    public static void CloseCraftingMenu(PlayerParty playerParty)
     {
-        //
+        MenuMaster.SetupSelectionBufferInGameplay(0.5f);
+        GameplayMaster.Party = playerParty;
+        SceneManager.UnloadSceneAsync(CRAFTING_SCENE);
+        InCraftingMenu = false;
+        if (!InMenu) Time.timeScale = 1;
     }
 
     public static void OpenCutscene()

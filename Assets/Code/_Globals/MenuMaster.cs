@@ -56,4 +56,23 @@ public class MenuMaster : MonoBehaviour
         button.transform.GetChild(0).GetComponent<TextMeshProUGUI>().color = c;
         if (button.transform.childCount > 1) button.transform.GetChild(1).GetComponent<Image>().color = c;
     }
+
+    public static List<IToolForInventory> GroupInventoryToolsToList(Item[] it, Weapon[] wp, Accessory[] ac)
+    {
+        List<IToolForInventory> toolsInStock = new List<IToolForInventory>();
+        if (it != null) toolsInStock.AddRange(it);
+        if (wp != null) toolsInStock.AddRange(wp);
+        if (ac != null) toolsInStock.AddRange(ac);
+        return toolsInStock;
+    }
+
+    public static IToolForInventory[] GroupInventoryToolsToArray(Item[] it, Weapon[] wp, Accessory[] ac)
+    {
+        IToolForInventory[] toolsInStock = new IToolForInventory[it.Length + wp.Length + ac.Length];
+        int i = 0;
+        foreach (Item t in it) toolsInStock[i++] = t;
+        foreach (Weapon w in wp) toolsInStock[i++] = w;
+        foreach (Accessory a in ac) toolsInStock[i++] = a;
+        return toolsInStock;
+    }
 }

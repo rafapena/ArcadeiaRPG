@@ -15,6 +15,7 @@ public class MapNPC : MapExplorer
 
     protected override void Start()
     {
+        Cutscene.enabled = false;
         base.Start();
     }
 
@@ -39,5 +40,6 @@ public class MapNPC : MapExplorer
         if (Interacting) return;
         Interacting = true;
         Cutscene.Open(interactor);
+        Cutscene.gameObject.SetActive(true);
     }
 }

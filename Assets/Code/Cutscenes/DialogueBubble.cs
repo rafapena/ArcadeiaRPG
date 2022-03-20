@@ -4,16 +4,14 @@ using TMPro;
 using UnityEngine.UI;
 using UnityEngine.Events;
 
-/// <summary>
-/// Administrates the game's cutscenes
-/// </summary>
-public class DialogueBubble : MonoBehaviour
+[System.Serializable]
+public struct DialogueBubble
 {
     [TextArea] public string Text;
     public string Condition;
 
     [Tooltip("Skip dialogue bubbles in cutscene\nIf value is 0 => Immediately end cutscene")]
-    public int Jump = 1;
+    public int Jump;
 
     public enum DialogueCharacter { None, Left1, Right1, Left2, Right2 }
 

@@ -63,9 +63,9 @@ public class MMBlueprints : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameO
     public override void Open()
     {
         base.Open();
-        CollectionFrame.RegisterToolList(0, MenuManager.PartyInfo.CraftableItems);
-        CollectionFrame.RegisterToolList(1, MenuManager.PartyInfo.CraftableWeapons);
-        CollectionFrame.RegisterToolList(2, MenuManager.PartyInfo.CraftableAccessories);
+        CollectionFrame.SetToolListOnTab(0, MenuManager.PartyInfo.CraftableItems);
+        CollectionFrame.SetToolListOnTab(1, MenuManager.PartyInfo.CraftableWeapons);
+        CollectionFrame.SetToolListOnTab(2, MenuManager.PartyInfo.CraftableAccessories);
         CollectionFrame.InitializeSelection();
     }
 

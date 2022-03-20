@@ -108,9 +108,9 @@ public class Storage : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameO
     {
         SelectionName.text = title;
         InventoryMode = inventoryMode;
-        CollectionFrame.RegisterToolList(0, SourceSystem.Items.FindAll(x => !x.IsKey));
-        CollectionFrame.RegisterToolList(1, SourceSystem.Weapons);
-        CollectionFrame.RegisterToolList(2, SourceSystem.Accessories);
+        CollectionFrame.SetToolListOnTab(0, SourceSystem.Items.FindAll(x => !x.IsKey));
+        CollectionFrame.SetToolListOnTab(1, SourceSystem.Weapons);
+        CollectionFrame.SetToolListOnTab(2, SourceSystem.Accessories);
         switch (CollectionFrame.CurrentInventoryList)
         {
             case InventorySystem.ListType.Items:
@@ -244,7 +244,18 @@ public class Storage : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameO
     {
         SourceSystem.Remove(CollectionFrame.ToolList.SelectedObject, ConfirmFrame.Amount);
         TargetSystem.Add(TargetTool ?? CollectionFrame.ToolList.SelectedObject, ConfirmFrame.Amount);
-        CollectionFrame.Refresh();
+        switch (CollectionFrame.CurrentInventoryList)
+        {
+            case InventorySystem.ListType.Items:
+                CollectionFrame.Refresh(SourceSystem.Items.FindAll(x => !x.IsKey));
+                break;
+            case InventorySystem.ListType.Weapons:
+                CollectionFrame.Refresh(SourceSystem.Weapons);
+                break;
+            case InventorySystem.ListType.Accessories:
+                CollectionFrame.Refresh(SourceSystem.Accessories);
+                break;
+        }
         UndoConfirmAmount();
     }
 }
