@@ -29,6 +29,7 @@ public class CutsceneManager : MonoBehaviour
 
     private void Update()
     {
+        if (!SceneMaster.InCutscene) return;
         UpdateGoldDisplay();
     }
 
@@ -179,6 +180,7 @@ public class CutsceneManager : MonoBehaviour
 
     public void ChangeGold(int amount)
     {
+        if (!SceneMaster.InCutscene) return;
         Player.Party.Inventory.Gold += amount;
         if (Player.Party.Inventory.Gold <= 0) Player.Party.Inventory.Gold = 0;
         GoldChangeSpeed = amount / 60 + (amount > 0 ? 1 : -1);

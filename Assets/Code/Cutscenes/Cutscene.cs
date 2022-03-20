@@ -26,7 +26,7 @@ public class Cutscene : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Manager == null) return;
+        if (!SceneMaster.InCutscene || Manager == null) return;
         else if (!Manager.ChoicesFrame.activeSelf && CurrentlyRunning && InputMaster.Interact) CutsceneInteraction();
         else if (Manager.ChoicesFrame.activeSelf) ManageChoicesFrame();
     }

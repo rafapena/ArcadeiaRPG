@@ -23,7 +23,7 @@ public class Shop : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameOper
     public TextMeshProUGUI CarryingAmount;
     public TextMeshProUGUI GoldAmountBuying;
     public GameObject NotEnoughGoldText;
-    private ToolForInventory SelectedToolToInventory;
+    private IToolForInventory SelectedToolToInventory;
 
     // Selling - general
     public ToolListCollectionFrame SellingFrame;
@@ -75,8 +75,9 @@ public class Shop : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameOper
         else
         {
             SellingFrame.TargetFrame.Activate();
-            SellingFrame.RegisterToolList(0, PartyInfo.Inventory.Items);
+            SellingFrame.RegisterToolList(0, PartyInfo.Inventory.Items.FindAll(x => !x.IsKey));
             SellingFrame.RegisterToolList(1, PartyInfo.Inventory.Weapons);
+            SellingFrame.RegisterToolList(2, PartyInfo.Inventory.Accessories);
             SellingFrame.InitializeSelection();
             SellingFrame.TrackCarryWeight(PartyInfo.Inventory);
         }
@@ -196,7 +197,7 @@ public class Shop : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameOper
             UpdateCarryingAmount();
             if (BuyingList.SelectedObject is Weapon wp) RefreshPartyMemberEquips(wp);
             else CharacterEquipCheckFrame.SetActive(false);
-            NotEnoughGoldText.SetActive(PartyInfo.Inventory.Gold - BuyingList.SelectedObject.DefaultPrice < 0);
+            NotEnoughGoldText.SetActive(PartyInfo.Inventory.Gold - BuyingList.SelectedObject.Price < 0);
         }
         else
         {
@@ -214,7 +215,7 @@ public class Shop : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameOper
             AddedGoldFrame.SetActive(true);
             bool canSell = SellingFrame.ToolList.SelectedObject.CanRemove;
             AddedGoldIcon.SetActive(canSell);
-            AddedGoldValue.text = canSell ? ("+ " + SellingFrame.ToolList.SelectedObject.DefaultSellPrice) : "";
+            AddedGoldValue.text = canSell ? ("+ " + SellingFrame.ToolList.SelectedObject.SellPrice) : "";
             CannotSellMesssage.SetActive(!canSell);
         }
         else AddedGoldFrame.SetActive(false);
@@ -285,7 +286,7 @@ public class Shop : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameOper
         BuyingListBlock.SetActive(true);
         BuyingList.SelectedButton.KeepSelected();
         SetupSelectToolToInventory();
-        ConfirmFrame.Activate(1, PartyInfo.Inventory.Gold / SelectedToolToInventory.DefaultPrice);
+        ConfirmFrame.Activate(1, PartyInfo.Inventory.Gold / SelectedToolToInventory.Price);
         ConfirmText.text = "How many will you purchase?";
         CharacterEquipCheckFrame.SetActive(false);
         UpdateResultChecker(ConfirmFrame.Amount);
@@ -323,15 +324,15 @@ public class Shop : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameOper
         if (isBuying)
         {
             ResultCheckCarrying.text = ((SelectedToolToInventory?.Quantity ?? 0) + amount).ToString();
-            ResultCheckGold.text = (PartyInfo.Inventory.Gold - SelectedToolToInventory.DefaultPrice * amount).ToString();
+            ResultCheckGold.text = (PartyInfo.Inventory.Gold - SelectedToolToInventory.Price * amount).ToString();
             ResultCheckCarryTracker.Set(PartyInfo.Inventory.CarryWeight + amount * SelectedToolToInventory.Weight, PartyInfo.Inventory.WeightCapacity);
         }
         else
         {
-            ToolForInventory tool = SellingFrame.ToolList.SelectedObject;
-            ResultCheckCarrying.text = (tool.Quantity - amount).ToString();
-            ResultCheckGold.text = (PartyInfo.Inventory.Gold + tool.DefaultSellPrice * amount).ToString();
-            ResultCheckCarryTracker.Set(PartyInfo.Inventory.CarryWeight - amount * tool.Weight, PartyInfo.Inventory.WeightCapacity);
+            IToolForInventory ActiveTool = SellingFrame.ToolList.SelectedObject;
+            ResultCheckCarrying.text = (ActiveTool.Quantity - amount).ToString();
+            ResultCheckGold.text = (PartyInfo.Inventory.Gold + ActiveTool.SellPrice * amount).ToString();
+            ResultCheckCarryTracker.Set(PartyInfo.Inventory.CarryWeight - amount * ActiveTool.Weight, PartyInfo.Inventory.WeightCapacity);
         }
     }
 
@@ -349,28 +350,25 @@ public class Shop : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameOper
 
     private int ConfirmPurchase()
     {
-        int total = ConfirmFrame.Amount * SelectedToolToInventory.DefaultPrice;
+        int total = ConfirmFrame.Amount * SelectedToolToInventory.Price;
         PartyInfo.Inventory.Gold -= total;
-        if (SelectedToolToInventory is Item it) PartyInfo.Inventory.AddItem(it, ConfirmFrame.Amount);
-        else if (SelectedToolToInventory is Weapon wp) PartyInfo.Inventory.AddWeapon(wp, ConfirmFrame.Amount);
-
-        TransactionConfirmedFrame.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "Purchased " + SelectedToolToInventory.Name;
-        TransactionConfirmedFrame.transform.GetChild(1).GetComponent<Image>().sprite = SelectedToolToInventory.GetComponent<SpriteRenderer>().sprite;
+        PartyInfo.Inventory.Add(SelectedToolToInventory, ConfirmFrame.Amount);
+        
+        TransactionConfirmedFrame.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "Purchased " + SelectedToolToInventory.Info.Name;
+        TransactionConfirmedFrame.transform.GetChild(1).GetComponent<Image>().sprite = SelectedToolToInventory.Info.GetComponent<SpriteRenderer>().sprite;
         UpdateCarryingAmount();
         return total;
     }
 
     private int ConfirmSell()
     {
-        ToolForInventory tool = SellingFrame.ToolList.SelectedObject;
-
-        int total = ConfirmFrame.Amount * tool.DefaultSellPrice;
+        IToolForInventory tool = SellingFrame.ToolList.SelectedObject;
+        int total = ConfirmFrame.Amount * tool.SellPrice;
         PartyInfo.Inventory.Gold += total;
-        if (tool is Item it) PartyInfo.Inventory.RemoveItem(it, ConfirmFrame.Amount);
-        else if (tool is Weapon wp) PartyInfo.Inventory.RemoveWeapon(wp, ConfirmFrame.Amount);
+        PartyInfo.Inventory.Remove(tool, ConfirmFrame.Amount);
 
-        TransactionConfirmedFrame.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "Sold " + tool.Name;
-        TransactionConfirmedFrame.transform.GetChild(1).GetComponent<Image>().sprite = tool.GetComponent<SpriteRenderer>().sprite;
+        TransactionConfirmedFrame.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "Sold " + tool.Info.Name;
+        TransactionConfirmedFrame.transform.GetChild(1).GetComponent<Image>().sprite = tool.Info.GetComponent<SpriteRenderer>().sprite;
         SellingFrame.Refresh();
         SellingFrame.ListBlocker.SetActive(true);
         return total;

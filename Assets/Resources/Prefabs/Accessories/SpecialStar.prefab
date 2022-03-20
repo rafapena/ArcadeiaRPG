@@ -73,7 +73,7 @@ SpriteRenderer:
   m_SortingOrder: 0
   m_Sprite: {fileID: -9076862125893698508, guid: 4adca08bd9ab25348a3e779ff2400cdf,
     type: 3}
-  m_Color: {r: 0.8624313, g: 1, b: 0, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -96,63 +96,41 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Id: 0
-  Name: 
-  Description: 
-  Type: 0
-  Formula: 0
-  ActionTime: 0
-  HPModType: 0
-  SPModType: 0
-  HPAmount: 0
-  HPPercent: 0
-  SPPecent: 0
-  HPRecoil: 0
-  Scope: 0
-  ConsecutiveActs: 1
-  RandomTarget: 0
-  Element: 0
-  AlwaysHits: 0
-  Power: 10
-  Range: 50
-  Accuracy: 100
-  CritcalRate: 2
-  Variance: 0
-  Priority: 0
-  Projectile: {fileID: 0}
-  ClassExclusives: []
-  ChangedStatesGiveRate: []
-  ChangedStatesReceiveRate: []
-  Disabled: 0
-  DefaultPrice: 0
-  RequiredTools: []
-  Quantity: 0
-  Weight: 0
-  Effect:
-    HPRegen: 0
-    SPRegen: 0
-    SPConsumeRate: 0
-    ComboDifficulty: 0
-    TurnEnd1: 0
-    TurnEnd2: 0
-    WhenToExecute: 0
-    RemoveByHitChance: 0
-    CounterRate: 0
-    ReflectRate: 0
-    PhysicalDamageRate: 0
-    MagicalDamageRate: 0
-    ExtraTurns: 0
-    DisabledToolTypes: 
-    ChangedElementRates: []
-    ChangedStateRates: []
-    TurnsLeft: 0
+  Name: Special Star
+  Description: Heals HP every turn
+  HPRegen: 50
+  SPRegen: 0
+  SPConsumeRate: 0
+  ComboDifficulty: 0
+  TurnEnd1: 0
+  TurnEnd2: 0
+  WhenToExecute: 1
+  RemoveByHitChance: 0
+  CounterRate: 0
+  ReflectRate: 0
+  PhysicalDamageRate: 0
+  MagicalDamageRate: 0
+  ExtraTurns: 0
+  DisabledToolTypes: 
+  ChangedElementRates: []
+  ChangedStateRates: []
+  TurnsLeft: 0
   HPMin: 0
   HPMax: 100
   SPMin: 0
   SPMax: 100
   AnyState: 0
   NoState: 0
+  StateActive1: {fileID: 0}
+  StateActive2: {fileID: 0}
+  StateInactive1: {fileID: 0}
+  StateInactive2: {fileID: 0}
   ExpGainRate: 0
   GoldGainRate: 0
   AllyCondition: 0
   FoeCondition: 0
   UserCondition: 0
+  ClassExclusives: []
+  _DefaultPrice: 600
+  _RequiredTools: []
+  _Weight: 1

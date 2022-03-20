@@ -40,14 +40,13 @@ public abstract class BattlerAI : Battler
         ExecutedAction = false;
         if (!CanMove()) return;
         SelectedWeapon = SelectWeapon(usersPartyMembers, opponentPartyMembers);
-        Tool t = SelectTool(usersPartyMembers, opponentPartyMembers);
+        ActiveTool t = SelectTool(usersPartyMembers, opponentPartyMembers);
         if (t == null) return;
         switch (t.GetType().Name)
         {
             case "Skill": SelectedSkill = t as Skill; break;
             case "Item": SelectedItem = t as Item; break;
         }
-        SelectedTeamSkillPartners = SelectTeammates(usersPartyMembers, opponentPartyMembers);
         SelectedTargets = SelectTargets(usersPartyMembers, opponentPartyMembers);
     }
 
@@ -56,7 +55,7 @@ public abstract class BattlerAI : Battler
         return null;
     }
 
-    protected Tool SelectTool(List<Battler> usersPartyMembers, List<Battler> opponentPartyMembers)
+    protected ActiveTool SelectTool(List<Battler> usersPartyMembers, List<Battler> opponentPartyMembers)
     {
         return ToolAI[0].Move;
     }

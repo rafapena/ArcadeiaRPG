@@ -124,12 +124,27 @@ MonoBehaviour:
   ChangedStatesGiveRate: []
   ChangedStatesReceiveRate: []
   Disabled: 0
-  DefaultPrice: 200
-  RequiredTools: []
-  Quantity: 1
-  Weight: 1
   UseCondition: 0
   IsKey: 0
   Consumable: 1
-  PermantentStatChanges: {fileID: 0}
+  PermantentStatChanges:
+    MaxHP: 0
+    Atk: 0
+    Def: 0
+    Map: 0
+    Mar: 0
+    Spd: 0
+    Tec: 0
+    Luk: 0
+    Acc: 0
+    Eva: 0
+    Crt: 0
+    Cev: 0
   TurnsInto: {fileID: 0}
+  _DefaultPrice: 200
+  _RequiredTools:
+  - Tool: {fileID: 7230775191068158404, guid: db8c71b6c4218214086cf5982e9e2adb, type: 3}
+    Quantity: 1
+  - Tool: {fileID: 7230775191068158404, guid: 77df0195c5c99154580a874268a423bc, type: 3}
+    Quantity: 10
+  _Weight: 1

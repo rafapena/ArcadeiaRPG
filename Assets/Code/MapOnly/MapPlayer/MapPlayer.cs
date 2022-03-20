@@ -77,7 +77,7 @@ public class MapPlayer : MapExplorer
         Party.UpdateAll(all);
         for (int i = 0; i < Party.LoggedObjectives.Count; i++)
         {
-            Party.LoggedObjectives[i] = Instantiate(Party.LoggedObjectives[i], gameObject.transform);
+            Party.LoggedObjectives[i] = Instantiate(Party.LoggedObjectives[i], ObjectivesListDump);
         }
     }
 

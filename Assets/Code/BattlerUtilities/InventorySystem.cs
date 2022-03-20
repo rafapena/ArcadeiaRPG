@@ -7,15 +7,18 @@ public class InventorySystem : MonoBehaviour
     {
         None,
         Items,
-        Weapons
+        Weapons,
+        Accessories
     }
+
+    private MapPlayer Player;
 
     public int Gold;
 
-    // Lists are meant to be sorted by ID, automatically - Public for Unity Editing: Will set to private set, afterwards
+    // Public for Unity Editing: Will set to private set, afterwards
     public List<Item> Items;
     public List<Weapon> Weapons;
-    public List<Item> KeyItems;
+    public List<Accessory> Accessories;
 
     // Weight
     [HideInInspector] public int CarryWeight;
@@ -23,9 +26,12 @@ public class InventorySystem : MonoBehaviour
 
     private void Awake()
     {
+        Player = gameObject.GetComponent<MapPlayer>();
+
+        // FOR TESTING ONLY
         Items = SetupToolGroup(Items);
         Weapons = SetupToolGroup(Weapons);
-        KeyItems = SetupToolGroup(KeyItems);
+        Accessories = SetupToolGroup(Accessories);
     }
 
     public void UpdateToCurrentWeight()
@@ -33,10 +39,10 @@ public class InventorySystem : MonoBehaviour
         CarryWeight = 0;
         CarryWeight += SetupCarryWeightForList(Items);
         CarryWeight += SetupCarryWeightForList(Weapons);
-        CarryWeight += SetupCarryWeightForList(KeyItems);
+        CarryWeight += SetupCarryWeightForList(Accessories);
     }
 
-    private int SetupCarryWeightForList<T>(List<T> tools) where T : ToolForInventory
+    private int SetupCarryWeightForList<T>(List<T> tools) where T : IToolForInventory
     {
         int total = 0;
         foreach (T t in tools)
@@ -44,24 +50,25 @@ public class InventorySystem : MonoBehaviour
         return total;
     }
 
-    public List<ToolForInventory> GetItemsAndWeapons()
+    public List<IToolForInventory> GetItemsAndWeapons()
     {
-        List<ToolForInventory> inventory = new List<ToolForInventory>();
+        List<IToolForInventory> inventory = new List<IToolForInventory>();
         foreach (Item it in Items) inventory.Add(it);
         foreach (Weapon wp in Weapons) inventory.Add(wp);
-        foreach (Item it in KeyItems) inventory.Add(it);
+        foreach (Accessory ac in Accessories) inventory.Add(ac);
         return inventory;
     }
 
-    private List<T> SetupToolGroup<T>(List<T> toolList) where T : ToolForInventory
+    // FOR TESTING ONLY
+    private List<T> SetupToolGroup<T>(List<T> toolList) where T : IToolForInventory
     {
         List<T> groupedList = new List<T>();
         for (int i = 0; i < toolList.Count; i++)
         {
-            int foundTool = groupedList.FindIndex(t => t.Id == toolList[i].Id);
+            int foundTool = groupedList.FindIndex(t => t.Info.Id == toolList[i].Info.Id);
             if (foundTool < 0)
             {
-                toolList[i] = Instantiate(toolList[i]);
+                toolList[i] = (T)InitializeTool(toolList[i], Player ? Player.ItemsListDump : null);
                 toolList[i].Quantity = 1;
                 groupedList.Add(toolList[i]);
             }
@@ -70,61 +77,59 @@ public class InventorySystem : MonoBehaviour
         return groupedList;
     }
 
+    private IToolForInventory InitializeTool<T>(T tool, Transform t) where T : IToolForInventory
+    {
+        if (tool is Item it) return Instantiate(it, t);
+        else if (tool is Weapon wp) return Instantiate(wp, t);
+        else if (tool is Accessory ac) return Instantiate(ac, t);
+        return default(T);
+    }
+
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- Add/Remove Content --
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public Item AddItem(Item item, int amount = 1)
+    public IToolForInventory Add<T>(T tool, int amount = 1) where T : IToolForInventory
     {
-        List<Item> itemList = item.IsKey ? KeyItems : Items;
-        return AddInventoryTool(ref itemList, item, amount);
+        if (tool is Item it) return AddInventoryTool(ref Items, it, amount);
+        else if (tool is Weapon wp) return AddInventoryTool(ref Weapons, wp, amount);
+        else if (tool is Accessory ac) return AddInventoryTool(ref Accessories, ac, amount);
+        else return default(T);
     }
 
-    public Item RemoveItem(int index, int amount = 1, bool IsKey = false)
+    public IToolForInventory Remove<T>(int index, int amount = 1) where T : IToolForInventory
     {
-        List<Item> itemList = IsKey ? KeyItems : Items;
-        return RemoveInventoryToolByIndex(ref itemList, index, amount);
+        if (typeof(T).Name.Equals("Item")) return RemoveInventoryToolByIndex(ref Items, index, amount);
+        else if (typeof(T).Name.Equals("Weapon")) return RemoveInventoryToolByIndex(ref Weapons, index, amount);
+        else if (typeof(T).Name.Equals("Accessory")) return RemoveInventoryToolByIndex(ref Accessories, index, amount);
+        else return default(T);
     }
 
-    public int RemoveItem(Item item, int amount = 1)
+    public int Remove<T>(T tool, int amount = 1) where T : IToolForInventory
     {
-        List<Item> itemList = item.IsKey ? KeyItems : Items;
-        return RemoveInventoryToolByValue(ref itemList, item, amount);
+        if (tool is Item it) return RemoveInventoryToolByValue(ref Items, it, amount);
+        else if (tool is Weapon wp) return RemoveInventoryToolByValue(ref Weapons, wp, amount);
+        else if (tool is Accessory ac) return RemoveInventoryToolByValue(ref Accessories, ac, amount);
+        else return -1;
     }
 
-    public Weapon AddWeapon(Weapon weapon, int amount = 1)
-    {
-        return AddInventoryTool(ref Weapons, weapon, amount);
-    }
-
-    public Weapon RemoveWeapon(int index, int amount = 1)
-    {
-        return RemoveInventoryToolByIndex(ref Weapons, index, amount);
-    }
-
-    public int RemoveWeapon(Weapon weapon, int amount = 1)
-    {
-        return RemoveInventoryToolByValue(ref Weapons, weapon, amount);
-    }
-
-    private T AddInventoryTool<T>(ref List<T> toolList, T newTool, int amount) where T : ToolForInventory
+    private T AddInventoryTool<T>(ref List<T> toolList, T newTool, int amount) where T : IToolForInventory
     {
         CarryWeight += newTool.Weight * amount;
-        if (toolList.Find(t => t.Id == newTool.Id) == null)
+        if (toolList.Find(t => t.Info.Id == newTool.Info.Id) == null)
         {
-            MapPlayer p = gameObject.GetComponent<MapPlayer>();
-            newTool = Instantiate(newTool, (p ? p.ItemsListDump : null));
+            newTool = (T)InitializeTool(newTool, Player ? Player.ItemsListDump : null);
             newTool.Quantity = amount;
-            newTool.gameObject.GetComponent<Renderer>().enabled = false;
+            newTool.Info.gameObject.GetComponent<Renderer>().enabled = false;
             toolList.Add(newTool);
         }
         else newTool.Quantity += amount;
         return newTool;
     }
 
-    private T RemoveInventoryToolByIndex<T>(ref List<T> toolList, int index, int amount) where T : ToolForInventory
+    private T RemoveInventoryToolByIndex<T>(ref List<T> toolList, int index, int amount) where T : IToolForInventory
     {
-        if (index < 0 || index >= toolList.Count) return null;
+        if (index < 0 || index >= toolList.Count) return default(T);
         T t = toolList[index];
         int fixedAmount = (t.Quantity - amount < 0) ? t.Quantity : amount; 
         if (t.Quantity - fixedAmount <= 0) toolList.RemoveAt(index);
@@ -133,10 +138,10 @@ public class InventorySystem : MonoBehaviour
         return t;
     }
 
-    private int RemoveInventoryToolByValue<T>(ref List<T> toolList, T tool, int amount) where T : ToolForInventory
+    private int RemoveInventoryToolByValue<T>(ref List<T> toolList, T tool, int amount) where T : IToolForInventory
     {
         if (tool == null) return -1;
-        int index = toolList.FindIndex(t => t.Id == tool.Id);
+        int index = toolList.FindIndex(t => t.Info.Id == tool.Info.Id);
         RemoveInventoryToolByIndex(ref toolList, index, amount);
         return index;
     }

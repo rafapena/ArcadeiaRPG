@@ -65,6 +65,7 @@ public class MMBlueprints : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameO
         base.Open();
         CollectionFrame.RegisterToolList(0, MenuManager.PartyInfo.CraftableItems);
         CollectionFrame.RegisterToolList(1, MenuManager.PartyInfo.CraftableWeapons);
+        CollectionFrame.RegisterToolList(2, MenuManager.PartyInfo.CraftableAccessories);
         CollectionFrame.InitializeSelection();
     }
 
@@ -154,7 +155,7 @@ public class MMBlueprints : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameO
         else RequirementsFrame.Deactivate();
     }
 
-    public void RefreshRequirements(List<ToolQuantity> craftsList)
+    public void RefreshRequirements(List<ItemOrWeaponQuantity> craftsList)
     {
         MaterialsCheck.SetActive(false);
         for (int i = 0; i < RequirementsList.childCount; i++)
@@ -175,7 +176,7 @@ public class MMBlueprints : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameO
         }
     }
 
-    private int GetQuantityFromInventory(List<ToolQuantity> craftsList, int i)
+    private int GetQuantityFromInventory(List<ItemOrWeaponQuantity> craftsList, int i)
     {
         if (craftsList[i].Tool is Item it) return MenuManager.PartyInfo.Inventory.Items.Find(x => x.Id == it.Id)?.Quantity ?? 0;
         else if (craftsList[i].Tool is Weapon wp) return MenuManager.PartyInfo.Inventory.Weapons.Find(x => x.Id == wp.Id)?.Quantity ?? 0;
@@ -194,14 +195,13 @@ public class MMBlueprints : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameO
 
     private void UpdateInventory()
     {
-        var tool = CollectionFrame.ToolList.SelectedObject;
-        foreach (ToolQuantity c in tool.RequiredTools)
+        IToolForInventory tool = CollectionFrame.ToolList.SelectedObject;
+        MenuManager.PartyInfo.Inventory.Add(tool);
+        foreach (ItemOrWeaponQuantity c in tool.RequiredTools)
         {
-            if (c.Tool is Item it0) MenuManager.PartyInfo.Inventory.RemoveItem(it0, c.Quantity);
-            else if (c.Tool is Weapon wp0) MenuManager.PartyInfo.Inventory.RemoveWeapon(wp0, c.Quantity);
+            if (c.Tool is Item it) MenuManager.PartyInfo.Inventory.Remove(it, c.Quantity);
+            else if (c.Tool is Weapon wp) MenuManager.PartyInfo.Inventory.Remove(wp, c.Quantity);
         }
-        if (tool is Item it) MenuManager.PartyInfo.Inventory.AddItem(it);
-        else if (tool is Weapon wp) MenuManager.PartyInfo.Inventory.AddWeapon(wp);
     }
 
     public void CraftDoneSetup()
@@ -215,9 +215,13 @@ public class MMBlueprints : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameO
 
     private void SetupCraftDoneInfo()
     {
-        InventorySystem.ListType type = (CollectionFrame.ToolList.SelectedObject is Weapon) ? InventorySystem.ListType.Weapons : InventorySystem.ListType.Items;
+        InventorySystem.ListType type;
+        if (CollectionFrame.ToolList.SelectedObject is Item) type = InventorySystem.ListType.Items;
+        else if (CollectionFrame.ToolList.SelectedObject is Weapon) type = InventorySystem.ListType.Weapons;
+        else type = InventorySystem.ListType.Accessories;
+        
         InventoryToolSelectionList.CloneTo(CraftDoneToolInfo.gameObject, CollectionFrame.ToolList.InfoFrame.gameObject, type);
-        CraftDoneTool.GetComponent<Image>().sprite = CollectionFrame.ToolList.SelectedObject.GetComponent<SpriteRenderer>().sprite;
+        CraftDoneTool.GetComponent<Image>().sprite = CollectionFrame.ToolList.SelectedObject.Info.GetComponent<SpriteRenderer>().sprite;
     }
 
     private void CraftDoneUndoSetup()

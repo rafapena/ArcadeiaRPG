@@ -3,6 +3,6 @@
 [System.Serializable]
 public struct ItemDropRate
 {
-    public ToolForInventory ItemDropped;
+    public IToolForInventory ItemDropped;
     public float Rate;
 }

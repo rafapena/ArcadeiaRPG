@@ -113,6 +113,7 @@ MonoBehaviour:
   Element: 0
   AlwaysHits: 1
   Power: 0
+  Range: 50
   Accuracy: 0
   CritcalRate: 0
   Variance: 0
@@ -123,12 +124,23 @@ MonoBehaviour:
   ChangedStatesGiveRate: []
   ChangedStatesReceiveRate: []
   Disabled: 0
-  DefaultPrice: 15
-  RequiredTools: []
-  Quantity: 0
-  Weight: 1
   UseCondition: 0
   IsKey: 0
   Consumable: 1
-  PermantentStatChanges: {fileID: 0}
+  PermantentStatChanges:
+    MaxHP: 0
+    Atk: 0
+    Def: 0
+    Map: 0
+    Mar: 0
+    Spd: 0
+    Tec: 0
+    Luk: 0
+    Acc: 0
+    Eva: 0
+    Crt: 0
+    Cev: 0
   TurnsInto: {fileID: 0}
+  _DefaultPrice: 25
+  _RequiredTools: []
+  _Weight: 1

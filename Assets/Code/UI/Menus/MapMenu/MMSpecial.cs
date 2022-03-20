@@ -227,28 +227,28 @@ public class MMSpecial : MM_Super
         List<Battler> party = MenuManager.PartyInfo.GetWholeParty();
         switch (SelectedSkill.Scope)
         {
-            case Tool.ScopeType.OneTeammate:
-            case Tool.ScopeType.Self:
+            case ActiveTool.ScopeType.OneTeammate:
+            case ActiveTool.ScopeType.Self:
                 foreach (Battler p in party)
                     if (!p.Unconscious) SelectableTeammates.Add(p);
                 SelectAllTeammates = false;
                 break;
 
-            case Tool.ScopeType.OneKnockedOutTeammate:
+            case ActiveTool.ScopeType.OneKnockedOutTeammate:
                 foreach (Battler p in party)
                     if (p.Unconscious) SelectableTeammates.Add(p);
                 SelectAllTeammates = false;
                 break;
 
-            case Tool.ScopeType.AllTeammates:
-            case Tool.ScopeType.EveryoneButSelf:
-            case Tool.ScopeType.Everyone:
+            case ActiveTool.ScopeType.AllTeammates:
+            case ActiveTool.ScopeType.EveryoneButSelf:
+            case ActiveTool.ScopeType.Everyone:
                 foreach (Battler p in party)
                     if (!p.Unconscious) SelectableTeammates.Add(p);
                 SelectAllTeammates = true;
                 break;
 
-            case Tool.ScopeType.AllKnockedOutTeammates:
+            case ActiveTool.ScopeType.AllKnockedOutTeammates:
                 foreach (Battler p in party)
                     if (p.Unconscious) SelectableTeammates.Add(p);
                 SelectAllTeammates = true;

@@ -12,6 +12,8 @@ public class ResourcesMaster : MonoBehaviour
     public const float DEFAULT_MASTER_SFX_VOLUME = 0.8f;
     public const int DEFAULT_TEXT_DELAY_INDEX = 1;
 
+    public static Accessory[] Accessories { get; private set; }
+
     public static BattleAlly[] Allies { get; private set; }
 
     public static BattlerClass[] Classes { get; private set; }
@@ -54,6 +56,7 @@ public class ResourcesMaster : MonoBehaviour
 
     private void SetupLists()
     {
+        Accessories = SortById(Resources.LoadAll<Accessory>("Prefabs/Accessories"));
         Allies = SortById(Resources.LoadAll<BattleAlly>("Prefabs/Allies"));
         Players = SortById(Resources.LoadAll<BattlePlayer>("Prefabs/BattlePlayers"));
         Classes = SortById(Resources.LoadAll<BattlerClass>("Prefabs/BattlerClasses"));

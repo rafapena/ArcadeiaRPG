@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class AITool : MonoBehaviour
 {
-    public Tool Move;
+    public ActiveTool Move;
     public int Priority;
     public int Quantity;
     public int HPLow;

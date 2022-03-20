@@ -2,8 +2,8 @@
 
 // Not to be used for the inventory system
 [System.Serializable]
-public struct ToolQuantity
+public struct ItemOrWeaponQuantity
 {
-    public ToolForInventory Tool;
+    public ActiveTool Tool;
     public int Quantity;
 }

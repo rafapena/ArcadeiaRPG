@@ -6,8 +6,8 @@ using UnityEngine.SceneManagement;
 
 public class BattleMaster
 {
-    public const int MAX_NUMBER_OF_ITEMS = 6;
     public const int MAX_NUMBER_OF_WEAPONS = 3;
+    public const int MAX_NUMBER_OF_ACCESSORIES = 3;
     public const int DEFAULT_RATE = 100;
     public const int SP_CAP = 100;
     public const int BASE_ACCURACY = 95;

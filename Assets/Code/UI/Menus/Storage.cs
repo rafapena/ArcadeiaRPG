@@ -39,7 +39,7 @@ public class Storage : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameO
     private bool InventoryMode;             // Browsnig/selecting in inventory or storage
     private InventorySystem SourceSystem;
     private InventorySystem TargetSystem;
-    private ToolForInventory TargetTool;    // Map to selected tool from the opposite inventory system
+    private IToolForInventory TargetTool;    // Map to selected ActiveTool from the opposite inventory system
 
     // Data
     [HideInInspector] public PlayerParty PartyInfo;
@@ -108,8 +108,9 @@ public class Storage : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameO
     {
         SelectionName.text = title;
         InventoryMode = inventoryMode;
-        CollectionFrame.RegisterToolList(0, SourceSystem.Items);
+        CollectionFrame.RegisterToolList(0, SourceSystem.Items.FindAll(x => !x.IsKey));
         CollectionFrame.RegisterToolList(1, SourceSystem.Weapons);
+        CollectionFrame.RegisterToolList(2, SourceSystem.Accessories);
         switch (CollectionFrame.CurrentInventoryList)
         {
             case InventorySystem.ListType.Items:
@@ -117,6 +118,9 @@ public class Storage : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameO
                 break;
             case InventorySystem.ListType.Weapons:
                 CollectionFrame.SelectTab(1);
+                break;
+            case InventorySystem.ListType.Accessories:
+                CollectionFrame.SelectTab(2);
                 break;
         }
     }
@@ -173,14 +177,16 @@ public class Storage : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameO
         }
     }
 
-    private ToolForInventory GetTargetTool()
+    private IToolForInventory GetTargetTool()
     {
         switch (CollectionFrame.CurrentInventoryList)
         {
             case InventorySystem.ListType.Items:
-                return TargetSystem.Items.Find(x => x.Id == CollectionFrame.ToolList.SelectedObject.Id);
+                return TargetSystem.Items.Find(x => x.Id == CollectionFrame.ToolList.SelectedObject.Info.Id);
             case InventorySystem.ListType.Weapons:
-                return TargetSystem.Weapons.Find(x => x.Id == CollectionFrame.ToolList.SelectedObject.Id);
+                return TargetSystem.Weapons.Find(x => x.Id == CollectionFrame.ToolList.SelectedObject.Info.Id);
+            case InventorySystem.ListType.Accessories:
+                return TargetSystem.Accessories.Find(x => x.Id == CollectionFrame.ToolList.SelectedObject.Info.Id);
             default:
                 return null;
         }
@@ -200,21 +206,21 @@ public class Storage : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameO
     private void UpdateResultChecker(int amount)
     {
         ResultCheckFrame.SetActive(true);
-        ToolForInventory tool = CollectionFrame.ToolList.SelectedObject;
-        int source = tool.Quantity - amount;
+        IToolForInventory ActiveTool = CollectionFrame.ToolList.SelectedObject;
+        int source = ActiveTool.Quantity - amount;
         int target = (TargetTool?.Quantity ?? 0) + amount;
 
         if (InventoryMode)
         {
             ResultCheckInventory.text = source.ToString();
             ResultCheckStorage.text = target.ToString();
-            ResultCheckCarryWeight.Set(PartyInfo.Inventory.CarryWeight - amount * tool.Weight, PartyInfo.Inventory.WeightCapacity);
+            ResultCheckCarryWeight.Set(PartyInfo.Inventory.CarryWeight - amount * ActiveTool.Weight, PartyInfo.Inventory.WeightCapacity);
         }
         else
         {
             ResultCheckInventory.text = target.ToString();
             ResultCheckStorage.text = source.ToString();
-            ResultCheckCarryWeight.Set(PartyInfo.Inventory.CarryWeight + amount * tool.Weight, PartyInfo.Inventory.WeightCapacity);
+            ResultCheckCarryWeight.Set(PartyInfo.Inventory.CarryWeight + amount * ActiveTool.Weight, PartyInfo.Inventory.WeightCapacity);
         }
     }
 
@@ -236,17 +242,8 @@ public class Storage : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameO
 
     public void ConfirmTransaction()
     {
-        switch (CollectionFrame.CurrentInventoryList)
-        {
-            case InventorySystem.ListType.Items:
-                SourceSystem.RemoveItem(CollectionFrame.ToolList.SelectedObject as Item, ConfirmFrame.Amount);
-                TargetSystem.AddItem((TargetTool ?? CollectionFrame.ToolList.SelectedObject) as Item, ConfirmFrame.Amount);
-                break;
-            case InventorySystem.ListType.Weapons:
-                SourceSystem.RemoveWeapon(CollectionFrame.ToolList.SelectedObject as Weapon, ConfirmFrame.Amount);
-                TargetSystem.AddWeapon((TargetTool ?? CollectionFrame.ToolList.SelectedObject) as Weapon, ConfirmFrame.Amount);
-                break;
-        }
+        SourceSystem.Remove(CollectionFrame.ToolList.SelectedObject, ConfirmFrame.Amount);
+        TargetSystem.Add(TargetTool ?? CollectionFrame.ToolList.SelectedObject, ConfirmFrame.Amount);
         CollectionFrame.Refresh();
         UndoConfirmAmount();
     }

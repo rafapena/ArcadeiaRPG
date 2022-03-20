@@ -203,7 +203,7 @@ public class Battle : MonoBehaviour
                 }
                 if (ActingBattler.GetType().Name == "BattleEnemy") ActingBattler.ExecuteAction(EnemyPartyMembers, PlayerPartyMembers);
                 else ActingBattler.ExecuteAction(PlayerPartyMembers, EnemyPartyMembers);
-                Tool abt = ActingBattler.SelectedToolMove;
+                ActiveTool abt = ActingBattler.SelectedToolMove;
                 if (abt)
                     BattleStateTime = Time.time + abt.ActionTime;
                 break;

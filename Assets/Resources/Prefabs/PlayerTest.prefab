@@ -368,6 +368,7 @@ MonoBehaviour:
   - {fileID: 7230775191068158404, guid: 77df0195c5c99154580a874268a423bc, type: 3}
   CraftableWeapons:
   - {fileID: 4959000729214192542, guid: f43fc6a9a0487964283e05224babca5a, type: 3}
+  CraftableAccessories: []
   PreemptiveAttackChance: 0
 --- !u!114 &8854167014643114184
 MonoBehaviour:
@@ -423,12 +424,19 @@ MonoBehaviour:
   - {fileID: 1623505104987198706, guid: db3b6b36abc81214a8b4f9956b5e567c, type: 3}
   - {fileID: 1623505104987198706, guid: db3b6b36abc81214a8b4f9956b5e567c, type: 3}
   - {fileID: 1623505104987198706, guid: db3b6b36abc81214a8b4f9956b5e567c, type: 3}
+  - {fileID: 8767277357031307296, guid: 6312d90d97dee8445b8e10dce3b56572, type: 3}
   Weapons:
   - {fileID: 3552097900181454016, guid: ffa9f6fe244c85248a1bb202285c251d, type: 3}
   - {fileID: 4959000729214192542, guid: f43fc6a9a0487964283e05224babca5a, type: 3}
-  KeyItems: []
+  Accessories:
+  - {fileID: 4549664854553296160, guid: aef28947dc5666c4cbd2bc85b9beabce, type: 3}
+  - {fileID: 4549664854553296160, guid: aef28947dc5666c4cbd2bc85b9beabce, type: 3}
+  - {fileID: 4549664854553296160, guid: aef28947dc5666c4cbd2bc85b9beabce, type: 3}
+  - {fileID: 4549664854553296160, guid: aef28947dc5666c4cbd2bc85b9beabce, type: 3}
+  - {fileID: 8080823146443188448, guid: faef415b7e8519343b561564644fc8e2, type: 3}
+  - {fileID: 8080823146443188448, guid: faef415b7e8519343b561564644fc8e2, type: 3}
   CarryWeight: 0
-  WeightCapacity: 50
+  WeightCapacity: 60
 --- !u!114 &5726009491312351033
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -458,6 +466,8 @@ MonoBehaviour:
   - {fileID: 4959000729214192542, guid: f43fc6a9a0487964283e05224babca5a, type: 3}
   - {fileID: 4959000729214192542, guid: f43fc6a9a0487964283e05224babca5a, type: 3}
   - {fileID: 3552097900181454016, guid: ffa9f6fe244c85248a1bb202285c251d, type: 3}
-  KeyItems: []
+  Accessories:
+  - {fileID: 4549664854553296160, guid: aef28947dc5666c4cbd2bc85b9beabce, type: 3}
+  - {fileID: 4549664854553296160, guid: aef28947dc5666c4cbd2bc85b9beabce, type: 3}
   CarryWeight: 0
   WeightCapacity: 0

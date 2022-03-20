@@ -17,7 +17,7 @@ using System.Linq;
 /// - The number of existing entries must be at least the current number of columns
 /// - The navigation must be set on the first row's existing boxes
 /// </summary>
-public class InventoryToolSelectionList : SelectionList_Super<ToolForInventory>
+public class InventoryToolSelectionList : SelectionList_Super<IToolForInventory>
 {
     public enum AdditionalDisplayAttributes { None, Quanitity, Price }
 
@@ -46,7 +46,7 @@ public class InventoryToolSelectionList : SelectionList_Super<ToolForInventory>
         base.Awake();
     }
 
-    public void Refresh<T>(List<T> listData, int hardLimit = -1, bool customNavigation = false) where T : ToolForInventory
+    public void Refresh<T>(List<T> listData, int hardLimit = -1, bool customNavigation = false) where T : IToolForInventory
     {
         // Get number of scrollable rows
         int totalNumberOfRows = NumberOfVisibleRows;
@@ -63,7 +63,7 @@ public class InventoryToolSelectionList : SelectionList_Super<ToolForInventory>
         NavToRight = transform.GetChild(NumberOfColumns - 1).GetComponent<Button>().navigation.selectOnRight;
 
         // Add the data
-        ReferenceData = new List<ToolForInventory>();
+        ReferenceData = new List<IToolForInventory>();
         int i = 0;
         for (int r = 0; r < totalNumberOfRows; r++)
         {
@@ -92,7 +92,7 @@ public class InventoryToolSelectionList : SelectionList_Super<ToolForInventory>
                 // Set the icon in the box entry
                 Image blankImage = entry.transform.GetChild(0).GetComponent<Image>();
                 bool inDataList = i < listData.Count;
-                blankImage.color = (inDataList && listData[i].IsCraftable()) ? CraftedBackgroundColor : NormalBackgroundColor;
+                blankImage.color = (inDataList && listData[i].IsCraftable) ? CraftedBackgroundColor : NormalBackgroundColor;
                 if (inDataList) AddToList(entry.transform, listData[i]);
                 else SetToBlank(entry);
                 i++;
@@ -112,11 +112,11 @@ public class InventoryToolSelectionList : SelectionList_Super<ToolForInventory>
             SetSelected(listData.Count - 1);
     }
 
-    private void AddToList<T>(Transform entry, T dataEntry) where T : ToolForInventory
+    private void AddToList<T>(Transform entry, T dataEntry) where T : IToolForInventory
     {
         ReferenceData.Add(dataEntry);
         entry.transform.GetChild(1).gameObject.SetActive(true);
-        entry.transform.GetChild(1).gameObject.GetComponent<Image>().sprite = dataEntry.GetComponent<SpriteRenderer>().sprite;
+        entry.transform.GetChild(1).gameObject.GetComponent<Image>().sprite = dataEntry.Info.GetComponent<SpriteRenderer>().sprite;
         if (entry.transform.childCount > 2)
         {
             GameObject go = entry.transform.GetChild(2).gameObject;
@@ -127,10 +127,11 @@ public class InventoryToolSelectionList : SelectionList_Super<ToolForInventory>
                     go.SetActive(false);
                     break;
                 case AdditionalDisplayAttributes.Quanitity:
-                    go.GetComponent<TextMeshProUGUI>().text = dataEntry.Quantity.ToString();
+                    int quantity = dataEntry.Quantity;
+                    go.GetComponent<TextMeshProUGUI>().text = quantity == 1 ? "" : quantity.ToString();
                     break;
                 case AdditionalDisplayAttributes.Price:
-                    go.GetComponent<TextMeshProUGUI>().text = COST_PREFIX + dataEntry.DefaultPrice;
+                    go.GetComponent<TextMeshProUGUI>().text = COST_PREFIX + dataEntry.Price;
                     break;
             }
         }
@@ -188,27 +189,34 @@ public class InventoryToolSelectionList : SelectionList_Super<ToolForInventory>
         SelectedIndex = tmpIdx;
         SelectedObject = ReferenceData[SelectedIndex];
 
-        InfoFrame.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = SelectedObject.Name.ToUpper();
-        InfoFrame.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = SelectedObject.Description;
+        InfoFrame.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = SelectedObject.Info.Name.ToUpper();
+        InfoFrame.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = SelectedObject.Info.Description;
         SetElementImage(InfoFrame, 2, SelectedObject);
 
-        bool isWeapon = (SelectedObject.GetType().Name == "Weapon");
+        bool isWeapon = SelectedObject is Weapon;
         InfoFrame.transform.GetChild(3).gameObject.SetActive(isWeapon);
         InfoFrame.transform.GetChild(4).gameObject.SetActive(isWeapon);
         InfoFrame.transform.GetChild(5).gameObject.SetActive(isWeapon);
-        InfoFrame.transform.GetChild(3).GetChild(0).GetComponent<TextMeshProUGUI>().text = SelectedObject.Power.ToString();
-        InfoFrame.transform.GetChild(4).GetChild(0).GetComponent<TextMeshProUGUI>().text = SelectedObject.Range + "%";
-        InfoFrame.transform.GetChild(5).GetChild(0).GetComponent<TextMeshProUGUI>().text = "+" + SelectedObject.CritcalRate + "%";
+        if (SelectedObject is Weapon wp)
+        {
+            InfoFrame.transform.GetChild(3).GetChild(0).GetComponent<TextMeshProUGUI>().text = wp.Power.ToString();
+            InfoFrame.transform.GetChild(4).GetChild(0).GetComponent<TextMeshProUGUI>().text = wp.Range + "%";
+            InfoFrame.transform.GetChild(5).GetChild(0).GetComponent<TextMeshProUGUI>().text = "+" + wp.CritcalRate + "%";
+        }
 
         InfoFrame.transform.GetChild(6).GetChild(0).GetComponent<TextMeshProUGUI>().text = SelectedObject.Weight.ToString();
         return true;
     }
 
-    public static void SetElementImage<T>(GameObject infoFrame, int index, T tool) where T : Tool
+    public static void SetElementImage<T>(GameObject infoFrame, int index, T tool)
     {
-        bool hasElement = UIMaster.ElementImages.ContainsKey(tool.Element);
-        if (hasElement) infoFrame.transform.GetChild(index).GetComponent<Image>().sprite = UIMaster.ElementImages[tool.Element];
-        infoFrame.transform.GetChild(index).gameObject.SetActive(hasElement);
+        if (tool is ActiveTool at)
+        {
+            bool hasElement = UIMaster.ElementImages.ContainsKey(at.Element);
+            if (hasElement) infoFrame.transform.GetChild(index).GetComponent<Image>().sprite = UIMaster.ElementImages[at.Element];
+            infoFrame.transform.GetChild(index).gameObject.SetActive(hasElement);
+        }
+        else infoFrame.transform.GetChild(index).gameObject.SetActive(false);
     }
 
     public void UpdateNavRight(Transform newNavToRight)

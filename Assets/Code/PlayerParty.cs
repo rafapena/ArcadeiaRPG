@@ -28,6 +28,7 @@ public class PlayerParty : MonoBehaviour
     // Collected craftable items/weapons
     public List<Item> CraftableItems;
     public List<Weapon> CraftableWeapons;
+    public List<Weapon> CraftableAccessories;
 
     [HideInInspector] public float PreemptiveAttackChance;
     
@@ -155,6 +156,7 @@ public class PlayerParty : MonoBehaviour
         Inventory.WeightCapacity = PlayerPrefs.GetInt("InventoryCapacity_" + file);
         LoadToolsList(file, ResourcesMaster.Items, inv, Inventory);
         LoadToolsList(file, ResourcesMaster.Weapons, inv, Inventory);
+        LoadToolsList(file, ResourcesMaster.Accessories, inv, Inventory);
     }
 
     private void LoadStorage(int file)
@@ -162,17 +164,18 @@ public class PlayerParty : MonoBehaviour
         string str = "Storage";
         LoadToolsList(file, ResourcesMaster.Items, str, Storage);
         LoadToolsList(file, ResourcesMaster.Weapons, str, Storage);
+        LoadToolsList(file, ResourcesMaster.Accessories, str, Storage);
     }
 
-    private void LoadToolsList<T>(int file, T[] list, string pre, InventorySystem system) where T : ToolForInventory
+    private void LoadToolsList<T>(int file, T[] list, string pre, InventorySystem system) where T : IToolForInventory
     {
         for (int i = 0; i < list.Length; i++)
         {
-            int quantity = PlayerPrefs.GetInt(pre + typeof(T).Name + list[i].Id + "_" + file);
+            int quantity = PlayerPrefs.GetInt(pre + typeof(T).Name + list[i].Info.Id + "_" + file);
             Item it = list[i] as Item;
             Weapon wp = list[i] as Weapon;
-            if (it) system.AddItem(it, quantity);
-            else if (wp) system.AddWeapon(wp, quantity);
+            if (it) system.Add(it, quantity);
+            else if (wp) system.Add(wp, quantity);
         }
     }
 

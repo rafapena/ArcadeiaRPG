@@ -5,7 +5,7 @@ public class Projectile : MonoBehaviour
 {
     [HideInInspector] private Battler Shooter;
     [HideInInspector] private List<Battler> Targets;
-    [HideInInspector] private Tool ToolEffect;
+    [HideInInspector] private ActiveTool ToolEffect;
 
     private Vector3 ShootDir;
     public float MoveSpeed;
@@ -18,11 +18,11 @@ public class Projectile : MonoBehaviour
         Destroy(gameObject, 12f);
     }
 
-    public void GetBattleInfo(Battler user, List<Battler> targets, Tool tool)
+    public void GetBattleInfo(Battler user, List<Battler> targets, ActiveTool ActiveTool)
     {
         Shooter = user;
         Targets = targets;
-        ToolEffect = tool;
+        ToolEffect = ActiveTool;
     }
 
     protected void Update()

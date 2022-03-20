@@ -29,13 +29,13 @@ public abstract class Battler : BaseObject
     [HideInInspector] public Stats StatBoosts;
     [HideInInspector] public List<Skill> Skills;
     public List<Weapon> Weapons;
+    public List<Accessory> Accessories;
 
     // Overall battle info
-    [HideInInspector] public Tool SelectedToolMove { get; private set; }
+    [HideInInspector] public ActiveTool SelectedToolMove { get; private set; }
     [HideInInspector] public Skill SelectedSkill;
     [HideInInspector] public Weapon SelectedWeapon;
     [HideInInspector] public Item SelectedItem;
-    [HideInInspector] public List<Battler> SelectedTeamSkillPartners;
     [HideInInspector] public List<Battler> SelectedTargets;
     [HideInInspector] public List<State> States;
 
@@ -162,7 +162,6 @@ public abstract class Battler : BaseObject
     {
         SelectedSkill = null;
         SelectedItem = null;
-        if (SelectedTeamSkillPartners != null) SelectedTeamSkillPartners.Clear();
         if (SelectedTargets != null) SelectedTargets.Clear();
         HitCritical = false;
         HitWeakness = false;
@@ -173,25 +172,42 @@ public abstract class Battler : BaseObject
     /// -- Equip Management --
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public int EquipWeapon(Weapon weapon)
+    public int Equip<T>(T equipment) where T : IToolForInventory
     {
-        if (!weapon) return -1;
-        Weapons.Add(weapon);
-        return Weapons.Count - 1;
+        if (equipment is Weapon wp)
+        {
+            Weapons.Add(wp);
+            return Weapons.Count - 1;
+        }
+        else if (equipment is Accessory ac)
+        {
+            Accessories.Add(ac);
+            return Accessories.Count - 1;
+        }
+        else return -1;
     }
 
-    public Weapon UnequipWeapon(int index)
+    public IToolForInventory Unequip<T>(int index) where T : IToolForInventory
     {
-        if (index < 0 || index >= Weapons.Count) return null;
-        Weapon weapon = Weapons[index];
-        Weapons.RemoveAt(index);
-        return weapon;
+        if (typeof(T).Name.Equals("Weapon") && index >= 0 && index < Weapons.Count)
+        {
+            Weapon weapon = Weapons[index];
+            Weapons.RemoveAt(index);
+            return weapon;
+        }
+        else if (typeof(T).Name.Equals("Accessory") && index >= 0 && index < Accessories.Count)
+        {
+            Accessory accessory = Accessories[index];
+            Accessories.RemoveAt(index);
+            return accessory;
+        }
+        else return default(T);
     }
 
-    public void ReplaceWeaponWith(Weapon weapon, int index)
+    public void ReplaceEquipWith<T>(T tool, int index) where T : IToolForInventory
     {
-        if (index < 0 || index >= Weapons.Count || !weapon) return;
-        Weapons[index] = weapon;
+        if (tool is Weapon wp && index >= 0 && index < Weapons.Count) Weapons[index] = wp;
+        else if (tool is Accessory ac && index >= 0 && index < Accessories.Count) Accessories[index] = ac;
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -287,12 +303,12 @@ public abstract class Battler : BaseObject
     }*/
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// -- Tool Pre-Actions --
+    /// -- ActiveTool Pre-Actions --
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     private void RedirectUnconsciousSelectedPartners(List<Battler> usersParty, List<Battler> opponentParty)
     {
-        for (int i = SelectedTeamSkillPartners.Count - 1; i >= 0; i--)
+        /*for (int i = SelectedTeamSkillPartners.Count - 1; i >= 0; i--)
         {
             if (SelectedTeamSkillPartners[i].Unconscious)
                 SelectedTeamSkillPartners.RemoveAt(i);
@@ -303,7 +319,7 @@ public abstract class Battler : BaseObject
             if (!p.Unconscious && p.GetType().Name == GetType().Name)
                 SelectedTeamSkillPartners.Add(p);
         }
-        DefaultToAttackRandom();
+        DefaultToAttackRandom();*/
     }
 
     protected abstract Skill GetDefaultSkill();
@@ -335,7 +351,7 @@ public abstract class Battler : BaseObject
 
     private bool ScopeForUnconsciousTeammates()
     {
-        return SelectedToolMove.Scope == Tool.ScopeType.OneKnockedOutTeammate || SelectedToolMove.Scope == Tool.ScopeType.AllKnockedOutTeammates;
+        return SelectedToolMove.Scope == ActiveTool.ScopeType.OneKnockedOutTeammate || SelectedToolMove.Scope == ActiveTool.ScopeType.AllKnockedOutTeammates;
     }
 
     private void SetupRandomTargets(List<Battler> usersParty, List<Battler> opponentParty)
@@ -343,14 +359,14 @@ public abstract class Battler : BaseObject
         Battler selected;
         switch (SelectedToolMove.Scope)
         {
-            case Tool.ScopeType.OneEnemy:
-            case Tool.ScopeType.SplashEnemies:
+            case ActiveTool.ScopeType.OneEnemy:
+            case ActiveTool.ScopeType.SplashEnemies:
                 do selected = opponentParty[Random.Range(0, opponentParty.Count)];
                 while (selected.Unconscious);
                 SelectedTargets.Add(selected);
                 break;
 
-            case Tool.ScopeType.OneRow:
+            case ActiveTool.ScopeType.OneRow:
                 do selected = opponentParty[Random.Range(0, opponentParty.Count)];
                 while (selected.Unconscious);
                 foreach (Battler b in opponentParty)
@@ -358,7 +374,7 @@ public abstract class Battler : BaseObject
                         SelectedTargets.Add(selected);
                 break;
 
-            case Tool.ScopeType.OneColumn:
+            case ActiveTool.ScopeType.OneColumn:
                 do selected = opponentParty[Random.Range(0, opponentParty.Count)];
                 while (selected.Unconscious);
                 foreach (Battler b in opponentParty)
@@ -366,13 +382,13 @@ public abstract class Battler : BaseObject
                         SelectedTargets.Add(selected);
                 break;
 
-            case Tool.ScopeType.OneTeammate:
+            case ActiveTool.ScopeType.OneTeammate:
                 do selected = usersParty[Random.Range(0, usersParty.Count)];
                 while (selected.Unconscious);
                 SelectedTargets.Add(selected);
                 break;
 
-            case Tool.ScopeType.OneKnockedOutTeammate:
+            case ActiveTool.ScopeType.OneKnockedOutTeammate:
                 int potentialTargets = 0;
                 foreach (Battler t in usersParty)
                     if (t.Unconscious)
@@ -387,7 +403,7 @@ public abstract class Battler : BaseObject
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// -- Tool Actions --
+    /// -- ActiveTool Actions --
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public void ExecuteAction(List<Battler> usersParty, List<Battler> opponentParty)
@@ -412,7 +428,7 @@ public abstract class Battler : BaseObject
         ExecuteTool();
     }
 
-    public Tool GetSelectedToolMove()
+    public ActiveTool GetSelectedToolMove()
     {
         if (SelectedSkill)
         {
@@ -487,39 +503,39 @@ public abstract class Battler : BaseObject
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// -- Receiving Tool Effects --
+    /// -- Receiving ActiveTool Effects --
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public delegate void ApplyExtra(Battler user, Tool tool, float effectMagnitude);
+    public delegate void ApplyExtra(Battler user, ActiveTool ActiveTool, float effectMagnitude);
 
-    public void ReceiveToolEffects(Battler user, Tool tool, ApplyExtra extraFunc = null)
+    public void ReceiveToolEffects(Battler user, ActiveTool ActiveTool, ApplyExtra extraFunc = null)
     {
         float effectMagnitude = 1.0f;
-        if (tool.Hit(user, this, effectMagnitude))
+        if (ActiveTool.Hit(user, this, effectMagnitude))
         {
-            int formulaOutput = tool.GetFormulaOutput(user, this, effectMagnitude);
-            int directHPChange = tool.HPAmount + (Stats.MaxHP * tool.HPPercent / 100);
+            int formulaOutput = ActiveTool.GetFormulaOutput(user, this, effectMagnitude);
+            int directHPChange = ActiveTool.HPAmount + (Stats.MaxHP * ActiveTool.HPPercent / 100);
             
-            int critRate = tool.GetCriticalHitRatio(user, this, effectMagnitude);       // UPDATES HitCritical
-            float elementRate = tool.GetElementRateRatio(user, this);                   // UPDATES HitWeakness and HitResistant
+            int critRate = ActiveTool.GetCriticalHitRatio(user, this, effectMagnitude);       // UPDATES HitCritical
+            float elementRate = ActiveTool.GetElementRateRatio(user, this);                   // UPDATES HitWeakness and HitResistant
             int ratesTotal = (int)(critRate * elementRate);
 
             int totalHPChange = (formulaOutput + directHPChange) * ratesTotal;
-            int totalSPChange = (formulaOutput + tool.SPPecent) * ratesTotal;
-            int realHPTotal = tool.GetTotalWithVariance(totalHPChange);
-            int realSPTotal = tool.GetTotalWithVariance(totalSPChange);
-            if (tool.HPModType != Tool.ModType.None && realHPTotal <= 0) realHPTotal = 1;
-            if (tool.SPModType != Tool.ModType.None && realSPTotal <= 0) realSPTotal = 1;
+            int totalSPChange = (formulaOutput + ActiveTool.SPPecent) * ratesTotal;
+            int realHPTotal = ActiveTool.GetTotalWithVariance(totalHPChange);
+            int realSPTotal = ActiveTool.GetTotalWithVariance(totalSPChange);
+            if (ActiveTool.HPModType != ActiveTool.ModType.None && realHPTotal <= 0) realHPTotal = 1;
+            if (ActiveTool.SPModType != ActiveTool.ModType.None && realSPTotal <= 0) realSPTotal = 1;
 
-            //List<int>[] states = tool.TriggeredStates(user, this, effectMagnitude);
+            //List<int>[] states = ActiveTool.TriggeredStates(user, this, effectMagnitude);
             //oneTarget.Add(states[0].Count);
             //foreach (int stateGiveId in states[0]) oneTarget.Add(stateGiveId);
             //oneTarget.Add(states[1].Count);
             //foreach (int stateReceiveId in states[1]) oneTarget.Add(stateReceiveId);
-            extraFunc?.Invoke(user, tool, effectMagnitude);
+            extraFunc?.Invoke(user, ActiveTool, effectMagnitude);
 
-            ChangeAndDisplayPopup(user, realHPTotal, tool.HPModType, "HP", user.ChangeHP, ChangeHP);
-            ChangeAndDisplayPopup(user, realSPTotal, tool.SPModType, "SP", user.ChangeSP, ChangeSP);
+            ChangeAndDisplayPopup(user, realHPTotal, ActiveTool.HPModType, "HP", user.ChangeHP, ChangeHP);
+            ChangeAndDisplayPopup(user, realSPTotal, ActiveTool.SPModType, "SP", user.ChangeSP, ChangeSP);
             CheckKO();
         }
         else
@@ -531,25 +547,25 @@ public abstract class Battler : BaseObject
 
     // Helper for function above
     public delegate void ChangeFunc(int total);
-    public void ChangeAndDisplayPopup(Battler user, int total, Tool.ModType modType, string HPorSP, ChangeFunc changeHPorSPForUser, ChangeFunc changeHPorSPForTarget)
+    public void ChangeAndDisplayPopup(Battler user, int total, ActiveTool.ModType modType, string HPorSP, ChangeFunc changeHPorSPForUser, ChangeFunc changeHPorSPForTarget)
     {
         Popup popup = null;
         switch (modType)
         {
-            case Tool.ModType.None:
+            case ActiveTool.ModType.None:
                 break;
-            case Tool.ModType.Damage:
+            case ActiveTool.ModType.Damage:
                 if (Time.timeScale > 0) 
                     popup = Instantiate(UIMaster.Popups[HPorSP + "Damage"], transform.position, Quaternion.identity);
                 changeHPorSPForTarget(-total);
                 break;
-            case Tool.ModType.Drain:
+            case ActiveTool.ModType.Drain:
                 if (Time.timeScale > 0) 
                     popup = Instantiate(UIMaster.Popups[HPorSP + "Drain"], transform.position, Quaternion.identity);
                 changeHPorSPForTarget(-total);
                 changeHPorSPForUser(total);
                 break;
-            case Tool.ModType.Recover:
+            case ActiveTool.ModType.Recover:
                 if (Time.timeScale > 0)
                     popup = Instantiate(UIMaster.Popups[HPorSP + "Recover"], transform.position, Quaternion.identity);
                 changeHPorSPForTarget(total);

@@ -58,7 +58,7 @@ public class BattleWin : MonoBehaviour
     private int GoldEarned;
     private int GoldIncreaseSpeed;
     private int NewGoldTotal;
-    private List<ToolForInventory> ItemsEarned;
+    private List<IToolForInventory> ItemsEarned;
 
     // Companionships
     private List<PlayerRelation> CompaionshipUpPlayers;
@@ -69,7 +69,7 @@ public class BattleWin : MonoBehaviour
         Selection = Selections.None;
         CInfoFrameMainColor = LevelEXP.GetComponent<Image>().color;
         CInfoFrameLevelUpColor = new Color(1, 0.9f, 0.3f, CInfoFrameMainColor.a);
-        ItemsEarned = new List<ToolForInventory>();
+        ItemsEarned = new List<IToolForInventory>();
         CompaionshipUpPlayers = new List<PlayerRelation>();
         CompanionshipUpBoostAmounts = new List<int>();
         NoItemsLabel.gameObject.SetActive(false);
@@ -128,7 +128,7 @@ public class BattleWin : MonoBehaviour
                 bool itemAlreadyInList = false;
                 for (int i = 0; i < ItemsEarned.Count; i++)
                 {
-                    if (idr.ItemDropped.Id == ItemsEarned[i].Id)
+                    if (idr.ItemDropped.Info.Id == ItemsEarned[i].Info.Id)
                     {
                         ItemsEarned[i].Quantity++;
                         itemAlreadyInList = true;
@@ -136,7 +136,7 @@ public class BattleWin : MonoBehaviour
                     }
                 }
                 if (itemAlreadyInList) continue;
-                ToolForInventory item = Instantiate(idr.ItemDropped);
+                IToolForInventory item = Instantiate(idr.ItemDropped as Item);
                 item.Quantity = 1;
                 ItemsEarned.Add(item);
             }
@@ -186,8 +186,8 @@ public class BattleWin : MonoBehaviour
         {
             Transform it = ItemsObtained.transform.GetChild(i);
             it.gameObject.SetActive(true);
-            it.GetChild(0).GetComponent<TextMeshProUGUI>().text = ItemsEarned[i].Name;
-            it.GetChild(1).GetComponent<Image>().sprite = ItemsEarned[i].GetComponent<SpriteRenderer>().sprite;
+            it.GetChild(0).GetComponent<TextMeshProUGUI>().text = ItemsEarned[i].Info.Name;
+            it.GetChild(1).GetComponent<Image>().sprite = ItemsEarned[i].Info.GetComponent<SpriteRenderer>().sprite;
             it.GetChild(2).GetComponent<TextMeshProUGUI>().text = "+" + ItemsEarned[i].Quantity;
         }
         for (; i < childSize; i++)

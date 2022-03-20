@@ -26,7 +26,7 @@ public class ToolListCollectionFrame : MonoBehaviour
 
     // Selection list
     public InventoryToolSelectionList ToolList;
-    private IEnumerable<ToolForInventory>[] ListOptions;
+    private IEnumerable<IToolForInventory>[] ListOptions;
     [HideInInspector] public InventorySystem.ListType CurrentInventoryList;
 
     // Carry tracking
@@ -56,7 +56,7 @@ public class ToolListCollectionFrame : MonoBehaviour
         foreach (Transform t in Tabs.transform)
             if (t.gameObject.activeSelf)
                 numberOfTabs++;
-        ListOptions = new IEnumerable<ToolForInventory>[numberOfTabs];
+        ListOptions = new IEnumerable<IToolForInventory>[numberOfTabs];
         SortFunctions = new SortingFunc[]{
             SortByDefaultAscending, SortByDefaultDescending,
             SortByQuantityAscending, SortByQuantityDescending,
@@ -64,10 +64,10 @@ public class ToolListCollectionFrame : MonoBehaviour
         };
     }
 
-    public void RegisterToolList<T>(int tabIndex, List<T> list) where T : ToolForInventory
+    public void RegisterToolList<T>(int tabIndex, List<T> list) where T : IToolForInventory
     {
         if (tabIndex >= ListOptions.Length || tabIndex < 0 || list == null) return;
-        ListOptions[tabIndex] = list;
+        ListOptions[tabIndex] = (IEnumerable<IToolForInventory>)list;
     }
 
     public void TrackCarryWeight(InventorySystem inventory)
@@ -94,7 +94,7 @@ public class ToolListCollectionFrame : MonoBehaviour
         DeactivateSorter();
     }
 
-    public void Refresh<T>(List<T> listData) where T : ToolForInventory
+    public void Refresh<T>(List<T> listData) where T : IToolForInventory
     {
         ToolList.Refresh(listData);
         SortFunctions[SavedSortSetting].Invoke();
@@ -107,7 +107,7 @@ public class ToolListCollectionFrame : MonoBehaviour
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// -- Inventory Lists --
+    /// -- Inventory List Tabs --
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public void InitializeSelection()
@@ -160,8 +160,15 @@ public class ToolListCollectionFrame : MonoBehaviour
             case "Weapon":
                 CurrentInventoryList = InventorySystem.ListType.Weapons;
                 break;
+            case "Accessory":
+                CurrentInventoryList = InventorySystem.ListType.Accessories;
+                break;
         }
     }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// -- Inventory Lists --
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public void SelectTool()
     {
@@ -225,12 +232,12 @@ public class ToolListCollectionFrame : MonoBehaviour
 
     public void SortByDefaultAscending()
     {
-        SortList(0, ListOptions[CurrentTabIndex].OrderBy(t => t.Id).ToList());
+        SortList(0, ListOptions[CurrentTabIndex].OrderBy(t => t.Info.Id).ToList());
     }
 
     public void SortByDefaultDescending()
     {
-        SortList(1, ListOptions[CurrentTabIndex].OrderByDescending(t => t.Id).ToList());
+        SortList(1, ListOptions[CurrentTabIndex].OrderByDescending(t => t.Info.Id).ToList());
     }
 
     public void SortByQuantityAscending()
@@ -253,7 +260,7 @@ public class ToolListCollectionFrame : MonoBehaviour
         SortList(5, ListOptions[CurrentTabIndex].OrderByDescending(t => t.Weight).ToList());
     }
 
-    private void SortList<T>(int type, List<T> list) where T : ToolForInventory
+    private void SortList<T>(int type, List<T> list) where T : IToolForInventory
     {
         SavedSortSetting = type;
         ToolList.Refresh(list);

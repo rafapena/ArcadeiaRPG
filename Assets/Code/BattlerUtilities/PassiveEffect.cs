@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 [System.Serializable]
-public struct PassiveEffect
+public abstract class PassiveEffect : BaseObject
 {
     public enum TurnSequence { ActionEnd, TurnEnd }
 

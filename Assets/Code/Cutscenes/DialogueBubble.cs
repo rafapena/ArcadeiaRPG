@@ -32,6 +32,7 @@ public class DialogueBubble : MonoBehaviour
 
     public void Display(CutsceneManager cm)
     {
+        if (!SceneMaster.InCutscene) return;
         cm.SetText(Text);
         cm.NameLabelL.text = Name;
         cm.NameLabelR.text = Name;

@@ -16,13 +16,10 @@ public class MMStats : MM_Super
     public StatsList StatsList;
 
     public Transform RelationsList;
-    public Transform SkillList;
-    public Transform TeamSkillList;
     public Transform WeaponsList;
-    public Transform ItemsList;
+    public Transform AccessoriesList;
     public Transform WeaknessesList;
     public Transform StrengthsList;
-    public Transform PassiveSkillsList;
 
     [HideInInspector] private BattlePlayer SelectedPlayer;
     [HideInInspector] private int SelectedPlayerIndex;
@@ -91,7 +88,6 @@ public class MMStats : MM_Super
         Level.text = MenuManager.PartyInfo.Level.ToString();
         StatsList.Setup(SelectedPlayer);
         SetupRelations();
-        SetupSkills();
         SetupEquipment();
         SetupRates();
     }
@@ -141,17 +137,10 @@ public class MMStats : MM_Super
         }
     }
 
-    public void SetupSkills()
-    {
-        bool moreThanZero = SelectedPlayer.Skills.Count > 0;
-        SkillList.parent.gameObject.SetActive(moreThanZero);
-        if (!moreThanZero) return;
-        SetupTools(SkillList, SelectedPlayer.Skills);
-    }
-
     public void SetupEquipment()
     {
         SetupTools(WeaponsList, SelectedPlayer.Weapons);
+        SetupTools(AccessoriesList, SelectedPlayer.Accessories);
     }
 
     public void SetupRates()
@@ -198,11 +187,11 @@ public class MMStats : MM_Super
     private void SetupTools<T>(Transform listGO, List<T> listData) where T : BaseObject
     {
         int i = 0;
-        foreach (T tool in listData)
+        foreach (T ActiveTool in listData)
         {
             Transform entry = listGO.GetChild(i++);
-            entry.GetComponent<Image>().sprite = tool.GetComponent<SpriteRenderer>().sprite;
-            if (entry.childCount > 0) entry.GetChild(0).GetComponent<TextMeshProUGUI>().text = tool.Name;
+            entry.GetComponent<Image>().sprite = ActiveTool.GetComponent<SpriteRenderer>().sprite;
+            if (entry.childCount > 0) entry.GetChild(0).GetComponent<TextMeshProUGUI>().text = ActiveTool.Name;
             entry.gameObject.SetActive(true);
         }
         for (; i < listGO.childCount; i++) listGO.GetChild(i).gameObject.SetActive(false);

@@ -105,6 +105,7 @@ public class SaveData
         PlayerPrefs.SetInt(bt + "SP_" + File, b.SP);
         SaveBattlersList(b.Skills, bt);
         SaveBattlersList(b.Weapons, bt);
+        SaveBattlersList(b.Accessories, bt);
         SaveBattlersList(b.States, bt);
         if (b.Weapons.Count > 0) PlayerPrefs.SetInt(bt + "SelectedWeapon_" + File, b.SelectedWeapon.Id);
         BattlePlayer p = b as BattlePlayer;
@@ -129,14 +130,15 @@ public class SaveData
         PlayerPrefs.SetInt("InventoryCapacity_" + File, GameplayMaster.Party.Inventory.WeightCapacity);
         SaveToolsList(GameplayMaster.Party.Inventory.Items, inv);
         SaveToolsList(GameplayMaster.Party.Inventory.Weapons, inv);
-        SaveToolsList(GameplayMaster.Party.Inventory.KeyItems, inv);
+        SaveToolsList(GameplayMaster.Party.Inventory.Accessories, inv);
         SaveToolsList(GameplayMaster.Party.Storage.Items, str);
         SaveToolsList(GameplayMaster.Party.Storage.Weapons, str);
+        SaveToolsList(GameplayMaster.Party.Storage.Accessories, str);
     }
 
-    private void SaveToolsList<T>(List<T> list, string pre) where T : ToolForInventory
+    private void SaveToolsList<T>(List<T> list, string pre) where T : IToolForInventory
     {
-        foreach (T entry in list) PlayerPrefs.SetInt(pre + typeof(T).Name + entry.Id + "_" + File, entry.Quantity);
+        foreach (T entry in list) PlayerPrefs.SetInt(pre + typeof(T).Name + entry.Info.Id + "_" + File, entry.Quantity);
     }
 
     private void SaveObjectives()
@@ -179,6 +181,7 @@ public class SaveData
         PlayerPrefs.DeleteKey(bt + "SP_" + File);
         DeleteBattlerList<Skill>(bt);
         DeleteBattlerList<Weapon>(bt);
+        DeleteBattlerList<Accessory>(bt);
         DeleteBattlerList<Item>(bt);
         DeleteBattlerList<State>(bt);
         for (int i = 0; i < ResourcesMaster.Players.Length; i++) PlayerPrefs.DeleteKey(bt + "Relation" + i + "_" + File);
@@ -210,9 +213,9 @@ public class SaveData
         DeleteToolList(ResourcesMaster.Weapons, str);
     }
 
-    private void DeleteToolList<T>(T[] list, string pre) where T : ToolForInventory
+    private void DeleteToolList<T>(T[] list, string pre) where T : IToolForInventory
     {
-        foreach (T entry in list) PlayerPrefs.DeleteKey(pre + typeof(T).Name + entry.Id + "_" + File);
+        foreach (T entry in list) PlayerPrefs.DeleteKey(pre + typeof(T).Name + entry.Info.Id + "_" + File);
     }
 
     private void DeleteObjectives()

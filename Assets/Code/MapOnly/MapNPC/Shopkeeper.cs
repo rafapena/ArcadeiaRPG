@@ -6,7 +6,7 @@ public class Shopkeeper : MapNPC
 {
     public PlayerParty Customer;
     public Sprite Image;
-    public List<ToolForInventory> ToolsInStock;
+    public List<IToolForInventory> ToolsInStock;
     public int TransactionAddedJump;
     public int OnlyBrowseAddedJump;
 

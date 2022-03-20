@@ -130,7 +130,7 @@ public class MMObjectives : MM_Super
         NameLabel.text = ObjectivesList.SelectedObject.Name.ToUpper();
         //GoldLabel.text = ObjectivesList.SelectedObject.InventoryRewards.Gold.ToString();
         //EXPLabel.text = ObjectivesList.SelectedObject.EXPReward.ToString();
-        List<ToolForInventory> list = ObjectivesList.SelectedObject.InventoryRewards.GetItemsAndWeapons();
+        List<IToolForInventory> list = ObjectivesList.SelectedObject.InventoryRewards.GetItemsAndWeapons();
         //RewardsToolList.Setup(list, list.Count);
         SetupDescription();
     }
