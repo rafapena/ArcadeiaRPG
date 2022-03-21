@@ -41,7 +41,7 @@ public class MMEquips : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOpera
         if (Selection == Selections.SelectTool || Selection == Selections.SelectToolSwap)
         {
             InventoryFrame.SelectTabInputs();
-            if (Input.GetKeyDown(KeyCode.V) && Selection != Selections.SelectToolSwap) OptimizeEquips();
+            if (Input.GetKeyDown(KeyCode.V) && Selection != Selections.SelectToolSwap) AutoEquip();
         }
     }
 
@@ -246,9 +246,9 @@ public class MMEquips : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOpera
 
     private void SetEquippedToolVisibility(bool enableWeaponList, bool enableAccessoriesList)
     {
-        EquippedAccessoriesLabel.text = enableAccessoriesList ? "EQUIPPED ACCESSORIES" : "\n\n\n\nSELECT A WEAPON TO SWAP OUT";
+        EquippedAccessoriesLabel.text = enableAccessoriesList ? "ACCESSORIES" : "\n\n\n\nSELECT A WEAPON TO SWAP OUT";
         EquippedAccessories.gameObject.SetActive(enableAccessoriesList);
-        EquippedWeaponsLabel.text = enableWeaponList ? "EQUIPPED WEAPONS" : "\n\n\n\nSELECT AN ACCESSORY TO SWAP OUT";
+        EquippedWeaponsLabel.text = enableWeaponList ? "WEAPONS" : "\n\n\n\nSELECT AN ACCESSORY TO SWAP OUT";
         EquippedWeapons.gameObject.SetActive(enableWeaponList);
         InventoryToolSelectionList first = enableWeaponList ? EquippedWeapons : EquippedAccessories;
         InventoryFrame.ToolList.UpdateNavRight(first.transform.GetChild(0));
@@ -341,9 +341,8 @@ public class MMEquips : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOpera
     /// -- Optimizing --
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public void OptimizeEquips()
+    public void AutoEquip()
     {
         if (Selection != Selections.SelectTool) return;
-        //
     }
 }

@@ -133,7 +133,7 @@ public class CutsceneManager : MonoBehaviour
         int jumpToIfFailed = int.Parse(components[0]);
         string cond = components[1];
         int val = int.Parse(components[2]);
-        bool mustBeFalse = condition[3] == '!';
+        bool mustBeFalse = components[3].Equals("!");
 
         bool metCondition = mustBeFalse ? !CheckCondition(cond, val) : CheckCondition(cond, val);
         return metCondition ? 0 : jumpToIfFailed;

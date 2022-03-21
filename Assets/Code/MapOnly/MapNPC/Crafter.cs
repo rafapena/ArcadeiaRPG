@@ -4,7 +4,6 @@ using UnityEngine.SceneManagement;
 
 public class Crafter : MapNPC
 {
-    public PlayerParty Customer;
     public Sprite Image;
     public int TransactionAddedJump;
     public int OnlyBrowseAddedJump;
@@ -31,7 +30,7 @@ public class Crafter : MapNPC
 
     public void OpenWorkshop()
     {
-        SceneMaster.OpenCraftingMenu(Customer, this);
+        SceneMaster.OpenCraftingMenu(Player.Party, this);
     }
 
     public void CloseWorkshop(bool doneTransaction)

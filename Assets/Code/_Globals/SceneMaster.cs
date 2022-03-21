@@ -31,6 +31,8 @@ public class SceneMaster : MonoBehaviour
     public const string SHOP_SCENE = "Shop";
     public const string STORAGE_SCENE = "Storage";
     public const string CRAFTING_SCENE = "Blueprints";
+    public const string CHANGE_CLASS_SCENE = "ChangeClass";
+    public const string CHANGE_SKILLS_SCENE = "ChangeSkills";
     public const string BATTLE_SCENE = "Battle";
     public const string GAME_OVER_SCENE = "GameOver";
     public const string SCREEN_TRANSITION_SCENE = "ScreenTransition";

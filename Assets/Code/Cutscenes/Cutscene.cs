@@ -6,13 +6,16 @@ using UnityEngine.Events;
 /// </summary>
 public class Cutscene : MonoBehaviour
 {
+    [HideInInspector]
     public CutsceneManager Manager;
+    
     public DialogueBubble[] Dialogue;
     private int CurrentBubble;
     public UnityEvent OnComplete;
     public Cutscene JumpToCutscene;
 
     private bool InteractionBuffer;
+    private int ToolQuantityController = 1;
 
     private bool EndingCutscene => CurrentBubble < 0 || CurrentBubble >= Dialogue.Length;
 
@@ -29,6 +32,10 @@ public class Cutscene : MonoBehaviour
         else if (!Manager.ChoicesFrame.activeSelf && InputMaster.Interact) CutsceneInteraction();
         else if (Manager.ChoicesFrame.activeSelf) ManageChoicesFrame();
     }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// -- Control flow --
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     private void CutsceneInteraction()
     {
@@ -68,13 +75,17 @@ public class Cutscene : MonoBehaviour
     {
         try
         {
+            Manager = UnityEngine.SceneManagement.SceneManager.GetActiveScene().GetRootGameObjects()[0].GetComponent<GameplayMaster>().CutsceneManager;
             Manager.Open(player);
             enabled = true;
             CurrentBubble = 0;
             RefreshDialogue();
             InteractionBuffer = hadToInteract;
         }
-        catch { }
+        catch
+        {
+            Debug.LogError("Could not open cutscene: First check that the GameplayMaster prefab is at the top of the gameobject tree in the scene");
+        }
     }
 
     public void Open(CutsceneManager manager, bool hadToInteract = true)
@@ -124,4 +135,28 @@ public class Cutscene : MonoBehaviour
         else Manager.Close();
         enabled = false;
     }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// -- Manager Operations --
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public void DisplayGold() => Manager.DisplayGold();
+
+    public void HideGold() => Manager.HideGold();
+
+    public void ChangeGold(int amount) => Manager.ChangeGold(amount);
+
+    public void SetToolQuantity(int amount) => ToolQuantityController = amount;
+
+    public void AddTool(Item tool) => Manager.Player.Party.Inventory.Remove(tool, ToolQuantityController);
+
+    public void RemoveTool(Item tool) => Manager.Player.Party.Inventory.Remove(tool, ToolQuantityController);
+
+    public void AddTool(Weapon tool) => Manager.Player.Party.Inventory.Remove(tool, ToolQuantityController);
+
+    public void RemoveTool(Weapon tool) => Manager.Player.Party.Inventory.Remove(tool, ToolQuantityController);
+
+    public void AddTool(Accessory tool) => Manager.Player.Party.Inventory.Remove(tool, ToolQuantityController);
+
+    public void RemoveTool(Accessory tool) => Manager.Player.Party.Inventory.Remove(tool);
 }

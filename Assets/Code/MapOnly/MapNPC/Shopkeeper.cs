@@ -4,7 +4,6 @@ using UnityEngine.SceneManagement;
 
 public class Shopkeeper : MapNPC
 {
-    public PlayerParty Customer;
     public Sprite Image;
     public int TransactionAddedJump;
     public int OnlyBrowseAddedJump;
@@ -40,11 +39,31 @@ public class Shopkeeper : MapNPC
 
     public void OpenShop(bool onlyBuying)
     {
-        SceneMaster.OpenShop(onlyBuying, Customer, this);
+        SceneMaster.OpenShop(onlyBuying, Player.Party, this);
     }
 
     public void CloseShop(bool doneTransaction)
     {
         Cutscene.ForceJump(doneTransaction ? TransactionAddedJump : OnlyBrowseAddedJump);
+    }
+
+    public void OpenClassChange()
+    {
+        //
+    }
+
+    public void CloseClassChange()
+    {
+        //
+    }
+
+    public void OpenSkillChange()
+    {
+        //
+    }
+
+    public void CloseSkillChange()
+    {
+        //
     }
 }

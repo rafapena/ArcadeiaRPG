@@ -7,6 +7,8 @@ using UnityEngine.SceneManagement;
 
 public class GameplayMaster : MonoBehaviour
 {
+    public CutsceneManager CutsceneManager;
+
     public enum Difficulties { Easy, Medium, Hard, Lunatic }
     public static Difficulties Difficulty;
     public MapMaster.Locations Location;

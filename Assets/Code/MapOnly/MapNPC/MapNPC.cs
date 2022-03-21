@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 public class MapNPC : MapExplorer
 {
     public Cutscene Cutscene;
+    [HideInInspector] public MapPlayer Player;
     [HideInInspector] public bool CloseToPlayer;
     [HideInInspector] public bool Interacting;
 
@@ -15,6 +16,7 @@ public class MapNPC : MapExplorer
 
     protected override void Start()
     {
+        Cutscene = GetComponent<Cutscene>();
         Cutscene.enabled = false;
         base.Start();
     }
@@ -39,6 +41,7 @@ public class MapNPC : MapExplorer
     {
         if (Interacting) return;
         Interacting = true;
+        Player = interactor;
         Cutscene.Open(interactor);
         Cutscene.gameObject.SetActive(true);
     }

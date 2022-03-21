@@ -28,7 +28,7 @@ public class PlayerParty : MonoBehaviour
     // Collected craftable items/weapons
     public List<Item> CraftableItems;
     public List<Weapon> CraftableWeapons;
-    public List<Weapon> CraftableAccessories;
+    public List<Accessory> CraftableAccessories;
 
     [HideInInspector] public float PreemptiveAttackChance;
     
