@@ -11,10 +11,11 @@ public class SceneMaster : MonoBehaviour
     private static bool InPauseMenu = false;
     private static bool InFileSelectMenu = false;
     private static int InShopMenu = 0;
+    private static bool InShop = false;
     private static bool InCraftingMenu = false;
     private static bool InStorageMenu = false;
 
-    public static bool InMenu => InMapMenu || InPauseMenu || InFileSelectMenu || InShopMenu > 0 || InStorageMenu || InCraftingMenu;
+    public static bool InMenu => InMapMenu || InPauseMenu || InFileSelectMenu || InShop || InStorageMenu || InCraftingMenu;
 
     public static bool BuyingInShop => InShopMenu == 1;
 
@@ -32,7 +33,6 @@ public class SceneMaster : MonoBehaviour
     public const string STORAGE_SCENE = "Storage";
     public const string CRAFTING_SCENE = "Blueprints";
     public const string CHANGE_CLASS_SCENE = "ChangeClass";
-    public const string CHANGE_SKILLS_SCENE = "ChangeSkills";
     public const string BATTLE_SCENE = "Battle";
     public const string GAME_OVER_SCENE = "GameOver";
     public const string SCREEN_TRANSITION_SCENE = "ScreenTransition";
@@ -79,108 +79,73 @@ public class SceneMaster : MonoBehaviour
         InBattle = false;
     }
 
-    public static void OpenMapMenu(PlayerParty playerParty)
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// -- Opening/closeing UI menus --
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    private static void OpenMenu(PlayerParty playerParty, string sceneName, ref bool menuCheck)
     {
-        GameplayMaster.Party = playerParty;
-        SceneManager.LoadScene(MAP_MENU_SCENE, LoadSceneMode.Additive);
-        InMapMenu = true;
+        if (!GameplayMaster.Party && playerParty != null) GameplayMaster.Party = playerParty;
+        SceneManager.LoadScene(sceneName, LoadSceneMode.Additive);
+        menuCheck = true;
         Time.timeScale = 0;
     }
 
-    public static void CloseMapMenu(PlayerParty playerParty)
+    private static void CloseMenu(PlayerParty playerParty, string sceneName, ref bool menuCheck)
     {
-        MenuMaster.SetupSelectionBufferInGameplay(0.5f);
+        MenuMaster.SetupSelectionBufferInGameplay(0.3f);
         GameplayMaster.Party = playerParty;
-        SceneManager.UnloadSceneAsync(MAP_MENU_SCENE);
-        InMapMenu = false;
+        SceneManager.UnloadSceneAsync(sceneName);
+        menuCheck = false;
         if (!InMenu) Time.timeScale = 1;
     }
 
-    public static void OpenPauseMenu(PlayerParty playerParty)
-    {
-        GameplayMaster.Party = playerParty;
-        SceneManager.LoadScene(PAUSE_MENU_SCENE, LoadSceneMode.Additive);
-        InPauseMenu = true;
-        Time.timeScale = 0;
-    }
+    public static void OpenMapMenu(PlayerParty playerParty) => OpenMenu(playerParty, MAP_MENU_SCENE, ref InMapMenu);
 
-    public static void ClosePauseMenu(PlayerParty playerParty)
-    {
-        MenuMaster.SetupSelectionBufferInGameplay(0.5f);
-        GameplayMaster.Party = playerParty;
-        SceneManager.UnloadSceneAsync(PAUSE_MENU_SCENE);
-        InPauseMenu = false;
-        if (!InMenu) Time.timeScale = 1;
-    }
+    public static void CloseMapMenu(PlayerParty playerParty) => CloseMenu(playerParty, MAP_MENU_SCENE, ref InMapMenu);
+
+    public static void OpenPauseMenu(PlayerParty playerParty) => OpenMenu(playerParty, PAUSE_MENU_SCENE, ref InPauseMenu);
+
+    public static void ClosePauseMenu(PlayerParty playerParty) => CloseMenu(playerParty, PAUSE_MENU_SCENE, ref InPauseMenu);
 
     public static void OpenFileSelect(FileSelect.FileMode fileMode, PlayerParty playerParty = null)
     {
-        if (!GameplayMaster.Party) GameplayMaster.Party = playerParty;
         FileSelect.FileSelectMode = fileMode;
-        SceneManager.LoadScene(FILE_SELECT_MENU_SCENE, LoadSceneMode.Additive);
-        InFileSelectMenu = true;
-        Time.timeScale = 0;
+        OpenMenu(playerParty, FILE_SELECT_MENU_SCENE, ref InFileSelectMenu);
     }
 
-    public static void CloseFileSelect()
-    {
-        MenuMaster.SetupSelectionBufferInGameplay();
-        SceneManager.UnloadSceneAsync(FILE_SELECT_MENU_SCENE);
-        InFileSelectMenu = false;
-        if (!InMenu) Time.timeScale = 1;
-    }
+    public static void CloseFileSelect() => CloseMenu(null, FILE_SELECT_MENU_SCENE, ref InFileSelectMenu);
 
     public static void OpenShop(bool onlyBuying, PlayerParty playerParty, Shopkeeper shop)
     {
-        GameplayMaster.Party = playerParty;
         GameplayMaster.Shop = shop;
-        SceneManager.LoadScene(SHOP_SCENE, LoadSceneMode.Additive);
         InShopMenu = onlyBuying ? 1 : 2;
-        Time.timeScale = 0;
+        OpenMenu(playerParty, SHOP_SCENE, ref InShop);
     }
 
-    public static void CloseShop(PlayerParty playerParty)
-    {
-        MenuMaster.SetupSelectionBufferInGameplay(0.5f);
-        GameplayMaster.Party = playerParty;
-        SceneManager.UnloadSceneAsync(SHOP_SCENE);
-        InShopMenu = 0;
-        if (!InMenu) Time.timeScale = 1;
-    }
+    public static void CloseShop(PlayerParty playerParty) => CloseMenu(playerParty, SHOP_SCENE, ref InShop);
 
-    public static void OpenStorage(PlayerParty playerParty)
-    {
-        GameplayMaster.Party = playerParty;
-        SceneManager.LoadScene(STORAGE_SCENE, LoadSceneMode.Additive);
-        InStorageMenu = true;
-        Time.timeScale = 0;
-    }
+    public static void OpenStorage(PlayerParty playerParty) => OpenMenu(playerParty, STORAGE_SCENE, ref InStorageMenu);
 
-    public static void CloseStorage(PlayerParty playerParty)
-    {
-        MenuMaster.SetupSelectionBufferInGameplay(0.5f);
-        GameplayMaster.Party = playerParty;
-        SceneManager.UnloadSceneAsync(STORAGE_SCENE);
-        InStorageMenu = false;
-        if (!InMenu) Time.timeScale = 1;
-    }
+    public static void CloseStorage(PlayerParty playerParty) => CloseMenu(playerParty, STORAGE_SCENE, ref InStorageMenu);
 
     public static void OpenCraftingMenu(PlayerParty playerParty, Crafter crafter)
     {
-        GameplayMaster.Party = playerParty;
+        /*GameplayMaster.Party = playerParty;
         SceneManager.LoadScene(CRAFTING_SCENE, LoadSceneMode.Additive);
         InCraftingMenu = true;
-        Time.timeScale = 0;
+        Time.timeScale = 0;*/
     }
 
-    public static void CloseCraftingMenu(PlayerParty playerParty)
-    {
-        MenuMaster.SetupSelectionBufferInGameplay(0.5f);
-        GameplayMaster.Party = playerParty;
-        SceneManager.UnloadSceneAsync(CRAFTING_SCENE);
-        InCraftingMenu = false;
-        if (!InMenu) Time.timeScale = 1;
-    }
+    public static void CloseCraftingMenu(PlayerParty playerParty) => CloseMenu(playerParty, CRAFTING_SCENE, ref InCraftingMenu);
+
+    public static void OpenChangeClassMenu(PlayerParty playerParty) => OpenMenu(playerParty, CHANGE_CLASS_SCENE, ref InShop);
+
+    public static void CloseChangeClassMenu(PlayerParty playerParty) => CloseMenu(playerParty, CHANGE_CLASS_SCENE, ref InShop);
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// -- Cutscenes/Other --
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public static void OpenCutscene()
     {
@@ -190,7 +155,7 @@ public class SceneMaster : MonoBehaviour
     public static void CloseCutscene(MapPlayer player)
     {
         GameplayMaster.Party = player.Party;
-        MenuMaster.SetupSelectionBufferInGameplay();
+        MenuMaster.SetupSelectionBufferInGameplay(0.5f);
         InCutscene = false;
     }
 

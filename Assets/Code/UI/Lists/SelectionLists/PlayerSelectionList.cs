@@ -13,7 +13,7 @@ using System.Collections.Generic;
 /// </summary>
 public class PlayerSelectionList : SelectionList_Super<Battler>
 {
-    public void Setup<T>(List<T> dataList) where T : Battler
+    public void Refresh<T>(List<T> dataList) where T : Battler
     {
         ReferenceData = new List<Battler>();
         int i = 0;

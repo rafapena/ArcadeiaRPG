@@ -28,7 +28,7 @@ public class MMMain : MM_Super
         Money.text = MenuManager.PartyInfo.Inventory.Gold.ToString();
         Level.text = MenuManager.PartyInfo.Level.ToString();
         SetupEXPInfo();
-        PartyList.Setup(MenuManager.PartyInfo.Players);
+        PartyList.Refresh(MenuManager.PartyInfo.Players);
         if (MenuManager.PartyInfo.AllPlayers.Count <= 4) MenuMaster.DisableSelection(ref TeamButton);
     }
 

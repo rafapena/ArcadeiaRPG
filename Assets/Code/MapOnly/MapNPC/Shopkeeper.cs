@@ -49,20 +49,10 @@ public class Shopkeeper : MapNPC
 
     public void OpenClassChange()
     {
-        //
+        SceneMaster.OpenChangeClassMenu(Player.Party);
     }
 
     public void CloseClassChange()
-    {
-        //
-    }
-
-    public void OpenSkillChange()
-    {
-        //
-    }
-
-    public void CloseSkillChange()
     {
         //
     }

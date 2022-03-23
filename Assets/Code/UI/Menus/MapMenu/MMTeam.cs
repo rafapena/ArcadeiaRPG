@@ -76,9 +76,9 @@ public class MMTeam : MM_Super
     public void SetupLists()
     {
         Selection = Selections.SelectFirstPlayer;
-        OneAvatar.Setup(MenuManager.PartyInfo.Players.Take(1).ToList());
-        CurrentPartyList.Setup(MenuManager.PartyInfo.Players.Skip(1).ToList());
-        ReservePartyList.Setup(MenuManager.PartyInfo.AllPlayers.Skip(MenuManager.PartyInfo.Players.Count).ToList());
+        OneAvatar.Refresh(MenuManager.PartyInfo.Players.Take(1).ToList());
+        CurrentPartyList.Refresh(MenuManager.PartyInfo.Players.Skip(1).ToList());
+        ReservePartyList.Refresh(MenuManager.PartyInfo.AllPlayers.Skip(MenuManager.PartyInfo.Players.Count).ToList());
         ListsSetup = true;
     }
 

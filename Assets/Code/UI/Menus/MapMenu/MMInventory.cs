@@ -348,7 +348,7 @@ public class MMInventory : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOp
         Selection = Selections.UseOnCharacter;
         string name = InventoryFrame.ToolList.SelectedObject.Info.Name.ToUpper();
         SelectTeammateLabel.text = SelectAllTeammates ? ("USE " + name + " ON EVERYONE?") : ("USE " + name + " ON...");
-        PartyList.Setup(SelectableTeammatesUse);
+        PartyList.Refresh(SelectableTeammatesUse);
         SetupTeammatesList();
     }
 
@@ -357,7 +357,7 @@ public class MMInventory : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOp
         Selection = Selections.EquipOnCharacter;
         SelectTeammateLabel.text = "EQUIP " + InventoryFrame.ToolList.SelectedObject.Info.Name.ToUpper() + " ON...";
         SetupEquippedLabelText();
-        PartyList.Setup(SelectableTeammatesEquip);
+        PartyList.Refresh(SelectableTeammatesEquip);
         SetupTeammatesList();
     }
 

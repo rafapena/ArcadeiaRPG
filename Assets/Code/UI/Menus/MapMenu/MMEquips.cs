@@ -99,7 +99,7 @@ public class MMEquips : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOpera
     public void SetupSelectTeammate()
     {
         Selection = Selections.PartyList;
-        PartyList.Setup(MenuManager.PartyInfo.AllPlayers);
+        PartyList.Refresh(MenuManager.PartyInfo.AllPlayers);
         EventSystem.current.SetSelectedGameObject(PartyList.transform.GetChild(0).gameObject);
     }
 

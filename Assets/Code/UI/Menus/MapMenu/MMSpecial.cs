@@ -54,7 +54,7 @@ public class MMSpecial : MM_Super
         base.Update();
         if (Selection == Selections.UsageDone && Time.realtimeSinceStartup > DoneTimer)
         {
-            PartyUserList.Setup(MenuManager.PartyInfo.AllPlayers);
+            PartyUserList.Refresh(MenuManager.PartyInfo.AllPlayers);
             if (SelectedSkill.EnoughSPFrom(PartyUserList.SelectedObject)) Selection = Selections.SelectTarget;
             else UndoSelectTarget();
         }
@@ -105,7 +105,7 @@ public class MMSpecial : MM_Super
     public void SetupUserList()
     {
         Selection = Selections.SelectPlayer;
-        PartyUserList.Setup(MenuManager.PartyInfo.AllPlayers);
+        PartyUserList.Refresh(MenuManager.PartyInfo.AllPlayers);
         ListsSetup = true;
     }
 
@@ -264,7 +264,7 @@ public class MMSpecial : MM_Super
         CannotUseFrame.SetActive(false);
         PartyTargetFrame.SetActive(true);
         SelectTargetTeammateLabel.text = SelectAllTeammates ? ("USE " + SelectedSkill.Name.ToUpper() + " ON EVERYONE?") : ("USE " + SelectedSkill.Name.ToUpper() + " ON...");
-        PartyTargetsList.Setup(SelectableTeammates);
+        PartyTargetsList.Refresh(SelectableTeammates);
         EventSystem.current.SetSelectedGameObject(PartyTargetsList.transform.GetChild(0).gameObject);
         if (SelectAllTeammates && Selection == Selections.SelectTarget) PartyTargetsList.HighlightAll();
         else PartyTargetsList.UnhighlightAll();
