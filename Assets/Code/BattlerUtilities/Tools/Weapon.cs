@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class Weapon : ActiveTool, IToolForInventory
+public class Weapon : ActiveTool, IToolEquippable
 {
     public Stats EquipBoosts;
     public BattleMaster.WeaponTypes WeaponType;
@@ -26,4 +26,8 @@ public class Weapon : ActiveTool, IToolForInventory
     public bool CanRemove => Price > 0;
     public int SellPrice => Price / 2;
     public bool IsCraftable => RequiredTools.Count > 0;
+
+    List<BattlerClass> IToolEquippable.ClassExclusives => ClassExclusives;
+
+    public int Index { get; set; }
 }

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using TMPro;
 using UnityEditor.MemoryProfiler;
@@ -28,6 +29,9 @@ public abstract class Battler : BaseObject
     public Stats Stats;
     [HideInInspector] public Stats StatBoosts;
     [HideInInspector] public List<Skill> Skills;
+
+    // Equipment
+    public List<IToolEquippable> Equipment => Weapons.Cast<IToolEquippable>().Concat(Accessories.Cast<IToolEquippable>()).ToList();
     public List<Weapon> Weapons;
     public List<Accessory> Accessories;
 
@@ -60,7 +64,6 @@ public abstract class Battler : BaseObject
     [HideInInspector] public List<BattleMaster.ToolTypes> DisabledToolTypes;
     [HideInInspector] public List<int> RemoveByHit;
     [HideInInspector] public List<int> ContactSpread;
-
 
     // Size of array == All elements and states, respectively. Takes values from ChangedElementRates and ChangedStateRates
     private string[][] DefaultChoiceButtonLetters;
@@ -172,22 +175,22 @@ public abstract class Battler : BaseObject
     /// -- Equip Management --
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public int Equip<T>(T equipment) where T : IToolForInventory
+    public int Equip<T>(T equipment) where T : IToolEquippable
     {
-        if (equipment is Weapon wp)
+        if (Weapons.Count + Accessories.Count > BattleMaster.MAX_NUMBER_OF_EQUIPS) return -1;
+        else if (equipment is Weapon wp)
         {
             Weapons.Add(wp);
             return Weapons.Count - 1;
         }
-        else if (equipment is Accessory ac)
+        else // equipment is Accessory
         {
-            Accessories.Add(ac);
+            Accessories.Add(equipment as Accessory);
             return Accessories.Count - 1;
         }
-        else return -1;
     }
 
-    public IToolForInventory Unequip<T>(int index) where T : IToolForInventory
+    public IToolEquippable Unequip<T>(int index) where T : IToolEquippable
     {
         if (typeof(T).Name.Equals("Weapon") && index >= 0 && index < Weapons.Count)
         {
@@ -204,10 +207,21 @@ public abstract class Battler : BaseObject
         else return default(T);
     }
 
-    public void ReplaceEquipWith<T>(T tool, int index) where T : IToolForInventory
+    public int Unequip<T>(T tool) where T : IToolEquippable
     {
-        if (tool is Weapon wp && index >= 0 && index < Weapons.Count) Weapons[index] = wp;
-        else if (tool is Accessory ac && index >= 0 && index < Accessories.Count) Accessories[index] = ac;
+        int index = 0;
+        if (tool is Weapon)
+        {
+            index = Weapons.FindIndex(x => x.Id == tool.Info.Id && x.Name.Equals(tool.Info.Name));
+            Weapons.RemoveAt(index);
+        }
+        else if (typeof(T).Name.Equals("Accessory") && index >= 0 && index < Accessories.Count)
+        {
+            index = Accessories.FindIndex(x => x.Id == tool.Info.Id && x.Name.Equals(tool.Info.Name));
+            Accessories.RemoveAt(index);
+        }
+        else return -1;
+        return index;
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

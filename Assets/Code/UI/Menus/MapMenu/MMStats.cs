@@ -16,8 +16,7 @@ public class MMStats : MM_Super
     public StatsList StatsList;
 
     public Transform RelationsList;
-    public Transform WeaponsList;
-    public Transform AccessoriesList;
+    public Transform EquipmentList;
     public Transform WeaknessesList;
     public Transform StrengthsList;
 
@@ -139,8 +138,16 @@ public class MMStats : MM_Super
 
     public void SetupEquipment()
     {
-        SetupTools(WeaponsList, SelectedPlayer.Weapons);
-        SetupTools(AccessoriesList, SelectedPlayer.Accessories);
+        int i = 0;
+        List<IToolEquippable> equipment = SelectedPlayer.Equipment;
+        foreach (IToolEquippable tool in equipment)
+        {
+            Transform entry = EquipmentList.GetChild(i++);
+            entry.GetChild(1).GetComponent<Image>().sprite = tool.Info.GetComponent<SpriteRenderer>().sprite;
+            entry.GetChild(2).GetComponent<TextMeshProUGUI>().text = tool.Info.Name;
+            entry.gameObject.SetActive(true);
+        }
+        for (; i < EquipmentList.childCount; i++) EquipmentList.GetChild(i).gameObject.SetActive(false);
     }
 
     public void SetupRates()
@@ -182,18 +189,5 @@ public class MMStats : MM_Super
         WeaknessesList.parent.gameObject.SetActive(i != 0 || i0 != 0);
         for (; i < WeaknessesList.childCount; i++) WeaknessesList.GetChild(i).gameObject.SetActive(false);
         for (; i0 < StrengthsList.childCount; i0++) StrengthsList.GetChild(i0).gameObject.SetActive(false);
-    }
-
-    private void SetupTools<T>(Transform listGO, List<T> listData) where T : BaseObject
-    {
-        int i = 0;
-        foreach (T ActiveTool in listData)
-        {
-            Transform entry = listGO.GetChild(i++);
-            entry.GetComponent<Image>().sprite = ActiveTool.GetComponent<SpriteRenderer>().sprite;
-            if (entry.childCount > 0) entry.GetChild(0).GetComponent<TextMeshProUGUI>().text = ActiveTool.Name;
-            entry.gameObject.SetActive(true);
-        }
-        for (; i < listGO.childCount; i++) listGO.GetChild(i).gameObject.SetActive(false);
     }
 }

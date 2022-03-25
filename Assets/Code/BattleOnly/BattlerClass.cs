@@ -8,5 +8,6 @@ public class BattlerClass : BaseObject
     public BattlerClass UpgradedClass2;
     public BattleMaster.WeaponTypes UsableWeapon1Type;
     public BattleMaster.WeaponTypes UsableWeapon2Type;
-    public List<Skill> SkillSet;
+    public List<SkillLearnLevel> SkillSet;
+    public int AttackTimes;
 }

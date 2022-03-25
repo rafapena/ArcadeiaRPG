@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class Accessory : PassiveEffect, IToolForInventory
+public class Accessory : PassiveEffect, IToolEquippable
 {
     public int HPMin;
     public int HPMax = 100;
@@ -39,4 +39,8 @@ public class Accessory : PassiveEffect, IToolForInventory
     public bool CanRemove => Price > 0;
     public int SellPrice => Price / 2;
     public bool IsCraftable => RequiredTools.Count > 0;
+
+    List<BattlerClass> IToolEquippable.ClassExclusives => ClassExclusives;
+
+    public int Index { get; set; }
 }

@@ -59,7 +59,7 @@ public class BattlePlayer : Battler
     {
         for (int i = 0; i < Class.SkillSet.Count; i++)
         {
-            if (Level >= (i + 1) * 5) Skills.Add(Class.SkillSet[i]);
+            if (Level >= (i + 1) * 5) Skills.Add(Class.SkillSet[i].LearnedSkill);
         }
     }
 
