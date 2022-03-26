@@ -3,7 +3,7 @@
 [System.Serializable]
 public abstract class PassiveEffect : BaseObject
 {
-    public enum TurnSequence { ActionEnd, TurnEnd }
+    public enum TurnSequence { ActionStart, ActionEnd, TurnEnd }
 
     //public Stats StatModifiers;
     public int HPRegen;
