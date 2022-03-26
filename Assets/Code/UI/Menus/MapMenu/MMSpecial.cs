@@ -25,8 +25,7 @@ public class MMSpecial : MM_Super
     public GameObject SkillsListFrame;
     public TextMeshProUGUI NoSkillsLabel;
     public TextMeshProUGUI NameLabel;
-    public TextMeshProUGUI SoloLabel;
-    public TextMeshProUGUI TeamLabel;
+    public TextMeshProUGUI SkillLabel;
     public GridLayoutGroup SkillsList;
     public GameObject CannotUseFrame;
     public TextMeshProUGUI CannotUseMessage;
@@ -149,7 +148,7 @@ public class MMSpecial : MM_Super
 
         NameLabel.text = p.Name.ToUpper();
         NoSkillsLabel.gameObject.SetActive(!hasAnySkills);
-        SoloLabel.gameObject.SetActive(hasSkills);
+        SkillLabel.gameObject.SetActive(hasSkills);
         SkillsList.gameObject.SetActive(hasSkills);
         if (hasSkills) SetupSkillList(SkillsList, p.Skills);
     }
@@ -172,7 +171,7 @@ public class MMSpecial : MM_Super
         SetupSkill(PartyUserList.SelectedObject.Skills);
     }
 
-    private void SetupSkill<T>(List<T> skillsList) where T : Skill
+    private void SetupSkill(List<Skill> skillsList)
     {
         if (Selection != Selections.SelectSkill) return;
         ListSelectable btn = EventSystem.current.currentSelectedGameObject.GetComponent<ListSelectable>();    

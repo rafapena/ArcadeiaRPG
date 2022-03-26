@@ -34,6 +34,7 @@ public abstract class Battler : BaseObject
     public List<IToolEquippable> Equipment => Weapons.Cast<IToolEquippable>().Concat(Accessories.Cast<IToolEquippable>()).ToList();
     public List<Weapon> Weapons;
     public List<Accessory> Accessories;
+    public bool MaxEquipment => Weapons.Count + Accessories.Count == BattleMaster.MAX_NUMBER_OF_EQUIPS;
 
     // Overall battle info
     [HideInInspector] public ActiveTool SelectedToolMove { get; private set; }
@@ -177,7 +178,7 @@ public abstract class Battler : BaseObject
 
     public int Equip<T>(T equipment) where T : IToolEquippable
     {
-        if (Weapons.Count + Accessories.Count > BattleMaster.MAX_NUMBER_OF_EQUIPS) return -1;
+        if (MaxEquipment) return -1;
         else if (equipment is Weapon wp)
         {
             Weapons.Add(wp);
@@ -210,12 +211,12 @@ public abstract class Battler : BaseObject
     public int Unequip<T>(T tool) where T : IToolEquippable
     {
         int index = 0;
-        if (tool is Weapon)
+        if (tool is Weapon && Weapons.Count > 0)
         {
             index = Weapons.FindIndex(x => x.Id == tool.Info.Id && x.Name.Equals(tool.Info.Name));
             Weapons.RemoveAt(index);
         }
-        else if (typeof(T).Name.Equals("Accessory") && index >= 0 && index < Accessories.Count)
+        else if (tool is Accessory && Accessories.Count > 0)
         {
             index = Accessories.FindIndex(x => x.Id == tool.Info.Id && x.Name.Equals(tool.Info.Name));
             Accessories.RemoveAt(index);

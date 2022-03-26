@@ -74,12 +74,17 @@ public class MMInventory : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOp
     public override void Open()
     {
         base.Open();
+        RefreshInventoryTabs();
+        InventoryFrame.TrackCarryWeight(MenuManager.PartyInfo.Inventory);
+        InventoryFrame.InitializeSelection();
+    }
+
+    private void RefreshInventoryTabs()
+    {
         InventoryFrame.SetToolListOnTab(0, GetInventoryItems(false));
         InventoryFrame.SetToolListOnTab(1, MenuManager.PartyInfo.Inventory.Weapons);
         InventoryFrame.SetToolListOnTab(2, MenuManager.PartyInfo.Inventory.Accessories);
         InventoryFrame.SetToolListOnTab(3, GetInventoryItems(true));
-        InventoryFrame.TrackCarryWeight(MenuManager.PartyInfo.Inventory);
-        InventoryFrame.InitializeSelection();
     }
 
     public override void Close()
@@ -310,7 +315,7 @@ public class MMInventory : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOp
         InventoryFrame.ListBlocker.SetActive(true);
         ConfirmDiscard.SetActive(true);
         DiscardLabel.text = "Discard\n" + InventoryFrame.ToolList.SelectedObject.Info.Name + "?";
-        EventSystem.current.SetSelectedGameObject(ConfirmDiscard.transform.GetChild(1).gameObject);
+        EventSystem.current.SetSelectedGameObject(ConfirmDiscard.transform.GetChild(2).gameObject);
     }
 
     public void UndoDiscard()
@@ -502,11 +507,7 @@ public class MMInventory : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOp
             MenuMaster.KeepHighlightedSelected(ref EquippedToolList.SelectedButton);
             SetupConfirmSwapButtons();
         }
-        else if (Selection == Selections.CharacterEquipsList)   // Equip from blank slot
-        {
-            if (InventoryFrame.CurrentInventoryList == InventorySystem.ListType.Weapons) Equip(false, PartyList.SelectedObject.Weapons.Count);
-            else if (InventoryFrame.CurrentInventoryList == InventorySystem.ListType.Accessories) Equip(false, PartyList.SelectedObject.Accessories.Count);
-        }
+        else if (Selection == Selections.CharacterEquipsList) Equip(false);   // Equip from blank slot
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -538,11 +539,10 @@ public class MMInventory : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOp
 
     public void SwitchEquipment()
     {
-        Equip(true, EquippedToolList.SelectedIndex);
+        Equip(true);
     }
 
-    // FIX SWITCHING
-    public void Equip(bool switchOut, int slot)
+    public void Equip(bool switchOut)
     {
         if (Selection == Selections.EquippedDone) return;
         Selection = Selections.EquippedDone;
@@ -551,22 +551,15 @@ public class MMInventory : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOp
         IToolEquippable tool = InventoryFrame.ToolList.SelectedObject as IToolEquippable;
         if (switchOut)
         {
-            //PartyList.SelectedObject.ReplaceEquipWith(tool, slot);
+            PartyList.SelectedObject.Unequip(EquippedToolList.SelectedObject as IToolEquippable);
             MenuManager.PartyInfo.Inventory.Add(EquippedToolList.SelectedObject);
         }
-        else PartyList.SelectedObject.Equip(tool);
+        PartyList.SelectedObject.Equip(tool);
+        MenuManager.PartyInfo.Inventory.Remove(tool);
 
-        switch (InventoryFrame.CurrentInventoryList)
-        {
-            case InventorySystem.ListType.Weapons:
-                MenuManager.PartyInfo.Inventory.Remove<Weapon>(InventoryFrame.ToolList.SelectedIndex);
-                InventoryFrame.Refresh(MenuManager.PartyInfo.Inventory.Weapons);
-                break;
-            case InventorySystem.ListType.Accessories:
-                MenuManager.PartyInfo.Inventory.Remove<Accessory>(InventoryFrame.ToolList.SelectedIndex);
-                InventoryFrame.Refresh(MenuManager.PartyInfo.Inventory.Accessories);
-                break;
-        }
+        RefreshInventoryTabs();
+        if (tool is Weapon) InventoryFrame.Refresh(MenuManager.PartyInfo.Inventory.Weapons);
+        else InventoryFrame.Refresh(MenuManager.PartyInfo.Inventory.Accessories);
         EquippedToolList.Refresh(PartyList.SelectedObject.Equipment, BattleMaster.MAX_NUMBER_OF_EQUIPS);
         ConfirmSwap.SetActive(false);
     }
