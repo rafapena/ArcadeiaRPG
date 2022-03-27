@@ -18,7 +18,7 @@ public class FileSelectionList : SelectionList_Super<SaveData>
     public int TotalNumberOfFiles;
     public string EmptyText;
 
-    public void Setup()
+    public void Refresh()
     {
         ReferenceData = new List<SaveData>();
         GameObject go = transform.GetChild(0).gameObject;

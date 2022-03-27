@@ -111,7 +111,7 @@ public class MMObjectives : MM_Super
         Selection = Selections.SelectObjective;
         SetFrameVisibility(objectiveList.Count != 0);
         MenuMaster.KeepHighlightedSelected(ref SelectedObjectivesTabBtn);
-        ObjectivesList.Setup(objectiveList);
+        ObjectivesList.Refresh(objectiveList);
         if (ObjectivesList.SelectedButton) ObjectivesList.SelectedButton.ClearHighlights();
         EventSystem.current.SetSelectedGameObject(ObjectivesList.transform.GetChild(0).gameObject);
     }
@@ -126,7 +126,7 @@ public class MMObjectives : MM_Super
         ObjectivesList.SetSelected();
         //RewardsToolList.gameObject.SetActive(true);
         GenerateSubObjectivesList(ObjectivesList.SelectedObject.NextObjectives);
-        SubObjectivesList.Setup(SubObjectivesData);
+        SubObjectivesList.Refresh(SubObjectivesData);
         NameLabel.text = ObjectivesList.SelectedObject.Name.ToUpper();
         //GoldLabel.text = ObjectivesList.SelectedObject.InventoryRewards.Gold.ToString();
         //EXPLabel.text = ObjectivesList.SelectedObject.EXPReward.ToString();

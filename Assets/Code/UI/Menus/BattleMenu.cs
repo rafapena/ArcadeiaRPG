@@ -365,7 +365,7 @@ public class BattleMenu : MonoBehaviour
 
     private bool NoAvailableTargets(ActiveTool ActiveTool)
     {
-        if (ActiveTool.Scope != ActiveTool.ScopeType.OneKnockedOutTeammate) return false;
+        if (ActiveTool.Scope != ActiveTool.ScopeType.OneKnockedOutAllies) return false;
         foreach (BattlePlayer p in CurrentBattle.PlayerParty.Players)
             if (p.HP == 0) return false;
         foreach (BattleAlly a in CurrentBattle.PlayerParty.Allies)
@@ -558,13 +558,13 @@ public class BattleMenu : MonoBehaviour
         bool selectLotsInOwnTeam = false;
         switch (SelectedTool.Scope)
         {
-            case ActiveTool.ScopeType.OneTeammate:
-            case ActiveTool.ScopeType.OneKnockedOutTeammate:
+            case ActiveTool.ScopeType.OneAlly:
+            case ActiveTool.ScopeType.OneKnockedOutAllies:
                 SelectTargetInTeam.gameObject.SetActive(true);
                 selectOneInOwnTeam = true;
                 break;
-            case ActiveTool.ScopeType.AllTeammates:               // Button only visible if there are allies, otherwise EndDecision() immediately removes the buttons
-            case ActiveTool.ScopeType.AllKnockedOutTeammates:     // Button only visible if there are allies, otherwise EndDecision() immediately removes the buttons
+            case ActiveTool.ScopeType.AllAllies:               // Button only visible if there are allies, otherwise EndDecision() immediately removes the buttons
+            case ActiveTool.ScopeType.AllKnockedOutAllies:     // Button only visible if there are allies, otherwise EndDecision() immediately removes the buttons
             case ActiveTool.ScopeType.EveryoneButSelf:
             case ActiveTool.ScopeType.Everyone:
                 SelectTargetInTeam.gameObject.SetActive(true);
@@ -596,17 +596,17 @@ public class BattleMenu : MonoBehaviour
         switch (SelectedTool.Scope)
         {
             case ActiveTool.ScopeType.OneEnemy:
-            case ActiveTool.ScopeType.SplashEnemies:
+            case ActiveTool.ScopeType.OneArea:
                 foreach (BattleEnemy e in CurrentBattle.EnemyParty.Enemies)
                     AddTargetButtonForSpecificEnemy(e, true, e.GenerateDefaultChoiceUI);
                 break;
 
-            case ActiveTool.ScopeType.OneRow:
+            case ActiveTool.ScopeType.StraightThrough:
                 foreach (BattleEnemy e in CurrentBattle.EnemyParty.Enemies)
                     AddTargetButtonForSpecificEnemy(e, true, e.GenerateRowChoiceUI);
                 break;
 
-            case ActiveTool.ScopeType.OneColumn:
+            case ActiveTool.ScopeType.Widespread:
                 foreach (BattleEnemy e in CurrentBattle.EnemyParty.Enemies)
                     AddTargetButtonForSpecificEnemy(e, true, e.GenerateColumnChoiceUI);
                 break;
@@ -620,7 +620,7 @@ public class BattleMenu : MonoBehaviour
                 EndDecisions();
                 break;
 
-            case ActiveTool.ScopeType.OneTeammate:
+            case ActiveTool.ScopeType.OneAlly:
                 if (SelectedTool.RandomTarget)
                 {
                     EndDecisions();
@@ -632,7 +632,7 @@ public class BattleMenu : MonoBehaviour
                     AddTargetButtonForSpecificAlly(a, true, a.GenerateChoiceUI, allyKeys[i0++]);
                 break;
 
-            case ActiveTool.ScopeType.OneKnockedOutTeammate:
+            case ActiveTool.ScopeType.OneKnockedOutAllies:
                 if (SelectedTool.RandomTarget)
                 {
                     EndDecisions();
@@ -644,12 +644,12 @@ public class BattleMenu : MonoBehaviour
                     AddTargetButtonForSpecificAlly(a, false, a.GenerateChoiceUI, allyKeys[i0++]);
                 break;
 
-            case ActiveTool.ScopeType.AllTeammates:
+            case ActiveTool.ScopeType.AllAllies:
                 TargetAllPlayers(CurrentBattle.PlayerParty.Players, true, true);
                 if (!TargetAllAI(CurrentBattle.PlayerParty.Allies, true)) EndDecisions();
                 break;
 
-            case ActiveTool.ScopeType.AllKnockedOutTeammates:
+            case ActiveTool.ScopeType.AllKnockedOutAllies:
                 TargetAllPlayers(CurrentBattle.PlayerParty.Players, false, false);
                 if (!TargetAllAI(CurrentBattle.PlayerParty.Allies, false)) EndDecisions();
                 break;
@@ -739,15 +739,15 @@ public class BattleMenu : MonoBehaviour
         }
         switch (SelectedTool.Scope)
         {
-            case ActiveTool.ScopeType.AllTeammates:
-            case ActiveTool.ScopeType.AllKnockedOutTeammates:
+            case ActiveTool.ScopeType.AllAllies:
+            case ActiveTool.ScopeType.AllKnockedOutAllies:
             case ActiveTool.ScopeType.AllEnemies:
             case ActiveTool.ScopeType.EveryoneButSelf:
             case ActiveTool.ScopeType.Everyone:
                 if (KeyPressed.Equals("A")) EndDecisions();
                 break;
-            case ActiveTool.ScopeType.OneTeammate:
-            case ActiveTool.ScopeType.OneKnockedOutTeammate:
+            case ActiveTool.ScopeType.OneAlly:
+            case ActiveTool.ScopeType.OneKnockedOutAllies:
                 switch (KeyPressed)
                 {
                     case "A": SelectedPlayerOrAllyTarget(CurrentBattle.PlayerParty.Players, 0); break;
@@ -782,8 +782,8 @@ public class BattleMenu : MonoBehaviour
     {
         if (index >= partyList.Count) return;
         T pa = partyList[index];
-        if (SelectedTool.Scope == ActiveTool.ScopeType.OneTeammate && !pa.Unconscious ||
-            SelectedTool.Scope == ActiveTool.ScopeType.OneKnockedOutTeammate && pa.Unconscious)
+        if (SelectedTool.Scope == ActiveTool.ScopeType.OneAlly && !pa.Unconscious ||
+            SelectedTool.Scope == ActiveTool.ScopeType.OneKnockedOutAllies && pa.Unconscious)
         {
             CP.SelectedTargets.Add(pa);
             EndDecisions();
@@ -796,7 +796,7 @@ public class BattleMenu : MonoBehaviour
         switch (SelectedTool.Scope)
         {
             case ActiveTool.ScopeType.OneEnemy:
-            case ActiveTool.ScopeType.SplashEnemies:
+            case ActiveTool.ScopeType.OneArea:
                 foreach (BattleEnemy e in CurrentBattle.EnemyParty.Enemies)
                 {
                     if (!e.Selectable() || e.RowPosition != vp || e.ColumnPosition != hp) continue;
@@ -804,7 +804,7 @@ public class BattleMenu : MonoBehaviour
                     EndDecisions();
                 }
                 break;
-            case ActiveTool.ScopeType.OneRow:
+            case ActiveTool.ScopeType.StraightThrough:
                 foreach (BattleEnemy e in CurrentBattle.EnemyParty.Enemies)
                 {
                     if (!e.Selectable() || e.RowPosition != vp) continue;
@@ -813,7 +813,7 @@ public class BattleMenu : MonoBehaviour
                 }
                 if (hitOne) EndDecisions();
                 break;
-            case ActiveTool.ScopeType.OneColumn:
+            case ActiveTool.ScopeType.Widespread:
                 foreach (BattleEnemy e in CurrentBattle.EnemyParty.Enemies)
                 {
                     if (!e.Selectable() || e.ColumnPosition != hp) continue;

@@ -13,7 +13,7 @@ using System.Collections.Generic;
 /// </summary>
 public class ObjectiveSelectionList : SelectionList_Super<Objective>
 {
-    public void Setup<T>(List<T> dataList) where T : Objective
+    public void Refresh<T>(List<T> dataList) where T : Objective
     {
         ReferenceData = new List<Objective>();
         int i = 0;

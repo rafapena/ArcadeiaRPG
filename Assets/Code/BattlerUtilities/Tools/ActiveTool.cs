@@ -6,8 +6,8 @@ public abstract class ActiveTool : BaseObject
     public enum ModType { None, Damage, Recover, Drain }
 
     public enum ScopeType {
-        None, OneEnemy, SplashEnemies, OneRow, OneColumn, AllEnemies,
-        Self, OneTeammate, OneKnockedOutTeammate, AllTeammates, AllKnockedOutTeammates,
+        None, OneEnemy, OneArea, StraightThrough, Widespread, AllEnemies,
+        Self, OneAlly, OneKnockedOutAllies, AllAllies, AllKnockedOutAllies,
         EveryoneButSelf, Everyone }
 
     public BattleMaster.ToolTypes Type;

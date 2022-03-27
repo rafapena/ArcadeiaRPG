@@ -45,7 +45,7 @@ public class FileSelect : MonoBehaviour
         DeleteConfirmationFrame.SetActive(false);
         OverwriteConfirmationFrame.SetActive(false);
         WaitingFrame.SetActive(false);
-        FilesList.Setup();
+        FilesList.Refresh();
         SetupFileInfo();    // Force file entry to show up
         switch (FileSelectMode)
         {
@@ -261,7 +261,7 @@ public class FileSelect : MonoBehaviour
         WaitingFrame.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = (FileSelectMode == FileMode.LoadOrDelete) ? "Deletion Successful" : "Save Successful";
         SuccessWaitingTimer = Time.unscaledTime + SUCCESS_WAITING_TIMER_LIMIT;
         GameObject selected = FilesList.SelectedButton.gameObject;
-        FilesList.Setup();
+        FilesList.Refresh();
         EventSystem.current.SetSelectedGameObject(selected);
         SetupFileInfo(true);
     }

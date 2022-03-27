@@ -66,9 +66,6 @@ public class MapPlayer : MapExplorer
             {
                 BattlePlayer p = all[i] as BattlePlayer;
                 p.AddLearnedSkills();
-                p.MapUsableSkills = new List<Skill>();
-                foreach (Skill s in p.Skills)
-                    if (s.CanUseOutsideOfBattle) p.MapUsableSkills.Add(s);
             }
             for (int j = 0; j < b.Skills.Count; j++) b.Skills[j] = Instantiate(b.Skills[j], b.transform);
             for (int j = 0; j < b.Weapons.Count; j++) b.Weapons[j] = Instantiate(b.Weapons[j], b.transform);
@@ -99,16 +96,9 @@ public class MapPlayer : MapExplorer
             {
                 BattlePlayer p = all[i] as BattlePlayer;
                 p.AddLearnedSkills();
-                p.MapUsableSkills = new List<Skill>();
-                foreach (Skill s in p.Skills)
-                    if (s.CanUseOutsideOfBattle) p.MapUsableSkills.Add(s);
             }
             Battler b = all[i];
-            for (int j = 0; j < b.Skills.Count; j++)
-            {
-                b.Skills[j] = Instantiate(b.Skills[j], b.transform);
-                //b.Skills[j].DisableForWarmup();
-            }
+            for (int j = 0; j < b.Skills.Count; j++) b.Skills[j] = Instantiate(b.Skills[j], b.transform);
             for (int j = 0; j < b.Weapons.Count; j++) b.Weapons[j] = Instantiate(b.Weapons[j], b.transform);
             for (int j = 0; j < b.States.Count; j++) b.States[j] = Instantiate(b.States[j], b.transform);
         }

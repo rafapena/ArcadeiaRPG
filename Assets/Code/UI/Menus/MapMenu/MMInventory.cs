@@ -251,20 +251,20 @@ public class MMInventory : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOp
         Item item = InventoryFrame.ToolList.SelectedObject as Item;
         switch (item.Scope)
         {
-            case ActiveTool.ScopeType.OneTeammate:
+            case ActiveTool.ScopeType.OneAlly:
             case ActiveTool.ScopeType.Self:
                 foreach (Battler p in party)
                     if (!p.Unconscious) SelectableTeammatesUse.Add(p);
                 SelectAllTeammates = false;
                 break;
 
-            case ActiveTool.ScopeType.OneKnockedOutTeammate:
+            case ActiveTool.ScopeType.OneKnockedOutAllies:
                 foreach (Battler p in party)
                     if (p.Unconscious) SelectableTeammatesUse.Add(p);
                 SelectAllTeammates = false;
                 break;
 
-            case ActiveTool.ScopeType.AllTeammates:
+            case ActiveTool.ScopeType.AllAllies:
             case ActiveTool.ScopeType.EveryoneButSelf:
             case ActiveTool.ScopeType.Everyone:
                 foreach (Battler p in party)
@@ -272,7 +272,7 @@ public class MMInventory : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOp
                 SelectAllTeammates = true;
                 break;
 
-            case ActiveTool.ScopeType.AllKnockedOutTeammates:
+            case ActiveTool.ScopeType.AllKnockedOutAllies:
                 foreach (Battler p in party)
                     if (p.Unconscious) SelectableTeammatesUse.Add(p);
                 SelectAllTeammates = true;

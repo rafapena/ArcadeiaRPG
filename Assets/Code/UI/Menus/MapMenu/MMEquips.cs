@@ -144,11 +144,22 @@ public class MMEquips : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOpera
 
     private void RefreshInventoryEquipTabs(IToolEquippable tool = null)
     {
+        InventoryFrame.SetToolListOnTab(0, GetWeapons());
+        InventoryFrame.SetToolListOnTab(1, GetAccessories());
+        if (tool is Weapon) InventoryFrame.Refresh(GetWeapons());
+        else if (tool is Accessory) InventoryFrame.Refresh(GetAccessories());
+    }
+
+    private List<Weapon> GetWeapons()
+    {
         BattlerClass bc = PartyList.SelectedObject.Class;
-        InventoryFrame.SetToolListOnTab(0, MenuManager.PartyInfo.Inventory.Weapons.FindAll(w => ClassCanEquip(w, bc) && (w.WeaponType == bc.UsableWeapon1Type || w.WeaponType == bc.UsableWeapon2Type)));
-        InventoryFrame.SetToolListOnTab(1, MenuManager.PartyInfo.Inventory.Accessories.FindAll(a => ClassCanEquip(a, bc)));
-        if (tool is Weapon) InventoryFrame.SelectTab(0);
-        else if (tool is Accessory) InventoryFrame.SelectTab(1);
+        return MenuManager.PartyInfo.Inventory.Weapons.FindAll(w => ClassCanEquip(w, bc) && (w.WeaponType == bc.UsableWeapon1Type || w.WeaponType == bc.UsableWeapon2Type));
+    }
+
+    private List<Accessory> GetAccessories()
+    {
+        BattlerClass bc = PartyList.SelectedObject.Class;
+        return MenuManager.PartyInfo.Inventory.Accessories.FindAll(a => ClassCanEquip(a, bc));
     }
 
     private bool ClassCanEquip(IToolEquippable tool, BattlerClass bc) => tool.ClassExclusives.Count == 0 || tool.ClassExclusives.Contains(bc);
@@ -236,8 +247,8 @@ public class MMEquips : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOpera
         IToolEquippable tool = EquippedTools.SelectedObject as IToolEquippable;
         PartyList.SelectedObject.Unequip(tool);
         MenuManager.PartyInfo.Inventory.Add(tool);
-        RefreshInventoryEquipTabs(tool);
         EquippedTools.Refresh(PartyList.SelectedObject.Equipment, BattleMaster.MAX_NUMBER_OF_EQUIPS, true);
+        RefreshInventoryEquipTabs(tool);
     }
 
     private void EquipTool()
@@ -245,8 +256,8 @@ public class MMEquips : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOpera
         IToolEquippable tool = InventoryFrame.ToolList.SelectedObject as IToolEquippable;
         PartyList.SelectedObject.Equip(tool);
         MenuManager.PartyInfo.Inventory.Remove(tool);
-        RefreshInventoryEquipTabs(tool);
         EquippedTools.Refresh(PartyList.SelectedObject.Equipment, BattleMaster.MAX_NUMBER_OF_EQUIPS, true);
+        RefreshInventoryEquipTabs(tool);
     }
 
     private void SetupToolSwap()
@@ -277,8 +288,8 @@ public class MMEquips : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOpera
         PartyList.SelectedObject.Equip(inventoryTool);
         MenuManager.PartyInfo.Inventory.Add(equippedTool);
         MenuManager.PartyInfo.Inventory.Remove(inventoryTool);
-        RefreshInventoryEquipTabs(equippedTool);
         EquippedTools.Refresh(PartyList.SelectedObject.Equipment, BattleMaster.MAX_NUMBER_OF_EQUIPS, true);
+        RefreshInventoryEquipTabs(equippedTool);
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

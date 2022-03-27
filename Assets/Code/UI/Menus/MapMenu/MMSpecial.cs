@@ -16,29 +16,16 @@ public class MMSpecial : MM_Super
     // Selections lists and Skill List attributes
     public PlayerSelectionList PartyUserList;
     public PlayerSelectionList PartyTargetsList;
-    private ListSelectable SelectedSkillButton;
-    private int SelectedSkillIndex;
-    private Skill SelectedSkill;
 
     // Child GameObjects
-    public GameObject SkillInfo;
     public GameObject SkillsListFrame;
-    public TextMeshProUGUI NoSkillsLabel;
-    public TextMeshProUGUI NameLabel;
-    public TextMeshProUGUI SkillLabel;
-    public GridLayoutGroup SkillsList;
-    public GameObject CannotUseFrame;
-    public TextMeshProUGUI CannotUseMessage;
+    public SkillSelectionList SkillsList;
     public GameObject PartyTargetFrame;
     public TextMeshProUGUI SelectTargetTeammateLabel;
 
     // General Selection Tracking
     private Selections Selection;
     private bool ListsSetup;
-
-    // Colors
-    private Color NormalSkillColor = Color.white;
-    private Color DisabledSkillColor;
 
     // List of potential targets
     private List<Battler> SelectableTeammates;
@@ -47,6 +34,13 @@ public class MMSpecial : MM_Super
     // Delay after a skill has been used
     private float DoneTimer;
 
+
+    protected override void Start()
+    {
+        base.Start();
+        SelectableTeammates = new List<Battler>();
+    }
+
     protected override void Update()
     {
         if (!MainComponent.Activated) return;
@@ -54,8 +48,12 @@ public class MMSpecial : MM_Super
         if (Selection == Selections.UsageDone && Time.realtimeSinceStartup > DoneTimer)
         {
             PartyUserList.Refresh(MenuManager.PartyInfo.AllPlayers);
-            if (SelectedSkill.EnoughSPFrom(PartyUserList.SelectedObject)) Selection = Selections.SelectTarget;
-            else UndoSelectTarget();
+            if (SkillsList.SelectedObject.EnoughSPFrom(PartyUserList.SelectedObject)) Selection = Selections.SelectTarget;
+            else
+            {
+                SkillsList.Refresh(PartyUserList.SelectedObject);
+                UndoSelectTarget();
+            }
         }
     }
 
@@ -91,10 +89,9 @@ public class MMSpecial : MM_Super
 
     protected override void ReturnToInitialSetup()
     {
-        SkillInfo.SetActive(false);
-        SkillsListFrame.SetActive(false);
-        CannotUseFrame.SetActive(false);
         PartyTargetFrame.SetActive(false);
+        SkillsListFrame.SetActive(true);
+        SkillsList.Deactivate();
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -112,108 +109,44 @@ public class MMSpecial : MM_Super
     {
         if (!ListsSetup || Selection != Selections.SelectPlayer) return;
         PartyUserList.SetSelected();
-        SkillsListFrame.SetActive(true);
-        SetupSkillList(PartyUserList.SelectedObject as BattlePlayer);
+        SkillsList.Activate();
+        SkillsList.Refresh(PartyUserList.SelectedObject);
     }
 
     public void DeselectUser()
     {
         if (Selection != Selections.SelectPlayer) return;
-        SkillInfo.SetActive(false);
-        SkillsListFrame.SetActive(false);
+        SkillsList.Deactivate();
     }
 
     public void SelectUser()
     {
+        if (!PartyUserList.SelectedObject.HasAnySkills) return;
         Selection = Selections.SelectSkill;
         PartyUserList.SetSelected();
         PartyUserList.UnhighlightAll();
         PartyUserList.SelectedButton.KeepSelected();
-        SetupSkillList(PartyUserList.SelectedObject as BattlePlayer);
-        bool hasAnySkill = PartyUserList.SelectedObject.Skills.Count > 0;
-        SkillInfo.SetActive(hasAnySkill);
-        CannotUseFrame.SetActive(false);
-        if (hasAnySkill) EventSystem.current.SetSelectedGameObject(SkillsList.transform.GetChild(0).gameObject);
+        EventSystem.current.SetSelectedGameObject(SkillsList.transform.GetChild(0).gameObject);
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- Skill List --
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    private void SetupSkillList(BattlePlayer p)
-    {
-        bool hasSkills = p.Skills.Count > 0;
-        bool hasAnySkills = hasSkills;
-        if (!hasAnySkills) NoSkillsLabel.text = p.Name.ToUpper() + " DOES NOT HAVE ANY SKILLS YET";
-
-        NameLabel.text = p.Name.ToUpper();
-        NoSkillsLabel.gameObject.SetActive(!hasAnySkills);
-        SkillLabel.gameObject.SetActive(hasSkills);
-        SkillsList.gameObject.SetActive(hasSkills);
-        if (hasSkills) SetupSkillList(SkillsList, p.Skills);
-    }
-
-    private void SetupSkillList<T>(GridLayoutGroup skillsListGUI, List<T> skillsListData) where T : Skill
-    {
-        int i = 0;
-        for (; i < skillsListData.Count; i++)
-        {
-            skillsListGUI.transform.GetChild(i).gameObject.SetActive(true);
-            skillsListGUI.transform.GetChild(i).GetChild(0).GetComponent<Image>().sprite = skillsListData[i].GetComponent<SpriteRenderer>().sprite;
-            skillsListGUI.transform.GetChild(i).GetChild(1).GetComponent<TextMeshProUGUI>().text = skillsListData[i].Name;
-            skillsListGUI.transform.GetChild(i).GetChild(2).GetComponent<TextMeshProUGUI>().text = skillsListData[i].SPConsume.ToString();
-        }
-        for (; i < skillsListGUI.transform.childCount; i++) skillsListGUI.transform.GetChild(i).gameObject.SetActive(false);
-    }
-
-    public void SetupSkill()
-    {
-        SetupSkill(PartyUserList.SelectedObject.Skills);
-    }
-
-    private void SetupSkill(List<Skill> skillsList)
-    {
-        if (Selection != Selections.SelectSkill) return;
-        ListSelectable btn = EventSystem.current.currentSelectedGameObject.GetComponent<ListSelectable>();    
-        if (SelectedSkillButton) SelectedSkillButton.ClearHighlights();
-        SelectedSkillButton = btn;
-        SelectedSkillIndex = btn.Index;
-        SelectedSkill = skillsList[SelectedSkillIndex];
-        DisplayCannotUseMessage();
-        SkillInfo.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = SelectedSkill.Name.ToUpper();
-        SkillInfo.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = SelectedSkill.Description;
-        InventoryToolSelectionList.SetElementImage(SkillInfo, 2, SelectedSkill);
-        SkillInfo.transform.GetChild(3).GetChild(0).GetComponent<TextMeshProUGUI>().text = SelectedSkill.Power.ToString();
-        SkillInfo.transform.GetChild(4).GetChild(0).GetComponent<TextMeshProUGUI>().text = SelectedSkill.ConsecutiveActs.ToString();
-        SkillInfo.transform.GetChild(5).GetChild(0).GetComponent<TextMeshProUGUI>().text = "+" + SelectedSkill.CritcalRate + "%";
-    }
-
-    private void DisplayCannotUseMessage()
-    {
-        SelectableTeammates = new List<Battler>();
-        SelectAllTeammates = false;
-        string msg = "";
-        if (!SelectedSkill.CanUseOutsideOfBattle) msg = "CANNOT USE OUTSIDE OF BATTLE";
-        else if (!SelectedSkill.EnoughSPFrom(PartyUserList.SelectedObject)) msg = "NOT ENOUGH SP TO USE";
-        else if (!SelectedSkill.UsedByClassUser(PartyUserList.SelectedObject)) msg = "MUST BE A " + SelectedSkill.ClassExclusives[0] + " TO USE THIS SKILL";
-        else if (!SelectedSkill.UsedByWeaponUser(PartyUserList.SelectedObject)) msg = "MUST HAVE A " + SelectedSkill.WeaponExclusives[0] + " TO USE THIS SKILL";
-        else if (!GetSelectableTargetsForUsingSkills()) msg = "NO AVAILABLE TEAMMATES TO USE THIS SKILL";
-        CannotUseFrame.SetActive(!msg.Equals(""));
-        CannotUseMessage.text = msg;
-    }
-
+    
     private void UndoSelectSkill()
     {
         Selection = Selections.SelectPlayer;
-        SkillInfo.SetActive(false);
-        CannotUseFrame.SetActive(false);
+        SkillsList.Deactivate();
         PartyUserList.SelectedButton.ClearHighlights();
         EventSystem.current.SetSelectedGameObject(PartyUserList.SelectedButton.gameObject);
     }
 
     public void SelectSkill()
     {
-        if (CannotUseFrame.activeSelf) return;
+        if (!SkillsList.CanSelectSkill) return;
+        SkillsList.UnhighlightAll();
+        SkillsList.SelectedButton.KeepSelected();
+        GetSelectableTargetsForUsingSkills();
         SetupSelectTarget();
     }
 
@@ -224,22 +157,23 @@ public class MMSpecial : MM_Super
     private bool GetSelectableTargetsForUsingSkills()
     {
         List<Battler> party = MenuManager.PartyInfo.GetWholeParty();
-        switch (SelectedSkill.Scope)
+        SelectableTeammates.Clear();
+        switch (SkillsList.SelectedObject.Scope)
         {
-            case ActiveTool.ScopeType.OneTeammate:
+            case ActiveTool.ScopeType.OneAlly:
             case ActiveTool.ScopeType.Self:
                 foreach (Battler p in party)
                     if (!p.Unconscious) SelectableTeammates.Add(p);
                 SelectAllTeammates = false;
                 break;
 
-            case ActiveTool.ScopeType.OneKnockedOutTeammate:
+            case ActiveTool.ScopeType.OneKnockedOutAllies:
                 foreach (Battler p in party)
                     if (p.Unconscious) SelectableTeammates.Add(p);
                 SelectAllTeammates = false;
                 break;
 
-            case ActiveTool.ScopeType.AllTeammates:
+            case ActiveTool.ScopeType.AllAllies:
             case ActiveTool.ScopeType.EveryoneButSelf:
             case ActiveTool.ScopeType.Everyone:
                 foreach (Battler p in party)
@@ -247,7 +181,7 @@ public class MMSpecial : MM_Super
                 SelectAllTeammates = true;
                 break;
 
-            case ActiveTool.ScopeType.AllKnockedOutTeammates:
+            case ActiveTool.ScopeType.AllKnockedOutAllies:
                 foreach (Battler p in party)
                     if (p.Unconscious) SelectableTeammates.Add(p);
                 SelectAllTeammates = true;
@@ -259,10 +193,12 @@ public class MMSpecial : MM_Super
     private void SetupSelectTarget()
     {
         Selection = Selections.SelectTarget;
-        SelectedSkillButton.KeepSelected();
-        CannotUseFrame.SetActive(false);
+        SkillsList.SelectedButton.KeepSelected();
         PartyTargetFrame.SetActive(true);
-        SelectTargetTeammateLabel.text = SelectAllTeammates ? ("USE " + SelectedSkill.Name.ToUpper() + " ON EVERYONE?") : ("USE " + SelectedSkill.Name.ToUpper() + " ON...");
+
+        string sk = SkillsList.SelectedObject.Name.ToUpper();
+        SelectTargetTeammateLabel.text = SelectAllTeammates ? ("USE " + sk + " ON EVERYONE?") : ("USE " + sk + " ON...");
+        
         PartyTargetsList.Refresh(SelectableTeammates);
         EventSystem.current.SetSelectedGameObject(PartyTargetsList.transform.GetChild(0).gameObject);
         if (SelectAllTeammates && Selection == Selections.SelectTarget) PartyTargetsList.HighlightAll();
@@ -273,8 +209,8 @@ public class MMSpecial : MM_Super
     {
         Selection = Selections.SelectSkill;
         PartyTargetFrame.SetActive(false);
-        SelectedSkillButton.ClearHighlights();
-        EventSystem.current.SetSelectedGameObject(SelectedSkillButton.gameObject);
+        SkillsList.SelectedButton.ClearHighlights();
+        EventSystem.current.SetSelectedGameObject(SkillsList.SelectedButton.gameObject);
     }
 
     public void SelectTarget()
@@ -311,13 +247,13 @@ public class MMSpecial : MM_Super
     private void UseSkill(int index)
     {
         PartyTargetsList.SelectedObject = SelectableTeammates[index];
-        PartyTargetsList.SelectedObject.ReceiveToolEffects(PartyUserList.SelectedObject, SelectedSkill);
+        PartyTargetsList.SelectedObject.ReceiveToolEffects(PartyUserList.SelectedObject, SkillsList.SelectedObject);
         UpdateGauges(PartyTargetsList, index, PartyTargetsList.SelectedObject);
     }
 
     private void ApplyEffectsToUser()
     {
-        PartyUserList.SelectedObject.ChangeSP(-SelectedSkill.SPConsume);
+        PartyUserList.SelectedObject.ChangeSP(-SkillsList.SelectedObject.SPConsume);
         UpdateGauges(PartyUserList, PartyUserList.SelectedIndex, PartyUserList.SelectedObject);
         for (int i = 0; i < SelectableTeammates.Count; i++)
         {

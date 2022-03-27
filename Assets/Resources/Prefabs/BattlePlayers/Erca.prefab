@@ -676,13 +676,10 @@ MonoBehaviour:
   Skills: []
   Weapons:
   - {fileID: 3552097900181454016, guid: ffa9f6fe244c85248a1bb202285c251d, type: 3}
-  Items:
-  - {fileID: 7230775191068158404, guid: 77df0195c5c99154580a874268a423bc, type: 3}
-  PassiveSkills: []
+  Accessories: []
   SelectedSkill: {fileID: 0}
   SelectedWeapon: {fileID: 0}
   SelectedItem: {fileID: 0}
-  SelectedTeamSkillPartners: []
   SelectedTargets: []
   States: []
   ExecutedAction: 0
@@ -742,10 +739,13 @@ MonoBehaviour:
   ClassSet:
   - {fileID: 94577713347072007, guid: aa68b1ce7e43d254d88764b2f4504a91, type: 3}
   - {fileID: 1791329435643984854, guid: 0c755c9bf65f36a4daba5c184e8a7aaa, type: 3}
-  SkillSet: []
+  SkillSet:
+  - LearnedSkill: {fileID: 3297598885578702653, guid: dcb917dcac2f1eb4395fd9bf9871dae5,
+      type: 3}
+    LearnLevel: 3
+    Permanent: 0
   PreExistingRelations: []
   AttackSkill: {fileID: 0}
-  MapUsableSkills: []
 --- !u!1 &2937574761951436176
 GameObject:
   m_ObjectHideFlags: 0

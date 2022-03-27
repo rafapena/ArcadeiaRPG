@@ -29,12 +29,14 @@ public abstract class Battler : BaseObject
     public Stats Stats;
     [HideInInspector] public Stats StatBoosts;
     [HideInInspector] public List<Skill> Skills;
+    public bool HasAnySkills => Skills.Count > 0;
 
     // Equipment
-    public List<IToolEquippable> Equipment => Weapons.Cast<IToolEquippable>().Concat(Accessories.Cast<IToolEquippable>()).ToList();
     public List<Weapon> Weapons;
     public List<Accessory> Accessories;
+    public List<IToolEquippable> Equipment => Weapons.Cast<IToolEquippable>().Concat(Accessories.Cast<IToolEquippable>()).ToList();
     public bool MaxEquipment => Weapons.Count + Accessories.Count == BattleMaster.MAX_NUMBER_OF_EQUIPS;
+    public bool UsingFists => Weapons.Count == 0;
 
     // Overall battle info
     [HideInInspector] public ActiveTool SelectedToolMove { get; private set; }
@@ -366,7 +368,7 @@ public abstract class Battler : BaseObject
 
     private bool ScopeForUnconsciousTeammates()
     {
-        return SelectedToolMove.Scope == ActiveTool.ScopeType.OneKnockedOutTeammate || SelectedToolMove.Scope == ActiveTool.ScopeType.AllKnockedOutTeammates;
+        return SelectedToolMove.Scope == ActiveTool.ScopeType.OneKnockedOutAllies || SelectedToolMove.Scope == ActiveTool.ScopeType.AllKnockedOutAllies;
     }
 
     private void SetupRandomTargets(List<Battler> usersParty, List<Battler> opponentParty)
@@ -375,13 +377,13 @@ public abstract class Battler : BaseObject
         switch (SelectedToolMove.Scope)
         {
             case ActiveTool.ScopeType.OneEnemy:
-            case ActiveTool.ScopeType.SplashEnemies:
+            case ActiveTool.ScopeType.OneArea:
                 do selected = opponentParty[Random.Range(0, opponentParty.Count)];
                 while (selected.Unconscious);
                 SelectedTargets.Add(selected);
                 break;
 
-            case ActiveTool.ScopeType.OneRow:
+            case ActiveTool.ScopeType.StraightThrough:
                 do selected = opponentParty[Random.Range(0, opponentParty.Count)];
                 while (selected.Unconscious);
                 foreach (Battler b in opponentParty)
@@ -389,7 +391,7 @@ public abstract class Battler : BaseObject
                         SelectedTargets.Add(selected);
                 break;
 
-            case ActiveTool.ScopeType.OneColumn:
+            case ActiveTool.ScopeType.Widespread:
                 do selected = opponentParty[Random.Range(0, opponentParty.Count)];
                 while (selected.Unconscious);
                 foreach (Battler b in opponentParty)
@@ -397,13 +399,13 @@ public abstract class Battler : BaseObject
                         SelectedTargets.Add(selected);
                 break;
 
-            case ActiveTool.ScopeType.OneTeammate:
+            case ActiveTool.ScopeType.OneAlly:
                 do selected = usersParty[Random.Range(0, usersParty.Count)];
                 while (selected.Unconscious);
                 SelectedTargets.Add(selected);
                 break;
 
-            case ActiveTool.ScopeType.OneKnockedOutTeammate:
+            case ActiveTool.ScopeType.OneKnockedOutAllies:
                 int potentialTargets = 0;
                 foreach (Battler t in usersParty)
                     if (t.Unconscious)

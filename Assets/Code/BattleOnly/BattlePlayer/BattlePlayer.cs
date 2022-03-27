@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Net.Security;
 using UnityEngine;
 using UnityEngine.UI;
@@ -16,7 +17,6 @@ public class BattlePlayer : Battler
     public PreExistingRelation[] PreExistingRelations;
 
     [HideInInspector] public Skill AttackSkill;
-    [HideInInspector] public List<Skill> MapUsableSkills;
     [HideInInspector] public List<PlayerRelation> Relations;
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -57,10 +57,8 @@ public class BattlePlayer : Battler
 
     public void AddLearnedSkills()
     {
-        for (int i = 0; i < Class.SkillSet.Count; i++)
-        {
-            if (Level >= (i + 1) * 5) Skills.Add(Class.SkillSet[i].LearnedSkill);
-        }
+        IEnumerable<SkillLearnLevel> skills = SkillSet.Concat(Class.SkillSet).OrderBy(x => x.LearnLevel).Where(x => x.LearnLevel <= Level);
+        foreach (SkillLearnLevel sk in skills) Skills.Add(sk.LearnedSkill);
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
