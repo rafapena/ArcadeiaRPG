@@ -63,7 +63,7 @@ public class InventoryToolSelectionList : SelectionList_Super<IToolForInventory>
         NavToRight = transform.GetChild(NumberOfColumns - 1).GetComponent<Button>().navigation.selectOnRight;
 
         // Add the data
-        ReferenceData = new List<IToolForInventory>();
+        ReferenceData.Clear();
         int i = 0;
         for (int r = 0; r < totalNumberOfRows; r++)
         {

@@ -15,7 +15,7 @@ public class PlayerSelectionList : SelectionList_Super<Battler>
 {
     public void Refresh<T>(List<T> dataList) where T : Battler
     {
-        ReferenceData = new List<Battler>();
+        ReferenceData.Clear();
         int i = 0;
         foreach (T dataEntry in dataList)
         {
@@ -50,7 +50,9 @@ public class PlayerSelectionList : SelectionList_Super<Battler>
     private void AddToList<T>(Transform entry, T dataEntry) where T : Battler
     {
         ReferenceData.Add(dataEntry);
-        entry.GetChild(0).GetComponent<Image>().sprite = dataEntry.MainImage;
+        GameObject go0 = entry.GetChild(0).gameObject;
+        if (go0.GetComponent<Image>() == null) go0.transform.GetChild(0).GetComponent<Image>().sprite = dataEntry.FaceImage;
+        else go0.GetComponent<Image>().sprite = dataEntry.FaceImage;
         entry.GetChild(1).GetComponent<TextMeshProUGUI>().text = dataEntry.Name.ToUpper();
         entry.GetChild(2).GetComponent<TextMeshProUGUI>().text = dataEntry.Class.Name.ToUpper();
         entry.GetChild(3).GetComponent<Gauge>().Set(dataEntry.HP, dataEntry.Stats.MaxHP);
@@ -62,6 +64,7 @@ public class PlayerSelectionList : SelectionList_Super<Battler>
     private void AddStates<T>(Transform entry, T teammate) where T : Battler
     {
         Transform statesGO = entry.GetChild(5).transform;
+        if (!statesGO.gameObject.activeSelf) return;
         int limit = teammate.States.Count < statesGO.childCount ? teammate.States.Count : statesGO.childCount;
         int i = 0;
         for (; i < limit; i++)

@@ -4,6 +4,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System.Collections.Generic;
+using System.Linq;
 
 public class MMMain : MM_Super
 {
@@ -20,6 +21,7 @@ public class MMMain : MM_Super
     public TextMeshProUGUI TotalEXP;
     public TextMeshProUGUI EXPLeft;
     public Gauge ToNextEXPBar;
+    public PlayerSelectionList ReservePartyList;
 
     public override void Open()
     {
@@ -29,6 +31,7 @@ public class MMMain : MM_Super
         Level.text = MenuManager.PartyInfo.Level.ToString();
         SetupEXPInfo();
         PartyList.Refresh(MenuManager.PartyInfo.Players);
+        ReservePartyList.Refresh(MenuManager.PartyInfo.AllPlayers.Skip(MenuManager.PartyInfo.Players.Count).ToList());
         if (MenuManager.PartyInfo.AllPlayers.Count <= 4) MenuMaster.DisableSelection(ref TeamButton);
     }
 

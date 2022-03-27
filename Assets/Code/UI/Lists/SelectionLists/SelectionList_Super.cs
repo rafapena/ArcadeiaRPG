@@ -47,6 +47,7 @@ public abstract class SelectionList_Super<T> : MonoBehaviour
         }
         catch (Exception) { }
         if (InfoFrame) InfoFrame.SetActive(false);
+        ReferenceData = new List<T>();
     }
 
     public virtual void ClearSelections()

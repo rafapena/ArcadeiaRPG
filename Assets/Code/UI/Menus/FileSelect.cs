@@ -168,7 +168,7 @@ public class FileSelect : MonoBehaviour
         DeleteConfirmationFrame.SetActive(true);
         DeleteConfirmationFrame.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "DELETE\nFILE " + FilesList.SelectedObject.File + "?";
         FilesList.SelectedButton.KeepSelected();
-        EventSystem.current.SetSelectedGameObject(DeleteConfirmationFrame.transform.GetChild(1).gameObject);
+        EventSystem.current.SetSelectedGameObject(DeleteConfirmationFrame.transform.GetChild(2).gameObject);
     }
 
     public void UndoDeleteConfirm()

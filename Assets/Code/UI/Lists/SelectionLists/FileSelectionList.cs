@@ -20,7 +20,7 @@ public class FileSelectionList : SelectionList_Super<SaveData>
 
     public void Refresh()
     {
-        ReferenceData = new List<SaveData>();
+        ReferenceData.Clear();
         GameObject go = transform.GetChild(0).gameObject;
         for (int i = transform.childCount; i < TotalNumberOfFiles; i++)
         {

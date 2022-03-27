@@ -15,7 +15,7 @@ public class ObjectiveSelectionList : SelectionList_Super<Objective>
 {
     public void Refresh<T>(List<T> dataList) where T : Objective
     {
-        ReferenceData = new List<Objective>();
+        ReferenceData.Clear();
         int i = 0;
         foreach (T dataEntry in dataList)
         {

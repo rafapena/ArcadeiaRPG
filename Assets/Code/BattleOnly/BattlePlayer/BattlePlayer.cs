@@ -6,7 +6,6 @@ using UnityEngine.UI;
 
 public class BattlePlayer : Battler
 {
-    public Sprite FaceImage;
     public Stats NaturalStats;
     public int Companionship = 100;
     public int SavePartnerRate = 100;

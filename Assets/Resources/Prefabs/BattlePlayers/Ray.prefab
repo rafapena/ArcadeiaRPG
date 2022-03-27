@@ -1933,13 +1933,10 @@ MonoBehaviour:
   Skills: []
   Weapons:
   - {fileID: 3552097900181454016, guid: ffa9f6fe244c85248a1bb202285c251d, type: 3}
-  Items:
-  - {fileID: 7230775191068158404, guid: 77df0195c5c99154580a874268a423bc, type: 3}
-  PassiveSkills: []
+  Accessories: []
   SelectedSkill: {fileID: 0}
   SelectedWeapon: {fileID: 0}
   SelectedItem: {fileID: 0}
-  SelectedTeamSkillPartners: []
   SelectedTargets: []
   States: []
   ExecutedAction: 0
@@ -1978,7 +1975,7 @@ MonoBehaviour:
   Waiting: 0
   SPToConsumeThisTurn: 0
   IsCharging: 0
-  FaceImage: {fileID: 0}
+  FaceImage: {fileID: 21300000, guid: 9c9595bb46c9daf4ba93ed84fefdedad, type: 3}
   NaturalStats:
     MaxHP: 0
     Atk: 0
@@ -2002,7 +1999,6 @@ MonoBehaviour:
   SkillSet: []
   PreExistingRelations: []
   AttackSkill: {fileID: 0}
-  MapUsableSkills: []
 --- !u!1 &9179182932690297800
 GameObject:
   m_ObjectHideFlags: 0

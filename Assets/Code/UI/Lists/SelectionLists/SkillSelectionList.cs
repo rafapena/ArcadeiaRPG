@@ -39,7 +39,7 @@ public class SkillSelectionList : SelectionList_Super<Skill>
     public void Refresh(Battler b)
     {
         ReferenceBattler = b;
-        ReferenceData = b.Skills;
+        ReferenceData.Clear();
         NoSkillsLabel.SetActive(!b.HasAnySkills);
         int i = 0;
         foreach (Skill dataEntry in ReferenceData)
@@ -63,6 +63,7 @@ public class SkillSelectionList : SelectionList_Super<Skill>
 
     private void AddToList(Transform entry, Skill dataEntry)
     {
+        ReferenceData.Add(dataEntry);
         entry.GetChild(0).GetComponent<Image>().sprite = dataEntry.GetComponent<SpriteRenderer>().sprite;
         entry.GetChild(1).GetComponent<TextMeshProUGUI>().text = dataEntry.Name.ToUpper();
         entry.GetChild(2).GetComponent<TextMeshProUGUI>().text = dataEntry.SPConsume > 0 ? dataEntry.SPConsume.ToString() : "";

@@ -22,6 +22,7 @@ public abstract class Battler : BaseObject
 
     // General battler data
     public Sprite MainImage;
+    public Sprite FaceImage;
     public int Level = 1;
     public BattlerClass Class;
     [HideInInspector] public int HP;
