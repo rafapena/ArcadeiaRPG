@@ -10,4 +10,8 @@ public class BattlerClass : BaseObject
     public BattleMaster.WeaponTypes UsableWeapon2Type;
     public List<SkillLearnLevel> SkillSet;
     public int AttackTimes;
+
+    public bool IsBaseClass => UpgradedClass1 != null;
+    
+    public bool IsAdvancedClass => UpgradedClass1 == null && UpgradedClass2 == null;
 }

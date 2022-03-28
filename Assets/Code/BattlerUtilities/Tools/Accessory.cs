@@ -42,5 +42,5 @@ public class Accessory : PassiveEffect, IToolEquippable
 
     List<BattlerClass> IToolEquippable.ClassExclusives => ClassExclusives;
 
-    public int Index { get; set; }
+    public bool CanEquipWith(BattlerClass c) => ClassExclusives.Count == 0 || ClassExclusives.Contains(c);
 }

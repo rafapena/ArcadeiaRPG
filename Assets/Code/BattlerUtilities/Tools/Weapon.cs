@@ -29,5 +29,5 @@ public class Weapon : ActiveTool, IToolEquippable
 
     List<BattlerClass> IToolEquippable.ClassExclusives => ClassExclusives;
 
-    public int Index { get; set; }
+    public bool CanEquipWith(BattlerClass c) => (ClassExclusives.Count == 0 || ClassExclusives.Contains(c)) && (WeaponType == c.UsableWeapon1Type || WeaponType == c.UsableWeapon2Type);
 }

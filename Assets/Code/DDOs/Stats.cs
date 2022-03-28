@@ -19,7 +19,6 @@ public struct Stats
     public int Eva;
     public int Crt;
     public int Cev;
-    private bool Converted;
 
     public void SetTo(Stats other)
     {
@@ -37,7 +36,7 @@ public struct Stats
         Cev = other.Cev;
     }
 
-    public void SetToZero()
+    public void SetToZero(int accMod = 0)
     {
         MaxHP = 0;
         Atk = 0;
@@ -47,10 +46,10 @@ public struct Stats
         Spd = 0;
         Tec = 0;
         Luk = 0;
-        Acc = 0;
-        Eva = 0;
-        Crt = 0;
-        Cev = 0;
+        Acc = accMod;
+        Eva = accMod;
+        Crt = accMod;
+        Cev = accMod;
     }
 
     public void Print()
@@ -83,8 +82,6 @@ public struct Stats
 
     public void ConvertFromBaseToActual(int level)
     {
-        if (Converted) return;
-        Converted = true;
         MaxHP = SetMHPNorms(level, MaxHP, 0);
         Atk = SetStatNorms(level, Atk, 0);
         Def = SetStatNorms(level, Def, 0);
@@ -101,8 +98,6 @@ public struct Stats
 
     public void ConvertFromBaseToActual(int level, Stats modifiers)
     {
-        if (Converted) return;
-        Converted = true;
         MaxHP = SetMHPNorms(level, MaxHP, modifiers.MaxHP);
         Atk = SetStatNorms(level, Atk, modifiers.Atk);
         Def = SetStatNorms(level, Def, modifiers.Def);

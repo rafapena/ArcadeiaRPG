@@ -7,10 +7,12 @@ using TMPro;
 
 public class StatsList : MonoBehaviour
 {
-    private int NUMBER_OF_STATS = 7;
+    private const int NUMBER_OF_STATS = 8;
+
     private Color PositiveColor;
     private Color NegativeColor = new Color(0.9f, 0.4f, 0.4f);
 
+    public TextMeshProUGUI MaxHP;
     public TextMeshProUGUI Str;
     public TextMeshProUGUI Def;
     public TextMeshProUGUI Map;
@@ -18,6 +20,7 @@ public class StatsList : MonoBehaviour
     public TextMeshProUGUI Spd;
     public TextMeshProUGUI Tec;
     public TextMeshProUGUI Luk;
+    public TextMeshProUGUI MaxHPBoost;
     public TextMeshProUGUI StrBoost;
     public TextMeshProUGUI DefBoost;
     public TextMeshProUGUI MapBoost;
@@ -26,13 +29,31 @@ public class StatsList : MonoBehaviour
     public TextMeshProUGUI TecBoost;
     public TextMeshProUGUI LukBoost;
 
+    private int[] StatsListBoosts;
+
     private void Awake()
     {
         PositiveColor = StrBoost.color;
+        StatsListBoosts = new int[NUMBER_OF_STATS];
     }
 
     public void Setup(BattlePlayer player)
     {
+        SetValues(player);
+        SetRelationStatBoosts(player);
+        SetStatBoosts();
+    }
+
+    public void Setup(BattlePlayer player, Stats otherStats)
+    {
+        SetValues(player);
+        SetDiffStatBoosts(player, otherStats);
+        SetStatBoosts();
+    }
+
+    private void SetValues(BattlePlayer player)
+    {
+        MaxHP.text = player.Stats.MaxHP.ToString();
         Str.text = player.Stats.Atk.ToString();
         Def.text = player.Stats.Def.ToString();
         Map.text = player.Stats.Map.ToString();
@@ -40,40 +61,21 @@ public class StatsList : MonoBehaviour
         Spd.text = player.Stats.Spd.ToString();
         Tec.text = player.Stats.Tec.ToString();
         Luk.text = player.Stats.Luk.ToString();
-        int[] statsListBoosts = GetCurrentStatBoosts(player);
-        StrBoost = SetStatText(StrBoost, statsListBoosts[0]);
-        DefBoost = SetStatText(DefBoost, statsListBoosts[1]);
-        MapBoost = SetStatText(MapBoost, statsListBoosts[2]);
-        MarBoost = SetStatText(MarBoost, statsListBoosts[3]);
-        SpdBoost = SetStatText(SpdBoost, statsListBoosts[4]);
-        TecBoost = SetStatText(TecBoost, statsListBoosts[5]);
-        LukBoost = SetStatText(LukBoost, statsListBoosts[6]);
     }
 
-    private int[] GetCurrentStatBoosts(BattlePlayer player)
+    private void SetStatBoosts()
     {
-        int[] stats = new int[NUMBER_OF_STATS];
-        foreach (PlayerRelation pr in player.Relations)
-        {
-            if (pr == null) continue;
-            stats[0] += GetStatBoost(pr, pr.Player.NaturalStats.Atk);
-            stats[1] += GetStatBoost(pr, pr.Player.NaturalStats.Def);
-            stats[2] += GetStatBoost(pr, pr.Player.NaturalStats.Map);
-            stats[3] += GetStatBoost(pr, pr.Player.NaturalStats.Mar);
-            stats[4] += GetStatBoost(pr, pr.Player.NaturalStats.Spd);
-            stats[5] += GetStatBoost(pr, pr.Player.NaturalStats.Tec);
-            stats[6] += GetStatBoost(pr, pr.Player.NaturalStats.Luk);
-        }
-        return stats;
+        MaxHPBoost = DisplayStatBoost(MaxHPBoost, StatsListBoosts[0]);
+        StrBoost = DisplayStatBoost(StrBoost, StatsListBoosts[1]);
+        DefBoost = DisplayStatBoost(DefBoost, StatsListBoosts[2]);
+        MapBoost = DisplayStatBoost(MapBoost, StatsListBoosts[3]);
+        MarBoost = DisplayStatBoost(MarBoost, StatsListBoosts[4]);
+        SpdBoost = DisplayStatBoost(SpdBoost, StatsListBoosts[5]);
+        TecBoost = DisplayStatBoost(TecBoost, StatsListBoosts[6]);
+        LukBoost = DisplayStatBoost(LukBoost, StatsListBoosts[7]);
     }
 
-    private int GetStatBoost(PlayerRelation pc, int stat)
-    {
-        if (stat < 0) return (int)((pc.Level - 1) * stat / 3f);
-        return (pc.Level - 1) * stat;
-    }
-
-    private TextMeshProUGUI SetStatText(TextMeshProUGUI boost, int stat)
+    private TextMeshProUGUI DisplayStatBoost(TextMeshProUGUI boost, int stat)
     {
         if (stat < 0)
         {
@@ -87,5 +89,39 @@ public class StatsList : MonoBehaviour
         }
         else boost.text = "";
         return boost;
+    }
+
+    private void SetDiffStatBoosts(BattlePlayer player, Stats other)
+    {
+        StatsListBoosts[0] = other.MaxHP - player.Stats.MaxHP;
+        StatsListBoosts[1] = other.Atk - player.Stats.Atk;
+        StatsListBoosts[2] = other.Def - player.Stats.Def;
+        StatsListBoosts[3] = other.Map - player.Stats.Map;
+        StatsListBoosts[4] = other.Mar - player.Stats.Mar;
+        StatsListBoosts[5] = other.Spd - player.Stats.Spd;
+        StatsListBoosts[6] = other.Tec - player.Stats.Tec;
+        StatsListBoosts[7] = other.Luk - player.Stats.Luk;
+    }
+
+    private void SetRelationStatBoosts(BattlePlayer player)
+    {
+        foreach (PlayerRelation pr in player.Relations)
+        {
+            if (pr == null) continue;
+            StatsListBoosts[0] += SetRelationStatBoost(pr, pr.Player.NaturalStats.MaxHP);
+            StatsListBoosts[1] += SetRelationStatBoost(pr, pr.Player.NaturalStats.Atk);
+            StatsListBoosts[2] += SetRelationStatBoost(pr, pr.Player.NaturalStats.Def);
+            StatsListBoosts[3] += SetRelationStatBoost(pr, pr.Player.NaturalStats.Map);
+            StatsListBoosts[4] += SetRelationStatBoost(pr, pr.Player.NaturalStats.Mar);
+            StatsListBoosts[5] += SetRelationStatBoost(pr, pr.Player.NaturalStats.Spd);
+            StatsListBoosts[6] += SetRelationStatBoost(pr, pr.Player.NaturalStats.Tec);
+            StatsListBoosts[7] += SetRelationStatBoost(pr, pr.Player.NaturalStats.Luk);
+        }
+    }
+
+    private int SetRelationStatBoost(PlayerRelation pc, int stat)
+    {
+        if (stat < 0) return (int)((pc.Level - 1) * stat / 3f);
+        return (pc.Level - 1) * stat;
     }
 }

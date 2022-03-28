@@ -150,19 +150,9 @@ public class MMEquips : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOpera
         else if (tool is Accessory) InventoryFrame.Refresh(GetAccessories());
     }
 
-    private List<Weapon> GetWeapons()
-    {
-        BattlerClass bc = PartyList.SelectedObject.Class;
-        return MenuManager.PartyInfo.Inventory.Weapons.FindAll(w => ClassCanEquip(w, bc) && (w.WeaponType == bc.UsableWeapon1Type || w.WeaponType == bc.UsableWeapon2Type));
-    }
+    private List<Weapon> GetWeapons() => MenuManager.PartyInfo.Inventory.Weapons.FindAll(w => w.CanEquipWith(PartyList.SelectedObject.Class));
 
-    private List<Accessory> GetAccessories()
-    {
-        BattlerClass bc = PartyList.SelectedObject.Class;
-        return MenuManager.PartyInfo.Inventory.Accessories.FindAll(a => ClassCanEquip(a, bc));
-    }
-
-    private bool ClassCanEquip(IToolEquippable tool, BattlerClass bc) => tool.ClassExclusives.Count == 0 || tool.ClassExclusives.Contains(bc);
+    private List<Accessory> GetAccessories() => MenuManager.PartyInfo.Inventory.Accessories.FindAll(a => a.CanEquipWith(PartyList.SelectedObject.Class));
 
     public void UndoToolSelection()
     {

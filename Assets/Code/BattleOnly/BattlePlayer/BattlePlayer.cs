@@ -69,30 +69,20 @@ public class BattlePlayer : Battler
         base.Update();
     }
 
-    /*public new void SetAllStats(int level)
+    // Note: Must handle equipment management elsewhere (e.g. ChangeClass.cs)
+    public void ChangeClass(BattlerClass newClass)
     {
-        base.SetAllStats(level);
-        if (Class != null) Stats = new Stats(level, Class.BaseStats, NaturalStats);
-    }
-
-    public void SetCurrentClass(List<BattlerClass> classesData, int classId)
-    {
-        if (ValidListInput(classesData, classId)) Class = classesData[classId];
+        IEnumerable<SkillLearnLevel> toKeep = Class.SkillSet.Where(x => x.Permanent);
+        Skills.Clear();
+        foreach (SkillLearnLevel sk in toKeep) Skills.Add(sk.LearnedSkill);
+        Class = newClass;
+        StatConversion();
+        AddLearnedSkills();
     }
 
     public void SetRelation(int id, int level)
     {
-        PlayerCompanionships[id] = 0;
-        for (int i = 1; i <= level; i++) PlayerCompanionships[id] += 10 * i;
+        //PlayerCompanionships[id] = 0;
+        //for (int i = 1; i <= level; i++) PlayerCompanionships[id] += 10 * i;
     }
-
-    public void AddSkillsFromLevel()
-    {
-        for (int i = 0; i < SkillSet.Count; i++)
-        {
-            if (Level < SkillSetLevels[i]) continue;
-            if (SkillSet[i].NumberOfUsers > 1) ComboSkills.Add(new Skill(SkillSet[i]));
-            else Skills.Add(new Skill(SkillSet[i]));
-        }
-    }*/
 }

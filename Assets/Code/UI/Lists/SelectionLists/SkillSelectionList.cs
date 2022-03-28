@@ -42,7 +42,7 @@ public class SkillSelectionList : SelectionList_Super<Skill>
         ReferenceData.Clear();
         NoSkillsLabel.SetActive(!b.HasAnySkills);
         int i = 0;
-        foreach (Skill dataEntry in ReferenceData)
+        foreach (Skill dataEntry in b.Skills)
         {
             transform.GetChild(i).gameObject.SetActive(true);
             GameObject entry = transform.GetChild(i).gameObject;
