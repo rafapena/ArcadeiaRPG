@@ -40,7 +40,5 @@ public class Accessory : PassiveEffect, IToolEquippable
     public int SellPrice => Price / 2;
     public bool IsCraftable => RequiredTools.Count > 0;
 
-    List<BattlerClass> IToolEquippable.ClassExclusives => ClassExclusives;
-
     public bool CanEquipWith(BattlerClass c) => ClassExclusives.Count == 0 || ClassExclusives.Contains(c);
 }

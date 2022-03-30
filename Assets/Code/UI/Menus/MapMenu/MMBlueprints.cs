@@ -20,6 +20,7 @@ public class MMBlueprints : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameO
     public GameObject MaterialsCheck;
     public MenuFrame RequirementsFrame;
     public Transform RequirementsList;
+    public ObtainingWeapons WeaponsUI;
 
     public GameObject CraftDoneBlock;
     public GameObject CraftDoneStar;
@@ -37,6 +38,7 @@ public class MMBlueprints : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameO
     protected override void Start()
     {
         base.Start();
+        WeaponsUI.Initialize(MenuManager.PartyInfo);
         MaterialsCheckTextColor = MaterialsCheck.transform.GetChild(0).GetComponent<TextMeshProUGUI>().color;
     }
 
@@ -150,9 +152,15 @@ public class MMBlueprints : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameO
         if (CollectionFrame.ToolList.DisplayedToolInfo)
         {
             RequirementsFrame.Activate();
+            if (CollectionFrame.ToolList.SelectedObject is Weapon wp) WeaponsUI.Refresh(wp);
+            else WeaponsUI.InfoFrame.Deactivate();
             RefreshRequirements(CollectionFrame.ToolList.SelectedObject.RequiredTools);
         }
-        else RequirementsFrame.Deactivate();
+        else
+        {
+            WeaponsUI.InfoFrame.Deactivate();
+            RequirementsFrame.Deactivate();
+        }
     }
 
     public void RefreshRequirements(List<ItemOrWeaponQuantity> craftsList)

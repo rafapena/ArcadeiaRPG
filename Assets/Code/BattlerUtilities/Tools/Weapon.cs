@@ -27,7 +27,9 @@ public class Weapon : ActiveTool, IToolEquippable
     public int SellPrice => Price / 2;
     public bool IsCraftable => RequiredTools.Count > 0;
 
-    List<BattlerClass> IToolEquippable.ClassExclusives => ClassExclusives;
-
     public bool CanEquipWith(BattlerClass c) => (ClassExclusives.Count == 0 || ClassExclusives.Contains(c)) && (WeaponType == c.UsableWeapon1Type || WeaponType == c.UsableWeapon2Type);
+
+
+    // For equipping weapons from store/crafter
+    public int GetValue(float p, float r, float c) => (int)(Power * p + Range * r + CriticalRate * c);
 }

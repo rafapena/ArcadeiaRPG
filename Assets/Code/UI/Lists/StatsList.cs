@@ -9,9 +9,6 @@ public class StatsList : MonoBehaviour
 {
     private const int NUMBER_OF_STATS = 8;
 
-    private Color PositiveColor;
-    private Color NegativeColor = new Color(0.9f, 0.4f, 0.4f);
-
     public TextMeshProUGUI MaxHP;
     public TextMeshProUGUI Str;
     public TextMeshProUGUI Def;
@@ -33,7 +30,6 @@ public class StatsList : MonoBehaviour
 
     private void Awake()
     {
-        PositiveColor = StrBoost.color;
         StatsListBoosts = new int[NUMBER_OF_STATS];
     }
 
@@ -65,30 +61,14 @@ public class StatsList : MonoBehaviour
 
     private void SetStatBoosts()
     {
-        MaxHPBoost = DisplayStatBoost(MaxHPBoost, StatsListBoosts[0]);
-        StrBoost = DisplayStatBoost(StrBoost, StatsListBoosts[1]);
-        DefBoost = DisplayStatBoost(DefBoost, StatsListBoosts[2]);
-        MapBoost = DisplayStatBoost(MapBoost, StatsListBoosts[3]);
-        MarBoost = DisplayStatBoost(MarBoost, StatsListBoosts[4]);
-        SpdBoost = DisplayStatBoost(SpdBoost, StatsListBoosts[5]);
-        TecBoost = DisplayStatBoost(TecBoost, StatsListBoosts[6]);
-        LukBoost = DisplayStatBoost(LukBoost, StatsListBoosts[7]);
-    }
-
-    private TextMeshProUGUI DisplayStatBoost(TextMeshProUGUI boost, int stat)
-    {
-        if (stat < 0)
-        {
-            boost.color = NegativeColor;
-            boost.text = stat.ToString();
-        }
-        else if (stat > 0)
-        {
-            boost.color = PositiveColor;
-            boost.text = "+" + stat;
-        }
-        else boost.text = "";
-        return boost;
+        MenuMaster.SetNumberBoost(MaxHPBoost, StatsListBoosts[0]);
+        MenuMaster.SetNumberBoost(StrBoost, StatsListBoosts[1]);
+        MenuMaster.SetNumberBoost(DefBoost, StatsListBoosts[2]);
+        MenuMaster.SetNumberBoost(MapBoost, StatsListBoosts[3]);
+        MenuMaster.SetNumberBoost(MarBoost, StatsListBoosts[4]);
+        MenuMaster.SetNumberBoost(SpdBoost, StatsListBoosts[5]);
+        MenuMaster.SetNumberBoost(TecBoost, StatsListBoosts[6]);
+        MenuMaster.SetNumberBoost(LukBoost, StatsListBoosts[7]);
     }
 
     private void SetDiffStatBoosts(BattlePlayer player, Stats other)

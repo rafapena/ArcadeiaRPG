@@ -36,7 +36,7 @@ public class InventoryToolSelectionList : SelectionList_Super<IToolForInventory>
     protected static Color CraftedBackgroundColor = new Color(0.7f, 0.9f, 1f, 0.7f);
 
     // Other settings
-    private const string COST_PREFIX = "<sprite=\"MenuIcons\" index=9> ";
+    private const string COST_PREFIX = "<sprite=\"MenuIcons\" index=10> ";
     public AdditionalDisplayAttributes AdditionalAttribute = AdditionalDisplayAttributes.Quanitity;
 
     protected override void Awake()
@@ -201,7 +201,7 @@ public class InventoryToolSelectionList : SelectionList_Super<IToolForInventory>
         {
             InfoFrame.transform.GetChild(3).GetChild(0).GetComponent<TextMeshProUGUI>().text = wp.Power.ToString();
             InfoFrame.transform.GetChild(4).GetChild(0).GetComponent<TextMeshProUGUI>().text = wp.Range + "%";
-            InfoFrame.transform.GetChild(5).GetChild(0).GetComponent<TextMeshProUGUI>().text = "+" + wp.CritcalRate + "%";
+            InfoFrame.transform.GetChild(5).GetChild(0).GetComponent<TextMeshProUGUI>().text = "+" + wp.CriticalRate + "%";
         }
 
         InfoFrame.transform.GetChild(6).GetChild(0).GetComponent<TextMeshProUGUI>().text = SelectedObject.Weight.ToString();

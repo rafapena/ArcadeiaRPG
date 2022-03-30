@@ -12,7 +12,7 @@ using System.Threading;
 
 public class Shop : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameOperations
 {
-    private enum Selections { None, Browsing, ConfirmingAmont, ConfirmedTransaction, SelectingEquips, ConfirmSwap }
+    private enum Selections { None, Browsing, ConfirmingAmont, ConfirmedTransaction, EquippingWeapon }
 
     private Selections Selection;
 
@@ -20,6 +20,7 @@ public class Shop : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameOper
     public MenuFrame BuyingFrame;
     public InventoryToolSelectionList BuyingList;
     public GameObject BuyingListBlock;
+    public ObtainingWeapons WeaponsUI;
     public TextMeshProUGUI CarryingAmount;
     public TextMeshProUGUI GoldAmountBuying;
     public GameObject NotEnoughGoldText;
@@ -43,13 +44,6 @@ public class Shop : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameOper
     public Gauge ResultCheckCarryTracker;
     public GameObject TransactionConfirmedFrame;
 
-    // Buying equipment
-    public GameObject CharacterEquipCheckFrame;
-    public Transform CharacterEquipCheckList;
-    public GameObject EquipNowConfirmation;
-    public MenuFrame SelectEquipsFrame;
-    public GameObject ConfirmSwap;
-
     // Info for globals
     [HideInInspector] public PlayerParty PartyInfo;
     [HideInInspector] public Shopkeeper Shopkeep;
@@ -70,6 +64,7 @@ public class Shop : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameOper
         PartyInfo = GameplayMaster.Party;
         Shopkeep = GameplayMaster.Shop;
         PartyInfo.Inventory.UpdateToCurrentWeight();
+        WeaponsUI.Initialize(PartyInfo);
         DisplayedGold = PartyInfo.Inventory.Gold;
         if (isBuying) BuyingFrame.Activate();
         else
@@ -112,18 +107,16 @@ public class Shop : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameOper
 
             case Selections.ConfirmedTransaction:
                 if (!MenuMaster.ReadyToSelectInMenu) break;
-                else if (isBuying && SelectedToolToInventory is Weapon)
+                else if (isBuying && SelectedToolToInventory is Weapon && !WeaponsUI.NooneNeeded)
                 {
-                    if (!EquipNowConfirmation.gameObject.activeSelf) SetupEquipConfirmation();
-                    else break;
+                    Selection = Selections.EquippingWeapon;
+                    WeaponsUI.OpenEquipCharacterSelection();
                 }
                 else if (Time.unscaledTime >= JustTransactedTimer && (select || back)) ReturnToSelection();
                 break;
 
-            case Selections.SelectingEquips:
-                break;
-
-            case Selections.ConfirmSwap:
+            case Selections.EquippingWeapon:
+                if (WeaponsUI.IsDone) ReturnToSelection();
                 break;
         }
     }
@@ -157,15 +150,10 @@ public class Shop : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameOper
         else SellingFrame.SelectingToolList();
 
         BuyingListBlock.gameObject.SetActive(false);
-        if (!(BuyingList.SelectedObject is Weapon))
-            CharacterEquipCheckFrame.SetActive(false);
-
+        WeaponsUI.Deactivate();
         ConfirmFrame.gameObject.SetActive(false);
         ResultCheckFrame.SetActive(false);
         TransactionConfirmedFrame.SetActive(false);
-        EquipNowConfirmation.SetActive(false);
-        SelectEquipsFrame.Deactivate();
-        ConfirmSwap.SetActive(false);
     }
 
     private void RefreshGoldDisplayBuying()
@@ -194,14 +182,14 @@ public class Shop : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameOper
         {
             SetupSelectToolToInventory();
             UpdateCarryingAmount();
-            if (BuyingList.SelectedObject is Weapon wp) RefreshPartyMemberEquips(wp);
-            else CharacterEquipCheckFrame.SetActive(false);
+            if (BuyingList.SelectedObject is Weapon wp) WeaponsUI.Refresh(wp);
+            else WeaponsUI.InfoFrame.Deactivate();
             NotEnoughGoldText.SetActive(PartyInfo.Inventory.Gold - BuyingList.SelectedObject.Price < 0);
         }
         else
         {
             CarryingAmount.text = "";
-            CharacterEquipCheckFrame.SetActive(false);
+            WeaponsUI.InfoFrame.Deactivate();
             NotEnoughGoldText.SetActive(false);
         }
     }
@@ -218,11 +206,6 @@ public class Shop : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameOper
             CannotSellMesssage.SetActive(!canSell);
         }
         else AddedGoldFrame.SetActive(false);
-    }
-
-    private void RefreshPartyMemberEquips(Weapon wp)
-    {
-        CharacterEquipCheckFrame.SetActive(true);
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -281,13 +264,14 @@ public class Shop : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameOper
     {
         if (!MenuMaster.ReadyToSelectInMenu || !BuyingList.RefreshToolInfo() || CannotPurchase) return;
         Selection = Selections.ConfirmingAmont;
+        WeaponsUI.InfoFrame.Deactivate();
         BuyingList.Selecting = false;
         BuyingListBlock.SetActive(true);
         BuyingList.SelectedButton.KeepSelected();
         SetupSelectToolToInventory();
         ConfirmFrame.Activate(1, PartyInfo.Inventory.Gold / SelectedToolToInventory.Price);
         ConfirmText.text = "How many will you purchase?";
-        CharacterEquipCheckFrame.SetActive(false);
+        ResultCheckFrame.SetActive(true);
         UpdateResultChecker(ConfirmFrame.Amount);
     }
 
@@ -353,7 +337,8 @@ public class Shop : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameOper
         int total = ConfirmFrame.Amount * SelectedToolToInventory.Price;
         PartyInfo.Inventory.Gold -= total;
         PartyInfo.Inventory.Add(SelectedToolToInventory, ConfirmFrame.Amount);
-        
+        WeaponsUI.AmountToEquip = ConfirmFrame.Amount;
+
         TransactionConfirmedFrame.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "Purchased " + SelectedToolToInventory.Info.Name;
         TransactionConfirmedFrame.transform.GetChild(1).GetComponent<Image>().sprite = SelectedToolToInventory.Info.GetComponent<SpriteRenderer>().sprite;
         UpdateCarryingAmount();
@@ -383,20 +368,5 @@ public class Shop : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameOper
                 break;
         }
         return total;
-    }
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// -- Buying menu only - Equipment management --
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    private void SetupEquipConfirmation()
-    {
-        EquipNowConfirmation.SetActive(true);
-        EventSystem.current.SetSelectedGameObject(EquipNowConfirmation.transform.GetChild(1).gameObject);
-    }
-
-    public void SetupSelectEquipsList()
-    {
-        SelectEquipsFrame.Activate();
     }
 }

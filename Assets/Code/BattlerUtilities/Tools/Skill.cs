@@ -36,7 +36,7 @@ public class Skill : ActiveTool
         Element = w.Element;
         Power = w.Power;
         Accuracy = w.Accuracy;
-        CritcalRate = w.CritcalRate;
+        CriticalRate = w.CriticalRate;
         Priority = w.Priority;
         Projectile = w.Projectile;
         ClassExclusives = w.ClassExclusives;

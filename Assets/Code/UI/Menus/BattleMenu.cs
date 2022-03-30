@@ -393,7 +393,7 @@ public class BattleMenu : MonoBehaviour
         InventoryToolSelectionList.SetElementImage(ConfirmToolFrame.gameObject, 3, ActiveTool);
         ConfirmToolFrame.transform.GetChild(4).GetChild(0).GetComponent<TextMeshProUGUI>().text = ActiveTool.Power.ToString();
         ConfirmToolFrame.transform.GetChild(5).GetChild(0).GetComponent<TextMeshProUGUI>().text = ActiveTool.ConsecutiveActs.ToString();
-        ConfirmToolFrame.transform.GetChild(6).GetChild(0).GetComponent<TextMeshProUGUI>().text = ActiveTool.CritcalRate + "%"; //GetCritStr(ActiveTool.CritcalRate);
+        ConfirmToolFrame.transform.GetChild(6).GetChild(0).GetComponent<TextMeshProUGUI>().text = ActiveTool.CriticalRate + "%"; //GetCritStr(ActiveTool.CritcalRate);
         ConfirmToolFrame.transform.GetChild(7).gameObject.SetActive(false); // Always false for Items, uses a different function to activate for Skills
         SetConfirmUsability(8, toolMenuConfirmIndex);
         ConfirmToolFrame.Activate();

@@ -11,6 +11,9 @@ using UnityEngine.UI;
 
 public class MenuMaster : MonoBehaviour
 {
+    public static Color POSITIVE_NUMBER_COLOR = new Color(0.5f, 1f, 0.5f);
+    public static Color NEGATIVE_NUMBER_COLOR = new Color(0.9f, 0.4f, 0.4f);
+
     // For menu selection
     private static float SelectionTimer = 0;
     private const float SELECTION_BUFFER = 0.6f;
@@ -46,6 +49,21 @@ public class MenuMaster : MonoBehaviour
         button.GetComponent<Button>().interactable = false;
         button.transform.GetChild(0).GetComponent<TextMeshProUGUI>().color = c;
         if (button.transform.childCount > 1) button.transform.GetChild(1).GetComponent<Image>().color = c;
+    }
+
+    public static void SetNumberBoost(TextMeshProUGUI boost, int number, string zeroText = "", string postText = "")
+    {
+        if (number < 0)
+        {
+            boost.color = NEGATIVE_NUMBER_COLOR;
+            boost.text = number + postText;
+        }
+        else if (number > 0)
+        {
+            boost.color = POSITIVE_NUMBER_COLOR;
+            boost.text = "+" + number + postText;
+        }
+        else boost.text = zeroText;
     }
 
     public static void EnableSelection(ref GameObject button)

@@ -99,7 +99,7 @@ public abstract class Tool : BaseObject
     // WRITES TO THE USER
     public int GetCriticalHitRatio(Battler u, Battler t, float effectMagnitude = 1.0f)
     {
-        float weaponCritRate = u.SelectedWeapon != null ? u.SelectedWeapon.CritcalRate : 100;
+        float weaponCritRate = u.SelectedWeapon != null ? u.SelectedWeapon.CriticalRate : 100;
         float toolCrt = CritcalRate * weaponCritRate / 10000f;
         float def = t.Tec() * t.Cev();
         float critExponent = 1.1f;

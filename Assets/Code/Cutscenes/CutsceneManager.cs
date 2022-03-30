@@ -159,6 +159,9 @@ public class CutsceneManager : MonoBehaviour
                 return Player.Party.AllPlayers.Find(x => x.Id == val) != null;
             case "T":
                 return Player.Party.Allies.Find(x => x.Id == val) != null;
+            // Objectives
+            // Current Time
+            // Game Variables
             default:
                 return true;
         }

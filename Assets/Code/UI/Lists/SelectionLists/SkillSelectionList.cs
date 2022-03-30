@@ -86,7 +86,7 @@ public class SkillSelectionList : SelectionList_Super<Skill>
         InfoFrame.transform.GetChild(2).gameObject.SetActive(hasElement);
         if (hasElement) InfoFrame.transform.GetChild(2).GetComponent<Image>().sprite = UIMaster.ElementImages[SelectedObject.Element];
         InfoFrame.transform.GetChild(4).GetComponent<TextMeshProUGUI>().text = SelectedObject.Power.ToString();
-        InfoFrame.transform.GetChild(6).GetComponent<TextMeshProUGUI>().text = "+" + SelectedObject.CritcalRate + "%";
+        InfoFrame.transform.GetChild(6).GetComponent<TextMeshProUGUI>().text = "+" + SelectedObject.CriticalRate + "%";
         InfoFrame.transform.GetChild(8).GetComponent<TextMeshProUGUI>().text = Regex.Replace(SelectedObject.Scope.ToString(), "(\\B[A-Z])", " $1").ToUpper();
         CheckDisplayCannotUseMessage(SelectedIndex);
     }

@@ -27,7 +27,7 @@ public abstract class ActiveTool : BaseObject
     public int Power = 10;
     public int Range = 50;
     public int Accuracy = 100;
-    public int CritcalRate = 2;
+    public int CriticalRate = 2;
     public int Variance;
     public int Priority;
     public Projectile Projectile;
@@ -99,8 +99,8 @@ public abstract class ActiveTool : BaseObject
     // WRITES TO THE USER
     public int GetCriticalHitRatio(Battler u, Battler t, float effectMagnitude = 1.0f)
     {
-        float weaponCritRate = u.SelectedWeapon != null ? u.SelectedWeapon.CritcalRate : 100;
-        float toolCrt = CritcalRate * weaponCritRate / 10000f;
+        float weaponCritRate = u.SelectedWeapon != null ? u.SelectedWeapon.CriticalRate : 100;
+        float toolCrt = CriticalRate * weaponCritRate / 10000f;
         float def = t.Tec() * t.Cev();
         float critExponent = 1.1f;
         float result = 2 * Mathf.Pow(u.Tec() * toolCrt, critExponent) * u.Crt() / (def != 0 ? def : 0.01f);

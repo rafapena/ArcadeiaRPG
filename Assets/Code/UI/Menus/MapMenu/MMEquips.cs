@@ -142,12 +142,20 @@ public class MMEquips : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOpera
         EventSystem.current.SetSelectedGameObject(EquippedTools.transform.GetChild(0).gameObject);
     }
 
-    private void RefreshInventoryEquipTabs(IToolEquippable tool = null)
+    private void RefreshInventoryEquipTabs(IToolEquippable tool = null, bool resetPosition = false)
     {
         InventoryFrame.SetToolListOnTab(0, GetWeapons());
         InventoryFrame.SetToolListOnTab(1, GetAccessories());
-        if (tool is Weapon) InventoryFrame.Refresh(GetWeapons());
-        else if (tool is Accessory) InventoryFrame.Refresh(GetAccessories());
+        if (tool is Weapon)
+        {
+            if (resetPosition) InventoryFrame.SelectTab(0);
+            else InventoryFrame.Refresh(GetWeapons());
+        }
+        else if (tool is Accessory)
+        {
+            if (resetPosition) InventoryFrame.SelectTab(1);
+            else InventoryFrame.Refresh(GetAccessories());
+        }
     }
 
     private List<Weapon> GetWeapons() => MenuManager.PartyInfo.Inventory.Weapons.FindAll(w => w.CanEquipWith(PartyList.SelectedObject.Class));
@@ -238,7 +246,7 @@ public class MMEquips : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOpera
         PartyList.SelectedObject.Unequip(tool);
         MenuManager.PartyInfo.Inventory.Add(tool);
         EquippedTools.Refresh(PartyList.SelectedObject.Equipment, BattleMaster.MAX_NUMBER_OF_EQUIPS, true);
-        RefreshInventoryEquipTabs(tool);
+        RefreshInventoryEquipTabs(tool, true);
     }
 
     private void EquipTool()
@@ -279,7 +287,7 @@ public class MMEquips : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOpera
         MenuManager.PartyInfo.Inventory.Add(equippedTool);
         MenuManager.PartyInfo.Inventory.Remove(inventoryTool);
         EquippedTools.Refresh(PartyList.SelectedObject.Equipment, BattleMaster.MAX_NUMBER_OF_EQUIPS, true);
-        RefreshInventoryEquipTabs(equippedTool);
+        RefreshInventoryEquipTabs(inventoryTool, true);
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
