@@ -99,6 +99,7 @@ public class MMBlueprints : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameO
         CollectionFrame.SelectingToolList();
         ConfirmCraft.SetActive(false);
         MaterialsCheck.SetActive(false);
+        WeaponsUI.InfoFrame.Deactivate();
         RequirementsFrame.Deactivate();
         CraftDoneBlock.SetActive(false);
         CraftDoneStar.SetActive(false);

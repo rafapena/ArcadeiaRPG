@@ -159,7 +159,7 @@ public class ObtainingWeapons : MonoBehaviour
     public void SelectCharacterEquip()
     {
         int index = EventSystem.current.currentSelectedGameObject.GetComponent<ListSelectable>().Index;
-        if (EquippingProgress == 0 || PartyList.GetChild(index).GetChild(4).gameObject.activeSelf) return;
+        if (EquippingProgress == 0 || EquippingProgress == 3 || PartyList.GetChild(index).GetChild(4).gameObject.activeSelf) return;
         PlayerEquipBoost peb = NeededPlayers[index];
         SelectedPlayerIndex = index;
         if (peb.Player.MaxEquipment && !peb.WeakestWeapon) OpenSwapEquipment(peb.Player);
