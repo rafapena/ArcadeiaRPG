@@ -144,7 +144,7 @@ public class Shop : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameOper
         Selection = Selections.Browsing;
         if (isBuying)
         {
-            BuyingList.Refresh(Shopkeep.GetAllToolsInStock());
+            BuyingList.Refresh(Shopkeep.GetAllToolsInStock(), PriceHighEnough);
             BuyingList.Selecting = true;
         }
         else SellingFrame.SelectingToolList();
@@ -154,6 +154,11 @@ public class Shop : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameOper
         ConfirmFrame.gameObject.SetActive(false);
         ResultCheckFrame.SetActive(false);
         TransactionConfirmedFrame.SetActive(false);
+    }
+
+    private bool PriceHighEnough(IToolForInventory tool)
+    {
+        return PartyInfo.Inventory.Gold >= tool.Price;
     }
 
     private void RefreshGoldDisplayBuying()

@@ -33,7 +33,10 @@ public class InventoryToolSelectionList : SelectionList_Super<IToolForInventory>
     protected int NumberOfBlankSquares;
     protected int NumberOfColumns;
     protected int NumberOfVisibleRows;
-    protected static Color CraftedBackgroundColor = new Color(0.7f, 0.9f, 1f, 0.7f);
+
+    // List enable/disable conditions
+    private const float DISABLED_TOOL_OPACITY = 0.2f;
+    public delegate bool EnableCondition(IToolForInventory data);
 
     // Other settings
     private const string COST_PREFIX = "<sprite=\"MenuIcons\" index=10> ";
@@ -47,6 +50,11 @@ public class InventoryToolSelectionList : SelectionList_Super<IToolForInventory>
     }
 
     public void Refresh<T>(List<T> listData, int hardLimit = -1, bool customNavigation = false) where T : IToolForInventory
+    {
+        Refresh(listData, null, hardLimit, customNavigation);
+    }
+
+    public void Refresh<T>(List<T> listData, EnableCondition enableCondition, int hardLimit = -1, bool customNavigation = false) where T : IToolForInventory
     {
         // Get number of scrollable rows
         int totalNumberOfRows = NumberOfVisibleRows;
@@ -92,8 +100,11 @@ public class InventoryToolSelectionList : SelectionList_Super<IToolForInventory>
                 // Set the icon in the box entry
                 Image blankImage = entry.transform.GetChild(0).GetComponent<Image>();
                 bool inDataList = i < listData.Count;
-                blankImage.color = (inDataList && listData[i].IsCraftable) ? CraftedBackgroundColor : NormalBackgroundColor;
-                if (inDataList) AddToList(entry.transform, listData[i]);
+                if (inDataList)
+                {
+                    AddToList(entry.transform, listData[i]);
+                    EnableOrDisableEntry(entry, enableCondition, listData[i]);
+                }
                 else SetToBlank(entry);
                 i++;
             }
@@ -153,11 +164,25 @@ public class InventoryToolSelectionList : SelectionList_Super<IToolForInventory>
         SetVerticalPointer(aboveEntry, entry.transform);
     }
 
+    private void EnableOrDisableEntry(GameObject entry, EnableCondition enableCondition, IToolForInventory data)
+    {
+        Color tempColor = entry.transform.GetChild(1).GetComponent<Image>().color;
+        tempColor.a = (enableCondition?.Invoke(data) ?? true) ? 1.0f : DISABLED_TOOL_OPACITY;
+        entry.transform.GetChild(1).GetComponent<Image>().color = tempColor;
+    }
+
     private void SetToBlank(GameObject entry)
     {
         entry.transform.GetChild(1).gameObject.SetActive(false);
         if (entry.transform.childCount > 2)
             entry.transform.GetChild(2).gameObject.SetActive(false);
+    }
+
+    public void RefreshEnabling(EnableCondition enableCondition)
+    {
+        int i = 0;
+        foreach (Transform t in transform)
+            EnableOrDisableEntry(t.gameObject, enableCondition, ReferenceData[i++]);
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

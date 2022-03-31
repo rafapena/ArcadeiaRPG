@@ -25,6 +25,7 @@ public class ObtainingWeapons : MonoBehaviour
     public TextMeshProUGUI EquipToWhomMessage;
     public GameObject SelectEquipmentFrame;
     public InventoryToolSelectionList SelectEquipmentList;
+    public GameObject ListBlocker;
 
     private PlayerParty Party;
     private static Weapon Weapon;
@@ -59,6 +60,7 @@ public class ObtainingWeapons : MonoBehaviour
         SelectedPlayerIndex = -1;
         AmountToEquip = 0;
         EquippingProgress = 0;
+        ListBlocker.SetActive(false);
         EquipToWhomFrame.SetActive(false);
         SelectEquipmentFrame.SetActive(false);
     }
@@ -172,6 +174,7 @@ public class ObtainingWeapons : MonoBehaviour
         SelectEquipmentFrame.SetActive(true);
         SelectEquipmentList.Refresh(player.Equipment);
         SelectEquipmentList.Selecting = true;
+        ListBlocker.SetActive(true);
         EventSystem.current.SetSelectedGameObject(SelectEquipmentList.transform.GetChild(0).gameObject);
     }
 
@@ -180,6 +183,7 @@ public class ObtainingWeapons : MonoBehaviour
         EquippingProgress = 1;
         SelectEquipmentFrame.SetActive(false);
         SelectEquipmentList.Selecting = false;
+        ListBlocker.SetActive(false);
         EventSystem.current.SetSelectedGameObject(PartyList.transform.GetChild(0).gameObject);
     }
 
@@ -223,6 +227,7 @@ public class ObtainingWeapons : MonoBehaviour
             return;
         }
         else if (SelectedPlayerIndex >= 0) EventSystem.current.SetSelectedGameObject(PartyList.transform.GetChild(0).gameObject);
+        ListBlocker.SetActive(false);
         EquippingProgress = 1;
     }
 }

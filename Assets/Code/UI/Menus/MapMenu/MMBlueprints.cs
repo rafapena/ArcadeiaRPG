@@ -247,7 +247,17 @@ public class MMBlueprints : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameO
         CraftDoneBlock.SetActive(false);
         if (Legend) Legend.SetActive(true);
         CollectionFrame.UndoSelectTool();
+        CollectionFrame.ToolList.RefreshEnabling(EnoughMaterials);
         MenuMaster.SetupSelectionBufferInMenu();
         Resetting = false;
+    }
+
+    private bool EnoughMaterials(IToolForInventory tool)
+    {
+        int i = 0;
+        foreach (ItemOrWeaponQuantity t in tool.RequiredTools)
+            if (GetQuantityFromInventory(tool.RequiredTools, i++) < t.Quantity)
+                return false;
+        return true;
     }
 }
