@@ -125,7 +125,7 @@ public class ToolListCollectionFrame : MonoBehaviour
 
     public void SelectTab(int tabIndex)
     {
-        if (ListBlocker.activeSelf)
+        if (ListBlocker.activeSelf || !Tabs.transform.GetChild(tabIndex).gameObject.activeSelf)
         {
             SelectTabFailed?.Invoke();
             return;

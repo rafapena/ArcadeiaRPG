@@ -182,7 +182,10 @@ public class InventoryToolSelectionList : SelectionList_Super<IToolForInventory>
     {
         int i = 0;
         foreach (Transform t in transform)
+        {
+            if (i >= ReferenceData.Count) return;
             EnableOrDisableEntry(t.gameObject, enableCondition, ReferenceData[i++]);
+        }
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

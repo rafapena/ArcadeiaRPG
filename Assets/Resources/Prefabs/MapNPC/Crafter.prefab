@@ -147,9 +147,9 @@ MonoBehaviour:
   Figure: {fileID: 0}
   Speed: 0
   Cutscene: {fileID: 2350240225161313501}
+  Player: {fileID: 0}
   CloseToPlayer: 0
   Interacting: 0
-  Customer: {fileID: 0}
   Image: {fileID: 0}
   TransactionAddedJump: 0
   OnlyBrowseAddedJump: 1
@@ -185,11 +185,11 @@ MonoBehaviour:
           m_Calls:
           - m_Target: {fileID: 1914083133897695949}
             m_MethodName: OpenWorkshop
-            m_Mode: 1
+            m_Mode: 3
             m_Arguments:
               m_ObjectArgument: {fileID: 0}
               m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-              m_IntArgument: 0
+              m_IntArgument: 2
               m_FloatArgument: 0
               m_StringArgument: 
               m_BoolArgument: 0

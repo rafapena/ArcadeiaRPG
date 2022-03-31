@@ -18,7 +18,7 @@ public class MMBlueprints : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameO
     public ToolListCollectionFrame CollectionFrame;
     public GameObject ConfirmCraft;
     public GameObject MaterialsCheck;
-    public MenuFrame RequirementsFrame;
+    public GameObject RequirementsFrame;
     public Transform RequirementsList;
     public ObtainingWeapons WeaponsUI;
 
@@ -27,7 +27,6 @@ public class MMBlueprints : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameO
     public MenuFrame CraftDoneToolInfo;
     public MenuFrame CraftDoneTool;
 
-    private bool BrowseOnly;
     private float DoneTimer;
     private const float CRAFTING_TIME = 3f;
     private bool Resetting;
@@ -38,7 +37,6 @@ public class MMBlueprints : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameO
     protected override void Start()
     {
         base.Start();
-        WeaponsUI.Initialize(MenuManager.PartyInfo);
         MaterialsCheckTextColor = MaterialsCheck.transform.GetChild(0).GetComponent<TextMeshProUGUI>().color;
     }
 
@@ -62,12 +60,41 @@ public class MMBlueprints : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameO
         }
     }
 
+    private void HandleTabs()
+    {
+        switch (GameplayMaster.CraftingMode)
+        {
+            case InventorySystem.ListType.None:
+                CollectionFrame.SetToolListOnTab(0, MenuManager.PartyInfo.CraftableItems);
+                CollectionFrame.SetToolListOnTab(1, MenuManager.PartyInfo.CraftableWeapons);
+                CollectionFrame.SetToolListOnTab(2, MenuManager.PartyInfo.CraftableAccessories);
+                break;
+            case InventorySystem.ListType.Items:
+                SetOneTab(MenuManager.PartyInfo.CraftableItems, 0);
+                break;
+            case InventorySystem.ListType.Weapons:
+                SetOneTab(MenuManager.PartyInfo.CraftableWeapons, 1);
+                break;
+            case InventorySystem.ListType.Accessories:
+                SetOneTab(MenuManager.PartyInfo.CraftableAccessories, 2);
+                break;
+        }
+    }
+
+    private void SetOneTab<T>(List<T> list, int tab) where T : IToolForInventory
+    {
+        CollectionFrame.SetToolListOnTab(tab, list);
+        CollectionFrame.Tabs.transform.GetChild(0).gameObject.SetActive(tab == 0);
+        CollectionFrame.Tabs.transform.GetChild(1).gameObject.SetActive(tab == 1);
+        CollectionFrame.Tabs.transform.GetChild(2).gameObject.SetActive(tab == 2);
+        CollectionFrame.SelectTab(tab);
+    }
+
     public override void Open()
     {
         base.Open();
-        CollectionFrame.SetToolListOnTab(0, MenuManager.PartyInfo.CraftableItems);
-        CollectionFrame.SetToolListOnTab(1, MenuManager.PartyInfo.CraftableWeapons);
-        CollectionFrame.SetToolListOnTab(2, MenuManager.PartyInfo.CraftableAccessories);
+        WeaponsUI.Initialize(MenuManager.PartyInfo);
+        HandleTabs();
         CollectionFrame.InitializeSelection();
     }
 
@@ -83,7 +110,8 @@ public class MMBlueprints : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameO
         {
             case Selections.SelectingBlueprints:
                 Selection = Selections.None;
-                MenuManager.GoToMain();
+                if (GameplayMaster.IsCrafting) SceneMaster.CloseCraftingMenu(MenuManager.PartyInfo);
+                else MenuManager.GoToMain();
                 break;
             case Selections.ConfirmCraft:
                 CollectionFrame.UndoSelectTool();
@@ -98,9 +126,12 @@ public class MMBlueprints : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameO
         Selection = Selections.SelectingBlueprints;
         CollectionFrame.SelectingToolList();
         ConfirmCraft.SetActive(false);
-        MaterialsCheck.SetActive(false);
-        WeaponsUI.InfoFrame.Deactivate();
-        RequirementsFrame.Deactivate();
+        if (!GameplayMaster.IsCrafting)
+        {
+            MaterialsCheck.SetActive(false);
+            WeaponsUI.InfoFrame.Deactivate();
+            RequirementsFrame.SetActive(false);
+        }
         CraftDoneBlock.SetActive(false);
         CraftDoneStar.SetActive(false);
         CraftDoneToolInfo.Deactivate();
@@ -110,6 +141,7 @@ public class MMBlueprints : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameO
     public void SelectTabSuccess()
     {
         Selection = Selections.SelectingBlueprints;
+        CollectionFrame.ToolList.RefreshEnabling(EnoughMaterials);
     }
 
     public void SelectTabFailed()
@@ -119,7 +151,7 @@ public class MMBlueprints : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameO
 
     public void SelectToolForCrafting()
     {
-        if (!BrowseOnly && !MaterialsCheck.gameObject.activeSelf) CollectionFrame.SelectTool();
+        if (GameplayMaster.IsCrafting && !MaterialsCheck.gameObject.activeSelf) CollectionFrame.SelectTool();
     }
 
     public void SelectToolSuccess()
@@ -152,7 +184,7 @@ public class MMBlueprints : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameO
         CollectionFrame.ToolList.HoverOverTool();
         if (CollectionFrame.ToolList.DisplayedToolInfo)
         {
-            RequirementsFrame.Activate();
+            RequirementsFrame.SetActive(true);
             if (CollectionFrame.ToolList.SelectedObject is Weapon wp) WeaponsUI.Refresh(wp);
             else WeaponsUI.InfoFrame.Deactivate();
             RefreshRequirements(CollectionFrame.ToolList.SelectedObject.RequiredTools);
@@ -160,7 +192,7 @@ public class MMBlueprints : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameO
         else
         {
             WeaponsUI.InfoFrame.Deactivate();
-            RequirementsFrame.Deactivate();
+            RequirementsFrame.SetActive(false);
         }
     }
 

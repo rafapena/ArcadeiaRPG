@@ -12,10 +12,9 @@ public class SceneMaster : MonoBehaviour
     private static bool InFileSelectMenu = false;
     private static int InShopMenu = 0;
     private static bool InShop = false;
-    private static bool InCraftingMenu = false;
     private static bool InStorageMenu = false;
 
-    public static bool InMenu => InMapMenu || InPauseMenu || InFileSelectMenu || InShop || InStorageMenu || InCraftingMenu;
+    public static bool InMenu => InMapMenu || InPauseMenu || InFileSelectMenu || InShop || InStorageMenu;
 
     public static bool BuyingInShop => InShopMenu == 1;
 
@@ -31,7 +30,6 @@ public class SceneMaster : MonoBehaviour
     public const string FILE_SELECT_MENU_SCENE = "FileSelect";
     public const string SHOP_SCENE = "Shop";
     public const string STORAGE_SCENE = "Storage";
-    public const string CRAFTING_SCENE = "Blueprints";
     public const string CHANGE_CLASS_SCENE = "ChangeClass";
     public const string BATTLE_SCENE = "Battle";
     public const string GAME_OVER_SCENE = "GameOver";
@@ -129,15 +127,17 @@ public class SceneMaster : MonoBehaviour
 
     public static void CloseStorage(PlayerParty playerParty) => CloseMenu(playerParty, STORAGE_SCENE, ref InStorageMenu);
 
-    public static void OpenCraftingMenu(PlayerParty playerParty, Crafter crafter)
+    public static void OpenCraftingMenu(PlayerParty playerParty, Crafter crafter, InventorySystem.ListType craftables)
     {
-        /*GameplayMaster.Party = playerParty;
-        SceneManager.LoadScene(CRAFTING_SCENE, LoadSceneMode.Additive);
-        InCraftingMenu = true;
-        Time.timeScale = 0;*/
+        GameplayMaster.CraftingMode = craftables;
+        OpenMapMenu(playerParty);
     }
 
-    public static void CloseCraftingMenu(PlayerParty playerParty) => CloseMenu(playerParty, CRAFTING_SCENE, ref InCraftingMenu);
+    public static void CloseCraftingMenu(PlayerParty playerParty)
+    {
+        GameplayMaster.CraftingMode = InventorySystem.ListType.None;
+        CloseMapMenu(playerParty);
+    }
 
     public static void OpenChangeClassMenu(PlayerParty playerParty) => OpenMenu(playerParty, CHANGE_CLASS_SCENE, ref InShop);
 

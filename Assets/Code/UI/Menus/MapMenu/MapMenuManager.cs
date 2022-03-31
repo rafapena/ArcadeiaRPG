@@ -30,8 +30,10 @@ public class MapMenuManager : MonoBehaviour
         if (!Stats.gameObject.activeSelf) Stats.gameObject.SetActive(true);
         if (!Map.gameObject.activeSelf) Map.gameObject.SetActive(true);
         if (!Objectives.gameObject.activeSelf) Objectives.gameObject.SetActive(true);
+
         PartyInfo = GameplayMaster.Party;
-        Main.Open();
+        if (GameplayMaster.IsCrafting) GoToBlueprints();
+        else Main.Open();
     }
 
     private void Update()

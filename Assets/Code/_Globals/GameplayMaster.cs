@@ -37,6 +37,8 @@ public class GameplayMaster : MonoBehaviour
 
     public static PlayerParty Party;
     public static Shopkeeper Shop;
+    public static InventorySystem.ListType CraftingMode;
+    public static bool IsCrafting => CraftingMode != InventorySystem.ListType.None;
 
     private void Awake()
     {
