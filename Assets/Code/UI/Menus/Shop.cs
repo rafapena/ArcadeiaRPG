@@ -22,14 +22,14 @@ public class Shop : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameOper
     public GameObject BuyingListBlock;
     public ObtainingWeapons WeaponsUI;
     public TextMeshProUGUI CarryingAmount;
-    public TextMeshProUGUI GoldAmountBuying;
+    public NumberUpdater GoldAmountBuying;
     public GameObject NotEnoughGoldText;
     private IToolForInventory SelectedToolToInventory;
 
     // Selling - general
     public ToolListCollectionFrame SellingFrame;
     public GameObject GoldAmountSellingFrame;
-    public TextMeshProUGUI GoldAmountSellingValue;
+    public NumberUpdater GoldAmountSellingValue;
     public GameObject AddedGoldFrame;
     public GameObject AddedGoldIcon;
     public TextMeshProUGUI AddedGoldValue;
@@ -52,8 +52,6 @@ public class Shop : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameOper
     private bool DoneTransaction;
     private float JustTransactedTimer;
     private float TRANSACTED_TIME_BUFFER = 0.5f;
-    private int DisplayedGold;
-    private int DisplayedGoldChangeSpeed;
 
     private bool isBuying => SceneMaster.BuyingInShop;
 
@@ -65,7 +63,8 @@ public class Shop : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameOper
         Shopkeep = GameplayMaster.Shop;
         PartyInfo.Inventory.UpdateToCurrentWeight();
         WeaponsUI.Initialize(PartyInfo);
-        DisplayedGold = PartyInfo.Inventory.Gold;
+        GoldAmountBuying.Initialize(PartyInfo.Inventory.Gold);
+        GoldAmountSellingValue.Initialize(PartyInfo.Inventory.Gold);
         if (isBuying) BuyingFrame.Activate();
         else
         {
@@ -85,8 +84,6 @@ public class Shop : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameOper
     {
         bool select = InputMaster.ProceedInMenu;
         bool back = InputMaster.GoingBack;
-        if (isBuying) RefreshGoldDisplayBuying();
-        else RefreshGoldDisplaySelling();
 
         switch (Selection)
         {
@@ -159,20 +156,6 @@ public class Shop : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameOper
     private bool PriceHighEnough(IToolForInventory tool)
     {
         return PartyInfo.Inventory.Gold >= tool.Price;
-    }
-
-    private void RefreshGoldDisplayBuying()
-    {
-        int targetGold = PartyInfo.Inventory.Gold;
-        DisplayedGold = (DisplayedGold > targetGold) ? (DisplayedGold - DisplayedGoldChangeSpeed) : targetGold;
-        GoldAmountBuying.text = DisplayedGold.ToString();
-    }
-
-    private void RefreshGoldDisplaySelling()
-    {
-        int targetGold = PartyInfo.Inventory.Gold;
-        DisplayedGold = (DisplayedGold < targetGold) ? (DisplayedGold + DisplayedGoldChangeSpeed) : targetGold;
-        GoldAmountSellingValue.text = DisplayedGold.ToString();
     }
     
     private void UpdateCarryingAmount()
@@ -333,14 +316,13 @@ public class Shop : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameOper
         ResultCheckFrame.SetActive(false);
         TransactionConfirmedFrame.SetActive(true);
         int total = isBuying ? ConfirmPurchase() : ConfirmSell();
-        DisplayedGoldChangeSpeed = total / 60 + 1;
         JustTransactedTimer = Time.unscaledTime + TRANSACTED_TIME_BUFFER;
     }
 
     private int ConfirmPurchase()
     {
         int total = ConfirmFrame.Amount * SelectedToolToInventory.Price;
-        PartyInfo.Inventory.Gold -= total;
+        GoldAmountBuying.Add(ref PartyInfo.Inventory.Gold, -total);
         PartyInfo.Inventory.Add(SelectedToolToInventory, ConfirmFrame.Amount);
         WeaponsUI.AmountToEquip = ConfirmFrame.Amount;
 
@@ -354,7 +336,7 @@ public class Shop : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameOper
     {
         IToolForInventory tool = SellingFrame.ToolList.SelectedObject;
         int total = ConfirmFrame.Amount * tool.SellPrice;
-        PartyInfo.Inventory.Gold += total;
+        GoldAmountSellingValue.Add(ref PartyInfo.Inventory.Gold, total);
         PartyInfo.Inventory.Remove(tool, ConfirmFrame.Amount);
         TransactionConfirmedFrame.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = "Sold " + tool.Info.Name;
         TransactionConfirmedFrame.transform.GetChild(1).GetComponent<Image>().sprite = tool.Info.GetComponent<SpriteRenderer>().sprite;

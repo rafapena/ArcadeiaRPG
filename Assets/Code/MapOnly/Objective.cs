@@ -6,8 +6,6 @@ public class Objective : BaseObject
     public enum Types { Main, Secondary, Other };
 
     public Types Type;
-    public int EXPReward;
-    public InventorySystem InventoryRewards;
     public List<SubObjective> NextObjectives;
 
     [HideInInspector] public bool Marked;

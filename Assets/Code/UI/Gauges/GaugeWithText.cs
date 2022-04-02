@@ -10,16 +10,19 @@ public abstract class GaugeWithText : Gauge
     public TextMeshProUGUI Label;   // Used by child subclasses
     public bool KeepTextColorOnEmpty;
 
-    protected static Color NormalColor;
-    protected static Color EmptyBarTextColor;
-    protected static Color SurpassedCapColor = new Color(0.8f, 0.2f, 0.2f);
-    protected static Color KOdColor = new Color(0.8f, 0.1f, 0.1f);
+    protected Color NormalTextColor;
+    protected Color NormalBarColor;
+    protected Color EmptyBarTextColor;
+    protected static Color SurpassedCapTextColor = new Color(0.8f, 0.2f, 0.2f);
+    protected static Color SurpassedCapBarColor = new Color(0.6f, 0.2f, 0.2f);
+    protected static Color KOdColor = new Color(0.6f, 0.1f, 0.1f);
 
     protected override void Awake()
     {
         base.Awake();
-        NormalColor = Color.white;
-        EmptyBarTextColor = KeepTextColorOnEmpty ? NormalColor : KOdColor;
+        NormalTextColor = Color.white;
+        NormalBarColor = Bar.color;
+        EmptyBarTextColor = KeepTextColorOnEmpty ? NormalTextColor : KOdColor;
     }
 
     protected override void SetBarAmount()
@@ -37,7 +40,7 @@ public abstract class GaugeWithText : Gauge
     public override void Fill()
     {
         base.Fill();
-        if (Title) Title.color = NormalColor;
+        if (Title) Title.color = NormalTextColor;
     }
 
     public override void Empty()
@@ -52,15 +55,15 @@ public abstract class GaugeWithText : Gauge
     {
         if (SurpassedCap())
         {
-            if (Title) Title.color = SurpassedCapColor;
-            Label.color = SurpassedCapColor;
-            Bar.color = SurpassedCapColor;
+            if (Title) Title.color = SurpassedCapTextColor;
+            Label.color = SurpassedCapTextColor;
+            Bar.color = SurpassedCapBarColor;
         }
         else if (NotEmpty())
         {
-            if (Title) Title.color = NormalColor;
-            Label.color = NormalColor;
-            Bar.color = NormalColor;
+            if (Title) Title.color = NormalTextColor;
+            Label.color = NormalTextColor;
+            Bar.color = NormalBarColor;
         }
         else
         {

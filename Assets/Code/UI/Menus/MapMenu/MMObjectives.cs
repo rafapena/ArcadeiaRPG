@@ -16,15 +16,12 @@ public class MMObjectives : MM_Super
     // Selection lists
     public ObjectiveSelectionList ObjectivesList;
     public ObjectiveSelectionList SubObjectivesList;
-    //public InventoryToolSelectionList RewardsToolList;
 
     // Child GameObjects
     public MenuFrame InfoFrame;
     public GameObject ObjectivesListTabs;
     public TextMeshProUGUI[] StaticLabels;
     public TextMeshProUGUI NameLabel;
-    //public TextMeshProUGUI GoldLabel;
-    //public TextMeshProUGUI EXPLabel;
     public TextMeshProUGUI DescriptionLabel;
 
     // General selection content
@@ -124,14 +121,9 @@ public class MMObjectives : MM_Super
     private void SetupObjective()
     {
         ObjectivesList.SetSelected();
-        //RewardsToolList.gameObject.SetActive(true);
         GenerateSubObjectivesList(ObjectivesList.SelectedObject.NextObjectives);
         SubObjectivesList.Refresh(SubObjectivesData);
         NameLabel.text = ObjectivesList.SelectedObject.Name.ToUpper();
-        //GoldLabel.text = ObjectivesList.SelectedObject.InventoryRewards.Gold.ToString();
-        //EXPLabel.text = ObjectivesList.SelectedObject.EXPReward.ToString();
-        List<IToolForInventory> list = ObjectivesList.SelectedObject.InventoryRewards.GetItemsAndWeapons();
-        //RewardsToolList.Setup(list, list.Count);
         SetupDescription();
     }
 
@@ -175,12 +167,9 @@ public class MMObjectives : MM_Super
     {
         ObjectivesList.gameObject.SetActive(visibility);
         SubObjectivesList.gameObject.SetActive(visibility);
-        //RewardsToolList.gameObject.SetActive(visibility);
         foreach (TextMeshProUGUI text in StaticLabels)
             text.gameObject.SetActive(visibility);
         NameLabel.gameObject.SetActive(visibility);
-        //GoldLabel.gameObject.SetActive(visibility);
-        //EXPLabel.gameObject.SetActive(visibility);
         DescriptionLabel.gameObject.SetActive(visibility);
     }
 

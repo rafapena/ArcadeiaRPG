@@ -20,24 +20,16 @@ public class CutsceneManager : MonoBehaviour
     public GameObject ChoicesList;
 
     public MenuFrame GoldFrame;
-    public TextMeshProUGUI GoldAmount;
-    private int DisplayedGold;
-    private int GoldChangeSpeed;
+    public NumberUpdater GoldAmount;
 
     private string FullText;
     private bool IsPrintingDialogue = false;
-
-    private void Update()
-    {
-        if (!SceneMaster.InCutscene) return;
-        UpdateGoldDisplay();
-    }
 
     public void Open(MapPlayer player)
     {
         SceneMaster.OpenCutscene();
         Player = player;
-        DisplayedGold = player.Party.Inventory.Gold;
+        GoldAmount.Initialize(player.Party.Inventory.Gold);
         gameObject.SetActive(true);
         ChoicesFrame.SetActive(false);
     }
@@ -185,19 +177,6 @@ public class CutsceneManager : MonoBehaviour
     public void ChangeGold(int amount)
     {
         if (!SceneMaster.InCutscene) return;
-        Player.Party.Inventory.Gold += amount;
-        if (Player.Party.Inventory.Gold <= 0) Player.Party.Inventory.Gold = 0;
-        GoldChangeSpeed = amount / 60 + (amount > 0 ? 1 : -1);
-    }
-
-    private void UpdateGoldDisplay()
-    {
-        GoldAmount.text = DisplayedGold.ToString();
-        DisplayedGold += GoldChangeSpeed;
-        if (GoldChangeSpeed < 0 && DisplayedGold < Player.Party.Inventory.Gold || GoldChangeSpeed > 0 && DisplayedGold > Player.Party.Inventory.Gold)
-        {
-            DisplayedGold = Player.Party.Inventory.Gold;
-            GoldChangeSpeed = 0;
-        }
+        GoldAmount.Add(ref Player.Party.Inventory.Gold, amount);
     }
 }
