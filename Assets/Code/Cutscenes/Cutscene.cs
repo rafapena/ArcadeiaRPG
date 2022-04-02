@@ -146,7 +146,7 @@ public class Cutscene : MonoBehaviour
 
     public void ChangeGold(int amount) => Manager.ChangeGold(amount);
 
-    public void ClearObjective(Objective obj) => Manager.ClearObjective(obj);
+    public void ClearSubObjective(SubObjective obj) => Manager.ClearSubObjective(obj);
 
     public void SetToolQuantity(int amount) => ToolQuantityController = amount;
 

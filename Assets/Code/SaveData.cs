@@ -120,7 +120,8 @@ public class SaveData
 
     private void SaveRelations()
     {
-        foreach (PlayerRelation pr in GameplayMaster.Party.Relations) PlayerPrefs.SetInt("Relation" + "_" + pr.Player1.Id + "_" + pr.Player2.Id + "_" + File, pr.Points);
+        int i = 0;
+        foreach (PlayerRelation pr in GameplayMaster.Party.Relations) PlayerPrefs.SetString("Relation" + i++ + "_" + File, pr.Player1.Id + "_" + pr.Player2.Id + "_" + pr.Points);
         PlayerPrefs.SetInt("RelationsCount" + "_" + File, GameplayMaster.Party.Relations.Count);
     }
 

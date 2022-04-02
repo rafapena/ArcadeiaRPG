@@ -143,14 +143,15 @@ public class PlayerParty : MonoBehaviour
 
     private void LoadRelations(int file)
     {
-        /*Relations = new List<PlayerRelation>(PlayerPrefs.GetInt("RelationsCount_" + file));
+        Relations = new List<PlayerRelation>(PlayerPrefs.GetInt("RelationsCount_" + file));
         for (int i = 0; i < Relations.Count; i++)
         {
-            Relations[i] = new PlayerRelation();
-            string str = bt + "Relation" + i + "_" + file;
-            if (PlayerPrefs.HasKey(str)) p.Relations[i].SetPoints(PlayerPrefs.GetInt(str));
-            PlayerPrefs.GetInt("Relation" + "_" + pr.Player1.Id + "_" + pr.Player2.Id + "_" + file);
-        }*/
+            string[] pString = PlayerPrefs.GetString("Relation" + i + "_" + file).Split('_');
+            BattlePlayer p1 = ResourcesMaster.Players.Where(x => x.Id == int.Parse(pString[0])).Single();
+            BattlePlayer p2 = ResourcesMaster.Players.Where(x => x.Id == int.Parse(pString[1])).Single();
+            Relations[i] = new PlayerRelation(p1, p2);
+            Relations[i].SetPoints(int.Parse(pString[2]));
+        }
     }
 
     private void LoadInventory(int file)

@@ -23,8 +23,7 @@ public class MapPlayer : MapExplorer
         base.Start();
         Party.Setup();
         TEST_SETUP();
-        //if (GameplayMaster.SelectedFile == 0) TEST_SETUP();
-        //else if (GameplayMaster.NoFileSelected()) SetupPartyNew();
+        //if (GameplayMaster.NoFileSelected()) SetupPartyNew();
         //else if (!GameplayMaster.FinishedLoadingContent()) Party.LoadFromFile(GameplayMaster.SelectedFile, this);
         //else Setup();
         GameplayMaster.Party = Party;
@@ -62,11 +61,7 @@ public class MapPlayer : MapExplorer
             b.HP = b.Stats.MaxHP;
             b.SP = 100;
             b.gameObject.SetActive(false);
-            if (b.GetType().Name == "BattlePlayer")
-            {
-                BattlePlayer p = all[i] as BattlePlayer;
-                p.AddLearnedSkills();
-            }
+            if (b is BattlePlayer p) p.AddLearnedSkills();
             for (int j = 0; j < b.Skills.Count; j++) b.Skills[j] = Instantiate(b.Skills[j], b.transform);
             for (int j = 0; j < b.Weapons.Count; j++) b.Weapons[j] = Instantiate(b.Weapons[j], b.transform);
             for (int j = 0; j < b.States.Count; j++) b.States[j] = Instantiate(b.States[j], b.transform);
@@ -86,18 +81,14 @@ public class MapPlayer : MapExplorer
         for (int i = 0; i < all.Count; i++)
         {
             all[i] = Instantiate(all[i], gameObject.transform);
-            all[i].Level = Party.Level;
-            if (all[i].Weapons.Count > 0) all[i].SelectedWeapon = all[i].Weapons[0];
-            all[i].StatConversion();
-            all[i].HP = all[i].Stats.MaxHP / 2;
-            all[i].SP = 100 / 2;
-            all[i].gameObject.SetActive(false);
-            if (all[i].GetType().Name == "BattlePlayer")
-            {
-                BattlePlayer p = all[i] as BattlePlayer;
-                p.AddLearnedSkills();
-            }
             Battler b = all[i];
+            b.Level = Party.Level;
+            if (b.Weapons.Count > 0) b.SelectedWeapon = b.Weapons[0];
+            b.StatConversion();
+            b.HP = b.Stats.MaxHP / 2;
+            b.SP = 100 / 2;
+            b.gameObject.SetActive(false);
+            if (b is BattlePlayer p) p.AddLearnedSkills();
             for (int j = 0; j < b.Skills.Count; j++) b.Skills[j] = Instantiate(b.Skills[j], b.transform);
             for (int j = 0; j < b.Weapons.Count; j++) b.Weapons[j] = Instantiate(b.Weapons[j], b.transform);
             for (int j = 0; j < b.States.Count; j++) b.States[j] = Instantiate(b.States[j], b.transform);

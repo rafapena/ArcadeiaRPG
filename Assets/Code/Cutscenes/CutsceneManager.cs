@@ -50,6 +50,8 @@ public class CutsceneManager : MonoBehaviour
     {
         SceneMaster.CloseCutscene(Player);
         HideGold();
+        ObjectiveFrame.Deactivate();
+        ItemsFrame.Deactivate();
         gameObject.SetActive(false);
         ChoicesFrame.SetActive(false);
     }
@@ -192,7 +194,7 @@ public class CutsceneManager : MonoBehaviour
         GoldAmount.Add(ref Player.Party.Inventory.Gold, amount);
     }
 
-    public void ClearObjective(Objective obj)
+    public void ClearSubObjective(SubObjective obj)
     {
         //Player.Party.LoggedObjectives.Find;
         ObjectiveFrame.Activate();
