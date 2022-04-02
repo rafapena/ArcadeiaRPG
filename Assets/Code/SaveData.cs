@@ -93,6 +93,7 @@ public class SaveData
         PlayerPrefs.SetInt("NumberOfPlayers", numberOfPlayers);
         foreach (BattleAlly ally in p.Allies) SaveBattler(i++, ally);
         PlayerPrefs.SetInt("NumberOfAllies", i - numberOfPlayers);
+        SaveRelations();
         SaveInventory();
         SaveObjectives();
     }
@@ -108,12 +109,6 @@ public class SaveData
         SaveBattlersList(b.Accessories, bt);
         SaveBattlersList(b.States, bt);
         if (b.Weapons.Count > 0) PlayerPrefs.SetInt(bt + "SelectedWeapon_" + File, b.SelectedWeapon.Id);
-        BattlePlayer p = b as BattlePlayer;
-        if (!p) return;
-        for (int i = 0; i < p.Relations.Count; i++)
-        {
-            if (p.Relations[i] != null) PlayerPrefs.SetInt(bt + "Relation" + i + "_" + File, p.Relations[i].Points);
-        }
     }
 
     private void SaveBattlersList<T>(List<T> list, string pre) where T : BaseObject
@@ -121,6 +116,12 @@ public class SaveData
         int i = 0;
         foreach (T entry in list) PlayerPrefs.SetInt(pre + typeof(T).Name + i++ + "_" + File, entry.Id);
         PlayerPrefs.SetInt(pre + typeof(T).Name + "Count_" + File, i);
+    }
+
+    private void SaveRelations()
+    {
+        foreach (PlayerRelation pr in GameplayMaster.Party.Relations) PlayerPrefs.SetInt("Relation" + "_" + pr.Player1.Id + "_" + pr.Player2.Id + "_" + File, pr.Points);
+        PlayerPrefs.SetInt("RelationsCount" + "_" + File, GameplayMaster.Party.Relations.Count);
     }
 
     private void SaveInventory()

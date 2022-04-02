@@ -9,19 +9,21 @@ using TMPro;
 
 public class RelationBar : MonoBehaviour
 {
-    public TextMeshProUGUI Status;
-    public Image Bar;
-    public GridLayoutGroup Circles;
+    public TextMeshProUGUI Name;
+    public Image Image;
+    public Gauge Gauge;
+    public Transform StarsList;
+    public Sprite WholeStar;
+    public Sprite EmptyStar;
 
-    private Color PastCircleColor = new Color(0.6f, 1f, 0.6f);
-
-    public void Setup(PlayerRelation companionShip)
+    public void Refresh(BattlePlayer p, PlayerRelation relation)
     {
-        Status.text = companionShip.Player.Name;    // BattleMaster.CompanionshipLevels[companionShip.Level];
-        RectTransform rt = Bar.transform.GetComponent<RectTransform>();
-        float xLength = (Circles.cellSize.x + Circles.spacing.x) * (BattleMaster.CompanionshipLevels.Length - 1);
-        rt.sizeDelta = new Vector3(xLength, rt.sizeDelta.y);
-        for (int i = 0; i < companionShip.Level; i++)
-            Circles.transform.GetChild(i).GetComponent<Image>().color = PastCircleColor;
+        Name.text = relation.GetOtherPlayerInRelationWith(p).Name;
+        int min = relation.Level == 0 ? 0 : PlayerRelation.PointMarkers[relation.Level - 1];
+        int current = relation.Points - min;
+        int max = relation.Level == PlayerRelation.PointMarkers.Length ? current : (PlayerRelation.PointMarkers[relation.Level] - min);
+        Gauge.Set(current, max);
+        int i = 0;
+        foreach (Transform star in StarsList) star.GetComponent<Image>().sprite = i++ < relation.Level ? WholeStar : EmptyStar;
     }
 }

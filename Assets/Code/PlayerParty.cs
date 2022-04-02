@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
 using UnityEngine.UI;
@@ -30,8 +31,9 @@ public class PlayerParty : MonoBehaviour
     public List<Weapon> CraftableWeapons;
     public List<Accessory> CraftableAccessories;
 
-    [HideInInspector] public float PreemptiveAttackChance;
-    
+    // Relations
+    [HideInInspector] public List<PlayerRelation> Relations = new List<PlayerRelation>();
+    public List<PlayerRelation> PreExistingRelations;
 
     private void Start()
     {
@@ -66,20 +68,18 @@ public class PlayerParty : MonoBehaviour
 
     private void SetupRelations()
     {
-        bool[] playerInParty = new bool[ResourcesMaster.Players.Length];
-        foreach (BattlePlayer p in AllPlayers)
+        Relations.Clear();
+        for (int i = 0; i < AllPlayers.Count; i++)
         {
-            playerInParty[p.Id] = true;
+            for (int j = i + 1; j < AllPlayers.Count; j++) Relations.Add(new PlayerRelation(AllPlayers[i], AllPlayers[j]));
         }
-        foreach (BattlePlayer p in AllPlayers)
-        {
-            p.Relations = new List<PlayerRelation>();
-            for (int j = 0; j < ResourcesMaster.Players.Length; j++) p.Relations.Add(null);
-            foreach (PreExistingRelation pr in p.PreExistingRelations)
-            {
-                if (playerInParty[pr.Player.Id]) p.Relations[pr.Player.Id] = new PlayerRelation(pr.Player, pr.RelationLevel);
-            }
-        }  
+        foreach (PlayerRelation per in PreExistingRelations) GetRelation(per.Player1, per.Player2).SetLevel(per.Level);
+    }
+
+    public PlayerRelation GetRelation(BattlePlayer p1, BattlePlayer p2)
+    {
+        IEnumerable<PlayerRelation> r = Relations.Where(x => x.PlayerInRelation(p1) && x.PlayerInRelation(p2));
+        return r.Any() ? r.First() : default;
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -104,6 +104,7 @@ public class PlayerParty : MonoBehaviour
         }
         for (int i = playerIndexCap; i < allyIndexCap; i++) LoadBattler(file, mp, ResourcesMaster.Allies, i);
         UpdateAll(GetWholeParty());
+        LoadRelations(file);
         LoadInventory(file);
         LoadStorage(file);
         LoadObjectives(file, mp);
@@ -123,16 +124,6 @@ public class PlayerParty : MonoBehaviour
         b.States = LoadBattlersList(file, b, ResourcesMaster.States, bt);
         string sw = bt + "SelectedWeapon_" + file;
         if (PlayerPrefs.HasKey(sw)) b.SelectedWeapon = b.Weapons.Find(x => x.Id == PlayerPrefs.GetInt(sw));
-        BattlePlayer p = b as BattlePlayer;
-        if (p)
-        {
-            p.Relations = new List<PlayerRelation>(ResourcesMaster.Players.Length);
-            for (int i = 0; i < p.Relations.Count; i++)
-            {
-                string str = bt + "Relation" + i + "_" + file;
-                if (PlayerPrefs.HasKey(str)) p.Relations[i].SetPoints(PlayerPrefs.GetInt(str));
-            }
-        }
         b.gameObject.SetActive(false);
         return b as T;
     }
@@ -148,6 +139,18 @@ public class PlayerParty : MonoBehaviour
             destList.Add(obj);
         }
         return destList;
+    }
+
+    private void LoadRelations(int file)
+    {
+        /*Relations = new List<PlayerRelation>(PlayerPrefs.GetInt("RelationsCount_" + file));
+        for (int i = 0; i < Relations.Count; i++)
+        {
+            Relations[i] = new PlayerRelation();
+            string str = bt + "Relation" + i + "_" + file;
+            if (PlayerPrefs.HasKey(str)) p.Relations[i].SetPoints(PlayerPrefs.GetInt(str));
+            PlayerPrefs.GetInt("Relation" + "_" + pr.Player1.Id + "_" + pr.Player2.Id + "_" + file);
+        }*/
     }
 
     private void LoadInventory(int file)
@@ -228,18 +231,6 @@ public class PlayerParty : MonoBehaviour
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// -- Companionship Info --
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    public PlayerRelation GetCompanionshipInfo(BattlePlayer p1, BattlePlayer p2)
-    {
-        foreach (PlayerRelation pc in p1.Relations)
-            if (pc.Player.Id == p2.Id)
-                return pc;
-        return null;    // Function should never actually go here: Indicates a malformed setup, otherwise
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- Combining Lists --
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -268,6 +259,5 @@ public class PlayerParty : MonoBehaviour
         }
         UpdateActivePlayers();
         SetupExpCurve();
-        SetupRelations();
     }
 }

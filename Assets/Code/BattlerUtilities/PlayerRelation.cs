@@ -1,33 +1,78 @@
 ﻿using System;
 using UnityEngine;
 
+[Serializable]
 public class PlayerRelation
 {
-    public enum RelationLevels { Acquaintances, Friends, BestFriends }
-    private static int[] PointMarkers = new int[] { 100, 200, 300 };
-    private int MAX_RELATION_LEVEL;
+    public static int[] PointMarkers = new int[] { 100, 200, 350, 500, 800, 1200 };
 
-    public BattlePlayer Player;
+    public int MAX_RELATION_LEVEL { get; private set; }
+
+    public BattlePlayer Player1;
+    public BattlePlayer Player2;
 
     public int Points { get; private set; }
-    
-    public int Level { get; private set; }
 
-    public PlayerRelation(BattlePlayer player, RelationLevels relationLevel)
+    [SerializeField]
+    private int _Level;
+    public int Level { get => _Level; private set => _Level = value; }
+
+    public PlayerRelation(BattlePlayer player1, BattlePlayer player2)
     {
-        MAX_RELATION_LEVEL = Enum.GetNames(typeof(RelationLevels)).Length;
-        Player = player;
-        Level = (int)relationLevel + 1;
-        Points = PointMarkers[Level - 1];
+        MAX_RELATION_LEVEL = PointMarkers.Length;
+        Player1 = player1;
+        Player2 = player2;
+        Points = 0;
+        _Level = 0;
     }
 
-    public int SetPoints(int points)
+    public void SetPoints(int points)
     {
         Points = points;
-        int gain = 0;
-        while (Level < MAX_RELATION_LEVEL && Points > PointMarkers[Level - 1]) gain++;
-        while (Level > 1 && Points < PointMarkers[Level - 2]) gain--;
-        Level += gain;
-        return gain;
+        int i = 0;
+        while (Level != MAX_RELATION_LEVEL && points >= PointMarkers[i++]) Level++;
+        while (Level != 0 && points < PointMarkers[i--]) Level--;
+    }
+
+    public void SetLevel(int level)
+    {
+        if (level <= 0)
+        {
+            Points = 0;
+            Level = 0;
+        }
+        else if (level > PointMarkers.Length)
+        {
+            Points = PointMarkers[PointMarkers.Length - 1];
+            Level = PointMarkers.Length;
+        }
+        else // Normal settings
+        {
+            Points = PointMarkers[level - 1];
+            Level = level;
+        }
+    }
+
+    public bool PlayerInRelation(BattlePlayer p)
+    {
+        return p.Id == Player1.Id || p.Id == Player2.Id;
+    }
+
+    public BattlePlayer GetOtherPlayerInRelationWith(BattlePlayer p)
+    {
+        return PlayerInRelation(p) ? (p.Id == Player1.Id ? Player2 : Player1) : null;
+    }
+
+    public void AddPoints(int points)
+    {
+        if (Level == MAX_RELATION_LEVEL) return;
+        Points += points;
+        if (Points > PointMarkers[Level]) Points = PointMarkers[Level];
+    }
+
+    public void LevelUp()
+    {
+        Points += 10;
+        Level++;
     }
 }

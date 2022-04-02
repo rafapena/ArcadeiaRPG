@@ -13,10 +13,8 @@ public class BattlePlayer : Battler
     public int AssistDamageRate = 100;
     public List<BattlerClass> ClassSet;
     public List<SkillLearnLevel> SkillSet;
-    public PreExistingRelation[] PreExistingRelations;
 
     [HideInInspector] public Skill AttackSkill;
-    [HideInInspector] public List<PlayerRelation> Relations;
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- Setup --

@@ -21,7 +21,7 @@ public class MMEquips : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOpera
 
     // Child GameObjects
     public ToolListCollectionFrame InventoryFrame;
-    public GameObject EquippedToolsFrame;
+    public MenuFrame EquippedToolsFrame;
 
     // General selection tracking
     private bool SelectingEquipment => InventoryFrame.CurrentInventoryList == InventorySystem.ListType.Weapons || InventoryFrame.CurrentInventoryList == InventorySystem.ListType.Accessories;
@@ -83,7 +83,7 @@ public class MMEquips : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOpera
         InventoryFrame.SelectingToolList();
         InventoryFrame.TargetFrame.Deactivate();
         InventoryFrame.ToolList.ClearSelections();
-        EquippedToolsFrame.SetActive(false);
+        EquippedToolsFrame.Deactivate();
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -107,7 +107,7 @@ public class MMEquips : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOpera
     {
         PartyList.SetSelected();
         EquippedToolsOwner.text = PartyList.SelectedObject.Name.ToUpper();
-        EquippedToolsFrame.SetActive(true);
+        EquippedToolsFrame.Activate();
         EquippedTools.Refresh(PartyList.SelectedObject.Equipment, BattleMaster.MAX_NUMBER_OF_EQUIPS, true);
         StatsList.Setup(PartyList.SelectedObject as BattlePlayer);
         StatsList.gameObject.SetActive(true);
@@ -116,7 +116,7 @@ public class MMEquips : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOpera
     public void DeselectingTeammates()
     {
         if (Selection != Selections.PartyList) return;
-        EquippedToolsFrame.SetActive(false);
+        EquippedToolsFrame.Deactivate();
         StatsList.gameObject.SetActive(false);
     }
 

@@ -205,7 +205,7 @@ public class ChangeClass : MonoBehaviour
         {
             Image starImg = statEntryStars.GetChild(i).GetComponent<Image>();
             if (stat >= 10) starImg.sprite = WholeStar;
-            else if (stat > 0) starImg.sprite = HalfStar;
+            else if (stat > 3) starImg.sprite = HalfStar;
             else starImg.sprite = EmptyStar;
             stat -= 10;
         }

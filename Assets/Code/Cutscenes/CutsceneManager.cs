@@ -21,9 +21,21 @@ public class CutsceneManager : MonoBehaviour
 
     public MenuFrame GoldFrame;
     public NumberUpdater GoldAmount;
+    public MenuFrame ObjectiveFrame;
+    public MenuFrame ItemsFrame;
+    private float ObjectiveFrameTimer;
+    private float ItemsFrameTimer;
+    private float OBJECTIVE_FRAME_TIME = 5f;
+    private float ITEMS_FRAME_TIME = 4f;
 
     private string FullText;
     private bool IsPrintingDialogue = false;
+
+    private void Update()
+    {
+        if (ObjectiveFrame.Activated && Time.unscaledTime > ObjectiveFrameTimer) ObjectiveFrame.Deactivate();
+        else if (ItemsFrame.Activated && Time.unscaledTime > ItemsFrameTimer) ItemsFrame.Deactivate();
+    }
 
     public void Open(MapPlayer player)
     {
@@ -161,7 +173,7 @@ public class CutsceneManager : MonoBehaviour
 
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// -- Gold management --
+    /// -- UI Frame Management --
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public void DisplayGold()
@@ -178,5 +190,24 @@ public class CutsceneManager : MonoBehaviour
     {
         if (!SceneMaster.InCutscene) return;
         GoldAmount.Add(ref Player.Party.Inventory.Gold, amount);
+    }
+
+    public void ClearObjective(Objective obj)
+    {
+        //Player.Party.LoggedObjectives.Find;
+        ObjectiveFrame.Activate();
+        ObjectiveFrameTimer = Time.unscaledTime + OBJECTIVE_FRAME_TIME;
+        //ObjectiveFrame.transform.GetChild(1).GetComponent<Tmage>(). = ;
+        ObjectiveFrame.transform.GetChild(2).GetComponent<TextMeshProUGUI>().text = obj.Name;
+    }
+
+    public void AddTool(IToolForInventory tool, int quantity)
+    {
+        Player.Party.Inventory.Add(tool, quantity);
+        ItemsFrame.Activate();
+        ItemsFrameTimer = Time.unscaledTime + ITEMS_FRAME_TIME;
+        ItemsFrame.transform.GetChild(0).GetComponent<Image>().sprite = tool.Info.GetComponent<SpriteRenderer>()?.sprite ?? null;
+        ItemsFrame.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = quantity.ToString();
+        ItemsFrame.transform.GetChild(2).GetComponent<TextMeshProUGUI>().text = tool.Info.Name;
     }
 }

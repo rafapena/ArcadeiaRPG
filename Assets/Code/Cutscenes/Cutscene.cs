@@ -146,17 +146,19 @@ public class Cutscene : MonoBehaviour
 
     public void ChangeGold(int amount) => Manager.ChangeGold(amount);
 
+    public void ClearObjective(Objective obj) => Manager.ClearObjective(obj);
+
     public void SetToolQuantity(int amount) => ToolQuantityController = amount;
 
-    public void AddTool(Item tool) => Manager.Player.Party.Inventory.Remove(tool, ToolQuantityController);
+    public void AddTool(Item tool) => Manager.AddTool(tool, ToolQuantityController);
 
     public void RemoveTool(Item tool) => Manager.Player.Party.Inventory.Remove(tool, ToolQuantityController);
 
-    public void AddTool(Weapon tool) => Manager.Player.Party.Inventory.Remove(tool, ToolQuantityController);
+    public void AddTool(Weapon tool) => Manager.AddTool(tool, ToolQuantityController);
 
     public void RemoveTool(Weapon tool) => Manager.Player.Party.Inventory.Remove(tool, ToolQuantityController);
 
-    public void AddTool(Accessory tool) => Manager.Player.Party.Inventory.Remove(tool, ToolQuantityController);
+    public void AddTool(Accessory tool) => Manager.AddTool(tool, ToolQuantityController);
 
     public void RemoveTool(Accessory tool) => Manager.Player.Party.Inventory.Remove(tool);
 }

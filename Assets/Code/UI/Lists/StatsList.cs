@@ -4,9 +4,12 @@ using UnityEngine.EventSystems;
 using System.Collections;
 using UnityEngine.Events;
 using TMPro;
+using System.Collections.Generic;
+using System.Linq;
 
 public class StatsList : MonoBehaviour
 {
+    private PlayerParty Party;
     private const int NUMBER_OF_STATS = 8;
 
     public TextMeshProUGUI MaxHP;
@@ -33,15 +36,17 @@ public class StatsList : MonoBehaviour
         StatsListBoosts = new int[NUMBER_OF_STATS];
     }
 
-    public void Setup(BattlePlayer player)
+    public void Setup(BattlePlayer player, PlayerParty party = null)
     {
+        Party = party;
         SetValues(player);
         SetRelationStatBoosts(player);
         SetStatBoosts();
     }
 
-    public void Setup(BattlePlayer player, Stats otherStats)
+    public void Setup(BattlePlayer player, Stats otherStats, PlayerParty party = null)
     {
+        Party = party;
         SetValues(player);
         SetDiffStatBoosts(player, otherStats);
         SetStatBoosts();
@@ -85,17 +90,19 @@ public class StatsList : MonoBehaviour
 
     private void SetRelationStatBoosts(BattlePlayer player)
     {
-        foreach (PlayerRelation pr in player.Relations)
+        if (Party == null) return;
+        IEnumerable<PlayerRelation> relations = Party.Relations.Where(x => x.PlayerInRelation(player));
+        foreach (PlayerRelation pr in relations)
         {
-            if (pr == null) continue;
-            StatsListBoosts[0] += SetRelationStatBoost(pr, pr.Player.NaturalStats.MaxHP);
-            StatsListBoosts[1] += SetRelationStatBoost(pr, pr.Player.NaturalStats.Atk);
-            StatsListBoosts[2] += SetRelationStatBoost(pr, pr.Player.NaturalStats.Def);
-            StatsListBoosts[3] += SetRelationStatBoost(pr, pr.Player.NaturalStats.Map);
-            StatsListBoosts[4] += SetRelationStatBoost(pr, pr.Player.NaturalStats.Mar);
-            StatsListBoosts[5] += SetRelationStatBoost(pr, pr.Player.NaturalStats.Spd);
-            StatsListBoosts[6] += SetRelationStatBoost(pr, pr.Player.NaturalStats.Tec);
-            StatsListBoosts[7] += SetRelationStatBoost(pr, pr.Player.NaturalStats.Luk);
+            BattlePlayer p = pr.GetOtherPlayerInRelationWith(player);
+            StatsListBoosts[0] += SetRelationStatBoost(pr, p.NaturalStats.MaxHP);
+            StatsListBoosts[1] += SetRelationStatBoost(pr, p.NaturalStats.Atk);
+            StatsListBoosts[2] += SetRelationStatBoost(pr, p.NaturalStats.Def);
+            StatsListBoosts[3] += SetRelationStatBoost(pr, p.NaturalStats.Map);
+            StatsListBoosts[4] += SetRelationStatBoost(pr, p.NaturalStats.Mar);
+            StatsListBoosts[5] += SetRelationStatBoost(pr, p.NaturalStats.Spd);
+            StatsListBoosts[6] += SetRelationStatBoost(pr, p.NaturalStats.Tec);
+            StatsListBoosts[7] += SetRelationStatBoost(pr, p.NaturalStats.Luk);
         }
     }
 

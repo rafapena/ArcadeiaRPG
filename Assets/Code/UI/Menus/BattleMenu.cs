@@ -502,8 +502,8 @@ public class BattleMenu : MonoBehaviour
     {
         try
         {
-            PlayerRelation pcInfo = CurrentBattle.PlayerParty.GetCompanionshipInfo(CP, player as BattlePlayer);
-            return pcInfo.Points / 2;
+            //PlayerRelation pcInfo = CurrentBattle.PlayerParty.GetCompanionshipInfo(CP, player as BattlePlayer);
+            return 0;// pcInfo.Points / 2;
         }
         catch { return 0; }
     }

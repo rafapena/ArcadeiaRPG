@@ -85,7 +85,7 @@ public class MMStats : MM_Super
     {
         SetupCharacterInfo();
         Level.text = MenuManager.PartyInfo.Level.ToString();
-        StatsList.Setup(SelectedPlayer);
+        StatsList.Setup(SelectedPlayer, MenuManager.PartyInfo);
         SetupRelations();
         SetupEquipment();
         SetupRates();
@@ -115,24 +115,14 @@ public class MMStats : MM_Super
 
     public void SetupRelations()
     {
-        List<PlayerRelation> sortedRelations = SelectedPlayer.Relations;//.OrderByDescending(t => t.Points).ToList();
+        foreach (Transform t in RelationsList) t.gameObject.SetActive(false);
         int i = 0;
-        foreach (PlayerRelation pr in sortedRelations)
+        foreach (BattlePlayer p in MenuManager.PartyInfo.AllPlayers)
         {
-            if (pr == null) continue;
-            else if (MenuManager.PartyInfo.AllPlayers.Contains(pr.Player))
-            {
-                Transform entry = RelationsList.transform.GetChild(i);
-                RelationBar relBar = entry.GetChild(1).GetComponent<RelationBar>();
-                entry.gameObject.SetActive(true);
-                relBar.Setup(pr);
-            }
-            i++;
-        }
-        for (; i < RelationsList.transform.childCount; i++)
-        {
-            Transform entry = RelationsList.transform.GetChild(i);
-            entry.gameObject.SetActive(false);
+            if (p.Id == SelectedPlayer.Id) continue;
+            Transform t = RelationsList.GetChild(i++);
+            t.gameObject.SetActive(true);
+            t.GetComponent<RelationBar>().Refresh(SelectedPlayer, MenuManager.PartyInfo.GetRelation(SelectedPlayer, p));
         }
     }
 

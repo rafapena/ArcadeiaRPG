@@ -104,13 +104,11 @@ public class MMTeam : MM_Super
         int i0 = 0;
         for (; i < MenuManager.PartyInfo.Players.Count; i++)
         {
-            int playerId = MenuManager.PartyInfo.Players[i].Id;
-            if (p.Id == playerId) continue;
-            Transform entry = RelationsList.transform.GetChild(i0);
-            RelationBar relBar = entry.GetChild(1).GetComponent<RelationBar>();
+            BattlePlayer otherP = MenuManager.PartyInfo.Players[i];
+            if (p.Id == otherP.Id) continue;
+            Transform entry = RelationsList.transform.GetChild(i0++);
             entry.gameObject.SetActive(true);
-            relBar.Setup(p.Relations[playerId]);
-            i0++;
+            entry.GetComponent<RelationBar>().Refresh(p, MenuManager.PartyInfo.GetRelation(p, otherP));
         }
         for (; i0 < RelationsList.transform.childCount; i0++)
         {
