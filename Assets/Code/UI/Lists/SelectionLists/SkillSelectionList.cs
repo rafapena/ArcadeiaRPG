@@ -12,9 +12,12 @@ public class SkillSelectionList : SelectionList_Super<Skill>
     public GameObject CannotUseFrame;
     public TextMeshProUGUI CannotUseLabel;
 
-    // Colors
+    // Usability Ref
     private Battler ReferenceBattler;
+    private List<Battler> BattlersGroup;
     private static string[] Unusabilities = new string[10];
+
+    // Colors
     private Color NormalSkillColor = Color.white;
     private Color DisabledSkillColor;
 
@@ -36,8 +39,9 @@ public class SkillSelectionList : SelectionList_Super<Skill>
         Container.GetComponent<MenuFrame>().Deactivate();
     }
 
-    public void Refresh(Battler b)
+    public void Refresh(Battler b, List<Battler> bg)
     {
+        BattlersGroup = bg;
         ReferenceBattler = b;
         ReferenceData.Clear();
         NoSkillsLabel.SetActive(!b.HasAnySkills);
@@ -94,10 +98,11 @@ public class SkillSelectionList : SelectionList_Super<Skill>
     private string GetUnusability(Skill skill)
     {
         string msg = "";
-        if (!skill.CanUseOutsideOfBattle) msg = "CANNOT USE OUTSIDE OF BATTLE";
+        if (!skill.CanUseOutsideOfBattle && !SceneMaster.InBattle) msg = "CANNOT USE OUTSIDE OF BATTLE";
         else if (!skill.EnoughSPFrom(ReferenceBattler)) msg = "NOT ENOUGH SP TO USE";
         else if (!skill.UsedByClassUser(ReferenceBattler)) msg = "MUST BE A " + skill.ClassExclusives[0] + " TO USE".ToUpper();
         else if (!skill.UsedByWeaponUser(ReferenceBattler)) msg = "MUST HAVE A " + skill.WeaponExclusives[0] + " TO USE".ToUpper();
+        else if (!skill.AvailableTeammateTargets(ReferenceBattler, BattlersGroup)) msg = "NO AVAILABLE SELECTIONS WITHIN SCOPE";
         return msg;
     }
 

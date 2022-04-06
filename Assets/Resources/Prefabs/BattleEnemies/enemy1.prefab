@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 8319115907229363102}
   - component: {fileID: 3214752361891919622}
   - component: {fileID: 8291054806135509583}
-  m_Layer: 10
+  m_Layer: 11
   m_Name: Properties
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -111,7 +111,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1250328457163572579}
-  m_Layer: 10
+  m_Layer: 11
   m_Name: States
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -148,7 +148,7 @@ GameObject:
   - component: {fileID: 3077822174950779534}
   - component: {fileID: 7445137599958464949}
   - component: {fileID: 4782090350385324278}
-  m_Layer: 10
+  m_Layer: 11
   m_Name: HP
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -250,7 +250,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5474075392393044341}
   - component: {fileID: 1148962807525809724}
-  m_Layer: 10
+  m_Layer: 11
   m_Name: State3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -332,7 +332,7 @@ GameObject:
   - component: {fileID: 7334759470207144784}
   - component: {fileID: 5981881042964782753}
   - component: {fileID: 5302408967200719149}
-  m_Layer: 10
+  m_Layer: 11
   m_Name: Key
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -407,7 +407,8 @@ GameObject:
   - component: {fileID: 3433565585831540351}
   - component: {fileID: 1061896022351797397}
   - component: {fileID: 817317665460558166}
-  m_Layer: 10
+  - component: {fileID: -8410700116079560876}
+  m_Layer: 11
   m_Name: enemy1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -524,7 +525,9 @@ MonoBehaviour:
   RowPosition: 0
   ColumnPosition: 0
   Figure: {fileID: 0}
+  Speed: 0
   MainImage: {fileID: 0}
+  FaceImage: {fileID: 0}
   Level: 1
   Class: {fileID: 0}
   HP: 0
@@ -557,10 +560,10 @@ MonoBehaviour:
     Cev: 0
   Skills: []
   Weapons: []
+  Accessories: []
   SelectedSkill: {fileID: 0}
   SelectedWeapon: {fileID: 0}
   SelectedItem: {fileID: 0}
-  SelectedTeamSkillPartners: []
   SelectedTargets: []
   States: []
   ExecutedAction: 0
@@ -606,6 +609,27 @@ MonoBehaviour:
   MultiplyHP: 1
   ExtraTurns: 0
   IsSummon: 0
+--- !u!50 &-8410700116079560876
+Rigidbody2D:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4358518413735402372}
+  m_BodyType: 1
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDrag: 0
+  m_AngularDrag: 0.05
+  m_GravityScale: 0
+  m_Material: {fileID: 0}
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 0
 --- !u!1 &5167019645116249668
 GameObject:
   m_ObjectHideFlags: 0
@@ -616,7 +640,7 @@ GameObject:
   m_Component:
   - component: {fileID: 413172635955266863}
   - component: {fileID: 2690256922702305490}
-  m_Layer: 10
+  m_Layer: 11
   m_Name: State2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -697,7 +721,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1318769319672274306}
   - component: {fileID: 1870222378822240832}
-  m_Layer: 10
+  m_Layer: 11
   m_Name: State1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -779,7 +803,7 @@ GameObject:
   - component: {fileID: 9195078171163605619}
   - component: {fileID: 3249120578752042215}
   - component: {fileID: 902267392447920296}
-  m_Layer: 10
+  m_Layer: 11
   m_Name: Name
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -935,7 +959,7 @@ GameObject:
   - component: {fileID: 835387630054491209}
   - component: {fileID: 7939549501866525578}
   - component: {fileID: 7198431043941163996}
-  m_Layer: 10
+  m_Layer: 11
   m_Name: bar
   m_TagString: Untagged
   m_Icon: {fileID: 0}

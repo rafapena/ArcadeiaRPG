@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class Skill : ActiveTool
@@ -35,6 +36,7 @@ public class Skill : ActiveTool
         RandomTarget = w.RandomTarget;
         Element = w.Element;
         Power = w.Power;
+        Range = w.Range;
         Accuracy = w.Accuracy;
         CriticalRate = w.CriticalRate;
         Priority = w.Priority;
@@ -92,5 +94,18 @@ public class Skill : ActiveTool
     public bool UsedByWeaponUser(Battler battler)
     {
         return WeaponExclusives.Count == 0 || WeaponExclusives.Contains(battler.SelectedWeapon.WeaponType);
+    }
+
+    public bool AvailableTeammateTargets(Battler battler, List<Battler> battlersGroup)
+    {
+        switch (Scope)
+        {
+            case ScopeType.OneKnockedOutAlly:
+            case ScopeType.AllKnockedOutAllies:
+                return battlersGroup.Where(x => x.KOd).Any();
+            case ScopeType.EveryoneButSelf:
+                return battlersGroup.Where(x => !x.KOd).Any();
+        }
+        return true;
     }
 }

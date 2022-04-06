@@ -18,7 +18,11 @@ public abstract class Battler : BaseObject
     public VerticalPositions RowPosition;
     public HorizontalPositions ColumnPosition;
 
+    // Movement
     public Rigidbody2D Figure;
+    protected Vector3 Movement;
+    public float Speed;
+    protected bool CanMove;
 
     // General battler data
     public Sprite MainImage;
@@ -40,10 +44,8 @@ public abstract class Battler : BaseObject
     public bool UsingFists => Weapons.Count == 0;
 
     // Overall battle info
-    [HideInInspector] public ActiveTool SelectedToolMove { get; private set; }
-    [HideInInspector] public Skill SelectedSkill;
+    [HideInInspector] public ActiveTool SelectedTool;
     [HideInInspector] public Weapon SelectedWeapon;
-    [HideInInspector] public Item SelectedItem;
     [HideInInspector] public List<Battler> SelectedTargets;
     [HideInInspector] public List<State> States;
 
@@ -59,7 +61,7 @@ public abstract class Battler : BaseObject
     public int ComboDifficulty = 100;
     public bool Flying;
     [HideInInspector] public Stats StatModifiers;
-    [HideInInspector] public bool Unconscious;
+    [HideInInspector] public bool KOd;
     [HideInInspector] public bool Petrified;
     [HideInInspector] public int CannotMove;
     [HideInInspector] public int SPConsumeRate;
@@ -110,12 +112,37 @@ public abstract class Battler : BaseObject
 
     protected virtual void Update()
     {
-        //
+        Figure.velocity = Movement * Speed;
+    }
+
+    public void EnableMoving()
+    {
+        CanMove = true;
+    }
+
+    public void DisableMoving()
+    {
+        CanMove = false;
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- UI --
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    // UNUSED
+    public T GetNearestTarget<T>(IEnumerable<T> battlers) where T : Battler
+    {
+        T minB = battlers.First();
+        float minDist = float.MaxValue;
+        foreach (T b in battlers)
+        {
+            float dist = Vector3.Distance(transform.position, b.transform.position);
+            if (dist >= minDist) continue;
+            minB = b;
+            minDist = dist;
+        }
+        return minB;
+    }
 
     public void GenerateChoiceUI(string button)
     {
@@ -165,10 +192,9 @@ public abstract class Battler : BaseObject
     /// -- Initializers --
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public void ClearTurnChoices()
+    public void ClearDecisions()
     {
-        SelectedSkill = null;
-        SelectedItem = null;
+        SelectedTool = null;
         if (SelectedTargets != null) SelectedTargets.Clear();
         HitCritical = false;
         HitWeakness = false;
@@ -344,15 +370,14 @@ public abstract class Battler : BaseObject
 
     private void DefaultToAttackRandom()
     {
-        ClearTurnChoices();
-        SelectedSkill = GetDefaultSkill();
-        SelectedToolMove = GetSelectedToolMove();
+        ClearDecisions();
+        SelectedTool = GetDefaultSkill();
     }
 
     private void RedirectConsciousTargets(List<Battler> usersParty, List<Battler> opponentParty)
     {
         for (int i = SelectedTargets.Count - 1; i >= 0; i--)
-            if (!SelectedTargets[i].Unconscious)
+            if (!SelectedTargets[i].KOd)
                 SelectedTargets.RemoveAt(i);
         if (SelectedTargets.Count == 0)
             SetupRandomTargets(usersParty, opponentParty);
@@ -361,7 +386,7 @@ public abstract class Battler : BaseObject
     private void RedirectUnconsciousTargets(List<Battler> usersParty, List<Battler> opponentParty)
     {
         for (int i = SelectedTargets.Count - 1; i >= 0; i--)
-            if (SelectedTargets[i].Unconscious)
+            if (SelectedTargets[i].KOd)
                 SelectedTargets.RemoveAt(i);
         if (SelectedTargets.Count == 0)
             SetupRandomTargets(usersParty, opponentParty);
@@ -369,52 +394,52 @@ public abstract class Battler : BaseObject
 
     private bool ScopeForUnconsciousTeammates()
     {
-        return SelectedToolMove.Scope == ActiveTool.ScopeType.OneKnockedOutAllies || SelectedToolMove.Scope == ActiveTool.ScopeType.AllKnockedOutAllies;
+        return SelectedTool.Scope == ActiveTool.ScopeType.OneKnockedOutAlly || SelectedTool.Scope == ActiveTool.ScopeType.AllKnockedOutAllies;
     }
 
     private void SetupRandomTargets(List<Battler> usersParty, List<Battler> opponentParty)
     {
         Battler selected;
-        switch (SelectedToolMove.Scope)
+        switch (SelectedTool.Scope)
         {
             case ActiveTool.ScopeType.OneEnemy:
             case ActiveTool.ScopeType.OneArea:
                 do selected = opponentParty[Random.Range(0, opponentParty.Count)];
-                while (selected.Unconscious);
+                while (selected.KOd);
                 SelectedTargets.Add(selected);
                 break;
 
             case ActiveTool.ScopeType.StraightThrough:
                 do selected = opponentParty[Random.Range(0, opponentParty.Count)];
-                while (selected.Unconscious);
+                while (selected.KOd);
                 foreach (Battler b in opponentParty)
-                    if (!b.Unconscious && b.RowPosition == selected.RowPosition)
+                    if (!b.KOd && b.RowPosition == selected.RowPosition)
                         SelectedTargets.Add(selected);
                 break;
 
             case ActiveTool.ScopeType.Widespread:
                 do selected = opponentParty[Random.Range(0, opponentParty.Count)];
-                while (selected.Unconscious);
+                while (selected.KOd);
                 foreach (Battler b in opponentParty)
-                    if (!b.Unconscious && b.ColumnPosition == selected.ColumnPosition)
+                    if (!b.KOd && b.ColumnPosition == selected.ColumnPosition)
                         SelectedTargets.Add(selected);
                 break;
 
             case ActiveTool.ScopeType.OneAlly:
                 do selected = usersParty[Random.Range(0, usersParty.Count)];
-                while (selected.Unconscious);
+                while (selected.KOd);
                 SelectedTargets.Add(selected);
                 break;
 
-            case ActiveTool.ScopeType.OneKnockedOutAllies:
+            case ActiveTool.ScopeType.OneKnockedOutAlly:
                 int potentialTargets = 0;
                 foreach (Battler t in usersParty)
-                    if (t.Unconscious)
+                    if (t.KOd)
                         potentialTargets++;
                 if (potentialTargets == 0)      // User will skip their turn if everyone in their team is conscious, mid-turn
                     break;
                 do selected = usersParty[Random.Range(0, usersParty.Count)];
-                while (!selected.Unconscious);
+                while (!selected.KOd);
                 SelectedTargets.Add(selected);
                 break;
         }
@@ -426,44 +451,39 @@ public abstract class Battler : BaseObject
 
     public void ExecuteAction(List<Battler> usersParty, List<Battler> opponentParty)
     {
-        if (!CanMove()) return;
+        if (!CanDoAction()) return;
 
-        SelectedToolMove = GetSelectedToolMove();
+        /*SelectedToolMove = GetSelectedToolMove();
         if (!SelectedToolMove) return;
 
         if (SelectedToolMove.RandomTarget)
         {
             SelectedTargets.Clear();
             SetupRandomTargets(usersParty, opponentParty);
-        }
+        }*/
         
         if (ScopeForUnconsciousTeammates()) RedirectConsciousTargets(usersParty, opponentParty);
         else RedirectUnconsciousTargets(usersParty, opponentParty);
 
         if (SelectedTargets.Count == 0) DefaultToAttackRandom();
-        if (SPToConsumeThisTurn > SP) SelectedSkill = GetDefaultSkill();
+        if (SPToConsumeThisTurn > SP) SelectedTool = GetDefaultSkill();
         
         ExecuteTool();
     }
 
-    public ActiveTool GetSelectedToolMove()
+    public ActiveTool TryConvertToWeaponSettings()
     {
-        if (SelectedSkill)
-        {
-            if (SelectedSkill.WeaponDependent) SelectedSkill.ConvertToWeaponSettings(SelectedWeapon);
-            return SelectedSkill;
-        }
-        if (SelectedItem) return SelectedItem;
-        return null;
+        if (SelectedTool is Skill sk && sk.WeaponDependent) sk.ConvertToWeaponSettings(SelectedWeapon);
+        return SelectedTool;
     }
 
     private void ShootProjectile()
     {
         foreach (Battler t in SelectedTargets)
         {
-            Projectile p = Instantiate(SelectedToolMove.Projectile, transform.position, Quaternion.identity, gameObject.transform);
+            Projectile p = Instantiate(SelectedTool.Projectile, transform.position, Quaternion.identity, gameObject.transform);
             p.Setup(10, GetDirection(transform.position, t.transform.position));
-            p.GetBattleInfo(this, SelectedTargets, SelectedToolMove);
+            p.GetBattleInfo(this, SelectedTargets, SelectedTool);
             p.GetComponent<SpriteRenderer>().sortingLayerName = "Battle";
         }
     }
@@ -479,11 +499,8 @@ public abstract class Battler : BaseObject
 
     public void ExecuteTool()
     {
-        switch (SelectedToolMove.GetType().Name)
-        {
-            case "Skill": ExecuteSkill(SelectedSkill); break;
-            case "Item": ExecuteItem(); break;
-        }
+        if (SelectedTool is Skill sk) ExecuteSkill(sk);
+        else if (SelectedTool is Item it) ExecuteItem(it);
     }
 
     private S ExecuteSkill<S>(S skill) where S : Skill
@@ -510,9 +527,8 @@ public abstract class Battler : BaseObject
         return oneActResult;
     }
 
-    private Item ExecuteItem()
+    private Item ExecuteItem(Item it)
     {
-        Item it = SelectedItem;
         Stats.Add(it.PermantentStatChanges);
         //if (it.TurnsInto) Items[Items.FindIndex(x => x.Id == it.Id)] = Instantiate(it.TurnsInto, gameObject.transform);
         //else if (it.Consumable) Items.Remove(it);
@@ -594,11 +610,11 @@ public abstract class Battler : BaseObject
 
     private void CheckKO()
     {
-        Unconscious = (HP <= 0 || Petrified);
-        if (Unconscious) ClearTurnChoices();
-        if (GetComponent<SpriteRenderer>()) GetComponent<SpriteRenderer>().enabled = !Unconscious;
-        else if (GetComponent<Animator>()) GetComponent<Animator>().enabled = !Unconscious;
-        Properties.gameObject.SetActive(!Unconscious);
+        KOd = (HP <= 0 || Petrified);
+        if (KOd) ClearDecisions();
+        if (GetComponent<SpriteRenderer>()) GetComponent<SpriteRenderer>().enabled = !KOd;
+        else if (GetComponent<Animator>()) GetComponent<Animator>().enabled = !KOd;
+        Properties.gameObject.SetActive(!KOd);
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -607,7 +623,7 @@ public abstract class Battler : BaseObject
 
     public void MaxHPSP()
     {
-        Unconscious = false;
+        KOd = false;
         HP = Stats.MaxHP;
         SP = 100;
     }
@@ -630,9 +646,9 @@ public abstract class Battler : BaseObject
     /// -- Applying Passive Effects --
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public bool CanMove()
+    public bool CanDoAction()
     {
-        return !Unconscious && CannotMove <= 0 && !IsCharging;
+        return !KOd && CannotMove <= 0 && !IsCharging;
     }
 
     /*

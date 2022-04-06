@@ -4,8 +4,8 @@ using UnityEngine;
 public abstract class MapExplorer : MonoBehaviour
 {
     public const int NON_COLLIDABLE_EXPLORER_LAYER = 8;
-    public const int PLAYER_LAYER = 9;
-    public const int ENEMY_LAYER = 10;
+    public const int MAP_PLAYER_LAYER = 9;
+    public const int MAP_ENEMY_LAYER = 10;
 
     [HideInInspector] public Rigidbody2D Figure;
     protected Vector3 Movement;
@@ -16,8 +16,8 @@ public abstract class MapExplorer : MonoBehaviour
     protected virtual void Awake()
     {
         Figure = gameObject.GetComponent<Rigidbody2D>();
-        Physics2D.IgnoreLayerCollision(PLAYER_LAYER, NON_COLLIDABLE_EXPLORER_LAYER);
-        Physics2D.IgnoreLayerCollision(ENEMY_LAYER, NON_COLLIDABLE_EXPLORER_LAYER);
+        Physics2D.IgnoreLayerCollision(MAP_PLAYER_LAYER, NON_COLLIDABLE_EXPLORER_LAYER);
+        Physics2D.IgnoreLayerCollision(MAP_ENEMY_LAYER, NON_COLLIDABLE_EXPLORER_LAYER);
     }
 
     protected virtual void Start()

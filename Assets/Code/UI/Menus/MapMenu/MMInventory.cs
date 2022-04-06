@@ -254,13 +254,13 @@ public class MMInventory : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOp
             case ActiveTool.ScopeType.OneAlly:
             case ActiveTool.ScopeType.Self:
                 foreach (Battler p in party)
-                    if (!p.Unconscious) SelectableTeammatesUse.Add(p);
+                    if (!p.KOd) SelectableTeammatesUse.Add(p);
                 SelectAllTeammates = false;
                 break;
 
-            case ActiveTool.ScopeType.OneKnockedOutAllies:
+            case ActiveTool.ScopeType.OneKnockedOutAlly:
                 foreach (Battler p in party)
-                    if (p.Unconscious) SelectableTeammatesUse.Add(p);
+                    if (p.KOd) SelectableTeammatesUse.Add(p);
                 SelectAllTeammates = false;
                 break;
 
@@ -268,13 +268,13 @@ public class MMInventory : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOp
             case ActiveTool.ScopeType.EveryoneButSelf:
             case ActiveTool.ScopeType.Everyone:
                 foreach (Battler p in party)
-                    if (!p.Unconscious) SelectableTeammatesUse.Add(p);
+                    if (!p.KOd) SelectableTeammatesUse.Add(p);
                 SelectAllTeammates = true;
                 break;
 
             case ActiveTool.ScopeType.AllKnockedOutAllies:
                 foreach (Battler p in party)
-                    if (p.Unconscious) SelectableTeammatesUse.Add(p);
+                    if (p.KOd) SelectableTeammatesUse.Add(p);
                 SelectAllTeammates = true;
                 break;
         }

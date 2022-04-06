@@ -22,7 +22,7 @@ public class BattleMaster
     public static string[] CompanionshipLevels = new string[] { "Allies", "Supporters", "Battle Buddies", "Super Team", "Elite Duo", "Perfect Unison" };
     public static int[] CompanionshipPoints = new int[] { 100, 300, 600, 1000, 1500 };
 
-    // Variables used to transition between scenes
+    // Variables used to transitioning between scenes
     public static Environment EnvironmentSettings;
     public static PlayerParty PlayerParty;
     public static EnemyParty EnemyParty;

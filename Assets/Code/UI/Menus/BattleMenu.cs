@@ -1,121 +1,126 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices.ComTypes;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
-public class BattleMenu : MonoBehaviour
+public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameOperations
 {
-    private enum Selections { Actions, Skills, Items, Teammates, Targets, Animating } // Selection process navigation
-
-    private enum SelectedActions { None, Attack, Skill, Item, Run }     // Selections on the Action section
-
-    private enum DisabledTool { None, NoScope, LowSP, WarmupOrCoolDown, NoWeapon, NotClass }
+    private enum Selections { Awaiting, Actions, Skills, Items, Positioning, Aiming, Running, Disabled }
 
     // Keep track of the current battle and player/ActiveTool pointers 
     public Battle CurrentBattle;
     private int CurrentPlayer;
-    private BattlePlayer CP;
-    private Transform CPCI;
-    private ActiveTool SelectedTool;
+    private BattlePlayer ActingPlayer;
 
     // Selection management
+    private bool PassedSelectedToolBuffer => Time.unscaledTime > JustSelectedToolTimer;
+    private float JustSelectedToolTimer;
+    private float JUST_SELECTED_TOOL_TIME_BUFFER = 0.5f;
+    private readonly float DISABLED_ICON_TRANSPARENCY = 0.3f;
+    private bool MenuLoaded;
     private Selections Selection;
-    private SelectedActions SelectedAction;
-    private string KeyPressed;
-
-    // Loading
-    private bool LoadReady;
-    private float WaitTimeBeforeTurnStarts = 1f;
 
     // Child GameObjects
-    public MenuFrame CharacterInfo;
+    public MenuFrame PartyFrame;
+    public PlayerSelectionList PartyList;
     public MenuFrame CommonActionsFrame;
-    public MenuFrame SelectionFrame;
-    public GameObject SelectActionList;
-    public GameObject SelectToolList;
-    public MenuFrame ConfirmToolFrame;
-    public GameObject SelectTargetInTeam;
+    public MenuFrame SelectActionFrame;
+    public MenuFrame SelectSkillsFrame;
+    public SkillSelectionList SelectSkillsList;
+    public MenuFrame SelectItemsFrame;
+    public ToolListCollectionFrame SelectItemsList;
+    public GameObject SelectedActiveTool;
 
-    // General UI
-    private GameObject CSelected;       // Changing icon in the CharacterInfo character
-    private Color CInfoFrameMainColor;
-    private Color CInfoFrameCurrentColor;
-    private readonly float DISABLED_TRANSPARENCY = 0.3f;
+    // Target selection
+    private delegate void ScopeUpdateCheck();
+    private ScopeUpdateCheck UpdateTarget;
 
-    // ActiveTool Selection phase
-    private int ConfirmToolMenuIndex = -1;
-    private string[] DisableToolReasons;
-    private string[] TOOL_LETTER_COMMANDS = new string[] { "A", "S", "D", "Z", "X", "C" };
-
-    // Constants
-    private readonly int MAX_NUMBER_OF_SOLO_SKILLS = 3;
 
     private void Start()
     {
-        SelectTargetInTeam.SetActive(false);
-        CInfoFrameMainColor = CharacterInfo.transform.GetChild(0).GetComponent<Image>().color;
-        CInfoFrameCurrentColor = new Color(0.5f, 0.6f, 0.9f);
-        WaitTimeBeforeTurnStarts = Time.time + WaitTimeBeforeTurnStarts;
+        Selection = Selections.Disabled;
     }
 
     private void LateUpdate()
     {
-        if (Time.time <= WaitTimeBeforeTurnStarts) return;
-        if (!LoadReady)
+        if (Selection == Selections.Disabled || CurrentBattle.Waiting) return;
+        else if (!MenuLoaded)
         {
-            SetupPlayerComponents();
-            CurrentBattle.TurnStartSetup();
+            ActingPlayer.EnableMoving();
             SetupForSelectAction();
-            LoadReady = true;
+            ActivateCommonFrames();
+            MenuLoaded = true;
             return;
         }
-        KeyPressed = Input.inputString.ToUpper();
+
         switch (Selection)
         {
-            case Selections.Actions: SelectAction(); break;
-            case Selections.Skills: SelectSkill(); break;
-            case Selections.Items: SelectItem(); break;
-            case Selections.Teammates: SelectTeammates(); break;
-            case Selections.Targets: SelectTarget(); break;
-            default: break;
+            case Selections.Actions:
+                UpdateTarget?.Invoke();
+                SelectingAction();
+                break;
+
+            case Selections.Skills:
+            case Selections.Items:
+                if (Input.GetKeyDown(KeyCode.X)) SetupForSelectAction();
+                break;
+
+            case Selections.Positioning:
+            case Selections.Aiming:
+                UpdateTarget?.Invoke();
+                if (PassedSelectedToolBuffer) SelectingPositioningOrAiming();
+                break;
+
+            default:
+                break;
         }
     }
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// -- Setup icons for the current player --
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    private void SetupPlayerComponents()
+    public void Setup(BattlePlayer p)
     {
-        if (Selection == Selections.Animating) return;     // Indicates next player instead of next turn
-        int i = 0;
-        for (; i < CurrentBattle.PlayerParty.Players.Count; i++)
-        {
-            BattlePlayer p = CurrentBattle.PlayerParty.Players[i];
-            Transform oneCI = CharacterInfo.transform.GetChild(i);
-            oneCI.GetChild(0).GetComponent<TextMeshProUGUI>().text = p.Name.ToUpper();
-            oneCI.GetChild(1).GetComponent<Image>().sprite = p.MainImage;
-            oneCI.GetChild(2).GetComponent<Gauge>().Set(p.HP, p.Stats.MaxHP);
-            oneCI.GetChild(3).GetComponent<Gauge>().Set(p.SP, 100);
-            SetupPlayerStateComponents(p, oneCI);
-            oneCI.GetChild(5).gameObject.SetActive(oneCI.GetChild(5).GetComponent<Image>().sprite != null);
-        }
-        for (; i < CharacterInfo.transform.childCount; i++)
-            CharacterInfo.transform.GetChild(i).gameObject.SetActive(false);
+        Selection = Selections.Awaiting;
+        PartyList.Refresh(CurrentBattle.PlayerParty.Players);
+        SelectItemsList.SetToolListOnTab(0, CurrentBattle.PlayerParty.Inventory.Items.FindAll(x => !x.IsKey));
+        ActingPlayer = p;
+        DeclareCurrent(p);
     }
 
-    private void SetupPlayerStateComponents(BattlePlayer p, Transform oneCI)
+    public void Hide()
+    {
+        Selection = Selections.Disabled;
+        PartyFrame.Deactivate();
+        CommonActionsFrame.Deactivate();
+        SelectActionFrame.Deactivate();
+        SelectSkillsFrame.Deactivate();
+        SelectItemsFrame.Deactivate();
+    }
+
+    private void DeclareCurrent(BattlePlayer p)
     {
         int i = 0;
-        Transform ocis = oneCI.GetChild(4);
-        int statesLimit = p.States.Count < ocis.childCount ? p.States.Count : ocis.childCount;
-        for (; i < statesLimit; i++)
+        foreach (Transform t in PartyList.transform)
         {
-            ocis.GetChild(i).GetComponent<Image>().sprite = CP.States[i].GetComponent<SpriteRenderer>().sprite;
-            ocis.GetChild(i).gameObject.SetActive(true);
+            if (p.Id == PartyList.GetId(i++)) t.GetComponent<ListSelectable>().KeepHighlighted();
+            else t.GetComponent<ListSelectable>().ClearHighlights();
         }
-        for (; i < ocis.childCount; i++) ocis.GetChild(i).gameObject.SetActive(false);
+    }
+
+    public void DeclareNext(BattlePlayer p)
+    {
+        int i = 0;
+        foreach (Transform t in PartyList.transform)
+        {
+            t.GetChild(6).gameObject.SetActive(p.Id == PartyList.GetId(i++));
+        }
+    }
+
+    private void ActivateCommonFrames()
+    {
+        PartyFrame.Activate();
+        CommonActionsFrame.Activate();
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -124,84 +129,49 @@ public class BattleMenu : MonoBehaviour
 
     private void SetupForSelectAction()
     {
-        SetupCurrentSelection();
-        ResetChoices();
-        Selection = 0;
-        SelectedAction = SelectedActions.None;
-        GrayOutIconSelection(SelectActionList.transform.GetChild(1).gameObject, CP.Skills.Count == 0);
-        CharacterInfo.Activate();
-        CommonActionsFrame.Activate();
-        CommonActionsFrame.transform.GetChild(0).gameObject.SetActive(CurrentPlayer == 0);
-        CommonActionsFrame.transform.GetChild(1).gameObject.SetActive(CurrentPlayer > 0);
-        SetWeaponOnMenuAndCharacter();
+        Selection = Selections.Actions;
+        SetActionFrames(true, false);
+        GrayOutIconSelection(SelectActionFrame.transform.GetChild(1).gameObject, ActingPlayer.Skills.Count == 0);
         GrayOutIconSelection(CommonActionsFrame.transform.GetChild(0).gameObject, CurrentBattle.EnemyParty.RunDisabled);
-        SelectionFrame.Activate();
-        SelectActionList.SetActive(true);
-        SelectToolList.SetActive(false);
-        ConfirmToolFrame.Deactivate();
-        SelectTargetInTeam.SetActive(false);
-        CSelected.SetActive(false);
+        SetWeaponOnMenuAndCharacter();
+        SelectActionFrame.Activate();
+        SelectSkillsFrame.Deactivate();
+        SelectItemsFrame.Deactivate();
+        EventSystem.current.SetSelectedGameObject(null);
+
+        ActingPlayer.ClearDecisions();
+        ActingPlayer.EnableMoving();
+        ActingPlayer.SelectedTool = ActingPlayer.BasicAttackSkill;
+        ActingPlayer.TryConvertToWeaponSettings();
+        SetScopeTargetSearch(false);
     }
 
-    private void SetupCurrentSelection()
-    {
-        CP = CurrentBattle.PlayerParty.Players[CurrentPlayer];
-        CPCI = CharacterInfo.transform.GetChild(CurrentPlayer);
-        for (int i = 0; i < CharacterInfo.transform.childCount; i++)
-            CharacterInfo.transform.GetChild(i).GetComponent<Image>().color = CInfoFrameMainColor;
-        CPCI.GetComponent<Image>().color = CInfoFrameCurrentColor;
-        CSelected = CPCI.GetChild(5).gameObject;
-    }
-
-    private void ResetChoices()
-    {
-        ConfirmToolMenuIndex = -1;
-        SelectedTool = null;
-        CP.ClearTurnChoices();
-    }
-
-    private void SelectAction()
+    private void SelectingAction()
     {
         if (!MenuMaster.ReadyToSelectInMenu) return;
-        if (Input.GetKeyDown(KeyCode.Backspace) && CurrentPlayer > 0)
+        else if (Input.GetKeyDown(KeyCode.Z))
         {
-            CSelected.GetComponent<Image>().sprite = null;
-            ShiftPlayer(-1);
-            return;
+            if (ActingPlayer.SelectedTool.Ranged) SetupForAiming();
+            //else;
         }
-        switch (KeyPressed)
+        else if (Input.GetKeyDown(KeyCode.C) && !IsDisabled(SelectActionFrame.transform.GetChild(1).gameObject)) SetupForSelectSkill();
+        else if (Input.GetKeyDown(KeyCode.V) && !IsDisabled(SelectActionFrame.transform.GetChild(2).gameObject)) SetupForSelectItem();
+        else if (Input.GetKeyDown(KeyCode.R)) SelectRun();
+        else if (Input.GetKeyDown(KeyCode.Q))
         {
-            case "A":
-                CP.SelectedSkill = CP.AttackSkill;
-                SelectedTool = CP.SelectedWeapon;
-                SelectedAction = SelectedActions.Attack;
-                CSelected.SetActive(true);
-                CSelected.GetComponent<Image>().sprite = SelectActionList.transform.GetChild(0).GetChild(0).GetComponent<Image>().sprite;
-                SetupForSelectTarget();
-                break;
-            case "S":
-                if (IsDisabled(SelectActionList.transform.GetChild(1).gameObject)) break;
-                SelectedAction = SelectedActions.Skill;
-                CSelected.SetActive(true);
-                CSelected.GetComponent<Image>().sprite = SelectActionList.transform.GetChild(1).GetChild(0).GetComponent<Image>().sprite;
-                SetupForSelectSkill();
-                break;
-            case "D":
-                if (IsDisabled(SelectActionList.transform.GetChild(2).gameObject)) break;
-                SelectedAction = SelectedActions.Item;
-                CSelected.SetActive(true);
-                CSelected.GetComponent<Image>().sprite = SelectActionList.transform.GetChild(2).GetChild(0).GetComponent<Image>().sprite;
-                SetupForSelectItem();
-                break;
-            case "R":
-                SelectedAction = SelectedActions.Run;
-                SelectRun();
-                break;
-            case "Q":
-                CP.SelectedWeapon = GetNextWeapon();
-                SetWeaponOnMenuAndCharacter();
-                break;
+            ActingPlayer.SelectedWeapon = GetNextWeapon();
+            SetWeaponOnMenuAndCharacter();
         }
+    }
+
+    private void SetActionFrames(bool actionSelection, bool backButton)
+    {
+        CommonActionsFrame.transform.GetChild(0).gameObject.SetActive(!backButton);
+        CommonActionsFrame.transform.GetChild(1).gameObject.SetActive(backButton);
+        SelectActionFrame.transform.GetChild(0).gameObject.SetActive(actionSelection);
+        SelectActionFrame.transform.GetChild(1).gameObject.SetActive(actionSelection);
+        SelectActionFrame.transform.GetChild(2).gameObject.SetActive(actionSelection);
+        SelectActionFrame.transform.GetChild(3).gameObject.SetActive(!actionSelection);
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -211,85 +181,23 @@ public class BattleMenu : MonoBehaviour
     private void SetupForSelectSkill()
     {
         Selection = Selections.Skills;
-        SelectedTool = null;
-        CP.ClearTurnChoices();
-        CommonActionsFrame.transform.GetChild(0).gameObject.SetActive(false);
-        CommonActionsFrame.transform.GetChild(1).gameObject.SetActive(true);
-        CommonActionsFrame.transform.GetChild(2).gameObject.SetActive(true);
-        SelectionFrame.Activate();
-        SelectActionList.SetActive(false);
-        SelectToolList.SetActive(true);
-        ConfirmToolFrame.Deactivate();
-        SelectTargetInTeam.SetActive(false);
-        DisableToolReasons = new string[MAX_NUMBER_OF_SOLO_SKILLS];
-        for (int i = 0; i < DisableToolReasons.Length; i++)
-            DisableToolReasons[i] = "";
-        SetupForSkillSelectIcons(CP.Skills, 0, MAX_NUMBER_OF_SOLO_SKILLS);
+        SetActionFrames(true, true);
+        SelectActionFrame.Deactivate();
+        SelectSkillsFrame.Activate();
+        SelectItemsFrame.Deactivate();
+        SelectSkillsList.Refresh(ActingPlayer, FightingParty);
+        EventSystem.current.SetSelectedGameObject(SelectSkillsList.transform.GetChild(0).gameObject);
+
+        ActingPlayer.DisableMoving();
+        ActingPlayer.SelectedTool = null;
     }
 
-    // Skill and TeamSkill have different lists, but share the same set of icons on the UI
-    private void SetupForSkillSelectIcons<T>(List<T> skillList, int start, int maxListCount) where T : Skill
-    {
-        int i = 0;
-        int sLimit = skillList.Count < maxListCount ? skillList.Count : maxListCount;
-        for (; i < sLimit; i++)
-        {
-            int iconI = start + i;
-            Transform t = SelectToolList.transform.GetChild(iconI);
-            T skill = skillList[i];
-            t.GetChild(0).GetComponent<Image>().sprite = skill.GetComponent<SpriteRenderer>().sprite;
-            t.GetChild(1).GetComponent<TextMeshProUGUI>().text = skill.SPConsume > 0 ? skill.SPConsume.ToString() : "";
-            t.GetChild(2).GetComponent<TextMeshProUGUI>().text = skill.DisabledFromWarmupOrCooldown() ? skill.DisabledCount.ToString() : "";
-            t.gameObject.SetActive(true);
+    private List<Battler> FightingParty => CurrentBattle.PlayerParty.Players.Cast<Battler>().Concat(CurrentBattle.PlayerParty.Allies).ToList();
 
-            if (NoAvailableTargets(skill))
-                DisableToolReasons[iconI] = "No available teammates to select";
-            else if (skill.DisabledFromWarmupOrCooldown())
-                DisableToolReasons[iconI] = "Must wait for " + skill.DisabledCount + " more turns before using";
-            else if (!skill.UsedByWeaponUser(CP))
-                DisableToolReasons[iconI] = "A " + System.Enum.GetName(typeof(BattleMaster.WeaponTypes), skill.WeaponExclusives[0]) + " is required to use this";
-            else if (!skill.UsedByClassUser(CP))
-                DisableToolReasons[iconI] = "Must be at class " + skill.ClassExclusives[0].Name + " to use this";
-            GrayOutIconSelection(t.gameObject, DisableToolReasons[iconI].Length > 0);
-        }
-        for (; i < maxListCount; i++)
-        {
-            int iconI = start + i;
-            SelectToolList.transform.GetChild(iconI).gameObject.SetActive(false);
-        }
-    }
-
-    private void SelectSkill()
+    public void SelectSkill()
     {
-        if (!MenuMaster.ReadyToSelectInMenu) return;
-        if (Input.GetKeyDown(KeyCode.Backspace))
-        {
-            SetupForSelectAction();
-            return;
-        }
-        switch (KeyPressed)
-        {
-            case "A": ConfirmSkillSelection(CP.Skills, 0, 0); break;
-            case "S": ConfirmSkillSelection(CP.Skills, 1, 1); break;
-            case "D": ConfirmSkillSelection(CP.Skills, 2, 2); break;
-            case "Q":
-                CP.SelectedWeapon = GetNextWeapon();
-                SetWeaponOnMenuAndCharacter();
-                for (int i = 0; i < DisableToolReasons.Length; i++)
-                    DisableToolReasons[i] = "";
-                SetupForSkillSelectIcons(CP.Skills, 0, MAX_NUMBER_OF_SOLO_SKILLS);
-                SetConfirmUsability(7, ConfirmToolMenuIndex);
-                break;
-        }
-    }
-
-    private void ConfirmSkillSelection(List<Skill> Skills, int skillListIndex, int toolConfirmIndex)
-    {
-        if (skillListIndex >= Skills.Count) return;
-        CP.SelectedSkill = ConfirmGenericToolSelection(Skills, skillListIndex, toolConfirmIndex);
-        if (!CP.SelectedSkill) return;
-        ConfirmToolFrame.transform.GetChild(6).gameObject.SetActive(true);
-        ConfirmToolFrame.transform.GetChild(6).GetChild(0).GetComponent<TextMeshProUGUI>().text = "1";
+        ActingPlayer.SelectedTool = SelectSkillsList.SelectedObject;
+        SetupForPositioning();
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -299,445 +207,216 @@ public class BattleMenu : MonoBehaviour
     private void SetupForSelectItem()
     {
         Selection = Selections.Items;
-        SelectedTool = null;
-        CP.ClearTurnChoices();
-        CommonActionsFrame.transform.GetChild(0).gameObject.SetActive(false);
-        CommonActionsFrame.transform.GetChild(1).gameObject.SetActive(true);
-        CommonActionsFrame.transform.GetChild(2).gameObject.SetActive(false);
-        SelectionFrame.Activate();
-        SelectActionList.SetActive(false);
-        SelectToolList.SetActive(true);
-        ConfirmToolFrame.Deactivate();
-        SelectTargetInTeam.SetActive(false);
-        for (int i = 0; i < DisableToolReasons.Length; i++)
-            DisableToolReasons[i] = "";
-        SetupForItemSelectIcons();
+        SetActionFrames(true, true);
+        SelectActionFrame.Deactivate();
+        SelectSkillsFrame.Deactivate();
+        SelectItemsFrame.Activate();
+        SelectItemsList.ToolList.Selecting = true;
+        SelectItemsList.Refresh(CurrentBattle.PlayerParty.Inventory.Items.FindAll(x => !x.IsKey));
+        EventSystem.current.SetSelectedGameObject(SelectItemsList.ToolList.transform.GetChild(0).gameObject);
+
+        ActingPlayer.DisableMoving();
+        ActingPlayer.SelectedTool = null;
     }
 
-    private void SetupForItemSelectIcons()
+    public void SelectTabSuccess() { }
+
+    public void SelectTabFailed() { }
+
+    public void SelectToolSuccess()
     {
-        /*int i = 0;
-        int iLimit = (CP.Items.Count < BattleMaster.MAX_NUMBER_OF_ITEMS) ? CP.Items.Count : BattleMaster.MAX_NUMBER_OF_ITEMS;
-        for (; i < iLimit; i++)
-        {
-            SelectToolList.transform.GetChild(i).GetChild(0).GetComponent<Image>().sprite = CP.Items[i].GetComponent<SpriteRenderer>().sprite;
-            SelectToolList.transform.GetChild(i).GetChild(1).gameObject.SetActive(false);
-            SelectToolList.transform.GetChild(i).GetChild(2).gameObject.SetActive(false);
-            SelectToolList.transform.GetChild(i).gameObject.SetActive(true);
-            bool nva = NoAvailableTargets(CP.Items[i]);
-            bool nc =  !CP.Items[i].UsedByClassUser(CP);
-            GrayOutIconSelection(SelectToolList.transform.GetChild(i).gameObject, nva || nc);
-            if (nva) DisableToolReasons[i] = "No available teammates to select";
-            else if (nc) DisableToolReasons[i] = "Must be at class " + CP.Items[i].ClassExclusives[0].Name + " to use this";
-        }
-        for (; i < BattleMaster.MAX_NUMBER_OF_ITEMS; i++)
-            SelectToolList.transform.GetChild(i).gameObject.SetActive(false);*/
+        SelectItemsList.ToolList.Selecting = false;
+        ActingPlayer.SelectedTool = SelectItemsList.ToolList.SelectedObject as Item;
+        SetupForPositioning();
     }
 
-    private void SelectItem()
-    {
-        /*if (!MenuMaster.ReadyToSelectInMenu) return;
-        if (Input.GetKeyDown(KeyCode.Backspace))
-        {
-            SetupForSelectAction();
-            return;
-        }
-        switch (KeyPressed)
-        {
-            case "A": ConfirmItemSelection(CP.Items, 0, 0); break;
-            case "S": ConfirmItemSelection(CP.Items, 1, 1); break;
-            case "D": ConfirmItemSelection(CP.Items, 2, 2); break;
-            case "Z": ConfirmItemSelection(CP.Items, 3, 3); break;
-            case "X": ConfirmItemSelection(CP.Items, 4, 4); break;
-            case "C": ConfirmItemSelection(CP.Items, 5, 5); break;
-        }*/
-    }
+    public void SelectToolFailed() { }
 
-    private void ConfirmItemSelection(List<Item> items, int itemListIndex, int toolConfirmIndex)
-    {
-        if (itemListIndex < items.Count)
-            CP.SelectedItem = ConfirmGenericToolSelection(items, itemListIndex, toolConfirmIndex);
-    }
+    public void UndoSelectToolSuccess() { }
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// -- Battle phase process: SKILL/ITEM Helpers --
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    private bool NoAvailableTargets(ActiveTool ActiveTool)
-    {
-        if (ActiveTool.Scope != ActiveTool.ScopeType.OneKnockedOutAllies) return false;
-        foreach (BattlePlayer p in CurrentBattle.PlayerParty.Players)
-            if (p.HP == 0) return false;
-        foreach (BattleAlly a in CurrentBattle.PlayerParty.Allies)
-            if (a.HP == 0) return false;
-        return true;
-    }
-
-    private T ConfirmGenericToolSelection<T>(List<T> tools, int toolListIndex, int toolMenuConfirmIndex) where T : ActiveTool
-    {
-        if (toolListIndex >= tools.Count) return null;
-        T ActiveTool = tools[toolListIndex];
-
-        bool isDisabled = DisableToolReasons[toolMenuConfirmIndex].Length > 0;
-        if (ConfirmToolMenuIndex == toolMenuConfirmIndex) return isDisabled ? null : GenericToolSelectionFinal(ActiveTool);   // Final confirmation on ActiveTool, before going to target selection
-        ConfirmToolMenuIndex = toolMenuConfirmIndex;
-
-        bool isSkill = (Selection == Selections.Skills);
-        ConfirmToolFrame.transform.GetChild(4).gameObject.SetActive(isSkill);
-        ConfirmToolFrame.transform.GetChild(5).gameObject.SetActive(isSkill);
-        ConfirmToolFrame.transform.GetChild(6).gameObject.SetActive(isSkill);
-
-        ConfirmToolFrame.transform.GetChild(0).GetComponent<Image>().sprite = ActiveTool.GetComponent<SpriteRenderer>().sprite;
-        ConfirmToolFrame.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = ActiveTool.Name.ToUpper();
-        ConfirmToolFrame.transform.GetChild(2).GetComponent<TextMeshProUGUI>().text = ActiveTool.Description;
-        InventoryToolSelectionList.SetElementImage(ConfirmToolFrame.gameObject, 3, ActiveTool);
-        ConfirmToolFrame.transform.GetChild(4).GetChild(0).GetComponent<TextMeshProUGUI>().text = ActiveTool.Power.ToString();
-        ConfirmToolFrame.transform.GetChild(5).GetChild(0).GetComponent<TextMeshProUGUI>().text = ActiveTool.ConsecutiveActs.ToString();
-        ConfirmToolFrame.transform.GetChild(6).GetChild(0).GetComponent<TextMeshProUGUI>().text = ActiveTool.CriticalRate + "%"; //GetCritStr(ActiveTool.CritcalRate);
-        ConfirmToolFrame.transform.GetChild(7).gameObject.SetActive(false); // Always false for Items, uses a different function to activate for Skills
-        SetConfirmUsability(8, toolMenuConfirmIndex);
-        ConfirmToolFrame.Activate();
-        return ActiveTool;
-    }
-
-    private void SetElementImage<T>(int index, T ActiveTool) where T : ActiveTool
-    {
-        try
-        {
-            ConfirmToolFrame.transform.GetChild(index).GetComponent<Image>().sprite = UIMaster.ElementImages[ActiveTool.Element];
-            ConfirmToolFrame.transform.GetChild(index).gameObject.SetActive(true);
-        }
-        catch (KeyNotFoundException) { ConfirmToolFrame.transform.GetChild(index).gameObject.SetActive(false); }
-    }
-
-    private string GetCritStr(int critRate)
-    {
-        string str = "";
-        if (critRate > 0) str += "+" + critRate;
-        else if (critRate < 0) str += "-" + -critRate;
-        else return "-";
-        return str + "%";
-    }
-
-    private void SetConfirmUsability(int index, int toolMenuConfirmIndex)
-    {
-        if (toolMenuConfirmIndex < 0) return;
-        if (DisableToolReasons[toolMenuConfirmIndex].Length > 0)
-        {
-            ConfirmToolFrame.transform.GetChild(index).GetComponent<TextMeshProUGUI>().color = Color.yellow;
-            ConfirmToolFrame.transform.GetChild(index).GetComponent<TextMeshProUGUI>().text = DisableToolReasons[toolMenuConfirmIndex];
-            ConfirmToolFrame.transform.GetChild(index).GetChild(0).gameObject.SetActive(false);
-        }
-        else
-        {
-            ConfirmToolFrame.transform.GetChild(index).GetComponent<TextMeshProUGUI>().color = Color.white;
-            ConfirmToolFrame.transform.GetChild(index).GetComponent<TextMeshProUGUI>().text = "\nCONFIRM";
-            ConfirmToolFrame.transform.GetChild(index).GetChild(0).gameObject.SetActive(true);
-            ConfirmToolFrame.transform.GetChild(index).GetChild(0).GetComponent<Image>().sprite = UIMaster.LetterCommands[TOOL_LETTER_COMMANDS[toolMenuConfirmIndex]];
-        }
-    }
-
-    private T GenericToolSelectionFinal<T>(T ActiveTool) where T : ActiveTool
-    {
-        if (CP.SelectedItem)
-        {
-            CSelected.GetComponent<Image>().sprite = CP.SelectedItem.GetComponent<SpriteRenderer>().sprite;
-            SelectedTool = CP.SelectedItem;
-            CP.SelectedSkill = null;
-            SetupForSelectTarget();
-        }
-        else if (CP.SelectedSkill)
-        {
-            CSelected.GetComponent<Image>().sprite = CP.SelectedSkill.GetComponent<SpriteRenderer>().sprite;
-            CP.SelectedItem = null;
-            SelectedTool = CP.SelectedSkill;
-            SetupForSelectTarget();
-        }
-        return ActiveTool;
-    }
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// -- Battle phase process: TEAMMATES --
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    private void SetupForSelectTeammates()
-    {
-        Selection = Selections.Teammates;
-        CommonActionsFrame.transform.GetChild(0).gameObject.SetActive(false);
-        CommonActionsFrame.transform.GetChild(1).gameObject.SetActive(true);
-        CommonActionsFrame.transform.GetChild(2).gameObject.SetActive(false);
-        SelectionFrame.Deactivate();
-        ConfirmToolFrame.Deactivate();
-        SelectTargetInTeam.SetActive(true);
-        int i = 0;
-        string[] plc = new string[] { "A", "S", "D", "F" };
-        for (; i < CurrentBattle.PlayerParty.Players.Count; i++)
-            SetupKeyInputForPlayer(SelectTargetInTeam.transform.GetChild(i).gameObject, CurrentBattle.PlayerParty.Players[i], plc[i]);
-        for (; i < CurrentBattle.PlayerParty.MAX_NUMBER_OF_PLAYABLE_BATTLERS; i++)
-            SelectTargetInTeam.transform.GetChild(i).gameObject.SetActive(false);
-    }
-
-    private void SetupKeyInputForPlayer(GameObject go, BattlePlayer p, string letterCommand)
-    {
-        go.SetActive(!p.Equals(CP));
-        if (!go.activeSelf) return;
-
-        int crsp = GetCutRelationSP(p);
-        int netSPConsume = CP.SelectedSkill.SPConsume - crsp;
-        if (netSPConsume < 0) netSPConsume = 0;
-        Color disabler = new Color(1, 1, 1, netSPConsume > CP.SP ? DISABLED_TRANSPARENCY : 1);
-
-        go.transform.GetChild(0).GetComponent<Image>().sprite = UIMaster.LetterCommands[letterCommand];
-        go.transform.GetChild(0).GetComponent<Image>().color = disabler;
-        go.transform.GetChild(1).gameObject.SetActive(crsp > 0);
-        go.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = CP.SelectedSkill.SPConsume + "SP";
-        go.transform.GetChild(2).gameObject.SetActive(crsp > 0);
-        go.transform.GetChild(2).GetComponent<TextMeshProUGUI>().text = "-" + crsp + "SP";
-        go.transform.GetChild(3).gameObject.SetActive(true);
-        go.transform.GetChild(3).GetComponent<TextMeshProUGUI>().text = netSPConsume + " SP";
-        go.transform.GetChild(3).GetComponent<TextMeshProUGUI>().color = disabler;
-    }
-
-    private int GetCutRelationSP<B>(B player) where B : Battler
-    {
-        try
-        {
-            //PlayerRelation pcInfo = CurrentBattle.PlayerParty.GetCompanionshipInfo(CP, player as BattlePlayer);
-            return 0;// pcInfo.Points / 2;
-        }
-        catch { return 0; }
-    }
-
-    private void SelectTeammates()
-    {
-        if (!MenuMaster.ReadyToSelectInMenu) return;
-        if (Input.GetKeyDown(KeyCode.Backspace))
-        {
-            HideKeyboardChoiceButtons();
-            ConfirmToolMenuIndex = -1;
-            SetupForSelectSkill();
-            return;
-        }
-        switch (KeyPressed)
-        {
-            case "A": ConfirmTeammateSelection(0); break;
-            case "S": ConfirmTeammateSelection(1); break;
-            case "D": ConfirmTeammateSelection(2); break;
-            case "F": ConfirmTeammateSelection(3); break;
-        }
-    }
-
-    private void ConfirmTeammateSelection(int playerIndex)
-    {
-        GameObject go = SelectTargetInTeam.transform.GetChild(playerIndex).gameObject;
-        if (!go.activeSelf || go.transform.GetChild(3).GetComponent<TextMeshProUGUI>().color.a == DISABLED_TRANSPARENCY) return;
-        go.SetActive(false);
-        HideKeyboardChoiceButtons();
-        SetupForSelectTarget();
-    }
+    public void ActivateSorterSuccess() { }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- Battle phase process: TARGET --
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private void SetupForSelectTarget()
+    private void SetupForPositioning()
     {
-        Selection = Selections.Targets;
-        CommonActionsFrame.transform.GetChild(0).gameObject.SetActive(false);
-        CommonActionsFrame.transform.GetChild(1).gameObject.SetActive(true);
-        CommonActionsFrame.transform.GetChild(2).gameObject.SetActive(false);
-        SelectionFrame.Deactivate();
-        ConfirmToolFrame.Deactivate();
-        TargetSetupTeamTargets();
-        SetupFromScope();
+        Selection = Selections.Positioning;
+        SetActionFrames(false, true);
+        SelectActionFrame.Activate();
+        SelectSkillsFrame.Deactivate();
+        SelectItemsFrame.Deactivate();
+        EventSystem.current.SetSelectedGameObject(null);
+
+        SelectedActiveTool.transform.GetChild(0).GetComponent<Image>().sprite = ActingPlayer.SelectedTool.GetComponent<SpriteRenderer>().sprite;
+        SelectedActiveTool.transform.GetChild(2).GetComponent<TextMeshProUGUI>().text = ActingPlayer.SelectedTool.Name.ToUpper();
+        JustSelectedToolTimer = Time.unscaledTime + JUST_SELECTED_TOOL_TIME_BUFFER;
+
+        ActingPlayer.EnableMoving();
+        ActingPlayer.TryConvertToWeaponSettings();
+        SetScopeTargetSearch(true);
     }
 
-    private void TargetSetupTeamTargets()
+    public void CleanupScope()
     {
-        bool selectOneInOwnTeam = false;
-        bool selectLotsInOwnTeam = false;
-        switch (SelectedTool.Scope)
-        {
-            case ActiveTool.ScopeType.OneAlly:
-            case ActiveTool.ScopeType.OneKnockedOutAllies:
-                SelectTargetInTeam.gameObject.SetActive(true);
-                selectOneInOwnTeam = true;
-                break;
-            case ActiveTool.ScopeType.AllAllies:               // Button only visible if there are allies, otherwise EndDecision() immediately removes the buttons
-            case ActiveTool.ScopeType.AllKnockedOutAllies:     // Button only visible if there are allies, otherwise EndDecision() immediately removes the buttons
-            case ActiveTool.ScopeType.EveryoneButSelf:
-            case ActiveTool.ScopeType.Everyone:
-                SelectTargetInTeam.gameObject.SetActive(true);
-                selectLotsInOwnTeam = true;
-                break;
-        }
-        if (selectOneInOwnTeam || selectLotsInOwnTeam)
-        {
-            string[] playerLetterCommands = new string[] { "A", "S", "D", "F" };
-            for (int i = 0; i < CurrentBattle.PlayerParty.MAX_NUMBER_OF_PLAYABLE_BATTLERS; i++)
-            {
-                SelectTargetInTeam.transform.GetChild(i).GetChild(0).GetComponent<Image>().sprite = UIMaster.LetterCommands[selectOneInOwnTeam ? playerLetterCommands[i] : "A"];
-                SelectTargetInTeam.transform.GetChild(i).GetChild(0).gameObject.SetActive(true);
-                SelectTargetInTeam.transform.GetChild(i).GetChild(1).gameObject.SetActive(false);
-                SelectTargetInTeam.transform.GetChild(i).GetChild(2).gameObject.SetActive(false);
-                SelectTargetInTeam.transform.GetChild(i).GetChild(3).gameObject.SetActive(false);
-                SelectTargetInTeam.transform.GetChild(i).gameObject.SetActive(false);
-            }
-        }
-        SelectTargetInTeam.transform.GetChild(4).gameObject.SetActive(false);
+        foreach (Transform t in CurrentBattle.TargetFields.FieldsList)
+            t.GetComponent<TargetField>().Deactivate();
     }
 
-    private void SetupFromScope()
+    private void SetScopeTargetSearch(bool setToAim)
     {
-        CP.SelectedTargets = new List<Battler>();
-        int i = 0;
-        int i0 = 0;
-        string[] allyKeys = new string[] { "Z", "X", "C", "V", "B" };
-        switch (SelectedTool.Scope)
+        UpdateTarget = null;
+        if (setToAim && ActingPlayer.SelectedTool.Ranged) SetupForAiming();
+
+        switch (ActingPlayer.SelectedTool.Scope)
         {
             case ActiveTool.ScopeType.OneEnemy:
+                CurrentBattle.TargetFields.Single.Activate(ActingPlayer);
+                if (ActingPlayer.SelectedTool.Ranged) AimAtNearestEnemy();
+                else UpdateTarget = AimAtNearestEnemy;
+                break;
+
             case ActiveTool.ScopeType.OneArea:
-                foreach (BattleEnemy e in CurrentBattle.EnemyParty.Enemies)
-                    AddTargetButtonForSpecificEnemy(e, true, e.GenerateDefaultChoiceUI);
+                SetSplashTarget();
                 break;
 
             case ActiveTool.ScopeType.StraightThrough:
-                foreach (BattleEnemy e in CurrentBattle.EnemyParty.Enemies)
-                    AddTargetButtonForSpecificEnemy(e, true, e.GenerateRowChoiceUI);
+                CurrentBattle.TargetFields.StraightThrough.Activate(ActingPlayer);
                 break;
 
             case ActiveTool.ScopeType.Widespread:
-                foreach (BattleEnemy e in CurrentBattle.EnemyParty.Enemies)
-                    AddTargetButtonForSpecificEnemy(e, true, e.GenerateColumnChoiceUI);
+                CurrentBattle.TargetFields.Widespread.Activate(ActingPlayer);
                 break;
 
             case ActiveTool.ScopeType.AllEnemies:
-                TargetAllAI(CurrentBattle.EnemyParty.Enemies, true);
+                TargetAll(CurrentBattle.EnemyParty.Enemies.Where(x => !x.KOd));
                 break;
 
             case ActiveTool.ScopeType.Self:
-                CP.SelectedTargets.Add(CP);
-                EndDecisions();
+                CurrentBattle.TargetFields.Single.Activate(ActingPlayer);
+                UpdateTarget = () => CurrentBattle.TargetFields.Single.AimAt(ActingPlayer, false);
                 break;
 
             case ActiveTool.ScopeType.OneAlly:
-                if (SelectedTool.RandomTarget)
-                {
-                    EndDecisions();
-                    return;
-                }
-                foreach (BattlePlayer p in CurrentBattle.PlayerParty.Players) 
-                    SelectTargetInTeam.transform.GetChild(i++).gameObject.SetActive(!p.Unconscious);
-                foreach (BattleAlly a in CurrentBattle.PlayerParty.Allies)
-                    AddTargetButtonForSpecificAlly(a, true, a.GenerateChoiceUI, allyKeys[i0++]);
+                CurrentBattle.TargetFields.Single.Activate(ActingPlayer);
+                if (ActingPlayer.SelectedTool.Ranged) AimAtNearestKOdPlayer();
+                else UpdateTarget = AimAtNearestKOdPlayer;
                 break;
 
-            case ActiveTool.ScopeType.OneKnockedOutAllies:
-                if (SelectedTool.RandomTarget)
-                {
-                    EndDecisions();
-                    return;
-                }
-                foreach (BattlePlayer p in CurrentBattle.PlayerParty.Players)
-                    SelectTargetInTeam.transform.GetChild(i++).gameObject.SetActive(p.Unconscious);
-                foreach (BattleAlly a in CurrentBattle.PlayerParty.Allies)
-                    AddTargetButtonForSpecificAlly(a, false, a.GenerateChoiceUI, allyKeys[i0++]);
+            case ActiveTool.ScopeType.OneKnockedOutAlly:
+                CurrentBattle.TargetFields.Single.Activate(ActingPlayer);
+                CurrentBattle.TargetFields.Single.AimAt(ActingPlayer, true);
                 break;
 
             case ActiveTool.ScopeType.AllAllies:
-                TargetAllPlayers(CurrentBattle.PlayerParty.Players, true, true);
-                if (!TargetAllAI(CurrentBattle.PlayerParty.Allies, true)) EndDecisions();
+                TargetAll(CurrentBattle.PlayerParty.Players.Where(x => !x.KOd));
                 break;
 
             case ActiveTool.ScopeType.AllKnockedOutAllies:
-                TargetAllPlayers(CurrentBattle.PlayerParty.Players, false, false);
-                if (!TargetAllAI(CurrentBattle.PlayerParty.Allies, false)) EndDecisions();
+                TargetAll(CurrentBattle.PlayerParty.Players.Where(x => x.KOd));
+                break;
+
+            case ActiveTool.ScopeType.TrapSetup:
+                SetSplashTarget(0.6f);
+                break;
+
+            case ActiveTool.ScopeType.Planting:
+                SetSplashTarget(1.5f);
                 break;
 
             case ActiveTool.ScopeType.EveryoneButSelf:
-                TargetAllPlayers(CurrentBattle.PlayerParty.Players, true, false);
-                TargetAllAI(CurrentBattle.PlayerParty.Allies, true);
-                TargetAllAI(CurrentBattle.EnemyParty.Enemies, true);
+                TargetAll(CurrentBattle.AllBattlers.Where(x => !x.KOd && x.Id != ActingPlayer.Id));
                 break;
 
             case ActiveTool.ScopeType.Everyone:
-                TargetAllPlayers(CurrentBattle.PlayerParty.Players, true, true);
-                TargetAllAI(CurrentBattle.PlayerParty.Allies, true);
-                TargetAllAI(CurrentBattle.EnemyParty.Enemies, true);
+                TargetAll(CurrentBattle.AllBattlers.Where(x => !x.KOd));
                 break;
 
             default:
-                EndDecisions();
                 break;
         }
     }
 
-    private delegate void GenerateChoiceUIMode();
-    private void AddTargetButtonForSpecificEnemy(BattleEnemy ai, bool mustBeConscious, GenerateChoiceUIMode func)
+    private void AimAtNearestKOdPlayer()
     {
-        if (!ConsciousnessCheck(ai.Unconscious, mustBeConscious)) return;
-        else if (SelectedTool.RandomTarget) ai.GenerateChoiceUI("A");
-        else func();
+        CurrentBattle.TargetFields.Single.AimAt(ActingPlayer.GetNearestTarget(CurrentBattle.PlayerParty.Players.Where(x => x.KOd)), ActingPlayer.SelectedTool.Ranged);
     }
 
-    private delegate void GenerateChoiceUIModeArg(string customLetter);
-    private void AddTargetButtonForSpecificAlly(BattleAlly ai, bool mustBeConscious, GenerateChoiceUIModeArg func, string argStr)
+    private void AimAtNearestEnemy()
     {
-        if (!ConsciousnessCheck(ai.Unconscious, mustBeConscious)) return;
-        else if (SelectedTool.RandomTarget) ai.GenerateChoiceUI("A");
-        else func(argStr);
+        CurrentBattle.TargetFields.Single.AimAt(ActingPlayer.GetNearestTarget(CurrentBattle.EnemyParty.Enemies.Where(x => !x.KOd)), ActingPlayer.SelectedTool.Ranged);
     }
 
-    private void TargetAllPlayers(List<BattlePlayer> pList, bool mustBeConscious, bool includeUser)
+    private void SetSplashTarget(float scale = 1.0f)
     {
-        for (int i = 0; i < pList.Count; i++)
+        Battle.TargetFieldsGroup tfg = CurrentBattle.TargetFields;
+        TargetField tf = Instantiate(ActingPlayer.SelectedTool.Ranged ? (TargetField)tfg.SplashRange : (TargetField)tfg.SplashMeelee, tfg.FieldsList);
+        tf.DisposeOnDeactivate = true;
+        tf.Activate(ActingPlayer);
+        tf.transform.localScale *= scale;
+        if (tf is DynamicTargetField dtf) dtf.AimAt(ActingPlayer.GetNearestTarget(CurrentBattle.EnemyParty.Enemies.Where(x => !x.KOd)), true);
+    }
+
+    private void TargetAll<T>(IEnumerable<T> battlers) where T : Battler
+    {
+        CurrentBattle.TargetFields.Single.Activate(ActingPlayer);
+        foreach (T battler in battlers)
         {
-            if (!ConsciousnessCheck(pList[i].Unconscious, mustBeConscious)|| pList[i].Equals(CP) && !includeUser) continue;
-            CP.SelectedTargets.Add(pList[i]);
-            SelectTargetInTeam.transform.GetChild(i).gameObject.SetActive(true);
+            DynamicTargetField dtf = Instantiate(CurrentBattle.TargetFields.Single, CurrentBattle.TargetFields.FieldsList);
+            dtf.DisposeOnDeactivate = true;
+            dtf.AimAt(battler, false);
+        }
+        CurrentBattle.TargetFields.Single.Deactivate();
+    }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// -- Battle phase process: AIMING (Ranged moves only) --
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    private void SetupForAiming()
+    {
+        Selection = Selections.Aiming;
+        SetActionFrames(false, true);
+        JustSelectedToolTimer = Time.unscaledTime + JUST_SELECTED_TOOL_TIME_BUFFER;
+        ActingPlayer.DisableMoving();
+    }
+
+    private void SelectingPositioningOrAiming()
+    {
+        if (Input.GetKeyDown(KeyCode.X))
+        {
+            CleanupScope();
+            if (ActingPlayer.SelectedTool is Skill) SetupForSelectSkill();
+            else if (ActingPlayer.SelectedTool is Item) SetupForSelectItem();
+            else SetupForSelectAction();
+        }
+        else if (Input.GetKeyDown(KeyCode.Z))
+        {
+            if (Selection == Selections.Positioning) SetupForAiming();
+            //else ;
         }
     }
 
-    private bool TargetAllAI<T>(List<T> aiList, bool mustBeConscious) where T : Battler
-    {
-        int availableTargets = 0;
-        foreach (T ai in aiList)
-        {
-            if (!ConsciousnessCheck(ai.Unconscious, mustBeConscious)) continue;
-            ai.GenerateChoiceUI("A");
-            CP.SelectedTargets.Add(ai);
-            availableTargets++;
-        }
-        return availableTargets > 0;
-    }
-
-    private bool ConsciousnessCheck(bool IsUnconscious, bool mustBeConscious)
-    {
-        if (mustBeConscious) return !IsUnconscious;
-        else return IsUnconscious;
-    }
-
-    //////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- Finsihed setup: User selecting target in run-time --
-    //////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     private void SelectTarget()
     {
-        if (Input.GetKeyDown(KeyCode.Backspace))
+        if (InputMaster.GoingBack)
         {
-            HideKeyboardChoiceButtons();
-            ConfirmToolMenuIndex = -1;
-            if (SelectedAction == SelectedActions.Skill) SetupForSelectSkill();
-            else if (SelectedAction == SelectedActions.Item) SetupForSelectItem();
+            if (ActingPlayer.SelectedTool is Skill && ActingPlayer.SelectedTool.Id != ActingPlayer.BasicAttackSkill.Id) SetupForSelectSkill();
+            else if (ActingPlayer.SelectedTool is Item) SetupForSelectItem();
             else SetupForSelectAction();
             return;
         }
-        if (SelectedTool.RandomTarget)
+        /*if (SelectedTool.RandomTarget)
         {
             if (KeyPressed.Equals("A")) EndDecisions();
             return;
         }
-        switch (SelectedTool.Scope)
+        switch (ActingPlayer.SelectedTool.Scope)
         {
             case ActiveTool.ScopeType.AllAllies:
             case ActiveTool.ScopeType.AllKnockedOutAllies:
@@ -775,17 +454,17 @@ public class BattleMenu : MonoBehaviour
                     case "C": SelectedEnemyTarget(Battler.VerticalPositions.Bottom, Battler.HorizontalPositions.Right); break;
                 }
                 break;
-        }
+        }*/
     }
 
     private void SelectedPlayerOrAllyTarget<T>(List<T> partyList, int index) where T : Battler
     {
         if (index >= partyList.Count) return;
         T pa = partyList[index];
-        if (SelectedTool.Scope == ActiveTool.ScopeType.OneAlly && !pa.Unconscious ||
-            SelectedTool.Scope == ActiveTool.ScopeType.OneKnockedOutAllies && pa.Unconscious)
+        if (ActingPlayer.SelectedTool.Scope == ActiveTool.ScopeType.OneAlly && !pa.KOd ||
+            ActingPlayer.SelectedTool.Scope == ActiveTool.ScopeType.OneKnockedOutAlly && pa.KOd)
         {
-            CP.SelectedTargets.Add(pa);
+            ActingPlayer.SelectedTargets.Add(pa);
             EndDecisions();
         }
     }
@@ -793,14 +472,14 @@ public class BattleMenu : MonoBehaviour
     private void SelectedEnemyTarget(Battler.VerticalPositions vp, Battler.HorizontalPositions hp)
     {
         bool hitOne = false;
-        switch (SelectedTool.Scope)
+        switch (ActingPlayer.SelectedTool.Scope)
         {
             case ActiveTool.ScopeType.OneEnemy:
             case ActiveTool.ScopeType.OneArea:
                 foreach (BattleEnemy e in CurrentBattle.EnemyParty.Enemies)
                 {
                     if (!e.Selectable() || e.RowPosition != vp || e.ColumnPosition != hp) continue;
-                    CP.SelectedTargets.Add(e);
+                    ActingPlayer.SelectedTargets.Add(e);
                     EndDecisions();
                 }
                 break;
@@ -808,7 +487,7 @@ public class BattleMenu : MonoBehaviour
                 foreach (BattleEnemy e in CurrentBattle.EnemyParty.Enemies)
                 {
                     if (!e.Selectable() || e.RowPosition != vp) continue;
-                    CP.SelectedTargets.Add(e);
+                    ActingPlayer.SelectedTargets.Add(e);
                     hitOne = true;
                 }
                 if (hitOne) EndDecisions();
@@ -817,7 +496,7 @@ public class BattleMenu : MonoBehaviour
                 foreach (BattleEnemy e in CurrentBattle.EnemyParty.Enemies)
                 {
                     if (!e.Selectable() || e.ColumnPosition != hp) continue;
-                    CP.SelectedTargets.Add(e);
+                    ActingPlayer.SelectedTargets.Add(e);
                     hitOne = true;
                 }
                 if (hitOne) EndDecisions();
@@ -831,13 +510,12 @@ public class BattleMenu : MonoBehaviour
 
     private void EndDecisions()
     {
-        HideKeyboardChoiceButtons();
         SetSPConsumption();
         if (CurrentPlayer + 1 < CurrentBattle.PlayerParty.Players.Count)
             ShiftPlayer(1);
         else
         {
-            HideAll();
+            Hide();
             CurrentPlayer = -1;
             CurrentBattle.ExecuteTurn(CurrentBattle.PlayerParty.GetBattlingParty(), CurrentBattle.EnemyParty.ConvertToGeneric());
         }
@@ -845,23 +523,21 @@ public class BattleMenu : MonoBehaviour
     
     private void SetSPConsumption()
     {
-        CP.SPToConsumeThisTurn = CP.SelectedSkill.SPConsume;
+        ActingPlayer.SPToConsumeThisTurn = (ActingPlayer.SelectedTool as Skill).SPConsume;
     }
 
     public void EndTurn()
     {
         for (int i = 0; i < CurrentBattle.PlayerParty.Players.Count; i++)
         {
-            GameObject selected = CharacterInfo.transform.GetChild(i).GetChild(5).gameObject;
+            GameObject selected = PartyFrame.transform.GetChild(i).GetChild(5).gameObject;
             selected.GetComponent<Image>().sprite = null;
             selected.SetActive(false);
         }
         CurrentPlayer = 0;
-        while (!CurrentBattle.PlayerParty.Players[CurrentPlayer].CanMove())
+        while (!CurrentBattle.PlayerParty.Players[CurrentPlayer].CanDoAction())
             CurrentPlayer++;
         Selection = Selections.Actions;
-        LoadReady = false;
-        WaitTimeBeforeTurnStarts = Time.time + 1f;
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -871,57 +547,31 @@ public class BattleMenu : MonoBehaviour
     private void ShiftPlayer(int nextPlayer)
     {
         CurrentPlayer += nextPlayer;
-        while (!CurrentBattle.PlayerParty.Players[CurrentPlayer].CanMove())
+        while (!CurrentBattle.PlayerParty.Players[CurrentPlayer].CanDoAction())
             CurrentPlayer += nextPlayer;
         Selection = Selections.Actions;
-        LoadReady = false;
         CommonActionsFrame.Deactivate();
-        SelectionFrame.Deactivate();
-        WaitTimeBeforeTurnStarts = Time.time + 0.3f;
-    }
-
-    private void HideKeyboardChoiceButtons()
-    {
-        SelectTargetInTeam.gameObject.SetActive(false);
-        for (int i = 0; i < CurrentBattle.PlayerParty.Players.Count; i++) SelectTargetInTeam.transform.GetChild(i).gameObject.SetActive(false);
-        foreach (BattleAlly a in CurrentBattle.PlayerParty.Allies) a.RemoveChoiceUI();
-        foreach (BattleEnemy e in CurrentBattle.EnemyParty.Enemies) e.RemoveChoiceUI();
-    }
-
-    private void HideAll()
-    {
-        Selection = Selections.Animating;
-        SelectedAction = SelectedActions.None;
-        CharacterInfo.Deactivate();
-        CommonActionsFrame.Deactivate();
-        SelectionFrame.Deactivate();
-        ConfirmToolFrame.Deactivate();
-        SelectTargetInTeam.SetActive(false);
     }
 
     private Weapon GetNextWeapon()
     {
-        int selectedI = 0;
-        for (int i = 1; i < CP.Weapons.Count; i++)
-            if (CP.Weapons[i].Equals(CP.SelectedWeapon))
-                selectedI = i;
-        return CP.Weapons[(selectedI + 1) % CP.Weapons.Count];
+        int selectedI = ActingPlayer.Weapons.FindIndex(x => x.Id == ActingPlayer.SelectedWeapon.Id);
+        return ActingPlayer.Weapons[(selectedI + 1) % ActingPlayer.Weapons.Count];
     }
 
     private void SetWeaponOnMenuAndCharacter()
     {
-        SelectActionList.transform.GetChild(0).GetChild(0).GetComponent<Image>().sprite = CP.SelectedWeapon.GetComponent<SpriteRenderer>().sprite;
-        CommonActionsFrame.transform.GetChild(2).GetChild(0).GetComponent<Image>().sprite = CP.SelectedWeapon.GetComponent<SpriteRenderer>().sprite;
-        CommonActionsFrame.transform.GetChild(2).GetChild(2).gameObject.SetActive(CP.Weapons.Count > 1);
+        SelectActionFrame.transform.GetChild(0).GetChild(0).GetComponent<Image>().sprite = ActingPlayer.SelectedWeapon.GetComponent<SpriteRenderer>().sprite;
+        CommonActionsFrame.transform.GetChild(2).GetChild(0).GetComponent<Image>().sprite = ActingPlayer.SelectedWeapon.GetComponent<SpriteRenderer>().sprite;
+        CommonActionsFrame.transform.GetChild(2).GetChild(2).gameObject.SetActive(ActingPlayer.Weapons.Count > 1);
         CommonActionsFrame.transform.GetChild(2).gameObject.SetActive(true);
-        // Set weapon on character as well
     }
 
     private void GrayOutIconSelection(GameObject go, bool condition)
     {
-        float a = condition ? DISABLED_TRANSPARENCY : 1;
-        if (condition && go.GetComponent<Image>().color.a == DISABLED_TRANSPARENCY) return;
-        else if (!condition && go.GetComponent<Image>().color.a != DISABLED_TRANSPARENCY) return;
+        float a = condition ? DISABLED_ICON_TRANSPARENCY : 1;
+        if (condition && go.GetComponent<Image>().color.a == DISABLED_ICON_TRANSPARENCY) return;
+        else if (!condition && go.GetComponent<Image>().color.a != DISABLED_ICON_TRANSPARENCY) return;
         go.GetComponent<Image>().color = new Color(1, 1, 1, a);
         go.transform.GetChild(0).GetComponent<Image>().color = new Color(1, 1, 1, a);
         if (Selection == Selections.Actions)
@@ -933,7 +583,7 @@ public class BattleMenu : MonoBehaviour
 
     private bool IsDisabled(GameObject go)
     {
-        return go.GetComponent<Image>().color.a == DISABLED_TRANSPARENCY;
+        return go.GetComponent<Image>().color.a == DISABLED_ICON_TRANSPARENCY;
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -942,18 +592,14 @@ public class BattleMenu : MonoBehaviour
 
     private void SelectRun()
     {
-        HideAll();
-        SelectedAction = SelectedActions.Run;
+        Hide();
+        Selection = Selections.Running;
         //CurrentBattle.RunAway();
     }
 
     private void RunFailed()
     {
-        Selection = Selections.Animating;
-        for (int i = 0; i < CurrentBattle.PlayerParty.Players.Count; i++)
-        {
-            CurrentBattle.PlayerParty.Players[i].SelectedSkill = null;
-            CurrentBattle.PlayerParty.Players[i].SelectedItem = null;
-        }
+        Selection = Selections.Disabled;
+        for (int i = 0; i < CurrentBattle.PlayerParty.Players.Count; i++) CurrentBattle.PlayerParty.Players[i].ClearDecisions();
     }
 }

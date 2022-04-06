@@ -51,7 +51,7 @@ public class MMSpecial : MM_Super
             if (SkillsList.SelectedObject.EnoughSPFrom(PartyUserList.SelectedObject)) Selection = Selections.SelectTarget;
             else
             {
-                SkillsList.Refresh(PartyUserList.SelectedObject);
+                SkillsList.Refresh(PartyUserList.SelectedObject, MenuManager.PartyInfo.GetWholeParty());
                 UndoSelectTarget();
             }
         }
@@ -110,7 +110,7 @@ public class MMSpecial : MM_Super
         if (!ListsSetup || Selection != Selections.SelectPlayer) return;
         PartyUserList.SetSelected();
         SkillsList.Activate();
-        SkillsList.Refresh(PartyUserList.SelectedObject);
+        SkillsList.Refresh(PartyUserList.SelectedObject, MenuManager.PartyInfo.GetWholeParty());
     }
 
     public void DeselectUser()
@@ -163,13 +163,13 @@ public class MMSpecial : MM_Super
             case ActiveTool.ScopeType.OneAlly:
             case ActiveTool.ScopeType.Self:
                 foreach (Battler p in party)
-                    if (!p.Unconscious) SelectableTeammates.Add(p);
+                    if (!p.KOd) SelectableTeammates.Add(p);
                 SelectAllTeammates = false;
                 break;
 
-            case ActiveTool.ScopeType.OneKnockedOutAllies:
+            case ActiveTool.ScopeType.OneKnockedOutAlly:
                 foreach (Battler p in party)
-                    if (p.Unconscious) SelectableTeammates.Add(p);
+                    if (p.KOd) SelectableTeammates.Add(p);
                 SelectAllTeammates = false;
                 break;
 
@@ -177,13 +177,13 @@ public class MMSpecial : MM_Super
             case ActiveTool.ScopeType.EveryoneButSelf:
             case ActiveTool.ScopeType.Everyone:
                 foreach (Battler p in party)
-                    if (!p.Unconscious) SelectableTeammates.Add(p);
+                    if (!p.KOd) SelectableTeammates.Add(p);
                 SelectAllTeammates = true;
                 break;
 
             case ActiveTool.ScopeType.AllKnockedOutAllies:
                 foreach (Battler p in party)
-                    if (p.Unconscious) SelectableTeammates.Add(p);
+                    if (p.KOd) SelectableTeammates.Add(p);
                 SelectAllTeammates = true;
                 break;
         }

@@ -14,7 +14,9 @@ public class BattlePlayer : Battler
     public List<BattlerClass> ClassSet;
     public List<SkillLearnLevel> SkillSet;
 
-    [HideInInspector] public Skill AttackSkill;
+    [HideInInspector] public Skill BasicAttackSkill;
+
+    public bool UsingBasicAttack => SelectedTool is Skill && SelectedTool.Id == BasicAttackSkill.Id;
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- Setup --
@@ -23,17 +25,18 @@ public class BattlePlayer : Battler
     protected new void Awake()
     {
         base.Awake();
-        AttackSkill = Resources.Load<Skill>("Prefabs/Skills/Attack");
+        BasicAttackSkill = Resources.Load<Skill>("Prefabs/Skills/Attack");
     }
 
     protected override void Start()
     {
         base.Start();
+        Speed = 6;
     }
     
     protected override Skill GetDefaultSkill()
     {
-        Skill sk = AttackSkill;
+        Skill sk = BasicAttackSkill;
         sk.ConvertToWeaponSettings(SelectedWeapon);
         return sk;
     }
@@ -64,6 +67,7 @@ public class BattlePlayer : Battler
 
     protected override void Update()
     {
+        Movement = CanMove ? new Vector3(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")) : Vector3.zero;
         base.Update();
     }
 

@@ -38,16 +38,10 @@ public abstract class BattlerAI : Battler
     public void MakeDecision(List<Battler> usersPartyMembers, List<Battler> opponentPartyMembers)
     {
         ExecutedAction = false;
-        if (!CanMove()) return;
+        if (!CanDoAction()) return;
         SelectedWeapon = SelectWeapon(usersPartyMembers, opponentPartyMembers);
         ActiveTool t = SelectTool(usersPartyMembers, opponentPartyMembers);
-        if (t == null) return;
-        switch (t.GetType().Name)
-        {
-            case "Skill": SelectedSkill = t as Skill; break;
-            case "Item": SelectedItem = t as Item; break;
-        }
-        SelectedTargets = SelectTargets(usersPartyMembers, opponentPartyMembers);
+        if (t != null) SelectedTargets = SelectTargets(usersPartyMembers, opponentPartyMembers);
     }
 
     protected Weapon SelectWeapon(List<Battler> usersPartyMembers, List<Battler> opponentPartyMembers)

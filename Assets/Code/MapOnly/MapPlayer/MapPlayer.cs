@@ -117,7 +117,7 @@ public class MapPlayer : MapExplorer
             else if (Input.GetKeyDown(KeyCode.T)) SceneMaster.OpenStorage(Party);   // TEST MODE
         }
         base.Update();
-        if (gameObject.layer == NON_COLLIDABLE_EXPLORER_LAYER && !IsBlinking()) gameObject.layer = PLAYER_LAYER;
+        if (gameObject.layer == NON_COLLIDABLE_EXPLORER_LAYER && !IsBlinking()) gameObject.layer = MAP_PLAYER_LAYER;
         Movement = new Vector3(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
         Figure.velocity = Movement * Speed;
         AnimateDirection();

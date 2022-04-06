@@ -27,7 +27,7 @@ public class MapEnemy : MapExplorer
             return;
         }
         base.Update();
-        if (gameObject.layer == NON_COLLIDABLE_EXPLORER_LAYER && !IsBlinking()) gameObject.layer = ENEMY_LAYER;
+        if (gameObject.layer == NON_COLLIDABLE_EXPLORER_LAYER && !IsBlinking()) gameObject.layer = MAP_ENEMY_LAYER;
         if (SceneMaster.InCutscene && ChasingPlayer)
         {
             StopGoingAfterPlayer();

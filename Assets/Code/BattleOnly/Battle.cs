@@ -7,9 +7,30 @@ public class Battle : MonoBehaviour
 {
     public enum BattleStates { None, Menu, Action, Won, GameOver }
 
+    // Collision detection
+    public const int BATTLER_LAYER = 11;
+
+    // Loading
+    public bool Waiting => Time.unscaledTime < AwaitingTime;
+    private float AwaitingTime;
+    private const float AWAITING_TIME_BEFORE_ACTION_START = 0.5f;
+
     // UI
     public BattleMenu BattleMenu;
     public BattleWin BattleWinMenu;
+
+    // Target fields
+    [System.Serializable]
+    public struct TargetFieldsGroup
+    {
+        public Transform FieldsList;
+        public DynamicTargetField Single;
+        public DynamicTargetField SplashRange;
+        public StaticTargetField SplashMeelee;
+        public StaticTargetField StraightThrough;
+        public StaticTargetField Widespread;
+    }
+    public TargetFieldsGroup TargetFields;
 
     // Data transferred from Map
     [HideInInspector] public Environment Enviornment;
@@ -42,12 +63,21 @@ public class Battle : MonoBehaviour
     // Manage the battlers themselves
     private List<Battler> Battlers;
     private Battler ActingBattler;
+    private Battler NextActingBattler;
     private int ActingBattlerIndex;
-    
+
+    public IEnumerable<Battler> AllBattlers => Battlers;
+
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- Setup --
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    private void Awake()
+    {
+        Physics2D.IgnoreLayerCollision(BATTLER_LAYER, BATTLER_LAYER);
+        BattleMenu.CleanupScope();
+    }
 
     void Start()
     {
@@ -59,6 +89,7 @@ public class Battle : MonoBehaviour
         foreach (BattlePlayer p in PlayerParty.Players) Battlers.Add(p);
         foreach (BattleAlly a in PlayerParty.Allies) Battlers.Add(a);
         foreach (BattleEnemy e in EnemyParty.Enemies) Battlers.Add(e);
+        TurnStart();
     }
 
     void SetupBackground()
@@ -68,33 +99,36 @@ public class Battle : MonoBehaviour
 
     void SetupPlayerParty()
     {
-        Transform playerPartySquare = GameObject.Find("/PlayerParty").transform;
+        Transform playerPartyGameObject = GameObject.Find("/PlayerParty").transform;
         PlayerParty = Instantiate(BattleMaster.PlayerParty, gameObject.transform);
         PlayerParty.Players = SetupPlayerPositions(PlayerParty.Players);
-        for (int i = 0; i < PlayerParty.Players.Count; i++)
-        {
-            BattlePlayer bpO = PlayerParty.Players[i];
-            Vector3 bpPos = playerPartySquare.position + Positions[(int)bpO.RowPosition][(int)bpO.ColumnPosition];
-            BattlePlayer bp = Instantiate(bpO, bpPos, Quaternion.identity, playerPartySquare);
-            bp.AttackSkill = Instantiate(bp.AttackSkill, bp.transform);
-            bp = InstantiateContents(bp);
-            bp.transform.localScale = Vector3.one * 0.5f;
-            bp.gameObject.SetActive(true);
-            PlayerParty.Players[i] = bp;
-        }
         PlayerParty.Allies = SetupAllyPositions(PlayerParty.Allies);
-        for (int i = 0; i < PlayerParty.Allies.Count; i++)
+        PlayerParty.Players = SetupBattlers(PlayerParty.Players, playerPartyGameObject);
+        PlayerParty.Allies = SetupBattlers(PlayerParty.Allies, playerPartyGameObject);
+    }
+
+    void SetupEnemyParty()
+    {
+        Transform enemyPartySquare = GameObject.Find("/EnemyParty").transform;
+        EnemyParty = Instantiate(BattleMaster.EnemyParty, gameObject.transform);
+        EnemyParty.gameObject.SetActive(false);
+        EnemyParty.Enemies = SetupBattlers(EnemyParty.Enemies, enemyPartySquare);
+    }
+
+    List<T> SetupBattlers<T>(List<T> list, Transform playerPartySquare) where T : Battler
+    {
+        List<T> result = new List<T>();
+        foreach (Battler b0 in list)
         {
-            BattleAlly baO = PlayerParty.Allies[i];
-            Vector3 baPos = playerPartySquare.position + Positions[(int)baO.RowPosition][(int)baO.ColumnPosition];
-            BattleAlly ba = Instantiate(baO, baPos, Quaternion.identity, playerPartySquare);
-            ba = InstantiateContents(ba);
-            ba.transform.position = new Vector3(ba.transform.position.x, ba.transform.position.y + 1.5f);
-            ba.transform.localScale = Vector3.one * 0.5f;
-            ba.gameObject.SetActive(true);
-            ba.RemoveChoiceUI();
-            PlayerParty.Allies[i] = ba;
+            Vector3 bpPos = playerPartySquare.position + Positions[(int)b0.RowPosition][(int)b0.ColumnPosition];
+            T b = (T)Instantiate(b0, bpPos, Quaternion.identity, playerPartySquare);
+            if (b is BattlePlayer p) p.BasicAttackSkill = Instantiate(p.BasicAttackSkill, b.transform);
+            b = InstantiateContents(b);
+            b.transform.localScale = Vector3.one * 0.5f;
+            b.gameObject.SetActive(true);
+            result.Add(b);
         }
+        return result;
     }
 
     List<BattlePlayer> SetupPlayerPositions(List<BattlePlayer> party)
@@ -138,40 +172,16 @@ public class Battle : MonoBehaviour
         return allies;
     }
 
-    void SetupEnemyParty()
-    {
-        Transform enemyPartySquare = GameObject.Find("/EnemyParty").transform;
-        EnemyParty = Instantiate(BattleMaster.EnemyParty, gameObject.transform);
-        EnemyParty.gameObject.SetActive(false);
-        for (int i = 0; i < EnemyParty.Enemies.Count; i++)
-        {
-            BattleEnemy beO = EnemyParty.Enemies[i];
-            Vector3 bePos = enemyPartySquare.position + Positions[(int)beO.RowPosition][(int)beO.ColumnPosition];
-            BattleEnemy be = Instantiate(beO, bePos, Quaternion.identity, enemyPartySquare);
-            be = InstantiateContents(be);
-            be.transform.position = new Vector3(be.transform.position.x, be.transform.position.y + 1.5f);
-            be.transform.localScale = Vector3.one * 0.5f;
-            be.RemoveChoiceUI();
-            EnemyParty.Enemies[i] = be;
-        }
-    }
-
     private T InstantiateContents<T>(T b) where T : Battler
     {
-        /*for (int i = 0; i < b.Skills.Count; i++)
+        for (int i = 0; i < b.Skills.Count; i++)
         {
             b.Skills[i] = Instantiate(b.Skills[i], b.transform);
             b.Skills[i].DisableForWarmup();
         }
-        for (int i = 0; i < b.TeamSkills.Count; i++)
-        {
-            b.TeamSkills[i] = Instantiate(b.TeamSkills[i], b.transform);
-            b.TeamSkills[i].DisableForWarmup();
-        }
         for (int i = 0; i < b.Weapons.Count; i++) b.Weapons[i] = Instantiate(b.Weapons[i], b.transform);
-        for (int i = 0; i < b.Items.Count; i++) b.Items[i] = Instantiate(b.Items[i], b.transform);
-        for (int i = 0; i < b.PassiveSkills.Count; i++) b.PassiveSkills[i] = Instantiate(b.PassiveSkills[i], b.transform);
-        for (int i = 0; i < b.States.Count; i++) b.States[i] = Instantiate(b.States[i], b.transform);*/
+        for (int i = 0; i < b.Accessories.Count; i++) b.Accessories[i] = Instantiate(b.Accessories[i], b.transform);
+        for (int i = 0; i < b.States.Count; i++) b.States[i] = Instantiate(b.States[i], b.transform);
         b.StatBoosts.SetToZero();
         return b;
     }
@@ -182,7 +192,7 @@ public class Battle : MonoBehaviour
 
     private void Update()
     {
-        if (Time.time <= BattleStateTime) return;
+        if (Waiting) return;
         switch (BattleState)
         {
             case BattleStates.Action:
@@ -201,11 +211,9 @@ public class Battle : MonoBehaviour
                     EndingAction = false;
                     return;
                 }
-                if (ActingBattler.GetType().Name == "BattleEnemy") ActingBattler.ExecuteAction(EnemyPartyMembers, PlayerPartyMembers);
+                if (ActingBattler is BattleEnemy) ActingBattler.ExecuteAction(EnemyPartyMembers, PlayerPartyMembers);
                 else ActingBattler.ExecuteAction(PlayerPartyMembers, EnemyPartyMembers);
-                ActiveTool abt = ActingBattler.SelectedToolMove;
-                if (abt)
-                    BattleStateTime = Time.time + abt.ActionTime;
+                BattleStateTime = Time.time + (ActingBattler.SelectedTool?.ActionTime ?? 0);
                 break;
 
             case BattleStates.Won:
@@ -221,19 +229,45 @@ public class Battle : MonoBehaviour
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// -- Before action execution --
+    /// -- Turn Start --
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public void TurnStartSetup()
+    public void Await(float m = 1)
     {
-        ActingBattlerIndex = 0;
-        Battlers = SortBattlersBySpeed(Battlers);
-        ActingBattler = Battlers[ActingBattlerIndex];
-        EndingAction = false;
-        EndingTurn = false;
+        AwaitingTime = Time.unscaledTime + AWAITING_TIME_BEFORE_ACTION_START * m;
     }
 
-    // Insertion sort: best algorithm for this, since it order very rarely changes after the first setup, giving an overall O(N) runtime.
+    public void TurnStart()
+    {
+        Await(4);
+        ActingBattlerIndex = 0;
+        EndingAction = false;
+        EndingTurn = false;
+        ActionStart();
+    }
+
+    private void ActionStart()
+    {
+        Battlers = SortBattlersBySpeed(Battlers);
+        ActingBattler = Battlers[ActingBattlerIndex];
+        NextActingBattler = Battlers[(ActingBattlerIndex + 1) % Battlers.Count];
+
+        if (ActingBattler is BattlePlayer p)
+        {
+            BattleState = BattleStates.Menu;
+            BattleMenu.Setup(p);
+        }
+        else // Ally or enemy
+        {
+            BattleState = BattleStates.Action;
+            BattleMenu.Hide();
+            ActingBattler.EnableMoving();
+        }
+        if (NextActingBattler is BattlePlayer p0) BattleMenu.DeclareNext(p0);
+        //else;
+    }
+
+    // Insertion sort: Order very rarely changes after the first setup, giving an overall O(N) runtime.
     private List<Battler> SortBattlersBySpeed(List<Battler> battlers)
     {
         for (int i = ActingBattlerIndex; i < battlers.Count - 1; i++)
@@ -307,16 +341,16 @@ public class Battle : MonoBehaviour
     private bool EnemyPartyDefeated()
     {
         foreach (BattleEnemy e in EnemyParty.Enemies)
-            if (!e.Unconscious) return false;
+            if (!e.KOd) return false;
         return true;
     }
 
     private bool PlayerPartyDefeated()
     {
         foreach (BattlePlayer p in PlayerParty.Players)
-            if (!p.Unconscious) return false;
+            if (!p.KOd) return false;
         foreach (BattleAlly a in PlayerParty.Allies)
-            if (!a.Unconscious) return false;
+            if (!a.KOd) return false;
         return true;
     }
 

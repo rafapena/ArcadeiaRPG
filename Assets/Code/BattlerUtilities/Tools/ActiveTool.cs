@@ -7,8 +7,8 @@ public abstract class ActiveTool : BaseObject
 
     public enum ScopeType {
         None, OneEnemy, OneArea, StraightThrough, Widespread, AllEnemies,
-        Self, OneAlly, OneKnockedOutAllies, AllAllies, AllKnockedOutAllies,
-        EveryoneButSelf, Everyone }
+        Self, OneAlly, OneKnockedOutAlly, AllAllies, AllKnockedOutAllies,
+        TrapSetup, Planting, EveryoneButSelf, Everyone }
 
     public BattleMaster.ToolTypes Type;
     public BattleMaster.ToolFormulas Formula;
@@ -39,6 +39,8 @@ public abstract class ActiveTool : BaseObject
     private int ElementMagnitude;
     private StateRate[] StatesGiveRate;
     private StateRate[] StatesReceiveRate;
+
+    public bool Ranged => Range > 30;
 
     protected override void Awake()
     {

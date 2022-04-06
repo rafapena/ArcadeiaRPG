@@ -74,4 +74,9 @@ public class PlayerSelectionList : SelectionList_Super<Battler>
         }
         for (; i < statesGO.childCount; i++) statesGO.GetChild(i).gameObject.SetActive(false);
     }
+
+    public int GetId(int index)
+    {
+        return ReferenceData[index].Id;
+    }
 }
