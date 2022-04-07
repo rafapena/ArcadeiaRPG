@@ -9,6 +9,8 @@ public class Battle : MonoBehaviour
 
     // Collision detection
     public const int BATTLER_LAYER = 11;
+    public const int BATTLE_WALL_LAYER = 12;
+    public const int SCOPE_THROUGH_LAYER = 13;
 
     // Loading
     public bool Waiting => Time.unscaledTime < AwaitingTime;
@@ -76,7 +78,9 @@ public class Battle : MonoBehaviour
     private void Awake()
     {
         Physics2D.IgnoreLayerCollision(BATTLER_LAYER, BATTLER_LAYER);
-        BattleMenu.CleanupScope();
+        Physics2D.IgnoreLayerCollision(SCOPE_THROUGH_LAYER, BATTLER_LAYER);
+        Physics2D.IgnoreLayerCollision(SCOPE_THROUGH_LAYER, BATTLE_WALL_LAYER);
+        BattleMenu.ClearScope();
     }
 
     void Start()
@@ -100,7 +104,7 @@ public class Battle : MonoBehaviour
     void SetupPlayerParty()
     {
         Transform playerPartyGameObject = GameObject.Find("/PlayerParty").transform;
-        PlayerParty = Instantiate(BattleMaster.PlayerParty, gameObject.transform);
+        PlayerParty = BattleMaster.PlayerParty;
         PlayerParty.Players = SetupPlayerPositions(PlayerParty.Players);
         PlayerParty.Allies = SetupAllyPositions(PlayerParty.Allies);
         PlayerParty.Players = SetupBattlers(PlayerParty.Players, playerPartyGameObject);

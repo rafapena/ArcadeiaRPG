@@ -95,6 +95,7 @@ public class MMBlueprints : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameO
         base.Open();
         WeaponsUI.Initialize(MenuManager.PartyInfo);
         HandleTabs();
+        CollectionFrame.ToolList.SetEnableCondition(EnoughMaterials);
         CollectionFrame.InitializeSelection();
     }
 
@@ -141,7 +142,7 @@ public class MMBlueprints : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameO
     public void SelectTabSuccess()
     {
         Selection = Selections.SelectingBlueprints;
-        CollectionFrame.ToolList.RefreshEnabling(EnoughMaterials);
+        CollectionFrame.ToolList.RefreshEnabling();
     }
 
     public void SelectTabFailed()
@@ -279,7 +280,7 @@ public class MMBlueprints : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameO
         CraftDoneBlock.SetActive(false);
         if (Legend) Legend.SetActive(true);
         CollectionFrame.UndoSelectTool();
-        CollectionFrame.ToolList.RefreshEnabling(EnoughMaterials);
+        CollectionFrame.ToolList.RefreshEnabling();
         MenuMaster.SetupSelectionBufferInMenu();
         Resetting = false;
     }

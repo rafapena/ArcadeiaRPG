@@ -5,22 +5,22 @@ using UnityEngine;
 public class DynamicTargetField : TargetField
 {
     protected Vector3 Movement;
-    public float Speed;
+    private float Speed;
 
-    public float DefaultSpeed { get; private set; }
+    [SerializeField]
+    public float DefaultSpeed;
 
     // Start is called before the first frame update
     protected override void Start()
     {
         base.Start();
-        DefaultSpeed = Speed;
     }
 
     // Update is called once per frame
     protected override void Update()
     {
         if (!gameObject.activeSelf) return;
-        Movement = new Vector3(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"));
+        Movement = InputMaster.GetCustomMovementControls(KeyCode.UpArrow, KeyCode.DownArrow, KeyCode.LeftArrow, KeyCode.RightArrow);
         Figure.velocity = Movement * Speed;
     }
 

@@ -3,7 +3,6 @@ using UnityEngine;
 
 public class Weapon : ActiveTool, IToolEquippable
 {
-    public Stats EquipBoosts;
     public BattleMaster.WeaponTypes WeaponType;
     public bool CollideRange;
 

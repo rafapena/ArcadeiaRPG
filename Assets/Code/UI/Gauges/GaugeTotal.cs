@@ -11,29 +11,32 @@ public class GaugeTotal : GaugeWithText
 
     public int Max { get; private set; }
 
+    private const int CURRENT_TEXT_SIZE = 125;
+    private const int MAX_TEXT_SIZE = 75;
+
     protected override void SetBarAmount()
     {
         base.SetBarAmount();
-        Label.text = Current + "/" + Max;
+        SetLabelText(Current);
     }
 
     protected override void UpdateIncreaseInRealTime()
     {
         base.UpdateIncreaseInRealTime();
-        Label.text = Math.Round(Bar.fillAmount * Max) + "/" + Max;
+        SetLabelText((int)Math.Round(Bar.fillAmount * Max));
     }
 
     protected override void UpdateDecreaseInRealTime()
     {
         base.UpdateDecreaseInRealTime();
-        Label.text = Math.Round(Bar.fillAmount * Max) + "/" + Max;
+        SetLabelText((int)Math.Round(Bar.fillAmount * Max));
     }
 
     public override void Set(float current, float max)
     {
         Current = (int)current;
         Max = (int)max;
-        Label.text = Current + "/" + Max;
+        SetLabelText(Current);
         base.Set(current, max);
     }
 
@@ -47,17 +50,22 @@ public class GaugeTotal : GaugeWithText
     public override void Fill()
     {
         base.Fill();
-        Label.text = Max + "/" + Max;
+        SetLabelText(Max);
     }
 
     public override void Empty()
     {
         base.Empty();
-        Label.text = "0/" + Max;
+        SetLabelText(0);
     }
 
     protected override bool SurpassedCap()
     {
         return Current > Max;
+    }
+
+    private void SetLabelText(int current)
+    {
+        Label.text = "<size=" + CURRENT_TEXT_SIZE + "%>" + current + "</size><size=" + MAX_TEXT_SIZE + "%>/" + Max + "</size>";
     }
 }

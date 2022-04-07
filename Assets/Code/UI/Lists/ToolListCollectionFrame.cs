@@ -169,7 +169,7 @@ public class ToolListCollectionFrame : MonoBehaviour
     public void SelectTool()
     {
         if (!MenuMaster.ReadyToSelectInMenu) return;
-        else if (!ToolList.RefreshToolInfo())
+        else if (!ToolList.RefreshToolInfo() || ToolList.SelectedEntryIsDisabled())
         {
             if (ToolList.SelectedButton) ToolList.SelectedButton.ClearHighlights();
             SelectToolFailed?.Invoke();

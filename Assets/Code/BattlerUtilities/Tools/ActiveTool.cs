@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public abstract class ActiveTool : BaseObject
@@ -20,23 +21,19 @@ public abstract class ActiveTool : BaseObject
     public int SPPecent;
     public int HPRecoil;
     public ScopeType Scope;
-    public int ConsecutiveActs = 1;
-    public bool RandomTarget;
     public BattleMaster.Elements Element;
     public bool AlwaysHits;
     public int Power = 10;
     public int Range = 50;
+    public int CriticalRate = 0;
     public int Accuracy = 100;
-    public int CriticalRate = 2;
     public int Variance;
-    public int Priority;
     public Projectile Projectile;
     public List<BattlerClass> ClassExclusives;
     public StateRate[] ChangedStatesGiveRate;
     public StateRate[] ChangedStatesReceiveRate;
 
     [HideInInspector] public bool Disabled;
-    private int ElementMagnitude;
     private StateRate[] StatesGiveRate;
     private StateRate[] StatesReceiveRate;
 
@@ -157,5 +154,18 @@ public abstract class ActiveTool : BaseObject
     public bool UsedByClassUser(Battler battler)
     {
         return ClassExclusives.Count == 0 || ClassExclusives.Contains(battler.Class);
+    }
+
+    public bool AvailableTeammateTargets(List<Battler> battlersGroup)
+    {
+        switch (Scope)
+        {
+            case ScopeType.OneKnockedOutAlly:
+            case ScopeType.AllKnockedOutAllies:
+                return battlersGroup.Where(x => x.KOd).Any();
+            case ScopeType.EveryoneButSelf:
+                return battlersGroup.Where(x => !x.KOd).Any();
+        }
+        return true;
     }
 }

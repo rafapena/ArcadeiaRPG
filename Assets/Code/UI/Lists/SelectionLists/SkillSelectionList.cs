@@ -18,15 +18,17 @@ public class SkillSelectionList : SelectionList_Super<Skill>
     private static string[] Unusabilities = new string[10];
 
     // Colors
-    private Color NormalSkillColor = Color.white;
-    private Color DisabledSkillColor;
+    private Color NormalColor = Color.white;
+    private Color NormalSPTextColor;
+    private Color DisabledColor;
 
     public bool CanSelectSkill => !CannotUseFrame.activeSelf;
 
     private void Start()
     {
         CannotUseFrame.SetActive(false);
-        DisabledSkillColor = transform.GetChild(0).GetComponent<Button>().colors.disabledColor;
+        NormalSPTextColor = transform.GetChild(0).GetChild(2).GetComponent<TextMeshProUGUI>().color;
+        DisabledColor = transform.GetChild(0).GetComponent<Button>().colors.disabledColor;
     }
 
     public void Activate()
@@ -53,8 +55,11 @@ public class SkillSelectionList : SelectionList_Super<Skill>
             AddToList(entry.transform, dataEntry);
             
             Unusabilities[i] = GetUnusability(dataEntry);
-            entry.transform.GetChild(0).GetComponent<Image>().color = Unusabilities[i].Equals("") ? NormalSkillColor : DisabledSkillColor;
-            
+            bool usable = Unusabilities[i].Equals("");
+            entry.transform.GetChild(0).GetComponent<Image>().color = usable ? NormalColor : DisabledColor;
+            entry.transform.GetChild(1).GetComponent<TextMeshProUGUI>().color = usable ? NormalColor : DisabledColor;
+            entry.transform.GetChild(2).GetComponent<TextMeshProUGUI>().color = usable ? NormalSPTextColor : DisabledColor;
+
             ListSelectable e = entry.GetComponent<ListSelectable>();
             e.Index = i;
             e.ClearHighlights();
@@ -100,9 +105,9 @@ public class SkillSelectionList : SelectionList_Super<Skill>
         string msg = "";
         if (!skill.CanUseOutsideOfBattle && !SceneMaster.InBattle) msg = "CANNOT USE OUTSIDE OF BATTLE";
         else if (!skill.EnoughSPFrom(ReferenceBattler)) msg = "NOT ENOUGH SP TO USE";
-        else if (!skill.UsedByClassUser(ReferenceBattler)) msg = "MUST BE A " + skill.ClassExclusives[0] + " TO USE".ToUpper();
-        else if (!skill.UsedByWeaponUser(ReferenceBattler)) msg = "MUST HAVE A " + skill.WeaponExclusives[0] + " TO USE".ToUpper();
-        else if (!skill.AvailableTeammateTargets(ReferenceBattler, BattlersGroup)) msg = "NO AVAILABLE SELECTIONS WITHIN SCOPE";
+        else if (!skill.UsedByClassUser(ReferenceBattler)) msg = "MUST BE A " + skill.ClassExclusives[0].Name.ToUpper() + " TO USE";
+        else if (!skill.UsedByWeaponUser(ReferenceBattler)) msg = "MUST HAVE A " + skill.WeaponExclusives[0].ToString().ToUpper() + " TO USE";
+        else if (!skill.AvailableTeammateTargets(BattlersGroup)) msg = "NO AVAILABLE SELECTIONS WITHIN SCOPE";
         return msg;
     }
 

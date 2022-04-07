@@ -13,7 +13,12 @@ public class StaticTargetField : TargetField
     // Update is called once per frame
     protected override void Update()
     {
-        
+        if (Player)
+        {
+            Vector3 pos = Player.transform.position;
+            pos.x += ((RectTransform)transform).sizeDelta.x * transform.localScale.x / 2;
+            transform.position = pos;
+        }
     }
 
     public override void Activate(BattlePlayer p)

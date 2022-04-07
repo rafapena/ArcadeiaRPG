@@ -7,8 +7,6 @@ public abstract class TargetField : MonoBehaviour
     [HideInInspector] public Rigidbody2D Figure;
     public bool DisposeOnDeactivate;
     protected BattlePlayer Player;
-    
-    public bool IsPlacement { get; private set; }
 
     // Start is called before the first frame update
     protected virtual void Start()
@@ -30,13 +28,7 @@ public abstract class TargetField : MonoBehaviour
 
     public void Deactivate()
     {
-        IsPlacement = false;
-        if (DisposeOnDeactivate) Destroy(this);
+        if (DisposeOnDeactivate) Destroy(gameObject);
         else gameObject.SetActive(false);
-    }
-
-    public void SetAsPlacement()
-    {
-        IsPlacement = true;
     }
 }

@@ -67,7 +67,7 @@ public class BattlePlayer : Battler
 
     protected override void Update()
     {
-        Movement = CanMove ? new Vector3(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")) : Vector3.zero;
+        Movement = CanMove ? InputMaster.GetCustomMovementControls(KeyCode.W, KeyCode.S, KeyCode.A, KeyCode.D) : Vector3.zero;
         base.Update();
     }
 

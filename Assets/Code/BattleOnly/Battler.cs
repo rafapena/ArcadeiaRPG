@@ -471,10 +471,14 @@ public abstract class Battler : BaseObject
         ExecuteTool();
     }
 
-    public ActiveTool TryConvertToWeaponSettings()
+    public bool TryConvertSkillToWeaponSettings()
     {
-        if (SelectedTool is Skill sk && sk.WeaponDependent) sk.ConvertToWeaponSettings(SelectedWeapon);
-        return SelectedTool;
+        if (SelectedTool is Skill sk && sk.WeaponDependent)
+        {
+            sk.ConvertToWeaponSettings(SelectedWeapon);
+            return true;
+        }
+        return false;
     }
 
     private void ShootProjectile()

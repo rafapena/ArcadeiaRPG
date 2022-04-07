@@ -32,14 +32,11 @@ public class Skill : ActiveTool
         SPPecent = w.SPPecent;
         HPRecoil = w.HPRecoil;
         Scope = w.Scope;
-        ConsecutiveActs = w.ConsecutiveActs;
-        RandomTarget = w.RandomTarget;
         Element = w.Element;
         Power = w.Power;
         Range = w.Range;
         Accuracy = w.Accuracy;
         CriticalRate = w.CriticalRate;
-        Priority = w.Priority;
         Projectile = w.Projectile;
         ClassExclusives = w.ClassExclusives;
         ChangedStatesGiveRate = w.ChangedStatesGiveRate;
@@ -94,18 +91,5 @@ public class Skill : ActiveTool
     public bool UsedByWeaponUser(Battler battler)
     {
         return WeaponExclusives.Count == 0 || WeaponExclusives.Contains(battler.SelectedWeapon.WeaponType);
-    }
-
-    public bool AvailableTeammateTargets(Battler battler, List<Battler> battlersGroup)
-    {
-        switch (Scope)
-        {
-            case ScopeType.OneKnockedOutAlly:
-            case ScopeType.AllKnockedOutAllies:
-                return battlersGroup.Where(x => x.KOd).Any();
-            case ScopeType.EveryoneButSelf:
-                return battlersGroup.Where(x => !x.KOd).Any();
-        }
-        return true;
     }
 }

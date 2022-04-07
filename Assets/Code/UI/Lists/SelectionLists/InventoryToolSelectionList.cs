@@ -37,6 +37,7 @@ public class InventoryToolSelectionList : SelectionList_Super<IToolForInventory>
     // List enable/disable conditions
     private const float DISABLED_TOOL_OPACITY = 0.2f;
     public delegate bool EnableCondition(IToolForInventory data);
+    public EnableCondition StoredEnableCondition;
 
     // Other settings
     private const string COST_PREFIX = "<sprite=\"MenuIcons\" index=10> ";
@@ -103,7 +104,7 @@ public class InventoryToolSelectionList : SelectionList_Super<IToolForInventory>
                 if (inDataList)
                 {
                     AddToList(entry.transform, listData[i]);
-                    EnableOrDisableEntry(entry, enableCondition, listData[i]);
+                    EnableOrDisableEntry(entry, listData[i]);
                 }
                 else SetToBlank(entry);
                 i++;
@@ -164,11 +165,32 @@ public class InventoryToolSelectionList : SelectionList_Super<IToolForInventory>
         SetVerticalPointer(aboveEntry, entry.transform);
     }
 
-    private void EnableOrDisableEntry(GameObject entry, EnableCondition enableCondition, IToolForInventory data)
+    private void EnableOrDisableEntry(GameObject entry, IToolForInventory data)
     {
         Color tempColor = entry.transform.GetChild(1).GetComponent<Image>().color;
-        tempColor.a = (enableCondition?.Invoke(data) ?? true) ? 1.0f : DISABLED_TOOL_OPACITY;
+        tempColor.a = (StoredEnableCondition?.Invoke(data) ?? true) ? 1.0f : DISABLED_TOOL_OPACITY;
         entry.transform.GetChild(1).GetComponent<Image>().color = tempColor;
+        if (entry.transform.childCount > 1) entry.transform.GetChild(2).GetComponent<TextMeshProUGUI>().color = tempColor;
+    }
+
+    public void SetEnableCondition(EnableCondition enableCondition)
+    {
+        StoredEnableCondition = enableCondition;
+    }
+
+    public void RefreshEnabling()
+    {
+        int i = 0;
+        foreach (Transform t in transform)
+        {
+            if (i >= ReferenceData.Count) return;
+            EnableOrDisableEntry(t.gameObject, ReferenceData[i++]);
+        }
+    }
+
+    public bool SelectedEntryIsDisabled()
+    {
+        return SelectedButton.transform.GetChild(1).GetComponent<Image>().color.a == DISABLED_TOOL_OPACITY;
     }
 
     private void SetToBlank(GameObject entry)
@@ -176,16 +198,6 @@ public class InventoryToolSelectionList : SelectionList_Super<IToolForInventory>
         entry.transform.GetChild(1).gameObject.SetActive(false);
         if (entry.transform.childCount > 2)
             entry.transform.GetChild(2).gameObject.SetActive(false);
-    }
-
-    public void RefreshEnabling(EnableCondition enableCondition)
-    {
-        int i = 0;
-        foreach (Transform t in transform)
-        {
-            if (i >= ReferenceData.Count) return;
-            EnableOrDisableEntry(t.gameObject, enableCondition, ReferenceData[i++]);
-        }
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

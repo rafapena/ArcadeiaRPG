@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &7569271499837528704
+--- !u!1 &6892421222045026833
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,23 +8,23 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 3248169618960043792}
-  - component: {fileID: 8384673876078120243}
-  - component: {fileID: 3552097900181454016}
+  - component: {fileID: 1999151597384507265}
+  - component: {fileID: 4823883728301596066}
+  - component: {fileID: 569194072735984721}
   m_Layer: 0
-  m_Name: SmallSword
+  m_Name: BasicGun
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &3248169618960043792
+--- !u!4 &1999151597384507265
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7569271499837528704}
+  m_GameObject: {fileID: 6892421222045026833}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 122.052536, y: 69.95724, z: -1782.9915}
   m_LocalScale: {x: 1, y: 1, z: 1}
@@ -32,13 +32,13 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!212 &8384673876078120243
+--- !u!212 &4823883728301596066
 SpriteRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7569271499837528704}
+  m_GameObject: {fileID: 6892421222045026833}
   m_Enabled: 1
   m_CastShadows: 0
   m_ReceiveShadows: 0
@@ -71,8 +71,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -761887118410055393, guid: 0a78c727b4d99e241b10e1983b71faad,
-    type: 3}
+  m_Sprite: {fileID: -21522807587195298, guid: 0a78c727b4d99e241b10e1983b71faad, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -83,23 +82,23 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &3552097900181454016
+--- !u!114 &569194072735984721
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7569271499837528704}
+  m_GameObject: {fileID: 6892421222045026833}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ee7d2fd59113fb4458a662882a8bfbe6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Id: 0
-  Name: Small sword
-  Description: A sword that's small
+  Id: 3
+  Name: BasicGun
+  Description: Shoots things... using ice
   Type: 1
-  Formula: 1
+  Formula: 3
   ActionTime: 3
   HPModType: 1
   SPModType: 0
@@ -108,10 +107,10 @@ MonoBehaviour:
   SPPecent: 0
   HPRecoil: 0
   Scope: 1
-  Element: 0
+  Element: 2
   AlwaysHits: 0
   Power: 10
-  Range: 3
+  Range: 80
   CriticalRate: 2
   Accuracy: 100
   Variance: 10
@@ -121,8 +120,8 @@ MonoBehaviour:
   ChangedStatesGiveRate: []
   ChangedStatesReceiveRate: []
   Disabled: 0
-  WeaponType: 1
-  CollideRange: 1
+  WeaponType: 4
+  CollideRange: 0
   _DefaultPrice: 50
   _RequiredTools: []
   _Weight: 2
