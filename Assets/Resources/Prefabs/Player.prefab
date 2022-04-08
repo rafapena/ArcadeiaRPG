@@ -257,14 +257,17 @@ MonoBehaviour:
   Players: []
   AllPlayers:
   - {fileID: 4298201553111633178, guid: 63850b62653052a45b06cd30871d7841, type: 3}
-  Allies: []
+  Allies:
+  - {fileID: 4337297497971113263, guid: fcb8b5b5eefadd7408ac43da7fe057aa, type: 3}
   Inventory: {fileID: 6050286444565747904}
   Storage: {fileID: 8185591634616524626}
   LoggedObjectives:
   - {fileID: 919590195915574048, guid: 2d664c82c02a78a4aa46897d66851c79, type: 3}
   CraftableItems: []
   CraftableWeapons: []
-  PreemptiveAttackChance: 0
+  CraftableAccessories: []
+  Relations: []
+  PreExistingRelations: []
 --- !u!114 &6050286444565747904
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -280,7 +283,7 @@ MonoBehaviour:
   Gold: 0
   Items: []
   Weapons: []
-  KeyItems: []
+  Accessories: []
   CarryWeight: 0
   WeightCapacity: 50
 --- !u!114 &8185591634616524626
@@ -298,7 +301,7 @@ MonoBehaviour:
   Gold: 0
   Items: []
   Weapons: []
-  KeyItems: []
+  Accessories: []
   CarryWeight: 0
   WeightCapacity: 0
 --- !u!1 &6178216448038086072

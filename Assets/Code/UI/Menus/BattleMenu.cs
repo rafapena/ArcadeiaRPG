@@ -138,6 +138,13 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
         SetWeaponOnMenuAndCharacter();
     }
 
+    private void SetWeaponOnMenuAndCharacter()
+    {
+        SelectActionFrame.transform.GetChild(0).GetChild(0).GetComponent<Image>().sprite = ActingPlayer.SelectedWeapon.GetComponent<SpriteRenderer>().sprite;
+        OptionWeaponFrame.transform.GetChild(0).GetComponent<Image>().sprite = ActingPlayer.SelectedWeapon.GetComponent<SpriteRenderer>().sprite;
+        OptionWeaponFrame.transform.GetChild(2).gameObject.SetActive(ActingPlayer.Weapons.Count > 1);
+    }
+
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- Battle phase process: ACTION --
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -174,6 +181,25 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
         else if (Input.GetKeyDown(KeyCode.V) && !IsDisabled(SelectActionFrame.transform.GetChild(2).gameObject)) SetupForSelectItem();
         else if (Input.GetKeyDown(KeyCode.R)) SelectRun();
         else if (Input.GetKeyDown(KeyCode.Q)) UpdateWeapon();
+    }
+
+    private bool IsDisabled(GameObject go)
+    {
+        return go.GetComponent<Image>().color.a == DISABLED_ICON_TRANSPARENCY;
+    }
+
+    private void GrayOutIconSelection(GameObject go, bool condition)
+    {
+        float a = condition ? DISABLED_ICON_TRANSPARENCY : 1;
+        if (condition && go.GetComponent<Image>().color.a == DISABLED_ICON_TRANSPARENCY) return;
+        else if (!condition && go.GetComponent<Image>().color.a != DISABLED_ICON_TRANSPARENCY) return;
+        go.GetComponent<Image>().color = new Color(1, 1, 1, a);
+        go.transform.GetChild(0).GetComponent<Image>().color = new Color(1, 1, 1, a);
+        if (Selection == Selections.Actions)
+        {
+            go.transform.GetChild(1).GetComponent<TextMeshProUGUI>().color = new Color(1, 1, 1, a);
+            go.transform.GetChild(2).gameObject.SetActive(!condition);
+        }
     }
 
     private void SetActionFrame(bool actionSelection)
@@ -413,71 +439,7 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
 
     private void FinalizeSelections()
     {
-        //
-    }
-
-    private void SelectedPlayerOrAllyTarget<T>(List<T> partyList, int index) where T : Battler
-    {
-        if (index >= partyList.Count) return;
-        T pa = partyList[index];
-        if (ActingPlayer.SelectedTool.Scope == ActiveTool.ScopeType.OneAlly && !pa.KOd ||
-            ActingPlayer.SelectedTool.Scope == ActiveTool.ScopeType.OneKnockedOutAlly && pa.KOd)
-        {
-            ActingPlayer.SelectedTargets.Add(pa);
-            EndDecisions();
-        }
-    }
-
-    private void SelectedEnemyTarget(Battler.VerticalPositions vp, Battler.HorizontalPositions hp)
-    {
-        bool hitOne = false;
-        switch (ActingPlayer.SelectedTool.Scope)
-        {
-            case ActiveTool.ScopeType.OneEnemy:
-            case ActiveTool.ScopeType.OneArea:
-                foreach (BattleEnemy e in CurrentBattle.EnemyParty.Enemies)
-                {
-                    if (!e.Selectable() || e.RowPosition != vp || e.ColumnPosition != hp) continue;
-                    ActingPlayer.SelectedTargets.Add(e);
-                    EndDecisions();
-                }
-                break;
-            case ActiveTool.ScopeType.StraightThrough:
-                foreach (BattleEnemy e in CurrentBattle.EnemyParty.Enemies)
-                {
-                    if (!e.Selectable() || e.RowPosition != vp) continue;
-                    ActingPlayer.SelectedTargets.Add(e);
-                    hitOne = true;
-                }
-                if (hitOne) EndDecisions();
-                break;
-            case ActiveTool.ScopeType.Widespread:
-                foreach (BattleEnemy e in CurrentBattle.EnemyParty.Enemies)
-                {
-                    if (!e.Selectable() || e.ColumnPosition != hp) continue;
-                    ActingPlayer.SelectedTargets.Add(e);
-                    hitOne = true;
-                }
-                if (hitOne) EndDecisions();
-                break;
-        }
-    }
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// -- Turn execution --
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    private void EndDecisions()
-    {
-        /*SetSPConsumption();
-        if (CurrentPlayer + 1 < CurrentBattle.PlayerParty.Players.Count)
-            ShiftPlayer(1);
-        else
-        {
-            Hide();
-            CurrentPlayer = -1;
-            CurrentBattle.ExecuteTurn(CurrentBattle.PlayerParty.GetBattlingParty(), CurrentBattle.EnemyParty.ConvertToGeneric());
-        }*/
+        Selection = Selections.Disabled;
     }
     
     private void SetSPConsumption()
@@ -500,50 +462,19 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// -- Common action helpers --
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-    private void SetWeaponOnMenuAndCharacter()
-    {
-        SelectActionFrame.transform.GetChild(0).GetChild(0).GetComponent<Image>().sprite = ActingPlayer.SelectedWeapon.GetComponent<SpriteRenderer>().sprite;
-        OptionWeaponFrame.transform.GetChild(0).GetComponent<Image>().sprite = ActingPlayer.SelectedWeapon.GetComponent<SpriteRenderer>().sprite;
-        OptionWeaponFrame.transform.GetChild(2).gameObject.SetActive(ActingPlayer.Weapons.Count > 1);
-    }
-
-    private void GrayOutIconSelection(GameObject go, bool condition)
-    {
-        float a = condition ? DISABLED_ICON_TRANSPARENCY : 1;
-        if (condition && go.GetComponent<Image>().color.a == DISABLED_ICON_TRANSPARENCY) return;
-        else if (!condition && go.GetComponent<Image>().color.a != DISABLED_ICON_TRANSPARENCY) return;
-        go.GetComponent<Image>().color = new Color(1, 1, 1, a);
-        go.transform.GetChild(0).GetComponent<Image>().color = new Color(1, 1, 1, a);
-        if (Selection == Selections.Actions)
-        {
-            go.transform.GetChild(1).GetComponent<TextMeshProUGUI>().color = new Color(1, 1, 1, a);
-            go.transform.GetChild(2).gameObject.SetActive(!condition);
-        }
-    }
-
-    private bool IsDisabled(GameObject go)
-    {
-        return go.GetComponent<Image>().color.a == DISABLED_ICON_TRANSPARENCY;
-    }
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- Battle phase process: RUN --
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     private void SelectRun()
     {
-        Hide();
         Selection = Selections.Running;
+        Hide();
+        ClearScope();
         //CurrentBattle.RunAway();
     }
 
     private void RunFailed()
     {
-        Selection = Selections.Disabled;
-        for (int i = 0; i < CurrentBattle.PlayerParty.Players.Count; i++) CurrentBattle.PlayerParty.Players[i].ClearDecisions();
+        //
     }
 }

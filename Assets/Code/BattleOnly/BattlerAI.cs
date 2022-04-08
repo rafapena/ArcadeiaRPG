@@ -22,6 +22,11 @@ public abstract class BattlerAI : Battler
         }
     }
 
+    public void DeclareNext()
+    {
+        Properties.transform.GetChild(3).gameObject.SetActive(true);
+    }
+
     public override void StatConversion()
     {
         if (Class) Stats.SetTo(Class.BaseStats);

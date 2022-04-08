@@ -161,6 +161,8 @@ TextureImporter:
   isReadable: 0
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMasterTextureLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -170,8 +172,8 @@ TextureImporter:
   textureSettings:
     serializedVersion: 2
     filterMode: 0
-    aniso: -1
-    mipBias: -100
+    aniso: 1
+    mipBias: 0
     wrapU: 1
     wrapV: 1
     wrapW: 1
@@ -192,9 +194,12 @@ TextureImporter:
   textureType: 8
   textureShape: 1
   singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
   maxTextureSizeSet: 0
   compressionQualitySet: 0
   textureFormatSet: 0
+  ignorePngGamma: 0
   applyGammaDecoding: 0
   platformSettings:
   - serializedVersion: 3
@@ -240,7 +245,7 @@ TextureImporter:
       tessellationDetail: 0
       bones: []
       spriteID: f5adf5c771b9e8750800000000000000
-      internalID: 6309150653165853279
+      internalID: -2813390031070521868
       vertices: []
       indices: 
       edges: []
@@ -261,7 +266,7 @@ TextureImporter:
       tessellationDetail: 0
       bones: []
       spriteID: cbb2c966f0a1882b0800000000000000
-      internalID: -5582183084677387332
+      internalID: 6878988320447115735
       vertices: []
       indices: 
       edges: []
@@ -282,7 +287,7 @@ TextureImporter:
       tessellationDetail: 0
       bones: []
       spriteID: a4c99d8f331f38580800000000000000
-      internalID: -8825945639195403190
+      internalID: 8133887634180951956
       vertices: []
       indices: 
       edges: []
@@ -303,7 +308,7 @@ TextureImporter:
       tessellationDetail: 0
       bones: []
       spriteID: 90f3596ced42645e0800000000000000
-      internalID: -1925811251421298935
+      internalID: -6201701723107910509
       vertices: []
       indices: 
       edges: []
@@ -324,7 +329,7 @@ TextureImporter:
       tessellationDetail: 0
       bones: []
       spriteID: fa62c62a094e4b950800000000000000
-      internalID: 6464042675034924719
+      internalID: -8613015425468998081
       vertices: []
       indices: 
       edges: []
@@ -345,7 +350,7 @@ TextureImporter:
       tessellationDetail: 0
       bones: []
       spriteID: fdc3160541dddaa60800000000000000
-      internalID: 7687043218308938975
+      internalID: 1325063174387017646
       vertices: []
       indices: 
       edges: []
@@ -366,7 +371,7 @@ TextureImporter:
       tessellationDetail: 0
       bones: []
       spriteID: 227c3a3cb7ffe7470800000000000000
-      internalID: 8394427662493533986
+      internalID: -3888954303832050980
       vertices: []
       indices: 
       edges: []
@@ -387,7 +392,7 @@ TextureImporter:
       tessellationDetail: 0
       bones: []
       spriteID: 6ed3aa97e8b6747d0800000000000000
-      internalID: -2934258372537860634
+      internalID: 5024219565887102695
       vertices: []
       indices: 
       edges: []
@@ -408,7 +413,7 @@ TextureImporter:
       tessellationDetail: 0
       bones: []
       spriteID: a3edcd05f807b6d90800000000000000
-      internalID: -7103460226407539142
+      internalID: -50481306024140543
       vertices: []
       indices: 
       edges: []
@@ -429,7 +434,7 @@ TextureImporter:
       tessellationDetail: 0
       bones: []
       spriteID: 26d7ed9c4198c21f0800000000000000
-      internalID: -1068328289214497438
+      internalID: 2060569976912811898
       vertices: []
       indices: 
       edges: []
@@ -990,6 +995,43 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
+    nameFileIdTable:
+      Keyboard1_35: -6548319204785114539
+      Keyboard1_0: -2813390031070521868
+      Keyboard1_11: -8415224546634099147
+      Keyboard1_25: 6995326236181562428
+      Keyboard1_1: 6878988320447115735
+      Keyboard1_12: -5535642597725764097
+      Keyboard1_2: 8133887634180951956
+      Keyboard1_14: 3880423628081869715
+      Keyboard1_16: -9194811386049428039
+      Keyboard1_26: 1373727977630414880
+      Keyboard1_21: -8947460072880624579
+      Keyboard1_27: 2614007301554825303
+      Keyboard1_9: 2060569976912811898
+      Keyboard1_6: -3888954303832050980
+      Keyboard1_13: 3671931792963835502
+      Keyboard1_34: 1720994050678761696
+      Keyboard1_8: -50481306024140543
+      Keyboard1_5: 1325063174387017646
+      Keyboard1_4: -8613015425468998081
+      Keyboard1_20: 8409450896703958261
+      Keyboard1_18: -2096383301963523781
+      Keyboard1_31: -4616490456556703947
+      Keyboard1_32: -7483409509121521753
+      Keyboard1_22: -2604140222761825674
+      Keyboard1_24: -5058979967596228375
+      Keyboard1_3: -6201701723107910509
+      Keyboard1_33: -2317764115581706309
+      Keyboard1_10: -4753951427051174672
+      Keyboard1_15: 6297812101695901021
+      Keyboard1_23: -5265496026586445282
+      Keyboard1_28: 435097543562007189
+      Keyboard1_29: 3895502664119721402
+      Keyboard1_17: -8752935228662255839
+      Keyboard1_19: 711103340684773377
+      Keyboard1_30: 2631795729258775993
+      Keyboard1_7: 5024219565887102695
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

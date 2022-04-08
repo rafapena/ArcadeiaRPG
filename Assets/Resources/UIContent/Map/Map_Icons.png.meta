@@ -86,6 +86,8 @@ TextureImporter:
   isReadable: 0
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMasterTextureLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -94,9 +96,9 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: -1
-    aniso: -1
-    mipBias: -100
+    filterMode: 1
+    aniso: 1
+    mipBias: 0
     wrapU: 1
     wrapV: 1
     wrapW: 1
@@ -117,9 +119,12 @@ TextureImporter:
   textureType: 8
   textureShape: 1
   singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
   maxTextureSizeSet: 0
   compressionQualitySet: 0
   textureFormatSet: 0
+  ignorePngGamma: 0
   applyGammaDecoding: 0
   platformSettings:
   - serializedVersion: 3
@@ -165,7 +170,7 @@ TextureImporter:
       tessellationDetail: 0
       bones: []
       spriteID: b7980f7e2c75a42e0800000000000000
-      internalID: -2140802178234676869
+      internalID: -8158759994388974284
       vertices: []
       indices: 
       edges: []
@@ -186,7 +191,7 @@ TextureImporter:
       tessellationDetail: 0
       bones: []
       spriteID: 243ce24de8183da30800000000000000
-      internalID: 4238874124730942274
+      internalID: -272953187587846543
       vertices: []
       indices: 
       edges: []
@@ -207,7 +212,7 @@ TextureImporter:
       tessellationDetail: 0
       bones: []
       spriteID: a4aa9c5301bafeb80800000000000000
-      internalID: -8363277896893486518
+      internalID: -174430290746579012
       vertices: []
       indices: 
       edges: []
@@ -228,7 +233,7 @@ TextureImporter:
       tessellationDetail: 0
       bones: []
       spriteID: 32971a67047fe77e0800000000000000
-      internalID: -1765702147642394333
+      internalID: -3137873761689407198
       vertices: []
       indices: 
       edges: []
@@ -249,7 +254,7 @@ TextureImporter:
       tessellationDetail: 0
       bones: []
       spriteID: 5f0bf7ed4f967c0f0800000000000000
-      internalID: -1096791483815579403
+      internalID: -597190747974145581
       vertices: []
       indices: 
       edges: []
@@ -306,6 +311,14 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
+    nameFileIdTable:
+      Map_Icons_1: -272953187587846543
+      Map_Icons_2: -174430290746579012
+      Map_Icons_3: -3137873761689407198
+      Map_Icons_0: -8158759994388974284
+      Map_Icons_4: -597190747974145581
+      Map_Icons_6: 1796528761600679938
+      Map_Icons_5: -6099470724623463545
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

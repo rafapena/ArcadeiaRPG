@@ -10,7 +10,8 @@ using UnityEngine.UI;
 
 public abstract class Battler : BaseObject
 {
-    [HideInInspector] protected Transform Properties;
+    [SerializeField]
+    protected Transform Properties;
     public enum VerticalPositions { Top, Center, Bottom }
     public enum HorizontalPositions { Left, Center, Right }
 
@@ -19,9 +20,9 @@ public abstract class Battler : BaseObject
     public HorizontalPositions ColumnPosition;
 
     // Movement
-    public Rigidbody2D Figure;
+    [HideInInspector] public Rigidbody2D Figure;
     protected Vector3 Movement;
-    public float Speed;
+    [HideInInspector] public float Speed;
     protected bool CanMove;
 
     // General battler data

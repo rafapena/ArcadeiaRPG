@@ -18,6 +18,7 @@ public class Battle : MonoBehaviour
     private const float AWAITING_TIME_BEFORE_ACTION_START = 0.5f;
 
     // UI
+    public BattleCamera BattleCamera;
     public BattleMenu BattleMenu;
     public BattleWin BattleWinMenu;
 
@@ -268,7 +269,7 @@ public class Battle : MonoBehaviour
             ActingBattler.EnableMoving();
         }
         if (NextActingBattler is BattlePlayer p0) BattleMenu.DeclareNext(p0);
-        //else;
+        else (NextActingBattler as BattlerAI).DeclareNext();
     }
 
     // Insertion sort: Order very rarely changes after the first setup, giving an overall O(N) runtime.
@@ -335,7 +336,7 @@ public class Battle : MonoBehaviour
         }
         else if (PlayerPartyDefeated())
         {
-            if (EnemyParty.GameOverOnWin) DeclareGameOver();
+            if (EnemyParty.GameOverOnLose) DeclareGameOver();
             else SceneMaster.EndBattle(PlayerParty);
             return true;
         }

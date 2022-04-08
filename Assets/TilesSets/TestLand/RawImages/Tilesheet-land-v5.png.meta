@@ -329,6 +329,8 @@ TextureImporter:
   isReadable: 0
   streamingMipmaps: 0
   streamingMipmapsPriority: 0
+  vTOnly: 0
+  ignoreMasterTextureLimit: 0
   grayScaleToAlpha: 0
   generateCubemap: 6
   cubemapConvolution: 0
@@ -338,8 +340,8 @@ TextureImporter:
   textureSettings:
     serializedVersion: 2
     filterMode: 0
-    aniso: -1
-    mipBias: -100
+    aniso: 1
+    mipBias: 0
     wrapU: 1
     wrapV: 1
     wrapW: 1
@@ -360,9 +362,12 @@ TextureImporter:
   textureType: 8
   textureShape: 1
   singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
   maxTextureSizeSet: 0
   compressionQualitySet: 0
   textureFormatSet: 0
+  ignorePngGamma: 0
   applyGammaDecoding: 0
   platformSettings:
   - serializedVersion: 3
@@ -2544,6 +2549,109 @@ TextureImporter:
     edges: []
     weights: []
     secondaryTextures: []
+    nameFileIdTable:
+      Tilesheet-land-v5_2: 4887715624173199516
+      Tilesheet-land-v5_25: -8988499709917462785
+      Tilesheet-land-v5_13: 4066252992924574146
+      Tilesheet-land-v5_34: -7078336867842668605
+      Tilesheet-land-v5_93: -2575355513738856222
+      Tilesheet-land-v5_47: 7365625702155777495
+      Tilesheet-land-v5_60: -4925769466587756699
+      Tilesheet-land-v5_74: -7568831727589884601
+      Tilesheet-land-v5_52: -4249990691684814544
+      Tilesheet-land-v5_43: -1372639185698667663
+      Tilesheet-land-v5_27: -7957204700395193693
+      Tilesheet-land-v5_3: -3572725953869605522
+      Tilesheet-land-v5_84: 7910404072707336337
+      Tilesheet-land-v5_0: 5970654101772427663
+      Tilesheet-land-v5_69: -8255599399363113759
+      Tilesheet-land-v5_94: 5180910190749142765
+      Tilesheet-land-v5_26: -5521362231450588848
+      Tilesheet-land-v5_98: 5944005210914379125
+      Tilesheet-land-v5_32: 3744483973049351287
+      Tilesheet-land-v5_20: -8393898892156187635
+      Tilesheet-land-v5_39: -7464527542374122176
+      Tilesheet-land-v5_48: 7770692739769574196
+      Tilesheet-land-v5_100: -7377210102189369628
+      Tilesheet-land-v5_68: 6763327375221834843
+      Tilesheet-land-v5_90: -3651936763411672144
+      Tilesheet-land-v5_55: -4173192165178998466
+      Tilesheet-land-v5_67: -8026905225265856182
+      Tilesheet-land-v5_9: -4832865193580093904
+      Tilesheet-land-v5_72: -6429806919755296709
+      Tilesheet-land-v5_92: 6187465113481022591
+      Tilesheet-land-v5_54: 3172313303994143279
+      Tilesheet-land-v5_87: 3121565744027517811
+      Tilesheet-land-v5_37: 3797219719430675406
+      Tilesheet-land-v5_58: -2157570463727190936
+      Tilesheet-land-v5_63: -5770151754403092894
+      Tilesheet-land-v5_10: 5605540046241686114
+      Tilesheet-land-v5_15: -4083523938481259815
+      Tilesheet-land-v5_28: 60704171676058369
+      Tilesheet-land-v5_53: -6819401703890275117
+      Tilesheet-land-v5_8: -1726314819092498891
+      Tilesheet-land-v5_86: 7111080085089361664
+      Tilesheet-land-v5_95: -6739084259232535862
+      Tilesheet-land-v5_78: 2974686595411269339
+      Tilesheet-land-v5_11: 5512126853115836616
+      Tilesheet-land-v5_21: 1821727065422441734
+      Tilesheet-land-v5_12: 1792754718630850873
+      Tilesheet-land-v5_73: 4037633205806842094
+      Tilesheet-land-v5_4: -5575413565636879011
+      Tilesheet-land-v5_82: -448458359861766924
+      Tilesheet-land-v5_50: 3736323351545564877
+      Tilesheet-land-v5_56: -6486022593625172445
+      Tilesheet-land-v5_99: -3153071691176890486
+      Tilesheet-land-v5_35: -8237765088734011912
+      Tilesheet-land-v5_59: -4153940235713509538
+      Tilesheet-land-v5_64: 7321855606936935303
+      Tilesheet-land-v5_16: -8936078158281322563
+      Tilesheet-land-v5_36: -4890123998362411996
+      Tilesheet-land-v5_79: 7193590753855273658
+      Tilesheet-land-v5_83: -1516059350780324199
+      Tilesheet-land-v5_75: -3221917169583124334
+      Tilesheet-land-v5_76: 4616353865472027358
+      Tilesheet-land-v5_30: 592740563416520748
+      Tilesheet-land-v5_80: 2845510900541721304
+      Tilesheet-land-v5_6: 778177619164690405
+      Tilesheet-land-v5_49: -5104492971431286031
+      Tilesheet-land-v5_71: -764653604184021480
+      Tilesheet-land-v5_17: -1025854567305633893
+      Tilesheet-land-v5_97: -6591328159035882572
+      Tilesheet-land-v5_85: 9080220182061586969
+      Tilesheet-land-v5_7: -2175238033933684102
+      Tilesheet-land-v5_38: 1597903717025764462
+      Tilesheet-land-v5_31: -4577472288462797878
+      Tilesheet-land-v5_62: -7623380758458255388
+      Tilesheet-land-v5_33: -6808522635763657063
+      Tilesheet-land-v5_44: -1527780363561975613
+      Tilesheet-land-v5_91: 4405359590613942319
+      Tilesheet-land-v5_65: 1356852746181018587
+      Tilesheet-land-v5_45: -3499017549568774618
+      Tilesheet-land-v5_19: 9219546596815561282
+      Tilesheet-land-v5_88: 3427315005025456353
+      Tilesheet-land-v5_14: 6533783855692541428
+      Tilesheet-land-v5_96: 4982681178413520505
+      Tilesheet-land-v5_46: 7570862360500256962
+      Tilesheet-land-v5_101: 7916334779683148650
+      Tilesheet-land-v5_81: -8721164733563003397
+      Tilesheet-land-v5_24: -1906669984920032558
+      Tilesheet-land-v5_57: -6249788891388887614
+      Tilesheet-land-v5_22: 8990013131521029276
+      Tilesheet-land-v5_40: 602342880028240205
+      Tilesheet-land-v5_51: -165598432063556634
+      Tilesheet-land-v5_77: -3622373149126709275
+      Tilesheet-land-v5_41: -8099044104407533935
+      Tilesheet-land-v5_66: -4969753688953360667
+      Tilesheet-land-v5_42: -5552238869618087389
+      Tilesheet-land-v5_18: 1922626409657942977
+      Tilesheet-land-v5_5: 7513430335957132269
+      Tilesheet-land-v5_23: 1557742931088605168
+      Tilesheet-land-v5_70: -5963529647213215752
+      Tilesheet-land-v5_29: 1840380282703469959
+      Tilesheet-land-v5_61: 6815286423924465183
+      Tilesheet-land-v5_1: -3194500401991258217
+      Tilesheet-land-v5_89: -8665627767924196899
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0
