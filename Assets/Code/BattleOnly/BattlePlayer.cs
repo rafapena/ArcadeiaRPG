@@ -15,6 +15,7 @@ public class BattlePlayer : Battler
     public List<SkillLearnLevel> SkillSet;
 
     [HideInInspector] public Skill BasicAttackSkill;
+    private bool ArrowKeyMovement;
 
     public bool UsingBasicAttack => SelectedTool is Skill && SelectedTool.Id == BasicAttackSkill.Id;
 
@@ -33,7 +34,12 @@ public class BattlePlayer : Battler
         base.Start();
         Speed = 6;
     }
-    
+
+    protected override void MapGameObjectsToHUD()
+    {
+        // StateEffects
+    }
+
     protected override Skill GetDefaultSkill()
     {
         Skill sk = BasicAttackSkill;
@@ -61,13 +67,17 @@ public class BattlePlayer : Battler
         foreach (SkillLearnLevel sk in skills) Skills.Add(sk.LearnedSkill);
     }
 
+    public void EnableArrowKeyMovement() => ArrowKeyMovement = true;
+
+    public void DisableArrowKeyMovement() => ArrowKeyMovement = false;
+
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- Update --
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     protected override void Update()
     {
-        Movement = CanMove ? InputMaster.GetCustomMovementControls(KeyCode.W, KeyCode.S, KeyCode.A, KeyCode.D) : Vector3.zero;
+        if (Phase == Phases.DecidingAction) Movement = ArrowKeyMovement ? InputMaster.GetCustomMovementControls(KeyCode.W, KeyCode.S, KeyCode.A, KeyCode.D) : Vector3.zero;
         base.Update();
     }
 

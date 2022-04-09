@@ -14,4 +14,11 @@ public class BattlerClass : BaseObject
     public bool IsBaseClass => UpgradedClass1 != null;
     
     public bool IsAdvancedClass => UpgradedClass1 == null && UpgradedClass2 == null;
+
+    private Battler ActingBattler;
+
+    private void Update()
+    {
+        //
+    }
 }

@@ -26,6 +26,7 @@ Transform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: -5}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8854167014643114195}
   m_RootOrder: 2
@@ -58,6 +59,7 @@ Transform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: -5}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8854167014643114195}
   m_RootOrder: 3
@@ -119,6 +121,7 @@ Transform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: -5}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8854167014643114195}
   m_RootOrder: 0
@@ -149,6 +152,7 @@ Transform:
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: -5}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8854167014643114195}
   m_RootOrder: 1
@@ -187,6 +191,7 @@ Transform:
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: -5}
   m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 7771993840368400121}
   - {fileID: 4227045953516215092}
@@ -206,10 +211,12 @@ SpriteRenderer:
   m_CastShadows: 0
   m_ReceiveShadows: 0
   m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
   m_MotionVectors: 1
   m_LightProbeUsage: 1
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
+  m_RayTraceProcedural: 0
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -314,7 +321,7 @@ MonoBehaviour:
   ObjectivesListDump: {fileID: 3119796608945377178}
 --- !u!95 &8854167014643114191
 Animator:
-  serializedVersion: 3
+  serializedVersion: 4
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -327,6 +334,7 @@ Animator:
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
   m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
@@ -349,12 +357,12 @@ MonoBehaviour:
   EXPToNext: 0
   Players: []
   AllPlayers:
-  - {fileID: 4298201553111633178, guid: 63850b62653052a45b06cd30871d7841, type: 3}
-  - {fileID: 7185878704187127010, guid: ae89b416acec17f48b3121ff5475b448, type: 3}
-  - {fileID: 5714065535808972390, guid: 8e10798ded6fa2b43a02f913554e83fb, type: 3}
-  - {fileID: 2945622617598325490, guid: 6d9f2dda27a03f14990a0bcd0bc6258d, type: 3}
-  - {fileID: 1582057872820260929, guid: ebc601ebe7d963f47bcba9d473546c1d, type: 3}
-  - {fileID: 129202429268097128, guid: 7ba8230bcb299fe40af16b2ae5086ac3, type: 3}
+  - {fileID: 369289088755776406, guid: c6bc37663016d03499d7dbb04b489a16, type: 3}
+  - {fileID: -3312841330457794917, guid: fb299c616828de944880dd8cc095774b, type: 3}
+  - {fileID: 7764635152542998552, guid: 3da30d9a01fb0e84d9d51732a0a4ef57, type: 3}
+  - {fileID: -7036743324540286212, guid: c1bf24fa0cef1b34c94bec111c135148, type: 3}
+  - {fileID: 4946786919046775103, guid: 1634e25f10c519240bbbfa79f2fc7162, type: 3}
+  - {fileID: 2276251185403530114, guid: 5f3028c28b146494c888de4a24a0dc3b, type: 3}
   Allies:
   - {fileID: 4337297497971113263, guid: fcb8b5b5eefadd7408ac43da7fe057aa, type: 3}
   Inventory: {fileID: 8854167014643114184}

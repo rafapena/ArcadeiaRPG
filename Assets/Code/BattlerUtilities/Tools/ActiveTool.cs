@@ -60,8 +60,8 @@ public abstract class ActiveTool : BaseObject
         if (AlwaysHits) return true;
         float weaponAcc = u.SelectedWeapon != null ? u.SelectedWeapon.Accuracy : 100;
         float toolAcc = Accuracy * weaponAcc / 10000f;
-        float statsAcc = u.Tec() / t.Spd();
-        float result = BattleMaster.BASE_ACCURACY * toolAcc * statsAcc * u.Acc() / t.Eva();
+        float statsAcc = u.Tec / t.Spd;
+        float result = BattleMaster.BASE_ACCURACY * toolAcc * statsAcc * u.Acc / t.Eva;
         return Chance(result * effectMagnitude);
     }
 
@@ -74,22 +74,22 @@ public abstract class ActiveTool : BaseObject
         float offMod = 1.5f;
         float defMod = 1.25f;
         float tecMod = 3;
-        float gunOffenceReduce = 4f;
+        float gunOffenseReduce = 4f;
         switch (Formula)
         {
             case BattleMaster.ToolFormulas.PhysicalStandard:
-                formulaTotal = offMod * u.Atk() - defMod * t.Def();
+                formulaTotal = offMod * u.Atk - defMod * t.Def;
                 break;
             case BattleMaster.ToolFormulas.MagicalStandard:
-                formulaTotal = offMod * u.Map() - defMod * t.Mar();
+                formulaTotal = offMod * u.Map - defMod * t.Mar;
                 break;
             case BattleMaster.ToolFormulas.PhysicalGun:
-                float physicalOffense = (u.Atk() + u.Tec() * tecMod) / gunOffenceReduce;
-                formulaTotal = offMod * physicalOffense - defMod * t.Def();
+                float physicalOffense = (u.Atk + u.Tec * tecMod) / gunOffenseReduce;
+                formulaTotal = offMod * physicalOffense - defMod * t.Def;
                 break;
             case BattleMaster.ToolFormulas.MagicalGun:
-                float magicalOffense = (u.Map() + u.Tec() * tecMod) / gunOffenceReduce;
-                formulaTotal = offMod * magicalOffense  - defMod * t.Mar();
+                float magicalOffense = (u.Map + u.Tec * tecMod) / gunOffenseReduce;
+                formulaTotal = offMod * magicalOffense  - defMod * t.Mar;
                 break;
         }
         return (int)(formulaTotal * power * effectMagnitude);
@@ -100,9 +100,9 @@ public abstract class ActiveTool : BaseObject
     {
         float weaponCritRate = u.SelectedWeapon != null ? u.SelectedWeapon.CriticalRate : 100;
         float toolCrt = CriticalRate * weaponCritRate / 10000f;
-        float def = t.Tec() * t.Cev();
+        float def = t.Tec * t.Cev;
         float critExponent = 1.1f;
-        float result = 2 * Mathf.Pow(u.Tec() * toolCrt, critExponent) * u.Crt() / (def != 0 ? def : 0.01f);
+        float result = 2 * Mathf.Pow(u.Tec * toolCrt, critExponent) * u.Crt / (def != 0 ? def : 0.01f);
         int cRate = Chance(result * effectMagnitude) ? 3 : 1;
         u.HitCritical = (cRate == 3);
         return cRate;

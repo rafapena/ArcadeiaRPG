@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Net.NetworkInformation;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class Battle : MonoBehaviour
 {
-    public enum BattleStates { None, Menu, Action, Won, GameOver }
+    public enum BattleStates { None, Menu, PreAction, Action, Running, Won, GameOver }
 
     // Collision detection
     public const int BATTLER_LAYER = 11;
@@ -22,27 +23,10 @@ public class Battle : MonoBehaviour
     public BattleMenu BattleMenu;
     public BattleWin BattleWinMenu;
 
-    // Target fields
-    [System.Serializable]
-    public struct TargetFieldsGroup
-    {
-        public Transform FieldsList;
-        public DynamicTargetField Single;
-        public DynamicTargetField SplashRange;
-        public StaticTargetField SplashMeelee;
-        public StaticTargetField StraightThrough;
-        public StaticTargetField Widespread;
-    }
-    public TargetFieldsGroup TargetFields;
-
     // Data transferred from Map
     [HideInInspector] public Environment Enviornment;
     [HideInInspector] public PlayerParty PlayerParty;
     [HideInInspector] public EnemyParty EnemyParty;
-
-    // Helpers for their respective party lists for flexible target handling
-    [HideInInspector] public List<Battler> PlayerPartyMembers;  
-    [HideInInspector] public List<Battler> EnemyPartyMembers;
 
     // Raw locations based on battler's horizontal/vertical positions
     private static readonly float uX = 1.5f;
@@ -57,20 +41,15 @@ public class Battle : MonoBehaviour
     // Battle state tracking
     private BattleStates BattleState;
     private float BattleStateTime;
-
-    // Turn tracking
+    private bool LastActionOfTurn;
     [HideInInspector] public int Turn;
-    private bool EndingAction;
-    private bool EndingTurn;
 
     // Manage the battlers themselves
     private List<Battler> Battlers;
     private Battler ActingBattler;
     private Battler NextActingBattler;
-    private int ActingBattlerIndex;
-
     public IEnumerable<Battler> AllBattlers => Battlers;
-
+    public IEnumerable<Battler> FightingPlayerParty => PlayerParty.Players.Cast<Battler>().Concat(PlayerParty.Allies);
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- Setup --
@@ -81,7 +60,6 @@ public class Battle : MonoBehaviour
         Physics2D.IgnoreLayerCollision(BATTLER_LAYER, BATTLER_LAYER);
         Physics2D.IgnoreLayerCollision(SCOPE_THROUGH_LAYER, BATTLER_LAYER);
         Physics2D.IgnoreLayerCollision(SCOPE_THROUGH_LAYER, BATTLE_WALL_LAYER);
-        BattleMenu.ClearScope();
     }
 
     void Start()
@@ -90,10 +68,12 @@ public class Battle : MonoBehaviour
         SetupBackground();
         SetupPlayerParty();
         SetupEnemyParty();
+        BattleMenu.ClearAllNextLabels();
         Battlers = new List<Battler>();
         foreach (BattlePlayer p in PlayerParty.Players) Battlers.Add(p);
         foreach (BattleAlly a in PlayerParty.Allies) Battlers.Add(a);
         foreach (BattleEnemy e in EnemyParty.Enemies) Battlers.Add(e);
+        Await(4);
         TurnStart();
     }
 
@@ -200,25 +180,18 @@ public class Battle : MonoBehaviour
         if (Waiting) return;
         switch (BattleState)
         {
+            case BattleStates.Menu:
+                return;
+
+            case BattleStates.PreAction:
+                if (ActingBattler.Phase == Battler.Phases.UsingAction) ExecuteAction();
+                return;
+
             case BattleStates.Action:
-                if (ActingBattlerIndex >= Battlers.Count)
-                {
-                    TurnEnd();
-                    return;
-                }
-                else if (!EndingAction)
-                {
-                    EndingAction = true;
-                }
-                else
-                {
-                    ActionEnd();
-                    EndingAction = false;
-                    return;
-                }
-                if (ActingBattler is BattleEnemy) ActingBattler.ExecuteAction(EnemyPartyMembers, PlayerPartyMembers);
-                else ActingBattler.ExecuteAction(PlayerPartyMembers, EnemyPartyMembers);
-                BattleStateTime = Time.time + (ActingBattler.SelectedTool?.ActionTime ?? 0);
+                if (Time.time > BattleStateTime) ActionEnd();
+                break;
+
+            case BattleStates.Running:
                 break;
 
             case BattleStates.Won:
@@ -244,18 +217,16 @@ public class Battle : MonoBehaviour
 
     public void TurnStart()
     {
-        Await(4);
-        ActingBattlerIndex = 0;
-        EndingAction = false;
-        EndingTurn = false;
+        Turn++;
+        LastActionOfTurn = false;
         ActionStart();
     }
 
     private void ActionStart()
     {
         Battlers = SortBattlersBySpeed(Battlers);
-        ActingBattler = Battlers[ActingBattlerIndex];
-        NextActingBattler = Battlers[(ActingBattlerIndex + 1) % Battlers.Count];
+        GetNextFastestAvailableBattlers();
+        ActingBattler.Phase = Battler.Phases.DecidingAction;
 
         if (ActingBattler is BattlePlayer p)
         {
@@ -264,24 +235,21 @@ public class Battle : MonoBehaviour
         }
         else // Ally or enemy
         {
-            BattleState = BattleStates.Action;
             BattleMenu.Hide();
-            ActingBattler.EnableMoving();
+            if (ActingBattler is BattleAlly ally) ally.MakeDecision(FightingPlayerParty.ToList(), EnemyParty.Enemies);
+            else if (ActingBattler is BattleEnemy enemy) enemy.MakeDecision(EnemyParty.Enemies, FightingPlayerParty.ToList());
+            PrepareForAction();
         }
-        if (NextActingBattler is BattlePlayer p0) BattleMenu.DeclareNext(p0);
-        else (NextActingBattler as BattlerAI).DeclareNext();
+        BattleMenu.DeclareNext(NextActingBattler);
     }
 
-    // Insertion sort: Order very rarely changes after the first setup, giving an overall O(N) runtime.
     private List<Battler> SortBattlersBySpeed(List<Battler> battlers)
     {
-        for (int i = ActingBattlerIndex; i < battlers.Count - 1; i++)
+        for (int i = 0; i < battlers.Count - 1; i++)
         {
             for (int j = i + 1; j > 0; j--)
             {
-                int bj1 = battlers[j - 1].Spd();
-                int bj2 = battlers[j].Spd();
-                if (bj1 > bj2 || battlers[j - 1].ExecutedAction || bj1 == bj2 && Random.Range(0, 100) < 50) continue;
+                if (battlers[j - 1].Spd + Random.Range(-5, 6) > battlers[j].Spd + Random.Range(-5, 6)) continue;
                 Battler temp = battlers[j - 1];
                 battlers[j - 1] = battlers[j];
                 battlers[j] = temp;
@@ -290,18 +258,49 @@ public class Battle : MonoBehaviour
         return battlers;
     }
 
+    private void GetNextFastestAvailableBattlers()
+    {
+        int actingBattlerSet = 0;
+        foreach (Battler b in Battlers)
+        {
+            if (b.Phase == Battler.Phases.ExecutedAction) continue;
+            else if (actingBattlerSet == 0) ActingBattler = b;
+            else if (actingBattlerSet == 1) NextActingBattler = b;
+            actingBattlerSet++;
+        }
+        if (actingBattlerSet == 1)
+        {
+            NextActingBattler = Battlers[0];
+            LastActionOfTurn = true;
+        }
+    }
+
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- Action execution --
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public void ExecuteTurn(List<Battler> playerParty, List<Battler> enemyParty)
+    public void PrepareForAction()
     {
-        foreach (BattlePlayer p in PlayerParty.Players) p.ExecutedAction = false;
-        foreach (BattleAlly a in PlayerParty.Allies) a.MakeDecision(playerParty, enemyParty);
-        foreach (BattleEnemy e in EnemyParty.Enemies) e.MakeDecision(enemyParty, playerParty);
-        PlayerPartyMembers = playerParty;
-        EnemyPartyMembers = enemyParty;
+        BattleState = BattleStates.PreAction;
+        ActingBattler.Phase = ActingBattler.SelectedTool.Ranged ? Battler.Phases.UsingAction : Battler.Phases.PreparingAction;
+        if (ActingBattler.Phase == Battler.Phases.PreparingAction) ActingBattler.ApproachTarget();
+    }
+
+    public void ExecuteAction()
+    {
         BattleState = BattleStates.Action;
+        ActingBattler.ExecuteAction();
+        BattleStateTime = Time.time + (ActingBattler.SelectedTool?.ActionTime ?? 1);
+    }
+
+    public void RunAway()
+    {
+        BattleState = BattleStates.Running;
+    }
+
+    public void RunFailed()
+    {
+        BattleMenu.RunFailed();
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -310,17 +309,15 @@ public class Battle : MonoBehaviour
 
     private void ActionEnd()
     {
-        ActingBattler.ExecutedAction = true;
+        ActingBattler.Phase = Battler.Phases.ExecutedAction;
         if (CheckBattleEndCondition()) return;
-        ActingBattlerIndex++;
-        if (ActingBattlerIndex >= Battlers.Count) return;
-        Battlers = SortBattlersBySpeed(Battlers);
-        ActingBattler = Battlers[ActingBattlerIndex];
+        else if (LastActionOfTurn) TurnEnd();
+        else ActionStart();
     }
 
     private bool CheckBattleEndCondition()
     {
-        if (EnemyPartyDefeated())
+        if (EnemyPartyDefeated)
         {
             switch (EnemyParty.PartyMode)
             {
@@ -334,7 +331,7 @@ public class Battle : MonoBehaviour
             }
             return true;
         }
-        else if (PlayerPartyDefeated())
+        else if (PlayerPartyDefeated)
         {
             if (EnemyParty.GameOverOnLose) DeclareGameOver();
             else SceneMaster.EndBattle(PlayerParty);
@@ -343,21 +340,8 @@ public class Battle : MonoBehaviour
         return false;
     }
 
-    private bool EnemyPartyDefeated()
-    {
-        foreach (BattleEnemy e in EnemyParty.Enemies)
-            if (!e.KOd) return false;
-        return true;
-    }
-
-    private bool PlayerPartyDefeated()
-    {
-        foreach (BattlePlayer p in PlayerParty.Players)
-            if (!p.KOd) return false;
-        foreach (BattleAlly a in PlayerParty.Allies)
-            if (!a.KOd) return false;
-        return true;
-    }
+    private bool EnemyPartyDefeated => EnemyParty.Enemies.All(x => x.KOd);
+    private bool PlayerPartyDefeated => PlayerParty.Players.All(x => x.KOd) && PlayerParty.Allies.All(x => x.KOd);
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- End of turn --
@@ -365,26 +349,40 @@ public class Battle : MonoBehaviour
 
     private void TurnEnd()
     {
-        BattleState = BattleStates.Menu;
-        EndingTurn = true;
-        Turn++;
+        ResetBattlerActions();
         BattleMenu.EndTurn();
+        TurnStart();
+    }
+
+    private void ResetBattlerActions()
+    {
+        foreach (Battler b in AllBattlers)
+        {
+            b.SelectedTool = null;
+            b.Phase = Battler.Phases.None;
+        }
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- End of battle --
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    
+
+    private void ClearAll()
+    {
+        BattleMenu.ClearAllNextLabels();
+        ResetBattlerActions();
+    }
+
     private void DeclareWin()
     {
         BattleState = BattleStates.Won;
-        BattleStateTime = Time.time + 0.5f;
+        ClearAll();
     }
 
     private void DeclareGameOver()
     {
         BattleState = BattleStates.GameOver;
-        BattleStateTime = Time.time + 0.5f;
+        ClearAll();
     }
 
     private void SetupGameOver()

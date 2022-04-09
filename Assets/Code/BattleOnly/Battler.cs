@@ -11,9 +11,10 @@ using UnityEngine.UI;
 public abstract class Battler : BaseObject
 {
     [SerializeField]
-    protected Transform Properties;
+    protected BattlerHUD HUDProperties;
     public enum VerticalPositions { Top, Center, Bottom }
     public enum HorizontalPositions { Left, Center, Right }
+    public enum Phases { None, DecidingAction, Charging, PreparingAction, UsingAction, ExecutedAction }
 
     // Battler position
     public VerticalPositions RowPosition;
@@ -21,9 +22,10 @@ public abstract class Battler : BaseObject
 
     // Movement
     [HideInInspector] public Rigidbody2D Figure;
+    protected Vector3 MainLocation;
     protected Vector3 Movement;
     [HideInInspector] public float Speed;
-    protected bool CanMove;
+    [HideInInspector] public Phases Phase;
 
     // General battler data
     public Sprite MainImage;
@@ -51,7 +53,6 @@ public abstract class Battler : BaseObject
     [HideInInspector] public List<State> States;
 
     // Action execution info
-    [HideInInspector] public bool ExecutedAction;
     [HideInInspector] public bool HitCritical;
     [HideInInspector] public bool HitWeakness;
     [HideInInspector] public bool HitResistant;
@@ -73,34 +74,29 @@ public abstract class Battler : BaseObject
     [HideInInspector] public List<int> ContactSpread;
 
     // Size of array == All elements and states, respectively. Takes values from ChangedElementRates and ChangedStateRates
-    private string[][] DefaultChoiceButtonLetters;
-    [HideInInspector] public string TargetLetterCommand;
     [HideInInspector] public int[] ElementRates;
     [HideInInspector] public int[] StateRates;
 
-    [HideInInspector] protected Vector3 MainLocation;
-    [HideInInspector] public bool Waiting;
-    [HideInInspector] public int SPToConsumeThisTurn;
-    [HideInInspector] public bool IsCharging;   // Skill has this as well, but is needed to the BattleMenu
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// -- Setup --
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     protected override void Awake()
     {
         base.Awake();
-        Properties = transform.GetChild(0).transform;
+        HUDProperties= gameObject.GetComponent<BattlerHUD>();
         Figure = gameObject.GetComponent<Rigidbody2D>();
         MainLocation = transform.position;
+        MapGameObjectsToHUD();
         SetupElementRates();
     }
 
     protected virtual void Start()
     {
-        DefaultChoiceButtonLetters = new string[][]
-        {
-            new string[]{ "Q", "W", "E" },
-            new string[]{ "A", "S", "D" },
-            new string[]{ "Z", "X", "C" }
-        };
+        //
     }
+
+    protected abstract void MapGameObjectsToHUD();
 
     public abstract void StatConversion();
 
@@ -116,21 +112,10 @@ public abstract class Battler : BaseObject
         Figure.velocity = Movement * Speed;
     }
 
-    public void EnableMoving()
-    {
-        CanMove = true;
-    }
-
-    public void DisableMoving()
-    {
-        CanMove = false;
-    }
-
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- UI --
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    // UNUSED
     public T GetNearestTarget<T>(IEnumerable<T> battlers) where T : Battler
     {
         T minB = battlers.First();
@@ -145,48 +130,13 @@ public abstract class Battler : BaseObject
         return minB;
     }
 
-    public void GenerateChoiceUI(string button)
+    public Vector3 GetApproachVector(BattlePlayer p)
     {
-        GenerateChoiceUIAUX(button);
-    }
-
-    public void GenerateDefaultChoiceUI()
-    {
-        GenerateChoiceUIAUX(DefaultChoiceButtonLetters[(int)RowPosition][(int)ColumnPosition]);
-    }
-
-    public void GenerateColumnChoiceUI()
-    {
-        GenerateChoiceUIAUX(DefaultChoiceButtonLetters[0][(int)ColumnPosition]);
-    }
-
-    public void GenerateRowChoiceUI()
-    {
-        GenerateChoiceUIAUX(DefaultChoiceButtonLetters[(int)RowPosition][0]);
-    }
-
-    public bool Selectable()
-    {
-        return Properties.gameObject.activeSelf;
-    }
-
-    public void RemoveChoiceUI()
-    {
-        TargetLetterCommand = "";
-        Properties.GetChild(0).gameObject.SetActive(false);
-        Properties.GetChild(1).gameObject.SetActive(false);
-        Properties.GetChild(2).gameObject.SetActive(false);
-    }
-
-    private void GenerateChoiceUIAUX(string choiceButtonLetter)
-    {
-        TargetLetterCommand = choiceButtonLetter;
-        Properties.GetChild(0).gameObject.SetActive(true);
-        Properties.GetChild(1).gameObject.SetActive(true);
-        Properties.GetChild(2).gameObject.SetActive(true);
-        Properties.GetChild(0).GetComponent<TextMeshProUGUI>().text = Name;
-        Properties.GetChild(1).GetComponent<Image>().sprite = UIMaster.LetterCommands[TargetLetterCommand];
-        Properties.GetChild(2).GetComponent<Gauge>().Set(HP, Stats.MaxHP);
+        Vector3 bpp = p.transform.position;
+        float dist1 = Vector3.Distance(HUDProperties.ApproachPoints.GetChild(0).position, bpp);
+        float dist2 = Vector3.Distance(HUDProperties.ApproachPoints.GetChild(1).position, bpp);
+        Vector3 distVector = (dist1 >= dist2 ? HUDProperties.ApproachPoints.GetChild(0).position : HUDProperties.ApproachPoints.GetChild(1).position) - bpp;
+        return distVector.normalized;
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -200,6 +150,11 @@ public abstract class Battler : BaseObject
         HitCritical = false;
         HitWeakness = false;
         HitResistant = false;
+    }
+
+    public void ApproachTarget()
+    {
+        //Movement = get
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -450,26 +405,9 @@ public abstract class Battler : BaseObject
     /// -- ActiveTool Actions --
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public void ExecuteAction(List<Battler> usersParty, List<Battler> opponentParty)
+    public void ExecuteAction()
     {
-        if (!CanDoAction()) return;
-
-        /*SelectedToolMove = GetSelectedToolMove();
-        if (!SelectedToolMove) return;
-
-        if (SelectedToolMove.RandomTarget)
-        {
-            SelectedTargets.Clear();
-            SetupRandomTargets(usersParty, opponentParty);
-        }*/
-        
-        if (ScopeForUnconsciousTeammates()) RedirectConsciousTargets(usersParty, opponentParty);
-        else RedirectUnconsciousTargets(usersParty, opponentParty);
-
-        if (SelectedTargets.Count == 0) DefaultToAttackRandom();
-        if (SPToConsumeThisTurn > SP) SelectedTool = GetDefaultSkill();
-        
-        ExecuteTool();
+        Phase = Phases.UsingAction;
     }
 
     public bool TryConvertSkillToWeaponSettings()
@@ -502,18 +440,12 @@ public abstract class Battler : BaseObject
         return new Vector3(distX / norm, distY / norm);
     }
 
-    public void ExecuteTool()
-    {
-        if (SelectedTool is Skill sk) ExecuteSkill(sk);
-        else if (SelectedTool is Item it) ExecuteItem(it);
-    }
-
     private S ExecuteSkill<S>(S skill) where S : Skill
     {
         skill.StartCharge();
-        IsCharging = (skill.ChargeCount > 0);
         if (skill.ChargeCount > 0)
         {
+            Phase = Phases.Charging;
             skill.Charge1Turn();
             return skill;
         }
@@ -619,7 +551,6 @@ public abstract class Battler : BaseObject
         if (KOd) ClearDecisions();
         if (GetComponent<SpriteRenderer>()) GetComponent<SpriteRenderer>().enabled = !KOd;
         else if (GetComponent<Animator>()) GetComponent<Animator>().enabled = !KOd;
-        Properties.gameObject.SetActive(!KOd);
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -651,10 +582,7 @@ public abstract class Battler : BaseObject
     /// -- Applying Passive Effects --
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public bool CanDoAction()
-    {
-        return !KOd && CannotMove <= 0 && !IsCharging;
-    }
+    public bool CanDoAction => !KOd && CannotMove <= 0 && Phase != Phases.Charging;
 
     /*
     public void ApplyStartActionEffects(Environment e)
@@ -681,18 +609,18 @@ public abstract class Battler : BaseObject
     /// -- Stat Management: TEMPORARY FUNCTIONS UNTIL ALL STATE MANAGEMENT HAS BEEN IMPLEMENTED --
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public int Atk() { return Stats.Atk; }
-    public int Def() { return Stats.Def; }
-    public int Map() { return Stats.Map; }
-    public int Mar() { return Stats.Mar; }
-    public int Spd() { return Stats.Spd; }
-    public int Tec() { return Stats.Tec; }
-    public int Luk() { return Stats.Luk; }
+    public int Atk => Stats.Atk;
+    public int Def => Stats.Def;
+    public int Map => Stats.Map;
+    public int Mar => Stats.Mar;
+    public int Spd => Stats.Spd;
+    public int Tec => Stats.Tec;
+    public int Luk => Stats.Luk;
 
-    public int Acc() { return Stats.Acc; }
-    public int Eva() { return Stats.Eva; }
-    public int Crt() { return Stats.Crt; }
-    public int Cev() { return Stats.Cev; }
+    public int Acc => Stats.Acc;
+    public int Eva => Stats.Eva;
+    public int Crt => Stats.Crt;
+    public int Cev => Stats.Cev;
 
     /*public int Atk() { return NaturalNumber((Stats.Atk + StatBoosts.Atk) * StatModifiers.Atk / 100); }
     public int Def() { return NaturalNumber((Stats.Def + StatBoosts.Def) * StatModifiers.Def / 100); }
