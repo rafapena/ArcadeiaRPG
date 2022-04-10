@@ -6,10 +6,13 @@ public abstract class ActiveTool : BaseObject
 {
     public enum ModType { None, Damage, Recover, Drain }
 
-    public enum ScopeType {
+    public enum ScopeType
+    {
         None, OneEnemy, OneArea, StraightThrough, Widespread, AllEnemies,
         Self, OneAlly, OneKnockedOutAlly, AllAllies, AllKnockedOutAllies,
-        TrapSetup, Planting, EveryoneButSelf, Everyone }
+        TrapSetup, Planting,
+        EveryoneButSelf, Everyone
+    }
 
     public BattleMaster.ToolTypes Type;
     public BattleMaster.ToolFormulas Formula;

@@ -170,7 +170,7 @@ public class InventoryToolSelectionList : SelectionList_Super<IToolForInventory>
         Color tempColor = entry.transform.GetChild(1).GetComponent<Image>().color;
         tempColor.a = (StoredEnableCondition?.Invoke(data) ?? true) ? 1.0f : DISABLED_TOOL_OPACITY;
         entry.transform.GetChild(1).GetComponent<Image>().color = tempColor;
-        if (entry.transform.childCount > 1) entry.transform.GetChild(2).GetComponent<TextMeshProUGUI>().color = tempColor;
+        if (entry.transform.childCount > 2) entry.transform.GetChild(2).GetComponent<TextMeshProUGUI>().color = tempColor;
     }
 
     public void SetEnableCondition(EnableCondition enableCondition)

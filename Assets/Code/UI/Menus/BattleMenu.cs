@@ -17,8 +17,8 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
     // Selection management
     private bool PassedSelectedToolBuffer => Time.unscaledTime > JustSelectedToolTimer;
     private float JustSelectedToolTimer;
-    private float JUST_SELECTED_TOOL_TIME_BUFFER = 0.5f;
-    private readonly float DISABLED_ICON_TRANSPARENCY = 0.3f;
+    private const float JUST_SELECTED_TOOL_TIME_BUFFER = 0.5f;
+    private const float DISABLED_ICON_TRANSPARENCY = 0.3f;
     private bool MenuLoaded;
     private Action UpdateTarget;
     private Selections Selection;
@@ -49,24 +49,43 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
     public ToolListCollectionFrame SelectItemsList;
     public GameObject SelectedActiveTool;
 
+    // Skill management
+    private bool DeactivateActionFrame => ActivatedActionFrame && Time.time > SkillNameDisplayTimer;
+    public MenuFrame PlayerActionFrame;
+    public TextMeshProUGUI PlayerActionName;
+    public MenuFrame EnemyActionFrame;
+    public TextMeshProUGUI EnemyActionName;
+    private float SkillNameDisplayTimer;
+    private float SKILL_NAME_DISPLAY_TIME = 3f;
+    private bool ActivatedActionFrame;
+
     private void Start()
     {
         Selection = Selections.Disabled;
         SelectItemsList.ToolList.SetEnableCondition(GetScopeUsability);
-        ClearScope();
+        ClearScope(true);
     }
 
     private void LateUpdate()
     {
+        if (DeactivateActionFrame)
+        {
+            PlayerActionFrame.Deactivate();
+            EnemyActionFrame.Deactivate();
+            ActivatedActionFrame = false;
+        }
+
         if (Selection == Selections.Disabled || CurrentBattle.Waiting) return;
         else if (!MenuLoaded)
         {
             ActingPlayer.EnableArrowKeyMovement();
+            SetBlinkingBattlers(true);
             SetupForSelectAction();
             PartyFrame.Activate();
             MenuLoaded = true;
             return;
         }
+
         switch (Selection)
         {
             case Selections.Actions:
@@ -126,7 +145,7 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
     }
 
     public void DeclareNext(Battler nextActingBattler)
-    {   
+    {
         if (nextActingBattler is BattlePlayer nextP)
         {
             int i = 0;
@@ -169,6 +188,11 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
         OptionWeaponFrame.transform.GetChild(2).gameObject.SetActive(ActingPlayer.Weapons.Count > 1);
     }
 
+    private void SetBlinkingBattlers(bool blinking)
+    {
+        foreach (Battler b in CurrentBattle.AllBattlers) b.SetBlinkingBattler(blinking);
+    }
+
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- Battle phase process: ACTION --
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -190,7 +214,6 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
         SelectItemsFrame.Deactivate();
         EventSystem.current.SetSelectedGameObject(null);
 
-        ActingPlayer.ClearDecisions();
         ActingPlayer.EnableArrowKeyMovement();
         ActingPlayer.SelectedTool = ActingPlayer.BasicAttackSkill;
         ActingPlayer.TryConvertSkillToWeaponSettings();
@@ -252,7 +275,7 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
         SelectSkillsList.Refresh(ActingPlayer, CurrentBattle.FightingPlayerParty.ToList());
         EventSystem.current.SetSelectedGameObject(SelectSkillsList.transform.GetChild(0).gameObject);
 
-        ClearScope();
+        ClearScope(true);
         ActingPlayer.DisableArrowKeyMovement();
         ActingPlayer.SelectedTool = null;
     }
@@ -283,7 +306,7 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
         SelectItemsList.Refresh(CurrentBattle.PlayerParty.Inventory.Items.FindAll(x => !x.IsKey));
         EventSystem.current.SetSelectedGameObject(SelectItemsList.ToolList.transform.GetChild(0).gameObject);
 
-        ClearScope();
+        ClearScope(true);
         ActingPlayer.DisableArrowKeyMovement();
         ActingPlayer.SelectedTool = null;
     }
@@ -347,15 +370,16 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
         else if (Input.GetKeyDown(KeyCode.Z)) FinalizeSelections();
     }
 
-    public void ClearScope()
+    public void ClearScope(bool resetSelectedTargets)
     {
         UpdateTarget = null;
         foreach (Transform t in TargetFields.FieldsList) t.GetComponent<TargetField>().Deactivate();
+        if (resetSelectedTargets) CurrentBattle.ResetSelectedTargets();
     }
 
     private void SetScopeTargetSearch()
     {
-        ClearScope();
+        ClearScope(true);
         switch (ActingPlayer.SelectedTool.Scope)
         {
             case ActiveTool.ScopeType.OneEnemy:
@@ -382,6 +406,7 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
 
             case ActiveTool.ScopeType.Self:
                 TargetFields.Single.Activate(ActingPlayer);
+                DisableTargetingForBattlers(CurrentBattle.FightingPlayerParty);
                 UpdateTarget = () => TargetFields.Single.AimAt(ActingPlayer, false);
                 break;
 
@@ -429,12 +454,12 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
 
     private void AimAtNearestEnemy() => TargetFields.Single.AimAt(ActingPlayer.GetNearestTarget(CurrentBattle.EnemyParty.Enemies.Where(x => !x.KOd)), ActingPlayer.SelectedTool.Ranged);
 
-    private void SetSplashTarget(float scale = 1.0f)
+    private void SetSplashTarget(float scale = 1.0f, bool isSetup = false)
     {
         TargetFieldsGroup tfg = TargetFields;
         TargetField tf = Instantiate(ActingPlayer.SelectedTool.Ranged ? (TargetField)tfg.SplashRange : (TargetField)tfg.SplashMeelee, tfg.FieldsList);
         tf.DisposeOnDeactivate = true;
-        tf.Activate(ActingPlayer);
+        tf.Activate(ActingPlayer, isSetup);
         tf.transform.localScale *= scale;
         if (tf is DynamicTargetField dtf) dtf.AimAt(ActingPlayer.GetNearestTarget(CurrentBattle.EnemyParty.Enemies.Where(x => !x.KOd)), true);
     }
@@ -449,6 +474,17 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
             DynamicTargetField dtf = Instantiate(TargetFields.Single, TargetFields.FieldsList);
             dtf.DisposeOnDeactivate = true;
             dtf.AimAt(b, false);
+            b.Select(true);
+            b.LockSelectTrigger = true;
+        }
+    }
+
+    public void DisableTargetingForBattlers<T>(IEnumerable<T> battlers) where T : Battler
+    {
+        foreach (Battler b in battlers)
+        {
+            b.Select(false);
+            b.LockSelectTrigger = true;
         }
     }
 
@@ -458,11 +494,34 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
 
     private void FinalizeSelections()
     {
+        if (ActingPlayer.SelectedTool.Scope == ActiveTool.ScopeType.TrapSetup && CurrentBattle.AllBattlers.Any(x => x.IsSelected)) return;
         Selection = Selections.Disabled;
         ActingPlayer.DisableArrowKeyMovement();
-        Hide();
-        ClearScope();
         CurrentBattle.PrepareForAction();
+        Hide();
+        ClearScope(false);
+        SetBlinkingBattlers(false);
+        if (ActingPlayer.AimingForEnemies())
+        {
+            // After blinking is removed, select specifically enemies for flexible targeting
+            foreach (BattleEnemy e in CurrentBattle.EnemyParty.Enemies) e.Select(true);
+        }
+    }
+
+    public void DisplayUsedAction(Battler battler, ActiveTool action)
+    {
+        if (battler is BattleEnemy)
+        {
+            EnemyActionFrame.Activate();
+            EnemyActionName.text = action.Name;
+        }
+        else  // Player or ally
+        {
+            PlayerActionFrame.Activate();
+            PlayerActionName.text = action.Name;
+        }
+        SkillNameDisplayTimer = Time.time + SKILL_NAME_DISPLAY_TIME;
+        ActivatedActionFrame = true;
     }
 
     public void EndTurn()
@@ -478,7 +537,7 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
     {
         Selection = Selections.Running;
         Hide();
-        ClearScope();
+        ClearScope(true);
         CurrentBattle.RunAway();
     }
 

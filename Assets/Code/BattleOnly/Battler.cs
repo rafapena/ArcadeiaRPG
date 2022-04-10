@@ -11,7 +11,7 @@ using UnityEngine.UI;
 public abstract class Battler : BaseObject
 {
     [SerializeField]
-    protected BattlerHUD HUDProperties;
+    public BattlerHUD HUDProperties { get; private set; }
     public enum VerticalPositions { Top, Center, Bottom }
     public enum HorizontalPositions { Left, Center, Right }
     public enum Phases { None, DecidingAction, Charging, PreparingAction, UsingAction, ExecutedAction }
@@ -47,10 +47,12 @@ public abstract class Battler : BaseObject
     public bool UsingFists => Weapons.Count == 0;
 
     // Overall battle info
+    [HideInInspector] public bool IsSelected { get; private set; }
+    [HideInInspector] public bool LockSelectTrigger;
     [HideInInspector] public ActiveTool SelectedTool;
     [HideInInspector] public Weapon SelectedWeapon;
-    [HideInInspector] public List<Battler> SelectedTargets;
-    [HideInInspector] public List<State> States;
+    [HideInInspector] public List<State> States = new List<State>();
+    private bool BlinkingEnabled;
 
     // Action execution info
     [HideInInspector] public bool HitCritical;
@@ -70,12 +72,13 @@ public abstract class Battler : BaseObject
     [HideInInspector] public int Counter;
     [HideInInspector] public int Reflect;
     [HideInInspector] public List<BattleMaster.ToolTypes> DisabledToolTypes;
-    [HideInInspector] public List<int> RemoveByHit;
-    [HideInInspector] public List<int> ContactSpread;
+    [HideInInspector] public List<int> RemoveByHit = new List<int>();
+    [HideInInspector] public List<int> ContactSpread = new List<int>();
 
     // Size of array == All elements and states, respectively. Takes values from ChangedElementRates and ChangedStateRates
     [HideInInspector] public int[] ElementRates;
     [HideInInspector] public int[] StateRates;
+
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- Setup --
@@ -84,11 +87,14 @@ public abstract class Battler : BaseObject
     protected override void Awake()
     {
         base.Awake();
-        HUDProperties= gameObject.GetComponent<BattlerHUD>();
+        HUDProperties = gameObject.GetComponent<BattlerHUD>();
+        HUDProperties.ActionHitBox.SetBattler(this);
+        HUDProperties.ScopeHitBox.SetBattler(this);
         Figure = gameObject.GetComponent<Rigidbody2D>();
         MainLocation = transform.position;
         MapGameObjectsToHUD();
         SetupElementRates();
+        SetupStateRates();
     }
 
     protected virtual void Start()
@@ -107,9 +113,24 @@ public abstract class Battler : BaseObject
         foreach (ElementRate er in ChangedElementRates) ElementRates[(int)er.Element] = er.Rate;
     }
 
+    private void SetupStateRates()
+    {
+        StateRates = new int[ResourcesMaster.States.Length];
+        for (int i = 0; i < StateRates.Length; i++) StateRates[i] = BattleMaster.DEFAULT_RATE;
+        foreach (StateRate sr in ChangedStateRates) StateRates[sr.State.Id] = sr.Rate;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// -- Updating --
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
     protected virtual void Update()
     {
         Figure.velocity = Movement * Speed;
+        if (IsSelected && BlinkingEnabled && GetComponent<SpriteRenderer>())
+        {
+            GetComponent<SpriteRenderer>().color = Color.Lerp(Color.black, Color.white, Time.time % 1.5f);
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -130,12 +151,25 @@ public abstract class Battler : BaseObject
         return minB;
     }
 
-    public Vector3 GetApproachVector(BattlePlayer p)
+    public void SetBlinkingBattler(bool blinking)
     {
-        Vector3 bpp = p.transform.position;
-        float dist1 = Vector3.Distance(HUDProperties.ApproachPoints.GetChild(0).position, bpp);
-        float dist2 = Vector3.Distance(HUDProperties.ApproachPoints.GetChild(1).position, bpp);
-        Vector3 distVector = (dist1 >= dist2 ? HUDProperties.ApproachPoints.GetChild(0).position : HUDProperties.ApproachPoints.GetChild(1).position) - bpp;
+        SpriteRenderer sp = GetComponent<SpriteRenderer>();
+        if (sp && !blinking) sp.color = Color.white;
+        BlinkingEnabled = blinking;
+    }
+
+    public void Select(bool selected)
+    {
+        SpriteRenderer sp = GetComponent<SpriteRenderer>();
+        if (sp && !selected) sp.color = Color.white;
+        IsSelected = selected;
+    }
+
+    public Vector3 GetApproachVector(Vector3 approachPointLeft, Vector3 approachPointRight)
+    {
+        float dist1 = Vector3.Distance(approachPointLeft, transform.position);
+        float dist2 = Vector3.Distance(approachPointRight, transform.position);
+        Vector3 distVector = (dist1 >= dist2 ? approachPointLeft : approachPointRight) - transform.position;
         return distVector.normalized;
     }
 
@@ -143,18 +177,18 @@ public abstract class Battler : BaseObject
     /// -- Initializers --
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public void ClearDecisions()
+    public void ResetAction()
     {
+        Phase = Phases.None;
         SelectedTool = null;
-        if (SelectedTargets != null) SelectedTargets.Clear();
         HitCritical = false;
         HitWeakness = false;
         HitResistant = false;
     }
 
-    public void ApproachTarget()
+    public void ApproachTarget(Transform leftPoint, Transform rightPoint)
     {
-        //Movement = get
+        Movement = GetApproachVector(leftPoint.position, rightPoint.position);
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -303,102 +337,37 @@ public abstract class Battler : BaseObject
     }*/
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// -- ActiveTool Pre-Actions --
+    /// -- ActiveTool scoping --
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    private void RedirectUnconsciousSelectedPartners(List<Battler> usersParty, List<Battler> opponentParty)
-    {
-        /*for (int i = SelectedTeamSkillPartners.Count - 1; i >= 0; i--)
-        {
-            if (SelectedTeamSkillPartners[i].Unconscious)
-                SelectedTeamSkillPartners.RemoveAt(i);
-        }
-        for (int i = 0; i < usersParty.Count; i++)
-        {
-            Battler p = SelectedTeamSkillPartners[i];
-            if (!p.Unconscious && p.GetType().Name == GetType().Name)
-                SelectedTeamSkillPartners.Add(p);
-        }
-        DefaultToAttackRandom();*/
-    }
 
     protected abstract Skill GetDefaultSkill();
 
-    private void DefaultToAttackRandom()
+    public bool AimingForTeammates()
     {
-        ClearDecisions();
-        SelectedTool = GetDefaultSkill();
+        switch (SelectedTool.Scope)
+        {
+            case ActiveTool.ScopeType.OneAlly:
+            case ActiveTool.ScopeType.OneKnockedOutAlly:
+            case ActiveTool.ScopeType.AllAllies:
+            case ActiveTool.ScopeType.AllKnockedOutAllies:
+            case ActiveTool.ScopeType.Self:
+                return true;
+        }
+        return false;
     }
 
-    private void RedirectConsciousTargets(List<Battler> usersParty, List<Battler> opponentParty)
+    public bool AimingForEnemies()
     {
-        for (int i = SelectedTargets.Count - 1; i >= 0; i--)
-            if (!SelectedTargets[i].KOd)
-                SelectedTargets.RemoveAt(i);
-        if (SelectedTargets.Count == 0)
-            SetupRandomTargets(usersParty, opponentParty);
-    }
-
-    private void RedirectUnconsciousTargets(List<Battler> usersParty, List<Battler> opponentParty)
-    {
-        for (int i = SelectedTargets.Count - 1; i >= 0; i--)
-            if (SelectedTargets[i].KOd)
-                SelectedTargets.RemoveAt(i);
-        if (SelectedTargets.Count == 0)
-            SetupRandomTargets(usersParty, opponentParty);
-    }
-
-    private bool ScopeForUnconsciousTeammates()
-    {
-        return SelectedTool.Scope == ActiveTool.ScopeType.OneKnockedOutAlly || SelectedTool.Scope == ActiveTool.ScopeType.AllKnockedOutAllies;
-    }
-
-    private void SetupRandomTargets(List<Battler> usersParty, List<Battler> opponentParty)
-    {
-        Battler selected;
         switch (SelectedTool.Scope)
         {
             case ActiveTool.ScopeType.OneEnemy:
             case ActiveTool.ScopeType.OneArea:
-                do selected = opponentParty[Random.Range(0, opponentParty.Count)];
-                while (selected.KOd);
-                SelectedTargets.Add(selected);
-                break;
-
+            case ActiveTool.ScopeType.AllEnemies:
             case ActiveTool.ScopeType.StraightThrough:
-                do selected = opponentParty[Random.Range(0, opponentParty.Count)];
-                while (selected.KOd);
-                foreach (Battler b in opponentParty)
-                    if (!b.KOd && b.RowPosition == selected.RowPosition)
-                        SelectedTargets.Add(selected);
-                break;
-
             case ActiveTool.ScopeType.Widespread:
-                do selected = opponentParty[Random.Range(0, opponentParty.Count)];
-                while (selected.KOd);
-                foreach (Battler b in opponentParty)
-                    if (!b.KOd && b.ColumnPosition == selected.ColumnPosition)
-                        SelectedTargets.Add(selected);
-                break;
-
-            case ActiveTool.ScopeType.OneAlly:
-                do selected = usersParty[Random.Range(0, usersParty.Count)];
-                while (selected.KOd);
-                SelectedTargets.Add(selected);
-                break;
-
-            case ActiveTool.ScopeType.OneKnockedOutAlly:
-                int potentialTargets = 0;
-                foreach (Battler t in usersParty)
-                    if (t.KOd)
-                        potentialTargets++;
-                if (potentialTargets == 0)      // User will skip their turn if everyone in their team is conscious, mid-turn
-                    break;
-                do selected = usersParty[Random.Range(0, usersParty.Count)];
-                while (!selected.KOd);
-                SelectedTargets.Add(selected);
-                break;
+                return true;
         }
+        return false;
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -422,13 +391,13 @@ public abstract class Battler : BaseObject
 
     private void ShootProjectile()
     {
-        foreach (Battler t in SelectedTargets)
+        /*foreach (Battler t in SelectedTargets)
         {
             Projectile p = Instantiate(SelectedTool.Projectile, transform.position, Quaternion.identity, gameObject.transform);
             p.Setup(10, GetDirection(transform.position, t.transform.position));
             p.GetBattleInfo(this, SelectedTargets, SelectedTool);
             p.GetComponent<SpriteRenderer>().sortingLayerName = "Battle";
-        }
+        }*/
     }
 
     private Vector3 GetDirection(Vector3 userPos, Vector3 targetPos)
@@ -548,7 +517,7 @@ public abstract class Battler : BaseObject
     private void CheckKO()
     {
         KOd = (HP <= 0 || Petrified);
-        if (KOd) ClearDecisions();
+        if (KOd) ResetAction();
         if (GetComponent<SpriteRenderer>()) GetComponent<SpriteRenderer>().enabled = !KOd;
         else if (GetComponent<Animator>()) GetComponent<Animator>().enabled = !KOd;
     }

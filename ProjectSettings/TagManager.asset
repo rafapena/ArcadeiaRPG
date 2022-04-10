@@ -20,9 +20,9 @@ TagManager:
   - Cannot Touch
   - Map Player
   - Map Enemy
-  - Battler
-  - Battle Wall
-  - Scope Through
+  - Battler Base
+  - Action Hit Box
+  - Moving Scope Hit Box
   - 
   - 
   - 
@@ -44,6 +44,9 @@ TagManager:
   m_SortingLayers:
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Scope
+    uniqueID: 1577450607
     locked: 0
   - name: Battle
     uniqueID: 3970058461

@@ -1,20 +1,15 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 public class DynamicTargetField : TargetField
 {
     protected Vector3 Movement;
     private float Speed;
 
-    [SerializeField]
-    public float DefaultSpeed;
+    public Transform ApproachPointLeft;
+    public Transform ApproachPointRight;
 
-    // Start is called before the first frame update
-    protected override void Start()
-    {
-        base.Start();
-    }
+    [SerializeField]
+    private float DefaultSpeed;
 
     // Update is called once per frame
     protected override void Update()
@@ -24,9 +19,13 @@ public class DynamicTargetField : TargetField
         Figure.velocity = Movement * Speed;
     }
 
+    public override bool HasApproachPoints() => ApproachPointLeft != null && ApproachPointRight != null;
+
     public void AimAt(Battler target, bool movable)
     {
+        if (target.HUDProperties.ScopeHitBox == null) return;
         Speed = movable ? DefaultSpeed : 0;
-        transform.position = new Vector3(target.transform.position.x, target.transform.position.y, target.transform.position.z - 1);
+        Vector3 pos = target.HUDProperties.ScopeHitBox.transform.position;
+        transform.position = new Vector3(pos.x, pos.y, target.transform.position.z - 1);
     }
 }

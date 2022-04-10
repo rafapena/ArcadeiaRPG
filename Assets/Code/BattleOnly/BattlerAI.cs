@@ -53,7 +53,7 @@ public abstract class BattlerAI : Battler
         if (CanDoAction) return;
         SelectedWeapon = SelectWeapon(usersPartyMembers, opponentPartyMembers);
         ActiveTool t = SelectTool(usersPartyMembers, opponentPartyMembers);
-        if (t != null) SelectedTargets = SelectTargets(usersPartyMembers, opponentPartyMembers);
+        if (t != null) SelectTargets(usersPartyMembers, opponentPartyMembers);
     }
 
     protected Weapon SelectWeapon<T, U>(List<T> usersPartyMembers, List<U> opponentPartyMembers) where T : Battler where U : Battler
@@ -66,11 +66,9 @@ public abstract class BattlerAI : Battler
         return ToolAI[0].Move;
     }
 
-    protected List<Battler> SelectTargets<T, U>(List<T> usersPartyMembers, List<U> opponentPartyMembers) where T : Battler where U : Battler
+    protected void SelectTargets<T, U>(List<T> usersPartyMembers, List<U> opponentPartyMembers) where T : Battler where U : Battler
     {
-        List<Battler> targets = new List<Battler>();
-        targets.Add(opponentPartyMembers[Random.Range(0, opponentPartyMembers.Count)]);
-        return targets;
+        opponentPartyMembers[Random.Range(0, opponentPartyMembers.Count)].Select(true);
     }
 
     protected override void MapGameObjectsToHUD()
