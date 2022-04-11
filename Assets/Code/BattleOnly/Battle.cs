@@ -9,7 +9,7 @@ public class Battle : MonoBehaviour
     public enum BattleStates { None, Menu, PreAction, Action, Running, Won, GameOver }
 
     // Collision detection
-    public const int BATTLER_BASE_LAYER = 11;
+    public const int BASE_HITBOX_LAYER = 11;
     public const int ACTION_HITBOX_LAYER = 12;
     public const int MOVING_SCOPE_HITBOX_LAYER = 13;
 
@@ -46,10 +46,15 @@ public class Battle : MonoBehaviour
 
     // Manage the battlers themselves
     private List<Battler> Battlers = new List<Battler>();
-    private Battler ActingBattler;
-    private Battler NextActingBattler;
+    public Battler ActingBattler { get; private set; }
+    public Battler NextActingBattler { get; private set; }
     public IEnumerable<Battler> AllBattlers => Battlers;
     public IEnumerable<Battler> FightingPlayerParty => PlayerParty.Players.Cast<Battler>().Concat(PlayerParty.Allies);
+
+    // Lists dump
+    public Transform PlayerPartyDump;
+    public Transform EnemyPartyDump;
+    public Transform ClassControlDump;
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- Setup --
@@ -57,10 +62,9 @@ public class Battle : MonoBehaviour
 
     private void Awake()
     {
-        Physics2D.IgnoreLayerCollision(BATTLER_BASE_LAYER, BATTLER_BASE_LAYER);
+        Physics2D.IgnoreLayerCollision(BASE_HITBOX_LAYER, BASE_HITBOX_LAYER);
         Physics2D.IgnoreLayerCollision(MOVING_SCOPE_HITBOX_LAYER, MOVING_SCOPE_HITBOX_LAYER);
-        Physics2D.IgnoreLayerCollision(BATTLER_BASE_LAYER, MOVING_SCOPE_HITBOX_LAYER);
-        Physics2D.IgnoreLayerCollision(ACTION_HITBOX_LAYER, MOVING_SCOPE_HITBOX_LAYER);
+        Physics2D.IgnoreLayerCollision(BASE_HITBOX_LAYER, MOVING_SCOPE_HITBOX_LAYER);
     }
 
     void Start()
@@ -84,20 +88,18 @@ public class Battle : MonoBehaviour
 
     void SetupPlayerParty()
     {
-        Transform playerPartyGameObject = GameObject.Find("/PlayerParty").transform;
         PlayerParty = BattleMaster.PlayerParty;
         PlayerParty.Players = SetupPlayerPositions(PlayerParty.Players);
         PlayerParty.Allies = SetupAllyPositions(PlayerParty.Allies);
-        PlayerParty.Players = SetupBattlers(PlayerParty.Players, playerPartyGameObject);
-        PlayerParty.Allies = SetupBattlers(PlayerParty.Allies, playerPartyGameObject);
+        PlayerParty.Players = SetupBattlers(PlayerParty.Players, PlayerPartyDump);
+        PlayerParty.Allies = SetupBattlers(PlayerParty.Allies, PlayerPartyDump);
     }
 
     void SetupEnemyParty()
     {
-        Transform enemyPartyGameObject = GameObject.Find("/EnemyParty").transform;
         EnemyParty = Instantiate(BattleMaster.EnemyParty, gameObject.transform);
         EnemyParty.gameObject.SetActive(false);
-        EnemyParty.Enemies = SetupBattlers(EnemyParty.Enemies, enemyPartyGameObject);
+        EnemyParty.Enemies = SetupBattlers(EnemyParty.Enemies, EnemyPartyDump);
     }
 
     List<T> SetupBattlers<T>(List<T> list, Transform partyGameObject) where T : Battler
@@ -111,6 +113,12 @@ public class Battle : MonoBehaviour
             b = InstantiateContents(b);
             b.transform.localScale = Vector3.one * 0.5f;
             b.gameObject.SetActive(true);
+            b.SetBattle(this);
+            if (b.Class)
+            {
+                b.Class = Instantiate(b.Class, bpPos, Quaternion.identity, ClassControlDump);
+                b.Class.SetBattle(this);
+            }
             result.Add(b);
         }
         return result;
@@ -292,17 +300,24 @@ public class Battle : MonoBehaviour
     public virtual void PrepareForAction()
     {
         BattleState = BattleStates.PreAction;
-
-        ActingBattler.Phase = Battler.Phases.PreparingAction;
-        //if (ActingBattler.SelectedTool.Ranged && ActingBattler.SelectedTool)
-        //ActingBattler.Phase = ActingBattler.SelectedTool.Ranged ? Battler.Phases.UsingAction : Battler.Phases.PreparingAction;
-        //if (ActingBattler.Phase == Battler.Phases.PreparingAction) ActingBattler.ApproachTarget();
+        if (!ActingBattler.SelectedTool.Ranged && ActingBattler.SelectedTool.Scope == ActiveTool.ScopeType.OneEnemy)
+        {
+            ActingBattler.Phase = Battler.Phases.PreparingAction;
+            ActingBattler.ApproachTarget(BattleMenu.TargetFields.Single.ApproachPointLeft, BattleMenu.TargetFields.Single.ApproachPointRight);
+        }
+        else ActingBattler.Phase = Battler.Phases.UsingAction;
     }
 
     public void ExecuteAction()
     {
         BattleState = BattleStates.Action;
-        ActingBattler.ExecuteAction();
+        ActingBattler.Phase = Battler.Phases.UsingAction;
+        if (ActingBattler.UsingBasicAttack)
+        {
+            if (ActingBattler.Class) ActingBattler.Class.UseBasicAttack(ActingBattler.SelectedWeapon);
+            else ActingBattler.UseBasicAttack();
+        }
+        else ActingBattler.SelectedTool.ExecuteAction?.Invoke();
         BattleStateTime = Time.time + (ActingBattler.SelectedTool?.ActionTime ?? 1);
     }
 
@@ -323,9 +338,16 @@ public class Battle : MonoBehaviour
     private void ActionEnd()
     {
         ActingBattler.Phase = Battler.Phases.ExecutedAction;
+        FinishSkillUsage();
         if (CheckBattleEndCondition()) return;
         else if (LastActionOfTurn) TurnEnd();
         else ActionStart();
+    }
+
+    private void FinishSkillUsage()
+    {
+        if (ActingBattler.Class) ActingBattler.Class.ClearSkillExecution();
+        else ActingBattler.ClearSkillExecution();
     }
 
     private bool CheckBattleEndCondition()

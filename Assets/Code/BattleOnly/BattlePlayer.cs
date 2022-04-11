@@ -4,30 +4,22 @@ using System.Net.Security;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class BattlePlayer : Battler
+public abstract class BattlePlayer : Battler
 {
     public Stats NaturalStats;
-    public int Companionship = 100;
+    public int PartnerAccBoostRate = 100;
+    public int PartnerCritBoostRate = 100;
     public int SavePartnerRate = 100;
     public int CounterattackRate = 100;
     public int AssistDamageRate = 100;
+    public int StatBoostsRate = 100;
     public List<BattlerClass> ClassSet;
     public List<SkillLearnLevel> SkillSet;
-
-    [HideInInspector] public Skill BasicAttackSkill;
     private bool ArrowKeyMovement;
-
-    public bool UsingBasicAttack => SelectedTool is Skill && SelectedTool.Id == BasicAttackSkill.Id;
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- Setup --
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    protected new void Awake()
-    {
-        base.Awake();
-        BasicAttackSkill = Resources.Load<Skill>("Prefabs/Skills/Attack");
-    }
 
     protected override void Start()
     {

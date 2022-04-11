@@ -125,7 +125,7 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
     public void Hide()
     {
         Selection = Selections.Disabled;
-        PartyFrame.Deactivate();
+        //PartyFrame.Deactivate();
         OptionRunFrame.Deactivate();
         OptionBackFrame.Deactivate();
         OptionWeaponFrame.Deactivate();
@@ -205,10 +205,9 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
         OptionWeaponFrame.Activate();
         SetActionFrame(true);
 
-        GrayOutIconSelection(SelectActionFrame.transform.GetChild(1).gameObject, ActingPlayer.Skills.Count == 0);
+        GrayOutIconSelection(SelectActionFrame.transform.GetChild(1).gameObject, !ActingPlayer.HasAnySkills);
         GrayOutIconSelection(SelectActionFrame.transform.GetChild(2).gameObject, CurrentBattle.PlayerParty.Inventory.Items.Count == 0);
         GrayOutIconSelection(OptionRunFrame.gameObject, CurrentBattle.EnemyParty.RunDisabled);
-        SetWeaponOnMenuAndCharacter();
         SelectActionFrame.Activate();
         SelectSkillsFrame.Deactivate();
         SelectItemsFrame.Deactivate();
@@ -217,6 +216,7 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
         ActingPlayer.EnableArrowKeyMovement();
         ActingPlayer.SelectedTool = ActingPlayer.BasicAttackSkill;
         ActingPlayer.TryConvertSkillToWeaponSettings();
+        SetWeaponOnMenuAndCharacter();
         SetScopeTargetSearch();
     }
 
@@ -497,8 +497,8 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
         if (ActingPlayer.SelectedTool.Scope == ActiveTool.ScopeType.TrapSetup && CurrentBattle.AllBattlers.Any(x => x.IsSelected)) return;
         Selection = Selections.Disabled;
         ActingPlayer.DisableArrowKeyMovement();
-        CurrentBattle.PrepareForAction();
         Hide();
+        CurrentBattle.PrepareForAction();
         ClearScope(false);
         SetBlinkingBattlers(false);
         if (ActingPlayer.AimingForEnemies())
@@ -510,7 +510,9 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
 
     public void DisplayUsedAction(Battler battler, ActiveTool action)
     {
-        if (battler is BattleEnemy)
+        if (action is Skill sk && sk.Basic) return;
+
+        else if (battler is BattleEnemy)
         {
             EnemyActionFrame.Activate();
             EnemyActionName.text = action.Name;

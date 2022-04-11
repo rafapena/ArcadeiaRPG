@@ -115,7 +115,7 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 7390091020226098741}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &4337297497971113263
+--- !u!114 &5336059663881677090
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -124,16 +124,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 4358518413735402372}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c5148861e866d1145ada773abf2c5dbf, type: 3}
+  m_Script: {fileID: 11500000, guid: 3f6d7ba38adc66644a1d8982b859e602, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   Id: 0
   Name: Ally Guy
   Description: Exists in this world, temporarliy
-  Properties: {fileID: 0}
   RowPosition: 0
   ColumnPosition: 0
   Figure: {fileID: 0}
+  Phase: 0
   Speed: 0
   MainImage: {fileID: 0}
   FaceImage: {fileID: 0}
@@ -142,18 +142,18 @@ MonoBehaviour:
   HP: 0
   SP: 0
   Stats:
-    MaxHP: 0
-    Atk: 0
-    Def: 0
-    Map: 0
-    Mar: 0
-    Spd: 0
-    Tec: 0
-    Luk: 0
-    Acc: 0
-    Eva: 0
-    Crt: 0
-    Cev: 0
+    MaxHP: 40
+    Atk: 40
+    Def: 40
+    Map: 40
+    Mar: 40
+    Spd: 10
+    Tec: 40
+    Luk: 40
+    Acc: 100
+    Eva: 100
+    Crt: 100
+    Cev: 100
   StatBoosts:
     MaxHP: 0
     Atk: 0
@@ -170,17 +170,16 @@ MonoBehaviour:
   Skills: []
   Weapons: []
   Accessories: []
+  LockSelectTrigger: 0
   SelectedTool: {fileID: 0}
   SelectedWeapon: {fileID: 0}
-  SelectedTargets: []
   States: []
-  ExecutedAction: 0
+  BasicAttackSkill: {fileID: 0}
   HitCritical: 0
   HitWeakness: 0
   HitResistant: 0
   ChangedElementRates: []
   ChangedStateRates: []
-  ComboDifficulty: 100
   Flying: 0
   StatModifiers:
     MaxHP: 0
@@ -204,11 +203,7 @@ MonoBehaviour:
   DisabledToolTypes: 
   RemoveByHit: 
   ContactSpread: 
-  TargetLetterCommand: 
   ElementRates: 
   StateRates: 
-  Waiting: 0
-  SPToConsumeThisTurn: 0
-  IsCharging: 0
   ToolAI: []
   IsSummon: 0

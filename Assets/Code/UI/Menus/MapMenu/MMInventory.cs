@@ -42,6 +42,8 @@ public class MMInventory : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOp
     // Keep track of selected content
     private bool SelectingEquipment => InventoryFrame.CurrentInventoryList == InventorySystem.ListType.Weapons || InventoryFrame.CurrentInventoryList == InventorySystem.ListType.Accessories;
     private ListSelectable SelectedUsageListBtn;
+    public GameObject[] UseButtons;
+    public GameObject[] EquipButtons;
     public GameObject[] DiscardButtons;
 
     // List of potential targets
@@ -172,11 +174,7 @@ public class MMInventory : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOp
         Selection = Selections.Usage;
         SelectingUsage.SetActive(true);
         ConfirmDiscard.SetActive(false);
-        for (int i = 0; i < DiscardButtons.Length; i++)
-        {
-            if (InventoryFrame.ToolList.SelectedObject.CanRemove) MenuMaster.EnableSelection(ref DiscardButtons[i]);
-            else MenuMaster.DisableSelection(ref DiscardButtons[i]);
-        }
+        EnableDisableUsageButtons(InventoryFrame.ToolList.SelectedObject.CanRemove, ref DiscardButtons);
         if (SelectedUsageListBtn) SelectedUsageListBtn.ClearHighlights();
         SetupUsageButtons();
     }
@@ -206,6 +204,15 @@ public class MMInventory : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOp
         if (SelectedUsageListBtn) SelectedUsageListBtn.ClearHighlights();
     }
 
+    private void EnableDisableUsageButtons(bool condition, ref GameObject[] identicalUsageButtonsList)
+    {
+        for (int i = 0; i < identicalUsageButtonsList.Length; i++)
+        {
+            if (condition) MenuMaster.EnableSelection(ref identicalUsageButtonsList[i]);
+            else MenuMaster.DisableSelection(ref identicalUsageButtonsList[i]);
+        }
+    }
+
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- How will ActiveTool be used + Setup background data for character list --
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -220,15 +227,15 @@ public class MMInventory : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOp
         {
             case InventorySystem.ListType.Items:
                 CurrentUsageList = SelectingUsage.transform.GetChild(0);
-                CurrentUsageList.GetChild(0).GetComponent<Button>().interactable = GetSelectableTeammatesForUsingItems();
+                EnableDisableUsageButtons(GetSelectableTeammatesForUsingItems(), ref UseButtons);
                 break;
             case InventorySystem.ListType.Weapons:
                 CurrentUsageList = SelectingUsage.transform.GetChild(1);
-                CurrentUsageList.GetChild(0).GetComponent<Button>().interactable = GetSelectableTeammatesForEquippingWeapons();
+                EnableDisableUsageButtons(GetSelectableTeammatesForEquippingWeapons(), ref EquipButtons);
                 break;
             case InventorySystem.ListType.Accessories:
                 CurrentUsageList = SelectingUsage.transform.GetChild(1);
-                CurrentUsageList.GetChild(0).GetComponent<Button>().interactable = GetSelectableTeammatesForEquippingAccessories();
+                EnableDisableUsageButtons(GetSelectableTeammatesForEquippingAccessories(), ref EquipButtons);
                 break;
             default:
                 return;

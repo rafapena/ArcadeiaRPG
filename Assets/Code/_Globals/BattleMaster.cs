@@ -19,13 +19,10 @@ public class BattleMaster
     
     public enum ToolFormulas { None, PhysicalStandard, MagicalStandard, PhysicalGun, MagicalGun }
 
-    public static string[] CompanionshipLevels = new string[] { "Allies", "Supporters", "Battle Buddies", "Super Team", "Elite Duo", "Perfect Unison" };
-    public static int[] CompanionshipPoints = new int[] { 100, 300, 600, 1000, 1500 };
-
     // Variables used to transitioning between scenes
-    public static Environment EnvironmentSettings;
-    public static PlayerParty PlayerParty;
-    public static EnemyParty EnemyParty;
+    public static Environment EnvironmentSettings { get; private set; }
+    public static PlayerParty PlayerParty { get; private set; }
+    public static EnemyParty EnemyParty { get; private set; }
 
     public static void Setup(Environment environmentSettings, PlayerParty playerParty, EnemyParty enemyParty)
     {

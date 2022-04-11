@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class BattleEnemy : BattlerAI
+public abstract class BattleEnemy : BattlerAI
 {
     public int Exp;
     public int Gold;
-    public List<ItemDropRate> DroppedItems;
+    public ItemDropRate[] DroppedItems;
+    public WeaponDropRate[] DroppedWeapons;
     public float MultiplyHP = 1f;
     public int ExtraTurns;
 

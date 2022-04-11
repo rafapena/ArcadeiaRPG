@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Events;
 
 public abstract class ActiveTool : BaseObject
 {
@@ -39,6 +40,8 @@ public abstract class ActiveTool : BaseObject
     [HideInInspector] public bool Disabled;
     private StateRate[] StatesGiveRate;
     private StateRate[] StatesReceiveRate;
+
+    [HideInInspector] public UnityEvent ExecuteAction;
 
     public bool Ranged => Range > 30;
 

@@ -75,7 +75,7 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 5056690304748970156}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &2276251185403530114
+--- !u!114 &6199961017197056417
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -84,22 +84,21 @@ MonoBehaviour:
   m_GameObject: {fileID: 97867682907725689}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: be653f48522d4434ebb04f01fc13592c, type: 3}
+  m_Script: {fileID: 11500000, guid: 3c738471201f8ae4f83776af0fd78b96, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Id: 5
+  Id: 4
   Name: Ray
-  Description: First party member
-  HUDProperties: {fileID: 0}
+  Description: 
   RowPosition: 0
   ColumnPosition: 0
   Figure: {fileID: 0}
-  Speed: 0
   Phase: 0
+  Speed: 0
   MainImage: {fileID: 0}
   FaceImage: {fileID: 21300000, guid: 9c9595bb46c9daf4ba93ed84fefdedad, type: 3}
   Level: 1
-  Class: {fileID: 94577713347072007, guid: aa68b1ce7e43d254d88764b2f4504a91, type: 3}
+  Class: {fileID: 7546378099007312106, guid: aa68b1ce7e43d254d88764b2f4504a91, type: 3}
   HP: 0
   SP: 0
   Stats:
@@ -132,16 +131,16 @@ MonoBehaviour:
   Weapons:
   - {fileID: 3552097900181454016, guid: ffa9f6fe244c85248a1bb202285c251d, type: 3}
   Accessories: []
+  LockSelectTrigger: 0
   SelectedTool: {fileID: 0}
   SelectedWeapon: {fileID: 0}
-  SelectedTargets: []
   States: []
+  BasicAttackSkill: {fileID: 0}
   HitCritical: 0
   HitWeakness: 0
   HitResistant: 0
   ChangedElementRates: []
   ChangedStateRates: []
-  ComboDifficulty: 100
   Flying: 0
   StatModifiers:
     MaxHP: 0
@@ -180,12 +179,12 @@ MonoBehaviour:
     Eva: 0
     Crt: 0
     Cev: 0
-  Companionship: 100
+  PartnerAccBoostRate: 100
+  PartnerCritBoostRate: 100
   SavePartnerRate: 100
   CounterattackRate: 100
   AssistDamageRate: 100
+  StatBoostsRate: 100
   ClassSet:
-  - {fileID: 94577713347072007, guid: aa68b1ce7e43d254d88764b2f4504a91, type: 3}
-  - {fileID: 1791329435643984854, guid: 0c755c9bf65f36a4daba5c184e8a7aaa, type: 3}
+  - {fileID: 7546378099007312106, guid: aa68b1ce7e43d254d88764b2f4504a91, type: 3}
   SkillSet: []
-  BasicAttackSkill: {fileID: 0}

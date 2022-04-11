@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class BattleAlly : BattlerAI
+public abstract class BattleAlly : BattlerAI
 {
     public bool IsSummon;
 

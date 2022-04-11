@@ -8,7 +8,7 @@ using UnityEngine.AI;
 using UnityEngine.iOS;
 using UnityEngine.UI;
 
-public abstract class Battler : BaseObject
+public abstract class Battler : SkillUser
 {
     [SerializeField]
     public BattlerHUD HUDProperties { get; private set; }
@@ -22,10 +22,12 @@ public abstract class Battler : BaseObject
 
     // Movement
     [HideInInspector] public Rigidbody2D Figure;
+    [HideInInspector] public Phases Phase;
     protected Vector3 MainLocation;
     protected Vector3 Movement;
     [HideInInspector] public float Speed;
-    [HideInInspector] public Phases Phase;
+    private Vector3 ActionPrepDestination;
+    private const float BATTLER_APPROACH_DISTANCE_THRESHOLD = 1.25f;
 
     // General battler data
     public Sprite MainImage;
@@ -54,6 +56,10 @@ public abstract class Battler : BaseObject
     [HideInInspector] public List<State> States = new List<State>();
     private bool BlinkingEnabled;
 
+    // Basic attack
+    public bool UsingBasicAttack => SelectedTool is Skill && SelectedTool.Id == BasicAttackSkill.Id;
+    [HideInInspector] public Skill BasicAttackSkill;
+
     // Action execution info
     [HideInInspector] public bool HitCritical;
     [HideInInspector] public bool HitWeakness;
@@ -62,7 +68,6 @@ public abstract class Battler : BaseObject
     // PassiveEffect dependent info
     public ElementRate[] ChangedElementRates;
     public StateRate[] ChangedStateRates;
-    public int ComboDifficulty = 100;
     public bool Flying;
     [HideInInspector] public Stats StatModifiers;
     [HideInInspector] public bool KOd;
@@ -92,6 +97,7 @@ public abstract class Battler : BaseObject
         HUDProperties.ScopeHitBox.SetBattler(this);
         Figure = gameObject.GetComponent<Rigidbody2D>();
         MainLocation = transform.position;
+        BasicAttackSkill = ResourcesMaster.Skills[0];
         MapGameObjectsToHUD();
         SetupElementRates();
         SetupStateRates();
@@ -124,13 +130,19 @@ public abstract class Battler : BaseObject
     /// -- Updating --
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    protected virtual void Update()
+    protected override void Update()
     {
-        Figure.velocity = Movement * Speed;
-        if (IsSelected && BlinkingEnabled && GetComponent<SpriteRenderer>())
+        if (Phase == Phases.PreparingAction && Vector3.Distance(transform.position, ActionPrepDestination) < BATTLER_APPROACH_DISTANCE_THRESHOLD)
         {
-            GetComponent<SpriteRenderer>().color = Color.Lerp(Color.black, Color.white, Time.time % 1.5f);
+            Movement = Vector3.zero;
+            Phase = Phases.UsingAction;
         }
+
+        if (IsSelected && BlinkingEnabled && GetComponent<SpriteRenderer>())
+            GetComponent<SpriteRenderer>().color = Color.Lerp(Color.black, Color.white, Time.time % 1.5f);
+
+        base.Update();
+        Figure.velocity = Movement * Speed;
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -165,12 +177,13 @@ public abstract class Battler : BaseObject
         IsSelected = selected;
     }
 
-    public Vector3 GetApproachVector(Vector3 approachPointLeft, Vector3 approachPointRight)
+    public Vector3 GetApproachVector(ref Vector3 closestApproachPoint, Vector3 approachPointLeft, Vector3 approachPointRight)
     {
         float dist1 = Vector3.Distance(approachPointLeft, transform.position);
         float dist2 = Vector3.Distance(approachPointRight, transform.position);
-        Vector3 distVector = (dist1 >= dist2 ? approachPointLeft : approachPointRight) - transform.position;
-        return distVector.normalized;
+        closestApproachPoint = dist1 <= dist2 ? approachPointLeft : approachPointRight;
+        Vector3 distVector = closestApproachPoint - transform.position;
+        return distVector.normalized * 2f;
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -188,7 +201,7 @@ public abstract class Battler : BaseObject
 
     public void ApproachTarget(Transform leftPoint, Transform rightPoint)
     {
-        Movement = GetApproachVector(leftPoint.position, rightPoint.position);
+        Movement = GetApproachVector(ref ActionPrepDestination, leftPoint.position, rightPoint.position);
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -368,15 +381,6 @@ public abstract class Battler : BaseObject
                 return true;
         }
         return false;
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// -- ActiveTool Actions --
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    public void ExecuteAction()
-    {
-        Phase = Phases.UsingAction;
     }
 
     public bool TryConvertSkillToWeaponSettings()
