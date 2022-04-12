@@ -73,7 +73,7 @@ public class SkillSelectionList : SelectionList_Super<Skill>
     private void AddToList(Transform entry, Skill dataEntry)
     {
         ReferenceData.Add(dataEntry);
-        entry.GetChild(0).GetComponent<Image>().sprite = dataEntry.GetComponent<SpriteRenderer>().sprite;
+        entry.GetChild(0).GetComponent<Image>().sprite = dataEntry.Image;
         entry.GetChild(1).GetComponent<TextMeshProUGUI>().text = dataEntry.Name.ToUpper();
         entry.GetChild(2).GetComponent<TextMeshProUGUI>().text = dataEntry.SPConsume > 0 ? dataEntry.SPConsume.ToString() : "";
         entry.GetChild(3).GetComponent<TextMeshProUGUI>().text = dataEntry.Cooldown > 0 ? dataEntry.Cooldown.ToString() : "";
@@ -95,7 +95,7 @@ public class SkillSelectionList : SelectionList_Super<Skill>
         InfoFrame.transform.GetChild(2).gameObject.SetActive(hasElement);
         if (hasElement) InfoFrame.transform.GetChild(2).GetComponent<Image>().sprite = UIMaster.ElementImages[SelectedObject.Element];
         InfoFrame.transform.GetChild(4).GetComponent<TextMeshProUGUI>().text = SelectedObject.Power.ToString();
-        InfoFrame.transform.GetChild(6).GetComponent<TextMeshProUGUI>().text = "+" + SelectedObject.CriticalRate + "%";
+        InfoFrame.transform.GetChild(6).GetComponent<TextMeshProUGUI>().text = "+" + SelectedObject.CriticalRateBoost + "%";
         InfoFrame.transform.GetChild(8).GetComponent<TextMeshProUGUI>().text = Regex.Replace(SelectedObject.Scope.ToString(), "(\\B[A-Z])", " $1").ToUpper();
         CheckDisplayCannotUseMessage(SelectedIndex);
     }

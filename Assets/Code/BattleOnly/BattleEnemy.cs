@@ -15,6 +15,7 @@ public abstract class BattleEnemy : BattlerAI
     protected new void Start()
     {
         base.Start();
+        Direction = Vector3.left;
         Stats.MaxHP = (int)(Stats.MaxHP * MultiplyHP);
         HP = Stats.MaxHP;
     }

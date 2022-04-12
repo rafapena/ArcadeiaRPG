@@ -24,6 +24,7 @@ public abstract class BattlePlayer : Battler
     protected override void Start()
     {
         base.Start();
+        Direction = Vector3.right;
         Speed = 6;
     }
 
@@ -55,7 +56,7 @@ public abstract class BattlePlayer : Battler
 
     public void AddLearnedSkills()
     {
-        IEnumerable<SkillLearnLevel> skills = SkillSet.Concat(Class.SkillSet).OrderBy(x => x.LearnLevel).Where(x => x.LearnLevel <= Level);
+        IEnumerable<SkillLearnLevel> skills = SkillSet.Concat(Class.SkillSet).OrderBy(x => x.LearnLevel).Where(x => x.LearnLevel <= Level).ToList();
         foreach (SkillLearnLevel sk in skills) Skills.Add(sk.LearnedSkill);
     }
 

@@ -165,11 +165,109 @@ MonoBehaviour:
   ContactSpread: 
   ElementRates: 
   StateRates: 
-  ToolAI: []
+  AIActions: []
   Exp: 300
   Gold: 100
   DroppedItems: []
   DroppedWeapons: []
-  MultiplyHP: 1
+  MultiplyHP: 1000
   ExtraTurns: 0
   IsSummon: 0
+--- !u!114 &3740935258760432590
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4386740395647480033}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 93d63bffb241f284aa147625cf04b742, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Id: 0
+  Name: Slime Jump
+  Description: Slimy Jump
+  Type: 1
+  Formula: 1
+  ActionTime: 3
+  HPModType: 1
+  SPModType: 0
+  HPAmount: 0
+  HPPercent: 0
+  SPPecent: 0
+  HPRecoil: 0
+  Scope: 1
+  Element: 0
+  AlwaysHits: 0
+  Power: 10
+  Range: 10
+  CriticalRateBoost: 0
+  Accuracy: 90
+  Variance: 0
+  ClassExclusives: []
+  ChangedStatesGiveRate: []
+  ChangedStatesReceiveRate: []
+  Disabled: 0
+  Image: {fileID: 0}
+  Basic: 1
+  ClassSkill: 0
+  SPConsume: 0
+  Charge: 0
+  Warmup: 0
+  Cooldown: 0
+  Steal: 0
+  CanUseOutsideOfBattle: 0
+  WeaponDependent: 0
+  WeaponExclusives: 
+  ChargeCount: 0
+  DisabledCount: 0
+--- !u!114 &8841780359579117350
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4386740395647480033}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 93d63bffb241f284aa147625cf04b742, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Id: 1
+  Name: Sime Rush
+  Description: 
+  Type: 0
+  Formula: 0
+  ActionTime: 0
+  HPModType: 0
+  SPModType: 0
+  HPAmount: 0
+  HPPercent: 0
+  SPPecent: 0
+  HPRecoil: 0
+  Scope: 0
+  Element: 0
+  AlwaysHits: 0
+  Power: 10
+  Range: 50
+  CriticalRateBoost: 0
+  Accuracy: 100
+  Variance: 0
+  ClassExclusives: []
+  ChangedStatesGiveRate: []
+  ChangedStatesReceiveRate: []
+  Disabled: 0
+  Image: {fileID: 0}
+  Basic: 1
+  ClassSkill: 0
+  SPConsume: 0
+  Charge: 0
+  Warmup: 0
+  Cooldown: 0
+  Steal: 0
+  CanUseOutsideOfBattle: 0
+  WeaponDependent: 0
+  WeaponExclusives: 
+  ChargeCount: 0
+  DisabledCount: 0

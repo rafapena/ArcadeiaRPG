@@ -75,6 +75,156 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 2901879638291998507}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1949307758128806668
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8012685550229690622}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 93d63bffb241f284aa147625cf04b742, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Id: 2
+  Name: Arcadeia Spirit
+  Description: Heals all
+  Type: 4
+  Formula: 2
+  ActionTime: 2
+  HPModType: 2
+  SPModType: 0
+  HPAmount: 0
+  HPPercent: 0
+  SPPecent: 0
+  HPRecoil: 0
+  Scope: 9
+  Element: 0
+  AlwaysHits: 0
+  Power: 10
+  Range: 100
+  CriticalRateBoost: 0
+  Accuracy: 100
+  Variance: 0
+  ClassExclusives: []
+  ChangedStatesGiveRate: []
+  ChangedStatesReceiveRate: []
+  Disabled: 0
+  Image: {fileID: -7366120904289559265, guid: 4adca08bd9ab25348a3e779ff2400cdf, type: 3}
+  Basic: 0
+  ClassSkill: 0
+  SPConsume: 30
+  Charge: 0
+  Warmup: 0
+  Cooldown: 0
+  Steal: 0
+  CanUseOutsideOfBattle: 1
+  WeaponDependent: 0
+  WeaponExclusives: 
+  SummonChances: []
+  ChargeCount: 0
+  DisabledCount: 0
+--- !u!114 &3058026110521577577
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8012685550229690622}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 93d63bffb241f284aa147625cf04b742, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Id: 0
+  Name: Fiery Fireballs
+  Description: Throw fireballs
+  Type: 3
+  Formula: 2
+  ActionTime: 3
+  HPModType: 1
+  SPModType: 0
+  HPAmount: 0
+  HPPercent: 0
+  SPPecent: 0
+  HPRecoil: 0
+  Scope: 1
+  Element: 1
+  AlwaysHits: 0
+  Power: 20
+  Range: 50
+  CriticalRateBoost: 0
+  Accuracy: 100
+  Variance: 20
+  ClassExclusives: []
+  ChangedStatesGiveRate: []
+  ChangedStatesReceiveRate: []
+  Disabled: 0
+  Image: {fileID: 4466658906982423498, guid: 8aeac64171f072a4c968d566207bb397, type: 3}
+  Basic: 0
+  ClassSkill: 0
+  SPConsume: 10
+  Charge: 0
+  Warmup: 0
+  Cooldown: 0
+  Steal: 0
+  CanUseOutsideOfBattle: 0
+  WeaponDependent: 0
+  WeaponExclusives: 
+  SummonChances: []
+  ChargeCount: 0
+  DisabledCount: 0
+--- !u!114 &6238239113526363146
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8012685550229690622}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 93d63bffb241f284aa147625cf04b742, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Id: 1
+  Name: Laser Attack
+  Description: 
+  Type: 3
+  Formula: 2
+  ActionTime: 4
+  HPModType: 1
+  SPModType: 0
+  HPAmount: 0
+  HPPercent: 0
+  SPPecent: 0
+  HPRecoil: 0
+  Scope: 5
+  Element: 0
+  AlwaysHits: 0
+  Power: 35
+  Range: 50
+  CriticalRateBoost: 0
+  Accuracy: 100
+  Variance: 0
+  ClassExclusives: []
+  ChangedStatesGiveRate: []
+  ChangedStatesReceiveRate: []
+  Disabled: 0
+  Image: {fileID: 7980543043835355830, guid: cc189617f76e5d442956704279d5649f, type: 3}
+  Basic: 0
+  ClassSkill: 0
+  SPConsume: 20
+  Charge: 0
+  Warmup: 0
+  Cooldown: 0
+  Steal: 0
+  CanUseOutsideOfBattle: 0
+  WeaponDependent: 0
+  WeaponExclusives: 
+  SummonChances: []
+  ChargeCount: 0
+  DisabledCount: 0
 --- !u!114 &6876908596996911932
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -189,15 +339,69 @@ MonoBehaviour:
   - {fileID: 7546378099007312106, guid: aa68b1ce7e43d254d88764b2f4504a91, type: 3}
   - {fileID: 8162703085860456986, guid: 0c755c9bf65f36a4daba5c184e8a7aaa, type: 3}
   SkillSet:
-  - LearnedSkill: {fileID: 4510640406153721997, guid: 9026f12c84400864f8e02f88fd4730e6,
-      type: 3}
+  - LearnedSkill: {fileID: 3058026110521577577}
     LearnLevel: 1
-    Permanent: 0
-  - LearnedSkill: {fileID: 3297598885578702653, guid: dcb917dcac2f1eb4395fd9bf9871dae5,
-      type: 3}
-    LearnLevel: 1
-    Permanent: 0
-  - LearnedSkill: {fileID: 7319605355004161415, guid: 67ef8c8e7715e294281e1e368b7eb879,
-      type: 3}
-    LearnLevel: 1
-    Permanent: 0
+    Permanent: 1
+  - LearnedSkill: {fileID: 6238239113526363146}
+    LearnLevel: 2
+    Permanent: 1
+  - LearnedSkill: {fileID: 1949307758128806668}
+    LearnLevel: 3
+    Permanent: 1
+  - LearnedSkill: {fileID: 8136948550491050582}
+    LearnLevel: 99
+    Permanent: 1
+  CurrentSkillSet: []
+  Fireball: {fileID: 8282308100824431874, guid: 9e5016818a16d734d9353a63b64b4f41,
+    type: 3}
+  Laser: {fileID: 0}
+--- !u!114 &8136948550491050582
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8012685550229690622}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 93d63bffb241f284aa147625cf04b742, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Id: 3
+  Name: Arcadeia Power Storm
+  Description: Strongest attack
+  Type: 0
+  Formula: 0
+  ActionTime: 0
+  HPModType: 0
+  SPModType: 0
+  HPAmount: 0
+  HPPercent: 0
+  SPPecent: 0
+  HPRecoil: 0
+  Scope: 0
+  Element: 0
+  AlwaysHits: 0
+  Power: 10
+  Range: 50
+  CriticalRateBoost: 0
+  Accuracy: 100
+  Variance: 0
+  ClassExclusives: []
+  ChangedStatesGiveRate: []
+  ChangedStatesReceiveRate: []
+  Disabled: 0
+  Image: {fileID: -9076862125893698508, guid: 4adca08bd9ab25348a3e779ff2400cdf, type: 3}
+  Basic: 0
+  ClassSkill: 0
+  SPConsume: 0
+  Charge: 0
+  Warmup: 0
+  Cooldown: 0
+  Steal: 0
+  CanUseOutsideOfBattle: 0
+  WeaponDependent: 0
+  WeaponExclusives: 
+  SummonChances: []
+  ChargeCount: 0
+  DisabledCount: 0

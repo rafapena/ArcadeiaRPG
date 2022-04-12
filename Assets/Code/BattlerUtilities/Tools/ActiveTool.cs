@@ -29,19 +29,17 @@ public abstract class ActiveTool : BaseObject
     public bool AlwaysHits;
     public int Power = 10;
     public int Range = 50;
-    public int CriticalRate = 0;
+    public int CriticalRateBoost = 0;
     public int Accuracy = 100;
     public int Variance;
-    public Projectile Projectile;
     public List<BattlerClass> ClassExclusives;
     public StateRate[] ChangedStatesGiveRate;
     public StateRate[] ChangedStatesReceiveRate;
 
-    [HideInInspector] public bool Disabled;
+    [HideInInspector]
+    public bool Disabled;
     private StateRate[] StatesGiveRate;
     private StateRate[] StatesReceiveRate;
-
-    [HideInInspector] public UnityEvent ExecuteAction;
 
     public bool Ranged => Range > 30;
 
@@ -64,10 +62,11 @@ public abstract class ActiveTool : BaseObject
     public bool Hit(Battler u, Battler t, float effectMagnitude = 1.0f)
     {
         if (AlwaysHits) return true;
-        float weaponAcc = u.SelectedWeapon != null ? u.SelectedWeapon.Accuracy : 100;
-        float toolAcc = Accuracy * weaponAcc / 10000f;
+        float weaponAcc = u.SelectedWeapon?.Accuracy ?? 100;
+        float toolAcc = Accuracy * weaponAcc / 100f;
+        
         float statsAcc = u.Tec / t.Spd;
-        float result = BattleMaster.BASE_ACCURACY * toolAcc * statsAcc * u.Acc / t.Eva;
+        float result = toolAcc;// * statsAcc * u.Acc / t.Eva;
         return Chance(result * effectMagnitude);
     }
 
@@ -104,8 +103,8 @@ public abstract class ActiveTool : BaseObject
     // WRITES TO THE USER
     public int GetCriticalHitRatio(Battler u, Battler t, float effectMagnitude = 1.0f)
     {
-        float weaponCritRate = u.SelectedWeapon != null ? u.SelectedWeapon.CriticalRate : 100;
-        float toolCrt = CriticalRate * weaponCritRate / 10000f;
+        float weaponCritRate = u.SelectedWeapon != null ? u.SelectedWeapon.CriticalRateBoost : 100;
+        float toolCrt = CriticalRateBoost * weaponCritRate / 10000f;
         float def = t.Tec * t.Cev;
         float critExponent = 1.1f;
         float result = 2 * Mathf.Pow(u.Tec * toolCrt, critExponent) * u.Crt / (def != 0 ? def : 0.01f);

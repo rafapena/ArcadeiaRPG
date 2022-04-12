@@ -14,7 +14,7 @@ public class ObtainingWeapons : MonoBehaviour
             WeakestWeapon == null ||
             Weapon.Power > WeakestWeapon.Power ||
             Weapon.Range > WeakestWeapon.Range ||
-            Weapon.CriticalRate > WeakestWeapon.CriticalRate;
+            Weapon.CriticalRateBoost > WeakestWeapon.CriticalRateBoost;
         public BattlePlayer Player;
         public Weapon WeakestWeapon;
     }
@@ -109,7 +109,7 @@ public class ObtainingWeapons : MonoBehaviour
     {
         MenuMaster.SetNumberBoost(t.GetChild(1).GetChild(0).GetComponent<TextMeshProUGUI>(), wp.Power - (peb.WeakestWeapon?.Power ?? 0), "+0");
         MenuMaster.SetNumberBoost(t.GetChild(2).GetChild(0).GetComponent<TextMeshProUGUI>(), wp.Range - (peb.WeakestWeapon?.Range ?? 0), "+0", "%");
-        MenuMaster.SetNumberBoost(t.GetChild(3).GetChild(0).GetComponent<TextMeshProUGUI>(), wp.CriticalRate - (peb.WeakestWeapon?.CriticalRate ?? 0), "+0", "%");
+        MenuMaster.SetNumberBoost(t.GetChild(3).GetChild(0).GetComponent<TextMeshProUGUI>(), wp.CriticalRateBoost - (peb.WeakestWeapon?.CriticalRateBoost ?? 0), "+0", "%");
     }
 
     private void SetEntryAsEquipped(Transform entry, bool equipped)

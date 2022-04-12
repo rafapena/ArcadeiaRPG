@@ -9,7 +9,6 @@ public class BattleMaster
     public const int MAX_NUMBER_OF_EQUIPS = 4;
     public const int DEFAULT_RATE = 100;
     public const int SP_CAP = 100;
-    public const int BASE_ACCURACY = 95;
 
     public enum Elements { None, Fire, Ice, Thunder, Earth, Wind, Light, Dark }
 

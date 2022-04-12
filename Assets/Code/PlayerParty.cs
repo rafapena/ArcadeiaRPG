@@ -119,7 +119,6 @@ public class PlayerParty : MonoBehaviour
         b.StatConversion();
         b.HP = PlayerPrefs.GetInt(bt + "HP_" + file);
         b.SP = PlayerPrefs.GetInt(bt + "SP_" + file);
-        b.Skills = LoadBattlersList(file, b, ResourcesMaster.Skills, bt);
         b.Weapons = LoadBattlersList(file, b, ResourcesMaster.Weapons, bt);
         b.States = LoadBattlersList(file, b, ResourcesMaster.States, bt);
         string sw = bt + "SelectedWeapon_" + file;

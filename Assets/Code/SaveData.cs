@@ -104,7 +104,6 @@ public class SaveData
         PlayerPrefs.SetInt(bt + "Id_" + File, b.Id);
         PlayerPrefs.SetInt(bt + "HP_" + File, b.HP);
         PlayerPrefs.SetInt(bt + "SP_" + File, b.SP);
-        SaveBattlersList(b.Skills, bt);
         SaveBattlersList(b.Weapons, bt);
         SaveBattlersList(b.Accessories, bt);
         SaveBattlersList(b.States, bt);

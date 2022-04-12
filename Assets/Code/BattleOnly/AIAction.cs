@@ -3,11 +3,13 @@ using System.Net.NetworkInformation;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class AITool : MonoBehaviour
+public class AIAction : MonoBehaviour
 {
-    public ActiveTool Move;
+    public ActiveTool Action;
+    public int ClassSkillId = -1;
+
     public int Priority;
-    public int Quantity;
+    public int Turn;
     public int HPLow;
     public int HPHigh;
     public int SPLow;

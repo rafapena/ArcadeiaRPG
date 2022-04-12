@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.NetworkInformation;
 using UnityEngine;
@@ -16,7 +17,6 @@ public class Battle : MonoBehaviour
     // Loading
     public bool Waiting => Time.unscaledTime < AwaitingTime;
     private float AwaitingTime;
-    private const float AWAITING_TIME_BEFORE_ACTION_START = 0.5f;
 
     // UI
     public BattleCamera BattleCamera;
@@ -40,7 +40,7 @@ public class Battle : MonoBehaviour
 
     // Battle state tracking
     private BattleStates BattleState;
-    private float BattleStateTime;
+    private bool NotifiedDoneAction;
     private bool LastActionOfTurn;
     [HideInInspector] public int Turn;
 
@@ -54,7 +54,6 @@ public class Battle : MonoBehaviour
     // Lists dump
     public Transform PlayerPartyDump;
     public Transform EnemyPartyDump;
-    public Transform ClassControlDump;
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- Setup --
@@ -70,6 +69,7 @@ public class Battle : MonoBehaviour
     void Start()
     {
         SceneMaster.DeactivateStoredGameObjects();      // Hide overworld
+        //StartCoroutine(SetupContents());
         SetupBackground();
         SetupPlayerParty();
         SetupEnemyParty();
@@ -77,8 +77,13 @@ public class Battle : MonoBehaviour
         foreach (BattlePlayer p in PlayerParty.Players) Battlers.Add(p);
         foreach (BattleAlly a in PlayerParty.Allies) Battlers.Add(a);
         foreach (BattleEnemy e in EnemyParty.Enemies) Battlers.Add(e);
-        Await(4);
+        //Await(2);
         TurnStart();
+    }
+
+    IEnumerable SetupContents()
+    {
+        yield return null;
     }
 
     void SetupBackground()
@@ -109,16 +114,10 @@ public class Battle : MonoBehaviour
         {
             Vector3 bpPos = partyGameObject.position + Positions[(int)b0.RowPosition][(int)b0.ColumnPosition];
             T b = (T)Instantiate(b0, bpPos, Quaternion.identity, partyGameObject);
-            if (b is BattlePlayer p) p.BasicAttackSkill = Instantiate(p.BasicAttackSkill, b.transform);
             b = InstantiateContents(b);
             b.transform.localScale = Vector3.one * 0.5f;
             b.gameObject.SetActive(true);
             b.SetBattle(this);
-            if (b.Class)
-            {
-                b.Class = Instantiate(b.Class, bpPos, Quaternion.identity, ClassControlDump);
-                b.Class.SetBattle(this);
-            }
             result.Add(b);
         }
         return result;
@@ -167,13 +166,12 @@ public class Battle : MonoBehaviour
 
     private T InstantiateContents<T>(T b) where T : Battler
     {
-        for (int i = 0; i < b.Skills.Count; i++)
+        if (b.Class)
         {
-            b.Skills[i] = Instantiate(b.Skills[i], b.transform);
-            b.Skills[i].DisableForWarmup();
+            b.Class = Instantiate(b.Class, b.transform);
+            b.Class.SetBattle(this);
         }
-        for (int i = 0; i < b.Weapons.Count; i++) b.Weapons[i] = Instantiate(b.Weapons[i], b.transform);
-        for (int i = 0; i < b.Accessories.Count; i++) b.Accessories[i] = Instantiate(b.Accessories[i], b.transform);
+        b.BasicAttackSkill = Instantiate(b.BasicAttackSkill, b.transform);
         for (int i = 0; i < b.States.Count; i++) b.States[i] = Instantiate(b.States[i], b.transform);
         b.StatBoosts.SetToZero();
         return b;
@@ -196,7 +194,7 @@ public class Battle : MonoBehaviour
                 return;
 
             case BattleStates.Action:
-                if (Time.time > BattleStateTime) ActionEnd();
+                if (NotifiedDoneAction) ActionEnd();
                 break;
 
             case BattleStates.Running:
@@ -220,20 +218,24 @@ public class Battle : MonoBehaviour
 
     public void Await(float m = 1)
     {
-        AwaitingTime = Time.unscaledTime + AWAITING_TIME_BEFORE_ACTION_START * m;
+        if (Waiting) AwaitingTime += m;
+        else AwaitingTime = Time.unscaledTime + m;
     }
 
     public void TurnStart()
     {
         Turn++;
         LastActionOfTurn = false;
+        Battlers = SortBattlersBySpeed(Battlers);
+        Await(1);
         ActionStart();
     }
 
     private void ActionStart()
     {
+        Await(1);
+        NotifiedDoneAction = false;
         ResetSelectedTargets();
-        Battlers = SortBattlersBySpeed(Battlers);
         GetNextFastestAvailableBattlers();
         ActingBattler.Phase = Battler.Phases.DecidingAction;
 
@@ -248,8 +250,8 @@ public class Battle : MonoBehaviour
             if (ActingBattler is BattleAlly ally) ally.MakeDecision(FightingPlayerParty.ToList(), EnemyParty.Enemies);
             else if (ActingBattler is BattleEnemy enemy) enemy.MakeDecision(EnemyParty.Enemies, FightingPlayerParty.ToList());
             PrepareForAction();
+            BattleMenu.DeclareNext(NextActingBattler);
         }
-        BattleMenu.DeclareNext(NextActingBattler);
     }
 
     private List<Battler> SortBattlersBySpeed(List<Battler> battlers)
@@ -312,13 +314,28 @@ public class Battle : MonoBehaviour
     {
         BattleState = BattleStates.Action;
         ActingBattler.Phase = Battler.Phases.UsingAction;
+        if (ActingBattler.SelectedTool is not Skill sk || !sk.Basic) BattleMenu.DisplayUsedAction(ActingBattler, ActingBattler.SelectedTool);
+
         if (ActingBattler.UsingBasicAttack)
         {
             if (ActingBattler.Class) ActingBattler.Class.UseBasicAttack(ActingBattler.SelectedWeapon);
             else ActingBattler.UseBasicAttack();
         }
-        else ActingBattler.SelectedTool.ExecuteAction?.Invoke();
-        BattleStateTime = Time.time + (ActingBattler.SelectedTool?.ActionTime ?? 1);
+        else if (ActingBattler.SelectedTool is Skill skill)
+        {
+            if (skill.ClassSkill) ActingBattler.Class.UseSkill();
+            else ActingBattler.UseSkill();
+        }
+        else if (ActingBattler.SelectedTool is Item item)
+        {
+            if (ActingBattler.Class) ActingBattler.Class.UseItem(item);
+            else ActingBattler.UseItem(item);
+        }
+    }
+
+    public void NotifyDoneUsingAction()
+    {
+        NotifiedDoneAction = true;
     }
 
     public void RunAway()
@@ -346,8 +363,8 @@ public class Battle : MonoBehaviour
 
     private void FinishSkillUsage()
     {
-        if (ActingBattler.Class) ActingBattler.Class.ClearSkillExecution();
-        else ActingBattler.ClearSkillExecution();
+        if (ActingBattler.Class) ActingBattler.Class.ResetActionExecution();
+        else ActingBattler.ResetActionExecution();
     }
 
     private bool CheckBattleEndCondition()

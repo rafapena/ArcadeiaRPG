@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
-public abstract class BattlerClass : SkillUser
+public abstract class BattlerClass : ToolUser
 {
     public Stats BaseStats;
     public BattlerClass UpgradedClass1;
@@ -12,8 +13,8 @@ public abstract class BattlerClass : SkillUser
     public List<SkillLearnLevel> SkillSet;
 
     private int CurrentBasicAttackWeaponUsed;
-    private Action[] UseBasicAttackLists;
-    private Action[] AnimateBasicAttackLists;
+    private UnityAction[] UseBasicAttackLists;
+    private UnityAction[] AnimateBasicAttackLists;
 
     public bool IsBaseClass => UpgradedClass1 != null;
     
@@ -22,20 +23,23 @@ public abstract class BattlerClass : SkillUser
     protected override void Awake()
     {
         base.Awake();
-        CurrentBasicAttackWeaponUsed = -1;
-        UseBasicAttackLists = new Action[] { UseBasicAttack_Weaponless, UseBasicAttack_Blade, UseBasicAttack_Hammer, UseBasicAttack_Charm, UseBasicAttack_Gun, UseBasicAttack_Tools, UseBasicAttack_Camera };
-        AnimateBasicAttackLists = new Action[] { AnimateBasicAttack_Weaponless, AnimateBasicAttack_Blade, AnimateBasicAttack_Hammer, AnimateBasicAttack_Charm, AnimateBasicAttack_Gun, AnimateBasicAttack_Tools, AnimateBasicAttack_Camera };
+        UseBasicAttackLists = new UnityAction[] { UseBasicAttack_Weaponless, UseBasicAttack_Blade, UseBasicAttack_Hammer, UseBasicAttack_Charm, UseBasicAttack_Gun, UseBasicAttack_Tools, UseBasicAttack_Camera };
+        AnimateBasicAttackLists = new UnityAction[] { AnimateBasicAttack_Weaponless, AnimateBasicAttack_Blade, AnimateBasicAttack_Hammer, AnimateBasicAttack_Charm, AnimateBasicAttack_Gun, AnimateBasicAttack_Tools, AnimateBasicAttack_Camera };
     }
 
     protected override void Update()
     {
-        if (CurrentBasicAttackWeaponUsed >= 0) AnimateBasicAttackLists[CurrentBasicAttackWeaponUsed].Invoke();
+        if (CurrentBasicAttackWeaponUsed >= 0)
+        {
+            AnimateBasicAttackLists[CurrentBasicAttackWeaponUsed].Invoke();
+            TryNotifyActionCompletion();
+        }
         else base.Update();
     }
 
-    public override void ClearSkillExecution()
+    public override void ResetActionExecution()
     {
-        base.ClearSkillExecution();
+        base.ResetActionExecution();
         CurrentBasicAttackWeaponUsed = -1;
     }
 
@@ -43,9 +47,10 @@ public abstract class BattlerClass : SkillUser
     /// -- Basic attack usage --
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public virtual void UseBasicAttack(Weapon selectedWeapon)
+    public void UseBasicAttack(Weapon selectedWeapon)
     {
-        ClearSkillExecution();
+        ResetActionExecution();
+        StartUseTimer();
         CurrentBasicAttackWeaponUsed = selectedWeapon ? (int)selectedWeapon.WeaponType : 0;
         UseBasicAttackLists[CurrentBasicAttackWeaponUsed].Invoke();
     }

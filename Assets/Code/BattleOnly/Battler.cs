@@ -8,7 +8,7 @@ using UnityEngine.AI;
 using UnityEngine.iOS;
 using UnityEngine.UI;
 
-public abstract class Battler : SkillUser
+public abstract class Battler : ToolUser
 {
     [SerializeField]
     public BattlerHUD HUDProperties { get; private set; }
@@ -23,7 +23,7 @@ public abstract class Battler : SkillUser
     // Movement
     [HideInInspector] public Rigidbody2D Figure;
     [HideInInspector] public Phases Phase;
-    protected Vector3 MainLocation;
+    public Vector3 Direction;
     protected Vector3 Movement;
     [HideInInspector] public float Speed;
     private Vector3 ActionPrepDestination;
@@ -57,7 +57,7 @@ public abstract class Battler : SkillUser
     private bool BlinkingEnabled;
 
     // Basic attack
-    public bool UsingBasicAttack => SelectedTool is Skill && SelectedTool.Id == BasicAttackSkill.Id;
+    public bool UsingBasicAttack => SelectedTool == BasicAttackSkill;
     [HideInInspector] public Skill BasicAttackSkill;
 
     // Action execution info
@@ -96,8 +96,7 @@ public abstract class Battler : SkillUser
         HUDProperties.ActionHitBox.SetBattler(this);
         HUDProperties.ScopeHitBox.SetBattler(this);
         Figure = gameObject.GetComponent<Rigidbody2D>();
-        MainLocation = transform.position;
-        BasicAttackSkill = ResourcesMaster.Skills[0];
+        BasicAttackSkill = Resources.Load<Skill>("Prefabs/BasicAttack");
         MapGameObjectsToHUD();
         SetupElementRates();
         SetupStateRates();

@@ -5,7 +5,10 @@ public class Item : ActiveTool, IToolForInventory
 {
     public enum UseConditions { None, MapOnly, BattleOnly, Anywhere }
 
+    public enum UseTypes { Standard, Offense, BigOffense }
+
     public UseConditions UseCondition;
+    public UseTypes UseType;
     public bool IsKey;
     public bool Consumable = true;
     public Stats PermantentStatChanges;

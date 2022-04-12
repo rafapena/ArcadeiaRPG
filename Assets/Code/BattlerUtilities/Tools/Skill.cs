@@ -4,7 +4,9 @@ using UnityEngine.Events;
 
 public class Skill : ActiveTool
 {
+    public Sprite Image;
     public bool Basic;
+    public bool ClassSkill;
     public int SPConsume;
     public int Charge;
     public int Warmup;
@@ -13,8 +15,6 @@ public class Skill : ActiveTool
     public bool CanUseOutsideOfBattle;
     public bool WeaponDependent;
     public List<BattleMaster.WeaponTypes> WeaponExclusives;
-    public List<Command> Commands;
-    public List<SummonBattler> SummonChances;
 
     [HideInInspector] public int ChargeCount;
     [HideInInspector] public int DisabledCount;
@@ -37,8 +37,7 @@ public class Skill : ActiveTool
         Power = w.Power;
         Range = w.Range;
         Accuracy = w.Accuracy;
-        CriticalRate = w.CriticalRate;
-        Projectile = w.Projectile;
+        CriticalRateBoost = w.CriticalRateBoost;
         ClassExclusives = w.ClassExclusives;
         ChangedStatesGiveRate = w.ChangedStatesGiveRate;
         ChangedStatesReceiveRate = w.ChangedStatesReceiveRate;

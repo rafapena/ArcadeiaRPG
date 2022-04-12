@@ -30,8 +30,6 @@ public class ResourcesMaster : MonoBehaviour
     
     public static Objective[] Objectives { get; private set; }
     
-    public static Skill[] Skills { get; private set; }
-    
     public static State[] States { get; private set; }
     
     public static Weapon[] Weapons { get; private set; }
@@ -65,7 +63,6 @@ public class ResourcesMaster : MonoBehaviour
         //Environments = SortById(Resources.LoadAll<Environment>("Prefabs/Environments"));
         Items = SortById(Resources.LoadAll<Item>("Prefabs/Items"));
         Objectives = SortById(Resources.LoadAll<Objective>("Prefabs/Objectives"));
-        Skills = SortById(Resources.LoadAll<Skill>("Prefabs/Skills"));
         States = SortById(Resources.LoadAll<State>("Prefabs/States"));
         Weapons = SortById(Resources.LoadAll<Weapon>("Prefabs/Weapons"));
     }

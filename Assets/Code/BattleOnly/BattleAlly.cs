@@ -9,6 +9,7 @@ public abstract class BattleAlly : BattlerAI
     protected new void Start()
     {
         base.Start();
+        Direction = Vector3.right;
     }
 
     public void SetBattlePositions(VerticalPositions vp, HorizontalPositions hp)

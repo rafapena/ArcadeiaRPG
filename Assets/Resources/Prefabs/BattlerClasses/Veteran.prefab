@@ -10,6 +10,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1157716223317125595}
   - component: {fileID: 8162703085860456986}
+  - component: {fileID: 876429023132985256}
+  - component: {fileID: 4905199190673639873}
   m_Layer: 0
   m_Name: Veteran
   m_TagString: Untagged
@@ -64,4 +66,114 @@ MonoBehaviour:
   UpgradedClass2: {fileID: 0}
   UsableWeapon1Type: 1
   UsableWeapon2Type: 3
-  SkillSet: []
+  SkillSet:
+  - LearnedSkill: {fileID: 876429023132985256}
+    LearnLevel: 1
+    Permanent: 0
+  - LearnedSkill: {fileID: 4905199190673639873}
+    LearnLevel: 2
+    Permanent: 0
+  HighSlash: {fileID: 6276369190406296654, guid: 19a6a66bb0b7a0646bf30df8f8835dff,
+    type: 3}
+  WideSlash: {fileID: 8282308100824431874, guid: 9e5016818a16d734d9353a63b64b4f41,
+    type: 3}
+--- !u!114 &876429023132985256
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4808169265435286164}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 93d63bffb241f284aa147625cf04b742, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Id: 0
+  Name: Superpower Slash
+  Description: 
+  Type: 1
+  Formula: 1
+  ActionTime: 4
+  HPModType: 1
+  SPModType: 0
+  HPAmount: 0
+  HPPercent: 0
+  SPPecent: 0
+  HPRecoil: 0
+  Scope: 1
+  Element: 0
+  AlwaysHits: 0
+  Power: 35
+  Range: 10
+  CriticalRateBoost: 0
+  Accuracy: 100
+  Variance: 0
+  ClassExclusives: []
+  ChangedStatesGiveRate: []
+  ChangedStatesReceiveRate: []
+  Disabled: 0
+  Image: {fileID: 1465157572153278308, guid: 4adca08bd9ab25348a3e779ff2400cdf, type: 3}
+  Basic: 0
+  ClassSkill: 1
+  SPConsume: 30
+  Charge: 0
+  Warmup: 0
+  Cooldown: 0
+  Steal: 0
+  CanUseOutsideOfBattle: 0
+  WeaponDependent: 0
+  WeaponExclusives: 
+  SummonChances: []
+  ChargeCount: 0
+  DisabledCount: 0
+--- !u!114 &4905199190673639873
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4808169265435286164}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 93d63bffb241f284aa147625cf04b742, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Id: 1
+  Name: Team Motivation
+  Description: 
+  Type: 6
+  Formula: 0
+  ActionTime: 3
+  HPModType: 0
+  SPModType: 0
+  HPAmount: 0
+  HPPercent: 0
+  SPPecent: 0
+  HPRecoil: 0
+  Scope: 9
+  Element: 0
+  AlwaysHits: 0
+  Power: 0
+  Range: 100
+  CriticalRateBoost: 0
+  Accuracy: 100
+  Variance: 0
+  ClassExclusives: []
+  ChangedStatesGiveRate: []
+  ChangedStatesReceiveRate: []
+  Disabled: 0
+  Image: {fileID: 3935524927748901251, guid: 4adca08bd9ab25348a3e779ff2400cdf, type: 3}
+  Basic: 0
+  ClassSkill: 1
+  SPConsume: 15
+  Charge: 0
+  Warmup: 0
+  Cooldown: 0
+  Steal: 0
+  CanUseOutsideOfBattle: 0
+  WeaponDependent: 0
+  WeaponExclusives: 
+  SummonChances: []
+  ChargeCount: 0
+  DisabledCount: 0

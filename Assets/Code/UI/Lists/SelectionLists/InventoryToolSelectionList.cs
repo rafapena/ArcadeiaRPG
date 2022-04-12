@@ -241,7 +241,7 @@ public class InventoryToolSelectionList : SelectionList_Super<IToolForInventory>
         {
             InfoFrame.transform.GetChild(3).GetChild(0).GetComponent<TextMeshProUGUI>().text = wp.Power.ToString();
             InfoFrame.transform.GetChild(4).GetChild(0).GetComponent<TextMeshProUGUI>().text = wp.Range + "%";
-            InfoFrame.transform.GetChild(5).GetChild(0).GetComponent<TextMeshProUGUI>().text = "+" + wp.CriticalRate + "%";
+            InfoFrame.transform.GetChild(5).GetChild(0).GetComponent<TextMeshProUGUI>().text = "+" + wp.CriticalRateBoost + "%";
         }
 
         InfoFrame.transform.GetChild(6).GetChild(0).GetComponent<TextMeshProUGUI>().text = SelectedObject.Weight.ToString();

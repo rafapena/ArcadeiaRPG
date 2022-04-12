@@ -19,7 +19,6 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
     private float JustSelectedToolTimer;
     private const float JUST_SELECTED_TOOL_TIME_BUFFER = 0.5f;
     private const float DISABLED_ICON_TRANSPARENCY = 0.3f;
-    private bool MenuLoaded;
     private Action UpdateTarget;
     private Selections Selection;
 
@@ -74,20 +73,19 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
             EnemyActionFrame.Deactivate();
             ActivatedActionFrame = false;
         }
-
-        if (Selection == Selections.Disabled || CurrentBattle.Waiting) return;
-        else if (!MenuLoaded)
-        {
-            ActingPlayer.EnableArrowKeyMovement();
-            SetBlinkingBattlers(true);
-            SetupForSelectAction();
-            PartyFrame.Activate();
-            MenuLoaded = true;
-            return;
-        }
+        if (CurrentBattle.Waiting) return;
 
         switch (Selection)
         {
+            case Selections.Awaiting:
+                ActingPlayer.EnableArrowKeyMovement();
+                SetBlinkingBattlers(true);
+                PartyFrame.Activate();
+                DeclareCurrent(ActingPlayer);
+                DeclareNext(CurrentBattle.NextActingBattler);
+                SetupForSelectAction();
+                break;
+
             case Selections.Actions:
                 UpdateTarget?.Invoke();
                 SelectingAction();
@@ -119,7 +117,6 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
         PartyList.Refresh(CurrentBattle.PlayerParty.Players);
         SelectItemsList.SetToolListOnTab(0, CurrentBattle.PlayerParty.Inventory.Items.FindAll(x => !x.IsKey));
         ActingPlayer = p;
-        DeclareCurrent(p);
     }
 
     public void Hide()
@@ -205,9 +202,9 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
         OptionWeaponFrame.Activate();
         SetActionFrame(true);
 
-        GrayOutIconSelection(SelectActionFrame.transform.GetChild(1).gameObject, !ActingPlayer.HasAnySkills);
-        GrayOutIconSelection(SelectActionFrame.transform.GetChild(2).gameObject, CurrentBattle.PlayerParty.Inventory.Items.Count == 0);
-        GrayOutIconSelection(OptionRunFrame.gameObject, CurrentBattle.EnemyParty.RunDisabled);
+        //GrayOutIconSelection(SelectActionFrame.transform.GetChild(1).gameObject, !ActingPlayer.HasAnySkills);
+        //GrayOutIconSelection(SelectActionFrame.transform.GetChild(2).gameObject, CurrentBattle.PlayerParty.Inventory.Items.Count == 0);
+        //GrayOutIconSelection(OptionRunFrame.gameObject, CurrentBattle.EnemyParty.RunDisabled);
         SelectActionFrame.Activate();
         SelectSkillsFrame.Deactivate();
         SelectItemsFrame.Deactivate();
@@ -350,7 +347,7 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
         SelectItemsFrame.Deactivate();
         EventSystem.current.SetSelectedGameObject(null);
 
-        SelectedActiveTool.transform.GetChild(0).GetComponent<Image>().sprite = ActingPlayer.SelectedTool.GetComponent<SpriteRenderer>().sprite;
+        SelectedActiveTool.transform.GetChild(0).GetComponent<Image>().sprite = (ActingPlayer.SelectedTool is Skill sk) ? sk.Image : ActingPlayer.SelectedTool.GetComponent<SpriteRenderer>().sprite;
         SelectedActiveTool.transform.GetChild(2).GetComponent<TextMeshProUGUI>().text = ActingPlayer.SelectedTool.Name.ToUpper();
         JustSelectedToolTimer = Time.unscaledTime + JUST_SELECTED_TOOL_TIME_BUFFER;
 
@@ -406,6 +403,7 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
 
             case ActiveTool.ScopeType.Self:
                 TargetFields.Single.Activate(ActingPlayer);
+                TargetFields.Single.AimingPlayerCanReverse = false;
                 DisableTargetingForBattlers(CurrentBattle.FightingPlayerParty);
                 UpdateTarget = () => TargetFields.Single.AimAt(ActingPlayer, false);
                 break;
@@ -472,6 +470,7 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
         {
             if (b is BattlePlayer p && p.Id == ActingPlayer.Id) continue;
             DynamicTargetField dtf = Instantiate(TargetFields.Single, TargetFields.FieldsList);
+            dtf.AimingPlayerCanReverse = false;
             dtf.DisposeOnDeactivate = true;
             dtf.AimAt(b, false);
             b.Select(true);
@@ -501,11 +500,12 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
         CurrentBattle.PrepareForAction();
         ClearScope(false);
         SetBlinkingBattlers(false);
-        if (ActingPlayer.AimingForEnemies())
+        
+        /*if (ActingPlayer.AimingForEnemies())
         {
             // After blinking is removed, select specifically enemies for flexible targeting
             foreach (BattleEnemy e in CurrentBattle.EnemyParty.Enemies) e.Select(true);
-        }
+        }*/
     }
 
     public void DisplayUsedAction(Battler battler, ActiveTool action)

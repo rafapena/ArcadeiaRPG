@@ -7,20 +7,20 @@ using UnityEngine.UI;
 
 public abstract class BattlerAI : Battler
 {
-    public List<AITool> ToolAI;
+    public List<AIAction> AIActions;
 
     protected override void Awake()
     {
         base.Awake();
         HUDProperties.Name.text = Name.ToUpper();
 
-        foreach (AITool ait in ToolAI)
+        foreach (AIAction ait in AIActions)
         {
-            if (!ait.Move) continue;
-            switch (ait.Move.GetType().Name)
+            if (!ait.Action) continue;
+            switch (ait.Action.GetType().Name)
             {
-                case "Weapon": Weapons.Add(ait.Move as Weapon); break;
-                case "Skill": Skills.Add(ait.Move as Skill); break;
+                case "Weapon": Weapons.Add(ait.Action as Weapon); break;
+                case "Skill": Skills.Add(ait.Action as Skill); break;
             }
         }
     }
@@ -63,7 +63,7 @@ public abstract class BattlerAI : Battler
 
     protected ActiveTool SelectTool<T, U>(List<T> usersPartyMembers, List<U> opponentPartyMembers) where T : Battler where U : Battler
     {
-        return ToolAI[0].Move;
+        return AIActions[0].Action;
     }
 
     protected void SelectTargets<T, U>(List<T> usersPartyMembers, List<U> opponentPartyMembers) where T : Battler where U : Battler
