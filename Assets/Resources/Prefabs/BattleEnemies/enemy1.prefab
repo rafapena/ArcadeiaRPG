@@ -94,6 +94,7 @@ MonoBehaviour:
   ColumnPosition: 0
   Figure: {fileID: 0}
   Phase: 0
+  Direction: {x: 0, y: 0, z: 0}
   Speed: 0
   MainImage: {fileID: 0}
   FaceImage: {fileID: 0}
@@ -165,12 +166,70 @@ MonoBehaviour:
   ContactSpread: 
   ElementRates: 
   StateRates: 
-  AIActions: []
+  AIActions:
+  - Action: {fileID: 3740935258760432590}
+    ClassSkillId: 0
+    Priority: 0
+    Turn: 0
+    HPLow: 0
+    HPHigh: 0
+    SPLow: 0
+    SPHigh: 0
+    AllyCondition: 0
+    FoeCondition: 0
+    UserCondition: 0
+    TargetToolElement: 0
+    ActiveStates: []
+    InactiveStates: []
+    TargetElementRate: []
+    TargetStateRates: []
+    TargetStatConditions:
+      MaxHP: 0
+      Atk: 0
+      Def: 0
+      Map: 0
+      Mar: 0
+      Spd: 0
+      Tec: 0
+      Luk: 0
+      Acc: 0
+      Eva: 0
+      Crt: 0
+      Cev: 0
+  - Action: {fileID: 8841780359579117350}
+    ClassSkillId: 0
+    Priority: 0
+    Turn: 0
+    HPLow: 0
+    HPHigh: 0
+    SPLow: 0
+    SPHigh: 0
+    AllyCondition: 0
+    FoeCondition: 0
+    UserCondition: 0
+    TargetToolElement: 0
+    ActiveStates: []
+    InactiveStates: []
+    TargetElementRate: []
+    TargetStateRates: []
+    TargetStatConditions:
+      MaxHP: 0
+      Atk: 0
+      Def: 0
+      Map: 0
+      Mar: 0
+      Spd: 0
+      Tec: 0
+      Luk: 0
+      Acc: 0
+      Eva: 0
+      Crt: 0
+      Cev: 0
   Exp: 300
   Gold: 100
   DroppedItems: []
   DroppedWeapons: []
-  MultiplyHP: 1000
+  MultiplyHP: 50
   ExtraTurns: 0
   IsSummon: 0
 --- !u!114 &3740935258760432590

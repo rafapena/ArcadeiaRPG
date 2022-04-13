@@ -5135,8 +5135,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.00031857, y: 221.49847}
-  m_SizeDelta: {x: 1077, y: 72.5031}
+  m_AnchoredPosition: {x: -0.00032473, y: -288.25}
+  m_SizeDelta: {x: 1101, y: 72.5031}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!1 &841138229
 GameObject:
@@ -5270,7 +5270,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Figure: {fileID: 0}
   DisposeOnDeactivate: 0
-  DirectFocus: 1
+  AimingPlayerCanReverse: 0
 --- !u!114 &841138236
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5588,7 +5588,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Figure: {fileID: 0}
   DisposeOnDeactivate: 0
-  DirectFocus: 1
+  AimingPlayerCanReverse: 0
 --- !u!58 &901666820
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -8600,7 +8600,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Figure: {fileID: 0}
   DisposeOnDeactivate: 0
-  DirectFocus: 1
+  AimingPlayerCanReverse: 0
   ApproachPointLeft: {fileID: 872109563}
   ApproachPointRight: {fileID: 365101843}
   DefaultSpeed: 6
@@ -10113,7 +10113,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Figure: {fileID: 0}
   DisposeOnDeactivate: 0
-  DirectFocus: 1
+  AimingPlayerCanReverse: 0
 --- !u!114 &1531490833
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -17793,7 +17793,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Figure: {fileID: 0}
   DisposeOnDeactivate: 0
-  DirectFocus: 1
+  AimingPlayerCanReverse: 0
   ApproachPointLeft: {fileID: 0}
   ApproachPointRight: {fileID: 0}
   DefaultSpeed: 6

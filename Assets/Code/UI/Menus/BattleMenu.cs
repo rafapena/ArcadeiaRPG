@@ -73,16 +73,12 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
             EnemyActionFrame.Deactivate();
             ActivatedActionFrame = false;
         }
-        if (CurrentBattle.Waiting) return;
 
         switch (Selection)
         {
             case Selections.Awaiting:
-                ActingPlayer.EnableArrowKeyMovement();
-                SetBlinkingBattlers(true);
-                PartyFrame.Activate();
-                DeclareCurrent(ActingPlayer);
-                DeclareNext(CurrentBattle.NextActingBattler);
+                if (CurrentBattle.Waiting) break;
+                PostAwaitSetup();
                 SetupForSelectAction();
                 break;
 
@@ -105,9 +101,6 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
                 UpdateTarget?.Invoke();
                 if (PassedSelectedToolBuffer) SelectingTarget();
                 break;
-
-            default:
-                break;
         }
     }
 
@@ -117,12 +110,21 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
         PartyList.Refresh(CurrentBattle.PlayerParty.Players);
         SelectItemsList.SetToolListOnTab(0, CurrentBattle.PlayerParty.Inventory.Items.FindAll(x => !x.IsKey));
         ActingPlayer = p;
+        p.IsDecidingAction = true;
+    }
+
+    private void PostAwaitSetup()
+    {
+        ActingPlayer.EnableArrowKeyMovement();
+        SetBlinkingBattlers(true);
+        PartyFrame.Activate();
+        DeclareCurrent(ActingPlayer);
+        DeclareNext(CurrentBattle.NextActingBattler);
     }
 
     public void Hide()
     {
         Selection = Selections.Disabled;
-        //PartyFrame.Deactivate();
         OptionRunFrame.Deactivate();
         OptionBackFrame.Deactivate();
         OptionWeaponFrame.Deactivate();
@@ -202,9 +204,9 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
         OptionWeaponFrame.Activate();
         SetActionFrame(true);
 
-        //GrayOutIconSelection(SelectActionFrame.transform.GetChild(1).gameObject, !ActingPlayer.HasAnySkills);
-        //GrayOutIconSelection(SelectActionFrame.transform.GetChild(2).gameObject, CurrentBattle.PlayerParty.Inventory.Items.Count == 0);
-        //GrayOutIconSelection(OptionRunFrame.gameObject, CurrentBattle.EnemyParty.RunDisabled);
+        TryGrayOutIconSelection(SelectActionFrame.transform.GetChild(1).gameObject, !ActingPlayer.HasAnySkills);
+        TryGrayOutIconSelection(SelectActionFrame.transform.GetChild(2).gameObject, !CurrentBattle.PlayerParty.Inventory.Items.Where(x => !x.IsKey).Any());
+        TryGrayOutIconSelection(OptionRunFrame.gameObject, CurrentBattle.EnemyParty.RunDisabled);
         SelectActionFrame.Activate();
         SelectSkillsFrame.Deactivate();
         SelectItemsFrame.Deactivate();
@@ -232,17 +234,19 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
         return go.GetComponent<Image>().color.a == DISABLED_ICON_TRANSPARENCY;
     }
 
-    private void GrayOutIconSelection(GameObject go, bool condition)
+    private void TryGrayOutIconSelection(GameObject go, bool condition)
     {
         float a = condition ? DISABLED_ICON_TRANSPARENCY : 1;
         if (condition && go.GetComponent<Image>().color.a == DISABLED_ICON_TRANSPARENCY) return;
         else if (!condition && go.GetComponent<Image>().color.a != DISABLED_ICON_TRANSPARENCY) return;
-        go.GetComponent<Image>().color = new Color(1, 1, 1, a);
-        go.transform.GetChild(0).GetComponent<Image>().color = new Color(1, 1, 1, a);
+
+        Color newColor = new Color(1, 1, 1, a);
+        go.GetComponent<Image>().color = newColor;
+        go.transform.GetChild(0).GetComponent<Image>().color = newColor;
         if (Selection == Selections.Actions)
         {
-            go.transform.GetChild(1).GetComponent<TextMeshProUGUI>().color = new Color(1, 1, 1, a);
-            go.transform.GetChild(2).gameObject.SetActive(!condition);
+            go.transform.GetChild(1).gameObject.SetActive(!condition);
+            go.transform.GetChild(2).GetComponent<TextMeshProUGUI>().color = newColor;
         }
     }
 
@@ -493,19 +497,23 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
 
     private void FinalizeSelections()
     {
-        if (ActingPlayer.SelectedTool.Scope == ActiveTool.ScopeType.TrapSetup && CurrentBattle.AllBattlers.Any(x => x.IsSelected)) return;
+        if (!CheckTargetField()) return;
         Selection = Selections.Disabled;
         ActingPlayer.DisableArrowKeyMovement();
+        ActingPlayer.Movement = Vector3.zero;
+        ActingPlayer.IsDecidingAction = false;
         Hide();
         CurrentBattle.PrepareForAction();
         ClearScope(false);
         SetBlinkingBattlers(false);
-        
-        /*if (ActingPlayer.AimingForEnemies())
-        {
-            // After blinking is removed, select specifically enemies for flexible targeting
-            foreach (BattleEnemy e in CurrentBattle.EnemyParty.Enemies) e.Select(true);
-        }*/
+    }
+
+    private bool CheckTargetField()
+    {
+        if (ActingPlayer.AimingForTeammates()) return CurrentBattle.FightingPlayerParty.Any(x => x.IsSelected);
+        if (ActingPlayer.AimingForEnemies()) return CurrentBattle.EnemyParty.Enemies.Any(x => x.IsSelected);
+        if (ActingPlayer.SelectedTool.Scope == ActiveTool.ScopeType.TrapSetup) return CurrentBattle.AllBattlers.All(x => !x.IsSelected);
+        return true;
     }
 
     public void DisplayUsedAction(Battler battler, ActiveTool action)
@@ -530,6 +538,12 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
     {
         // Handle states
     }
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// -- Updating party list in real-time --
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public void ChangeHP() { }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- Battle phase process: RUN --

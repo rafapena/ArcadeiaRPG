@@ -10,8 +10,6 @@ public abstract class BattleEnemy : BattlerAI
     public float MultiplyHP = 1f;
     public int ExtraTurns;
 
-    [HideInInspector] public bool IsSummon;
-
     protected new void Start()
     {
         base.Start();

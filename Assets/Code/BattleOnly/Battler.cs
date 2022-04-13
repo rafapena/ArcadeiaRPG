@@ -14,7 +14,6 @@ public abstract class Battler : ToolUser
     public BattlerHUD HUDProperties { get; private set; }
     public enum VerticalPositions { Top, Center, Bottom }
     public enum HorizontalPositions { Left, Center, Right }
-    public enum Phases { None, DecidingAction, Charging, PreparingAction, UsingAction, ExecutedAction }
 
     // Battler position
     public VerticalPositions RowPosition;
@@ -22,11 +21,11 @@ public abstract class Battler : ToolUser
 
     // Movement
     [HideInInspector] public Rigidbody2D Figure;
-    [HideInInspector] public Phases Phase;
-    public Vector3 Direction;
-    protected Vector3 Movement;
+    [HideInInspector] public Vector3 Direction;
+    [HideInInspector] public Vector3 Movement;
     [HideInInspector] public float Speed;
-    private Vector3 ActionPrepDestination;
+    [HideInInspector] public Vector3 TargetFieldDestination;
+    private bool IsApproaching;
     private const float BATTLER_APPROACH_DISTANCE_THRESHOLD = 1.25f;
 
     // General battler data
@@ -36,23 +35,22 @@ public abstract class Battler : ToolUser
     public BattlerClass Class;
     [HideInInspector] public int HP;
     [HideInInspector] public int SP;
-    public Stats Stats;
     [HideInInspector] public Stats StatBoosts;
-    [HideInInspector] public List<Skill> Skills;
-    public bool HasAnySkills => Skills.Count > 0;
+    public Stats Stats;
 
-    // Equipment
+    // Equipmet
     public List<Weapon> Weapons;
     public List<Accessory> Accessories;
     public List<IToolEquippable> Equipment => Weapons.Cast<IToolEquippable>().Concat(Accessories.Cast<IToolEquippable>()).ToList();
     public bool MaxEquipment => Weapons.Count + Accessories.Count == BattleMaster.MAX_NUMBER_OF_EQUIPS;
-    public bool UsingFists => Weapons.Count == 0;
+    
 
     // Overall battle info
     [HideInInspector] public bool IsSelected { get; private set; }
     [HideInInspector] public bool LockSelectTrigger;
     [HideInInspector] public ActiveTool SelectedTool;
     [HideInInspector] public Weapon SelectedWeapon;
+    [HideInInspector] public bool IsCharging;
     [HideInInspector] public List<State> States = new List<State>();
     private bool BlinkingEnabled;
 
@@ -61,6 +59,7 @@ public abstract class Battler : ToolUser
     [HideInInspector] public Skill BasicAttackSkill;
 
     // Action execution info
+    [HideInInspector] public bool ExecutedAction;
     [HideInInspector] public bool HitCritical;
     [HideInInspector] public bool HitWeakness;
     [HideInInspector] public bool HitResistant;
@@ -125,16 +124,23 @@ public abstract class Battler : ToolUser
         foreach (StateRate sr in ChangedStateRates) StateRates[sr.State.Id] = sr.Rate;
     }
 
+    public void SetBattlePositions(VerticalPositions vp, HorizontalPositions hp)
+    {
+        RowPosition = vp;
+        ColumnPosition = hp;
+    }
+
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- Updating --
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     protected override void Update()
     {
-        if (Phase == Phases.PreparingAction && Vector3.Distance(transform.position, ActionPrepDestination) < BATTLER_APPROACH_DISTANCE_THRESHOLD)
+        if (IsApproaching && Vector3.Distance(transform.position, TargetFieldDestination) < BATTLER_APPROACH_DISTANCE_THRESHOLD)
         {
+            IsApproaching = false;
             Movement = Vector3.zero;
-            Phase = Phases.UsingAction;
+            CurrentBattle.NotifyToSwitchInBattlePhase();
         }
 
         if (IsSelected && BlinkingEnabled && GetComponent<SpriteRenderer>())
@@ -191,8 +197,8 @@ public abstract class Battler : ToolUser
 
     public void ResetAction()
     {
-        Phase = Phases.None;
         SelectedTool = null;
+        ExecutedAction = false;
         HitCritical = false;
         HitWeakness = false;
         HitResistant = false;
@@ -200,83 +206,15 @@ public abstract class Battler : ToolUser
 
     public void ApproachTarget(Transform leftPoint, Transform rightPoint)
     {
-        Movement = GetApproachVector(ref ActionPrepDestination, leftPoint.position, rightPoint.position);
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// -- Equip Management --
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    public int Equip<T>(T equipment) where T : IToolEquippable
-    {
-        if (MaxEquipment) return -1;
-        else if (equipment is Weapon wp)
-        {
-            Weapons.Add(wp);
-            return Weapons.Count - 1;
-        }
-        else // equipment is Accessory
-        {
-            Accessories.Add(equipment as Accessory);
-            return Accessories.Count - 1;
-        }
-    }
-
-    public IToolEquippable Unequip<T>(int index) where T : IToolEquippable
-    {
-        if (typeof(T).Name.Equals("Weapon") && index >= 0 && index < Weapons.Count)
-        {
-            Weapon weapon = Weapons[index];
-            Weapons.RemoveAt(index);
-            return weapon;
-        }
-        else if (typeof(T).Name.Equals("Accessory") && index >= 0 && index < Accessories.Count)
-        {
-            Accessory accessory = Accessories[index];
-            Accessories.RemoveAt(index);
-            return accessory;
-        }
-        else return default(T);
-    }
-
-    public int Unequip<T>(T tool) where T : IToolEquippable
-    {
-        int index = 0;
-        if (tool is Weapon && Weapons.Count > 0)
-        {
-            index = Weapons.FindIndex(x => x.Id == tool.Info.Id && x.Name.Equals(tool.Info.Name));
-            Weapons.RemoveAt(index);
-        }
-        else if (tool is Accessory && Accessories.Count > 0)
-        {
-            index = Accessories.FindIndex(x => x.Id == tool.Info.Id && x.Name.Equals(tool.Info.Name));
-            Accessories.RemoveAt(index);
-        }
-        else return -1;
-        return index;
+        IsApproaching = true;
+        Movement = GetApproachVector(ref TargetFieldDestination, leftPoint.position, rightPoint.position);
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- Add/Remove Passive Effect Components --
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    /*public int AddPassiveSkill(List<PassiveSkill> pSkillsList, int id)
-    {
-        if (!ValidListInput(pSkillsList, id)) return -1;
-        PassiveSkills.Add(new PassiveSkill(pSkillsList[id]));
-        AddPassiveEffects(PassiveSkills.Last());
-        return PassiveSkills.Last().Id;
-    }
-
-    public int RemovePassiveSkill(int listIndex)
-    {
-        if (!ValidListInput(PassiveSkills, listIndex)) return -1;
-        PassiveSkill toRemove = PassiveSkills[listIndex];
-        RemovePassiveEffects(toRemove);
-        PassiveSkills.RemoveAt(listIndex);
-        return toRemove.Id;
-    }
-
+    /*
     public int AddState(List<State> statesList, int id)
     {
         if (!ValidListInput(statesList, id)) return -1;
@@ -352,8 +290,6 @@ public abstract class Battler : ToolUser
     /// -- ActiveTool scoping --
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    protected abstract Skill GetDefaultSkill();
-
     public bool AimingForTeammates()
     {
         switch (SelectedTool.Scope)
@@ -392,43 +328,6 @@ public abstract class Battler : ToolUser
         return false;
     }
 
-    private void ShootProjectile()
-    {
-        /*foreach (Battler t in SelectedTargets)
-        {
-            Projectile p = Instantiate(SelectedTool.Projectile, transform.position, Quaternion.identity, gameObject.transform);
-            p.Setup(10, GetDirection(transform.position, t.transform.position));
-            p.GetBattleInfo(this, SelectedTargets, SelectedTool);
-            p.GetComponent<SpriteRenderer>().sortingLayerName = "Battle";
-        }*/
-    }
-
-    private Vector3 GetDirection(Vector3 userPos, Vector3 targetPos)
-    {
-        float distX = targetPos.x - userPos.x;
-        float distY = targetPos.y - userPos.y;
-        float norm = Mathf.Sqrt(distX * distX + distY * distY);
-        if (norm == 0) return Vector3.zero;
-        return new Vector3(distX / norm, distY / norm);
-    }
-
-    private S ExecuteSkill<S>(S skill) where S : Skill
-    {
-        skill.StartCharge();
-        if (skill.ChargeCount > 0)
-        {
-            Phase = Phases.Charging;
-            skill.Charge1Turn();
-            return skill;
-        }
-        skill.DisableForCooldown();
-        //sk.SummonPlayers();
-        //sk.SummonEnemies();
-        //ApplyToolEffectsPerTarget(sk, ExecuteSteal);
-        ShootProjectile();
-        return skill;
-    }
-
     private List<int> ExecuteSteal(List<int> oneActResult, Battler target, double effectMagnitude)
     {
         //double willSteal = effectMagnitude * 100 * Luk() / target.Luk();
@@ -436,49 +335,37 @@ public abstract class Battler : ToolUser
         return oneActResult;
     }
 
-    private Item ExecuteItem(Item it)
-    {
-        Stats.Add(it.PermantentStatChanges);
-        //if (it.TurnsInto) Items[Items.FindIndex(x => x.Id == it.Id)] = Instantiate(it.TurnsInto, gameObject.transform);
-        //else if (it.Consumable) Items.Remove(it);
-        ShootProjectile();
-        return it;
-    }
-
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- Receiving ActiveTool Effects --
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public delegate void ApplyExtra(Battler user, ActiveTool ActiveTool, float effectMagnitude);
-
-    public void ReceiveToolEffects(Battler user, ActiveTool ActiveTool, ApplyExtra extraFunc = null)
+    public void ReceiveToolEffects(Battler user, ActiveTool activeTool)
     {
         float effectMagnitude = 1.0f;
-        if (ActiveTool.Hit(user, this, effectMagnitude))
+        if (activeTool.Hit(user, this, effectMagnitude))
         {
-            int formulaOutput = ActiveTool.GetFormulaOutput(user, this, effectMagnitude);
-            int directHPChange = ActiveTool.HPAmount + (Stats.MaxHP * ActiveTool.HPPercent / 100);
+            int formulaOutput = activeTool.GetFormulaOutput(user, this, effectMagnitude);
+            int directHPChange = activeTool.HPAmount + (Stats.MaxHP * activeTool.HPPercent / 100);
             
-            int critRate = ActiveTool.GetCriticalHitRatio(user, this, effectMagnitude);       // UPDATES HitCritical
-            float elementRate = ActiveTool.GetElementRateRatio(user, this);                   // UPDATES HitWeakness and HitResistant
+            int critRate = activeTool.GetCriticalHitRatio(user, this, effectMagnitude);       // UPDATES HitCritical
+            float elementRate = activeTool.GetElementRateRatio(user, this);                   // UPDATES HitWeakness and HitResistant
             int ratesTotal = (int)(critRate * elementRate);
 
             int totalHPChange = (formulaOutput + directHPChange) * ratesTotal;
-            int totalSPChange = (formulaOutput + ActiveTool.SPPecent) * ratesTotal;
-            int realHPTotal = ActiveTool.GetTotalWithVariance(totalHPChange);
-            int realSPTotal = ActiveTool.GetTotalWithVariance(totalSPChange);
-            if (ActiveTool.HPModType != ActiveTool.ModType.None && realHPTotal <= 0) realHPTotal = 1;
-            if (ActiveTool.SPModType != ActiveTool.ModType.None && realSPTotal <= 0) realSPTotal = 1;
+            int totalSPChange = (formulaOutput + activeTool.SPPecent) * ratesTotal;
+            int realHPTotal = activeTool.GetTotalWithVariance(totalHPChange);
+            int realSPTotal = activeTool.GetTotalWithVariance(totalSPChange);
+            if (activeTool.HPModType != ActiveTool.ModType.None && realHPTotal <= 0) realHPTotal = 1;
+            if (activeTool.SPModType != ActiveTool.ModType.None && realSPTotal <= 0) realSPTotal = 1;
 
             //List<int>[] states = ActiveTool.TriggeredStates(user, this, effectMagnitude);
             //oneTarget.Add(states[0].Count);
             //foreach (int stateGiveId in states[0]) oneTarget.Add(stateGiveId);
             //oneTarget.Add(states[1].Count);
             //foreach (int stateReceiveId in states[1]) oneTarget.Add(stateReceiveId);
-            extraFunc?.Invoke(user, ActiveTool, effectMagnitude);
 
-            ChangeAndDisplayPopup(user, realHPTotal, ActiveTool.HPModType, "HP", user.ChangeHP, ChangeHP);
-            ChangeAndDisplayPopup(user, realSPTotal, ActiveTool.SPModType, "SP", user.ChangeSP, ChangeSP);
+            ChangeAndDisplayPopup(realHPTotal, activeTool.HPModType, "HP", user.ChangeHP, ChangeHP);
+            ChangeAndDisplayPopup(realSPTotal, activeTool.SPModType, "SP", user.ChangeSP, ChangeSP);
             CheckKO();
         }
         else
@@ -490,7 +377,7 @@ public abstract class Battler : ToolUser
 
     // Helper for function above
     public delegate void ChangeFunc(int total);
-    public void ChangeAndDisplayPopup(Battler user, int total, ActiveTool.ModType modType, string HPorSP, ChangeFunc changeHPorSPForUser, ChangeFunc changeHPorSPForTarget)
+    public void ChangeAndDisplayPopup(int total, ActiveTool.ModType modType, string HPorSP, ChangeFunc changeHPorSPForUser, ChangeFunc changeHPorSPForTarget)
     {
         Popup popup = null;
         switch (modType)
@@ -498,19 +385,16 @@ public abstract class Battler : ToolUser
             case ActiveTool.ModType.None:
                 break;
             case ActiveTool.ModType.Damage:
-                if (Time.timeScale > 0) 
-                    popup = Instantiate(UIMaster.Popups[HPorSP + "Damage"], transform.position, Quaternion.identity);
+                if (Time.timeScale > 0) popup = Instantiate(UIMaster.Popups[HPorSP + "Damage"], transform.position, Quaternion.identity);
                 changeHPorSPForTarget(-total);
                 break;
             case ActiveTool.ModType.Drain:
-                if (Time.timeScale > 0) 
-                    popup = Instantiate(UIMaster.Popups[HPorSP + "Drain"], transform.position, Quaternion.identity);
+                if (Time.timeScale > 0) popup = Instantiate(UIMaster.Popups[HPorSP + "Drain"], transform.position, Quaternion.identity);
                 changeHPorSPForTarget(-total);
                 changeHPorSPForUser(total);
                 break;
             case ActiveTool.ModType.Recover:
-                if (Time.timeScale > 0)
-                    popup = Instantiate(UIMaster.Popups[HPorSP + "Recover"], transform.position, Quaternion.identity);
+                if (Time.timeScale > 0) popup = Instantiate(UIMaster.Popups[HPorSP + "Recover"], transform.position, Quaternion.identity);
                 changeHPorSPForTarget(total);
                 break;
         }
@@ -529,21 +413,21 @@ public abstract class Battler : ToolUser
     /// -- General HP/SP Management --
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public void MaxHPSP()
+    public virtual void MaxHPSP()
     {
         KOd = false;
         HP = Stats.MaxHP;
         SP = 100;
     }
 
-    public void ChangeHP(int val)
+    public virtual void ChangeHP(int val)
     {
         HP += val;
         if (HP < 0) HP = 0;
         else if (HP > Stats.MaxHP) HP = Stats.MaxHP;
     }
 
-    public void ChangeSP(int val)
+    public virtual void ChangeSP(int val)
     {
         SP += val;
         if (SP < 0) SP = 0;
@@ -554,7 +438,7 @@ public abstract class Battler : ToolUser
     /// -- Applying Passive Effects --
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public bool CanDoAction => !KOd && CannotMove <= 0 && Phase != Phases.Charging;
+    public bool CanDoAction => !KOd && CannotMove <= 0 && !IsCharging;
 
     /*
     public void ApplyStartActionEffects(Environment e)
@@ -594,21 +478,21 @@ public abstract class Battler : ToolUser
     public int Crt => Stats.Crt;
     public int Cev => Stats.Cev;
 
-    /*public int Atk() { return NaturalNumber((Stats.Atk + StatBoosts.Atk) * StatModifiers.Atk / 100); }
-    public int Def() { return NaturalNumber((Stats.Def + StatBoosts.Def) * StatModifiers.Def / 100); }
-    public int Map() { return NaturalNumber((Stats.Map + StatBoosts.Map) * StatModifiers.Map / 100); }
-    public int Mar() { return NaturalNumber((Stats.Mar + StatBoosts.Mar) * StatModifiers.Mar / 100); }
-    public int Spd() { return NaturalNumber((Stats.Spd + StatBoosts.Spd) * StatModifiers.Spd / 100); }
-    public int Tec() { return NaturalNumber((Stats.Tec + StatBoosts.Tec) * StatModifiers.Tec / 100); }
-    public int Luk() { return NaturalNumber((Stats.Luk + StatBoosts.Luk) * StatModifiers.Luk / 100); }
+    /*public int Atk => NaturalNumber((Stats.Atk + StatBoosts.Atk) * StatModifiers.Atk / 100);
+    public int Def => NaturalNumber((Stats.Def + StatBoosts.Def) * StatModifiers.Def / 100);
+    public int Map => NaturalNumber((Stats.Map + StatBoosts.Map) * StatModifiers.Map / 100);
+    public int Mar => NaturalNumber((Stats.Mar + StatBoosts.Mar) * StatModifiers.Mar / 100);
+    public int Spd => NaturalNumber((Stats.Spd + StatBoosts.Spd) * StatModifiers.Spd / 100);
+    public int Tec => NaturalNumber((Stats.Tec + StatBoosts.Tec) * StatModifiers.Tec / 100);
+    public int Luk => NaturalNumber((Stats.Luk + StatBoosts.Luk) * StatModifiers.Luk / 100);
 
-    public int Acc() { return (Stats.Acc + StatBoosts.Acc) * StatModifiers.Acc / 100; }
-    public int Eva() { return (Stats.Eva + StatBoosts.Eva) * StatModifiers.Eva / 100; }
-    public int Crt() { return (Stats.Crt + StatBoosts.Crt) * StatModifiers.Crt / 100; }
-    public int Cev() { return (Stats.Cev + StatBoosts.Cev) * StatModifiers.Cev / 100; }*/
+    public int Acc => (Stats.Acc + StatBoosts.Acc) * StatModifiers.Acc / 100;
+    public int Eva => (Stats.Eva + StatBoosts.Eva) * StatModifiers.Eva / 100;
+    public int Crt => (Stats.Crt + StatBoosts.Crt) * StatModifiers.Crt / 100;
+    public int Cev => (Stats.Cev + StatBoosts.Cev) * StatModifiers.Cev / 100;*/
 
     public int NaturalNumber(int number)
     {
-        return number <= 0 ? 0 : number;
+        return number < 0 ? 0 : number;
     }
 }

@@ -30,6 +30,7 @@ public class MMSpecial : MM_Super
     // List of potential targets
     private List<Battler> SelectableTeammates;
     private bool SelectAllTeammates;
+    private BattlePlayer SelectedPlayer;
 
     // Delay after a skill has been used
     private float DoneTimer;
@@ -51,7 +52,7 @@ public class MMSpecial : MM_Super
             if (SkillsList.SelectedObject.EnoughSPFrom(PartyUserList.SelectedObject)) Selection = Selections.SelectTarget;
             else
             {
-                SkillsList.Refresh(PartyUserList.SelectedObject, MenuManager.PartyInfo.GetWholeParty());
+                SkillsList.Refresh(SelectedPlayer, MenuManager.PartyInfo.GetWholeParty());
                 UndoSelectTarget();
             }
         }
@@ -109,8 +110,9 @@ public class MMSpecial : MM_Super
     {
         if (!ListsSetup || Selection != Selections.SelectPlayer) return;
         PartyUserList.SetSelected();
+        SelectedPlayer = PartyUserList.SelectedObject as BattlePlayer;
         SkillsList.Activate();
-        SkillsList.Refresh(PartyUserList.SelectedObject, MenuManager.PartyInfo.GetWholeParty());
+        SkillsList.Refresh(SelectedPlayer, MenuManager.PartyInfo.GetWholeParty());
     }
 
     public void DeselectUser()
@@ -121,7 +123,7 @@ public class MMSpecial : MM_Super
 
     public void SelectUser()
     {
-        if (!PartyUserList.SelectedObject.HasAnySkills) return;
+        if (!SelectedPlayer.HasAnySkills) return;
         Selection = Selections.SelectSkill;
         PartyUserList.SetSelected();
         PartyUserList.UnhighlightAll();

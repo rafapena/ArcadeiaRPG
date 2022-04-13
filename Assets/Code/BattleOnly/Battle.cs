@@ -7,7 +7,7 @@ using UnityEngine.UI;
 
 public class Battle : MonoBehaviour
 {
-    public enum BattleStates { None, Menu, PreAction, Action, Running, Won, GameOver }
+    public enum BattlePhases { None, DecidingAction, PreAction, Action, RunningAway, Won, GameOver }
 
     // Collision detection
     public const int BASE_HITBOX_LAYER = 11;
@@ -39,8 +39,8 @@ public class Battle : MonoBehaviour
     };
 
     // Battle state tracking
-    private BattleStates BattleState;
-    private bool NotifiedDoneAction;
+    public BattlePhases Phase { get; private set; }
+    private bool NotifySwitchInBattlePhase;
     private bool LastActionOfTurn;
     [HideInInspector] public int Turn;
 
@@ -113,11 +113,7 @@ public class Battle : MonoBehaviour
         foreach (Battler b0 in list)
         {
             Vector3 bpPos = partyGameObject.position + Positions[(int)b0.RowPosition][(int)b0.ColumnPosition];
-            T b = (T)Instantiate(b0, bpPos, Quaternion.identity, partyGameObject);
-            b = InstantiateContents(b);
-            b.transform.localScale = Vector3.one * 0.5f;
-            b.gameObject.SetActive(true);
-            b.SetBattle(this);
+            T b = (T)InstantiateBattler(b0, bpPos);
             result.Add(b);
         }
         return result;
@@ -164,8 +160,10 @@ public class Battle : MonoBehaviour
         return allies;
     }
 
-    private T InstantiateContents<T>(T b) where T : Battler
+    public T InstantiateBattler<T>(T newBattler, Vector3 position) where T : Battler
     {
+        T b = Instantiate(newBattler, position, Quaternion.identity, (newBattler is BattleEnemy ? PlayerPartyDump : EnemyPartyDump));
+
         if (b.Class)
         {
             b.Class = Instantiate(b.Class, b.transform);
@@ -174,6 +172,11 @@ public class Battle : MonoBehaviour
         b.BasicAttackSkill = Instantiate(b.BasicAttackSkill, b.transform);
         for (int i = 0; i < b.States.Count; i++) b.States[i] = Instantiate(b.States[i], b.transform);
         b.StatBoosts.SetToZero();
+        
+        b.transform.localScale = Vector3.one * 0.5f;
+        b.gameObject.SetActive(true);
+        b.SetBattle(this);
+        if (b is BattlePlayer p) p.SetBattleMenu(BattleMenu);
         return b;
     }
 
@@ -184,32 +187,48 @@ public class Battle : MonoBehaviour
     private void Update()
     {
         if (Waiting) return;
-        switch (BattleState)
+        switch (Phase)
         {
-            case BattleStates.Menu:
-                return;
-
-            case BattleStates.PreAction:
-                if (ActingBattler.Phase == Battler.Phases.UsingAction) ExecuteAction();
-                return;
-
-            case BattleStates.Action:
-                if (NotifiedDoneAction) ActionEnd();
+            case BattlePhases.DecidingAction:
+                if (NotifiedToSwitchInBattlePhase()) PrepareForAction();
                 break;
 
-            case BattleStates.Running:
+            case BattlePhases.PreAction:
+                if (NotifiedToSwitchInBattlePhase()) ExecuteAction();
                 break;
 
-            case BattleStates.Won:
+            case BattlePhases.Action:
+                if (NotifiedToSwitchInBattlePhase()) ActionEnd();
+                break;
+
+            case BattlePhases.RunningAway:
+                break;
+
+            case BattlePhases.Won:
                 BattleWinMenu.Setup();
-                BattleState = BattleStates.None;
+                Phase = BattlePhases.None;
                 break;
 
-            case BattleStates.GameOver:
+            case BattlePhases.GameOver:
                 SetupGameOver();
-                BattleState = BattleStates.None;
+                Phase = BattlePhases.None;
                 break;
         }
+    }
+
+    public void NotifyToSwitchInBattlePhase()
+    {
+        NotifySwitchInBattlePhase = true;
+    }
+
+    private bool NotifiedToSwitchInBattlePhase()
+    {
+        if (NotifySwitchInBattlePhase)
+        {
+            NotifySwitchInBattlePhase = false;
+            return true;
+        }
+        return false;
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -234,23 +253,21 @@ public class Battle : MonoBehaviour
     private void ActionStart()
     {
         Await(1);
-        NotifiedDoneAction = false;
         ResetSelectedTargets();
         GetNextFastestAvailableBattlers();
-        ActingBattler.Phase = Battler.Phases.DecidingAction;
 
+        Phase = BattlePhases.DecidingAction;
         if (ActingBattler is BattlePlayer p)
         {
-            BattleState = BattleStates.Menu;
             BattleMenu.Setup(p);
         }
         else // Ally or enemy
         {
             BattleMenu.Hide();
+            BattleMenu.DeclareNext(NextActingBattler);
             if (ActingBattler is BattleAlly ally) ally.MakeDecision(FightingPlayerParty.ToList(), EnemyParty.Enemies);
             else if (ActingBattler is BattleEnemy enemy) enemy.MakeDecision(EnemyParty.Enemies, FightingPlayerParty.ToList());
             PrepareForAction();
-            BattleMenu.DeclareNext(NextActingBattler);
         }
     }
 
@@ -274,7 +291,7 @@ public class Battle : MonoBehaviour
         int actingBattlerSet = 0;
         foreach (Battler b in Battlers)
         {
-            if (b.Phase == Battler.Phases.ExecutedAction) continue;
+            if (b.ExecutedAction) continue;
             else if (actingBattlerSet == 0) ActingBattler = b;
             else if (actingBattlerSet == 1) NextActingBattler = b;
             actingBattlerSet++;
@@ -301,30 +318,43 @@ public class Battle : MonoBehaviour
 
     public virtual void PrepareForAction()
     {
-        BattleState = BattleStates.PreAction;
         if (!ActingBattler.SelectedTool.Ranged && ActingBattler.SelectedTool.Scope == ActiveTool.ScopeType.OneEnemy)
         {
-            ActingBattler.Phase = Battler.Phases.PreparingAction;
+            Phase = BattlePhases.PreAction;
             ActingBattler.ApproachTarget(BattleMenu.TargetFields.Single.ApproachPointLeft, BattleMenu.TargetFields.Single.ApproachPointRight);
         }
-        else ActingBattler.Phase = Battler.Phases.UsingAction;
+        else ExecuteAction();
+    }
+
+    private bool IsChargingSkill(Skill skill)
+    {
+        skill.StartCharge();
+        if (skill.ChargeCount == 0) return false;
+        //BattleState = BattleStates.
+        //ActingBattler.Phase = Battler.Phases.UsingAction;
+        skill.Charge1Turn();
+        ActingBattler.AnimatingCharging();
+        return true;
     }
 
     public void ExecuteAction()
     {
-        BattleState = BattleStates.Action;
-        ActingBattler.Phase = Battler.Phases.UsingAction;
-        if (ActingBattler.SelectedTool is not Skill sk || !sk.Basic) BattleMenu.DisplayUsedAction(ActingBattler, ActingBattler.SelectedTool);
+        Skill skill = ActingBattler.SelectedTool as Skill;
+        if (IsChargingSkill(skill)) return;
+
+        Phase = BattlePhases.Action;
+        if (!skill || !skill.Basic) BattleMenu.DisplayUsedAction(ActingBattler, ActingBattler.SelectedTool);
 
         if (ActingBattler.UsingBasicAttack)
         {
             if (ActingBattler.Class) ActingBattler.Class.UseBasicAttack(ActingBattler.SelectedWeapon);
             else ActingBattler.UseBasicAttack();
         }
-        else if (ActingBattler.SelectedTool is Skill skill)
+        else if (skill)
         {
             if (skill.ClassSkill) ActingBattler.Class.UseSkill();
             else ActingBattler.UseSkill();
+            skill.DisableForCooldown();
         }
         else if (ActingBattler.SelectedTool is Item item)
         {
@@ -333,14 +363,9 @@ public class Battle : MonoBehaviour
         }
     }
 
-    public void NotifyDoneUsingAction()
-    {
-        NotifiedDoneAction = true;
-    }
-
     public void RunAway()
     {
-        BattleState = BattleStates.Running;
+        Phase = BattlePhases.RunningAway;
     }
 
     public void RunFailed()
@@ -354,17 +379,28 @@ public class Battle : MonoBehaviour
 
     private void ActionEnd()
     {
-        ActingBattler.Phase = Battler.Phases.ExecutedAction;
-        FinishSkillUsage();
+        ActingBattler.ExecutedAction = true;
+        FinishActionUsage();
         if (CheckBattleEndCondition()) return;
         else if (LastActionOfTurn) TurnEnd();
         else ActionStart();
     }
 
-    private void FinishSkillUsage()
+    private void FinishActionUsage()
     {
         if (ActingBattler.Class) ActingBattler.Class.ResetActionExecution();
         else ActingBattler.ResetActionExecution();
+
+        if (ActingBattler.SelectedTool is Skill sk)
+        {
+            sk.DisableForCooldown();
+        }
+        else if (ActingBattler.SelectedTool is Item it)
+        {
+            //Stats.Add(item.PermantentStatChanges);
+            //if (it.TurnsInto) Items[Items.FindIndex(x => x.Id == it.Id)] = Instantiate(it.TurnsInto, gameObject.transform);
+            //else if (it.Consumable) Items.Remove(it);
+        }
     }
 
     private bool CheckBattleEndCondition()
@@ -427,13 +463,13 @@ public class Battle : MonoBehaviour
 
     private void DeclareWin()
     {
-        BattleState = BattleStates.Won;
+        Phase = BattlePhases.Won;
         ClearAll();
     }
 
     private void DeclareGameOver()
     {
-        BattleState = BattleStates.GameOver;
+        Phase = BattlePhases.GameOver;
         ClearAll();
     }
 

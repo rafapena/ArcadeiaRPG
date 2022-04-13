@@ -64,6 +64,6 @@ public abstract class TargetField : MonoBehaviour
     public void NotifyTriggerExit(Collider2D collision)
     {
         ScopeHitBox hb = collision.gameObject.GetComponent<ScopeHitBox>();
-        if (hb && !hb.Battler.LockSelectTrigger && AimingPlayer != null && AimingPlayer.Phase == Battler.Phases.DecidingAction) hb.Battler.Select(false);
+        if (hb && !hb.Battler.LockSelectTrigger && AimingPlayer != null && AimingPlayer.IsDecidingAction) hb.Battler.Select(false);
     }
 }

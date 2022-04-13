@@ -7,22 +7,17 @@ using UnityEngine.UI;
 
 public abstract class BattlerAI : Battler
 {
-    public List<AIAction> AIActions;
+    public List<AIAction> WeaponAI;
+    public List<AIAction> SkillAI;
+    public List<AIAction> ItemAI;
+
+    [HideInInspector]
+    public bool IsSummon;
 
     protected override void Awake()
     {
         base.Awake();
         HUDProperties.Name.text = Name.ToUpper();
-
-        foreach (AIAction ait in AIActions)
-        {
-            if (!ait.Action) continue;
-            switch (ait.Action.GetType().Name)
-            {
-                case "Weapon": Weapons.Add(ait.Action as Weapon); break;
-                case "Skill": Skills.Add(ait.Action as Skill); break;
-            }
-        }
     }
 
     public void SetUI(bool show)
@@ -35,6 +30,11 @@ public abstract class BattlerAI : Battler
         HUDProperties.Next.SetActive(visible);
     }
 
+    protected override void MapGameObjectsToHUD()
+    {
+        // StateEffects
+    }
+
     public override void StatConversion()
     {
         if (Class) Stats.SetTo(Class.BaseStats);
@@ -43,10 +43,9 @@ public abstract class BattlerAI : Battler
         SP = 100;
     }
 
-    protected override Skill GetDefaultSkill()
-    {
-        return Skills[0];   // Always assume that AI has at least one Solo Skill
-    }
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// -- Deciding action and target --
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public void MakeDecision<T, U>(List<T> usersPartyMembers, List<U> opponentPartyMembers) where T : Battler where U : Battler
     {
@@ -63,7 +62,7 @@ public abstract class BattlerAI : Battler
 
     protected ActiveTool SelectTool<T, U>(List<T> usersPartyMembers, List<U> opponentPartyMembers) where T : Battler where U : Battler
     {
-        return AIActions[0].Action;
+        return null;
     }
 
     protected void SelectTargets<T, U>(List<T> usersPartyMembers, List<U> opponentPartyMembers) where T : Battler where U : Battler
@@ -71,8 +70,19 @@ public abstract class BattlerAI : Battler
         opponentPartyMembers[Random.Range(0, opponentPartyMembers.Count)].Select(true);
     }
 
-    protected override void MapGameObjectsToHUD()
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// -- General HP/SP Management --
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public override void MaxHPSP()
     {
-        // StateEffects
+        base.MaxHPSP();
+        HUDProperties.Gauge.Fill();
+    }
+
+    public override void ChangeHP(int val)
+    {
+        base.ChangeHP(val);
+        HUDProperties.Gauge.SetAndAnimate(HP, Stats.MaxHP);
     }
 }

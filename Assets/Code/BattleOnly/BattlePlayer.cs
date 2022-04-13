@@ -6,6 +6,10 @@ using UnityEngine.UI;
 
 public abstract class BattlePlayer : Battler
 {
+    public bool HasAnySkills => Skills.Count > 0;
+    [HideInInspector] public List<Skill> Skills = new List<Skill>();
+    [HideInInspector] public bool IsDecidingAction;
+
     public Stats NaturalStats;
     public int PartnerAccBoostRate = 100;
     public int PartnerCritBoostRate = 100;
@@ -16,10 +20,11 @@ public abstract class BattlePlayer : Battler
     public List<BattlerClass> ClassSet;
     public List<SkillLearnLevel> SkillSet;
     private bool ArrowKeyMovement;
+    private BattleMenu BattleMenu;
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- Setup --
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     protected override void Start()
     {
@@ -31,19 +36,6 @@ public abstract class BattlePlayer : Battler
     protected override void MapGameObjectsToHUD()
     {
         // StateEffects
-    }
-
-    protected override Skill GetDefaultSkill()
-    {
-        Skill sk = BasicAttackSkill;
-        sk.ConvertToWeaponSettings(SelectedWeapon);
-        return sk;
-    }
-
-    public void SetBattlePositions(VerticalPositions vp, HorizontalPositions hp)
-    {
-        RowPosition = vp;
-        ColumnPosition = hp;
     }
 
     public override void StatConversion()
@@ -60,18 +52,76 @@ public abstract class BattlePlayer : Battler
         foreach (SkillLearnLevel sk in skills) Skills.Add(sk.LearnedSkill);
     }
 
+    public void SetBattleMenu(BattleMenu bm)
+    {
+        BattleMenu = bm;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// -- Update --
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    protected override void Update()
+    {
+        if (IsDecidingAction) Movement = ArrowKeyMovement ? InputMaster.GetCustomMovementControls(KeyCode.W, KeyCode.S, KeyCode.A, KeyCode.D) : Vector3.zero;
+        base.Update();
+    }
+
     public void EnableArrowKeyMovement() => ArrowKeyMovement = true;
 
     public void DisableArrowKeyMovement() => ArrowKeyMovement = false;
 
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// -- Update --
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// -- Class/Equip Management --
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    protected override void Update()
+    public int Equip<T>(T equipment) where T : IToolEquippable
     {
-        if (Phase == Phases.DecidingAction) Movement = ArrowKeyMovement ? InputMaster.GetCustomMovementControls(KeyCode.W, KeyCode.S, KeyCode.A, KeyCode.D) : Vector3.zero;
-        base.Update();
+        if (MaxEquipment) return -1;
+        else if (equipment is Weapon wp)
+        {
+            Weapons.Add(wp);
+            return Weapons.Count - 1;
+        }
+        else // equipment is Accessory
+        {
+            Accessories.Add(equipment as Accessory);
+            return Accessories.Count - 1;
+        }
+    }
+
+    public IToolEquippable Unequip<T>(int index) where T : IToolEquippable
+    {
+        if (typeof(T).Name.Equals("Weapon") && index >= 0 && index < Weapons.Count)
+        {
+            Weapon weapon = Weapons[index];
+            Weapons.RemoveAt(index);
+            return weapon;
+        }
+        else if (typeof(T).Name.Equals("Accessory") && index >= 0 && index < Accessories.Count)
+        {
+            Accessory accessory = Accessories[index];
+            Accessories.RemoveAt(index);
+            return accessory;
+        }
+        else return default(T);
+    }
+
+    public int Unequip<T>(T tool) where T : IToolEquippable
+    {
+        int index = 0;
+        if (tool is Weapon && Weapons.Count > 0)
+        {
+            index = Weapons.FindIndex(x => x.Id == tool.Info.Id && x.Name.Equals(tool.Info.Name));
+            Weapons.RemoveAt(index);
+        }
+        else if (tool is Accessory && Accessories.Count > 0)
+        {
+            index = Accessories.FindIndex(x => x.Id == tool.Info.Id && x.Name.Equals(tool.Info.Name));
+            Accessories.RemoveAt(index);
+        }
+        else return -1;
+        return index;
     }
 
     // Note: Must handle equipment management elsewhere (e.g. ChangeClass.cs)
@@ -85,9 +135,22 @@ public abstract class BattlePlayer : Battler
         AddLearnedSkills();
     }
 
-    public void SetRelation(int id, int level)
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// -- General HP/SP Management --
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public override void MaxHPSP()
     {
-        //PlayerCompanionships[id] = 0;
-        //for (int i = 1; i <= level; i++) PlayerCompanionships[id] += 10 * i;
+        base.MaxHPSP();
+    }
+
+    public override void ChangeHP(int val)
+    {
+        base.ChangeHP(val);
+    }
+
+    public override void ChangeSP(int val)
+    {
+        base.ChangeSP(val);
     }
 }

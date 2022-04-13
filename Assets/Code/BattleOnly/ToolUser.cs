@@ -4,6 +4,9 @@ using UnityEngine.Events;
 
 public abstract class ToolUser : BaseObject
 {
+    public enum CombatRangeTypes { Close, Medium, Far, ClassDependent }
+    public CombatRangeTypes CombatRangeType;
+
     protected Battle CurrentBattle;
     protected Battler User => CurrentBattle.ActingBattler;
     protected ActiveTool Action => CurrentBattle.ActingBattler.SelectedTool;
@@ -58,8 +61,8 @@ public abstract class ToolUser : BaseObject
     {
         if (CurrentActionTimer >= 1f)
         {
-            CurrentBattle.NotifyDoneUsingAction();
             ResetActionExecution();
+            CurrentBattle.NotifyToSwitchInBattlePhase();
         }
     }
 
@@ -84,8 +87,8 @@ public abstract class ToolUser : BaseObject
     {
         ResetActionExecution();
         StartUseTimer();
-        UsingUniqueBasicAttack = true;
         UseUniqueBasicAttack();
+        UsingUniqueBasicAttack = true;
     }
 
     protected virtual void UseUniqueBasicAttack() { }
@@ -100,8 +103,8 @@ public abstract class ToolUser : BaseObject
     {
         ResetActionExecution();
         StartUseTimer();
+        UseSkillsLists[Action.Id].Invoke();
         CurrentSkillUsed = Action.Id;
-        UseSkillsLists[CurrentSkillUsed].Invoke();
     }
 
     protected virtual void UseSkill_0() { }
@@ -128,6 +131,11 @@ public abstract class ToolUser : BaseObject
 
     protected virtual void AnimatingSkill_5() { }
 
+    public virtual void AnimatingCharging()
+    {
+        //
+    }
+
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- Item usage --
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -136,8 +144,9 @@ public abstract class ToolUser : BaseObject
     {
         ResetActionExecution();
         StartUseTimer();
-        CurrentItemModeUsed = (int)selectedItem.UseType;
-        ItemUseList[CurrentItemModeUsed].Invoke();
+        int mode = (int)selectedItem.UseType;
+        ItemUseList[mode].Invoke();
+        CurrentItemModeUsed = mode;
     }
 
     protected virtual void ItemUse_0()
@@ -182,6 +191,15 @@ public abstract class ToolUser : BaseObject
         p.Direct(Vector3.right);
         return p;
     }
+
+    protected void SummonBattler(BattlerAI b0)
+    {
+        BattlerAI b = CurrentBattle.InstantiateBattler(b0, User.TargetFieldDestination);
+        b.IsSummon = true;
+        if (b is BattleAlly a) CurrentBattle.PlayerParty.Allies.Add(a);
+        else if (b is BattleEnemy e) CurrentBattle.EnemyParty.Enemies.Add(e);
+    }
+
 
     protected bool PassedTime(float time, int actionSwitchNumber)
     {

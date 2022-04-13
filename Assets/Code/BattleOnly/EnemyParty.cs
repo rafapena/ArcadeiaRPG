@@ -6,6 +6,7 @@ public class EnemyParty : BaseObject
     public enum EnemyPartyModes { Regular, Boss, FinalBoss }
 
     public List<BattleEnemy> Enemies;
+    public List<Item> ItemInventory;
     public bool RunDisabled;
     public EnemyPartyModes PartyMode;
     public bool GameOverOnLose = true;

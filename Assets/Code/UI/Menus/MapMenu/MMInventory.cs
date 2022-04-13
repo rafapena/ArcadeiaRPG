@@ -50,6 +50,7 @@ public class MMInventory : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOp
     private List<Battler> SelectableTeammatesUse;
     private List<Battler> SelectableTeammatesEquip;
     private bool SelectAllTeammates;
+    private BattlePlayer SelectedPlayerForEquipping;
 
     // Delay after an item/weapon has been used/equipped
     private float DoneTimer;
@@ -433,6 +434,7 @@ public class MMInventory : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOp
             {
                 if (Selection == Selections.CharacterEquipsList) SetupEquippedTools();   // Can reclick another teammate, while selecting equipment from current teammate
                 PartyList.SelectedObject = SelectableTeammatesEquip[index];
+                SelectedPlayerForEquipping = PartyList.SelectedObject as BattlePlayer;
                 MenuMaster.KeepHighlightedSelected(ref PartyList.SelectedButton);
                 SetupCharacterEquipsList();
             }
@@ -558,10 +560,10 @@ public class MMInventory : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOp
         IToolEquippable tool = InventoryFrame.ToolList.SelectedObject as IToolEquippable;
         if (switchOut)
         {
-            PartyList.SelectedObject.Unequip(EquippedToolList.SelectedObject as IToolEquippable);
+            SelectedPlayerForEquipping.Unequip(EquippedToolList.SelectedObject as IToolEquippable);
             MenuManager.PartyInfo.Inventory.Add(EquippedToolList.SelectedObject);
         }
-        PartyList.SelectedObject.Equip(tool);
+        SelectedPlayerForEquipping.Equip(tool);
         MenuManager.PartyInfo.Inventory.Remove(tool);
 
         RefreshInventoryTabs();

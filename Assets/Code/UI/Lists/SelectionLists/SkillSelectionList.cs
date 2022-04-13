@@ -41,7 +41,7 @@ public class SkillSelectionList : SelectionList_Super<Skill>
         Container.GetComponent<MenuFrame>().Deactivate();
     }
 
-    public void Refresh(Battler b, List<Battler> bg)
+    public void Refresh(BattlePlayer b, List<Battler> bg)
     {
         BattlersGroup = bg;
         ReferenceBattler = b;

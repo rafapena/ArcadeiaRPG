@@ -51,8 +51,9 @@ public abstract class BattlerClass : ToolUser
     {
         ResetActionExecution();
         StartUseTimer();
-        CurrentBasicAttackWeaponUsed = selectedWeapon ? (int)selectedWeapon.WeaponType : 0;
-        UseBasicAttackLists[CurrentBasicAttackWeaponUsed].Invoke();
+        int mode = (int)(selectedWeapon?.WeaponType ?? 0);
+        UseBasicAttackLists[mode].Invoke();
+        CurrentBasicAttackWeaponUsed = mode;
     }
 
     protected virtual void UseBasicAttack_Weaponless() { }
