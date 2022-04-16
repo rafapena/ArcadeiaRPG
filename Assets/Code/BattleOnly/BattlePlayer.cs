@@ -37,7 +37,6 @@ public abstract class BattlePlayer : Battler
     {
         base.Start();
         Direction = Vector3.right;
-        Speed = 6;
     }
 
     protected override void MapGameObjectsToHUD()

@@ -81,9 +81,7 @@ public abstract class BattlerAI : Battler
 
     public void MakeDecision<T, U>(IList<T> usersPartyMembers, IList<U> opponentPartyMembers) where T : Battler where U : Battler
     {
-        if (!CanDoAction) return;
-        PossibleTargets.Clear();
-        
+        PossibleTargets.Clear();   
         SelectedAction = SelectAction(usersPartyMembers, opponentPartyMembers);
         if (!SelectedAction) return;
 

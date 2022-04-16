@@ -137,7 +137,7 @@ MonoBehaviour:
   Direction: {x: 0, y: 0, z: 0}
   Movement: {x: 0, y: 0, z: 0}
   Speed: 0
-  TargetFieldDestination: {x: 0, y: 0, z: 0}
+  ApproachDestination: {x: 0, y: 0, z: 0}
   MainImage: {fileID: 0}
   FaceImage: {fileID: 0}
   Level: 1
@@ -172,11 +172,12 @@ MonoBehaviour:
     Cev: 100
   Accessories: []
   LockSelectTrigger: 0
-  SelectedTool: {fileID: 0}
+  SelectedAction: {fileID: 0}
   SelectedWeapon: {fileID: 0}
   IsCharging: 0
   States: []
   BasicAttackSkill: {fileID: 0}
+  SelectedSingleMeeleeTarget: {fileID: 0}
   ExecutedAction: 0
   HitCritical: 0
   HitWeakness: 0

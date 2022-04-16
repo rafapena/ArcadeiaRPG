@@ -257,20 +257,24 @@ public class Battle : MonoBehaviour
         BattleMenu.ClearAllTurnIndicatorLabels();
         GetNextFastestAvailableBattlers();
 
-        Phase = BattlePhases.DecidingAction;
-        if (ActingBattler is BattlePlayer p)
+        if (ActingBattler.CanDoAction)
         {
-            BattleMenu.Setup(p);
+            Phase = BattlePhases.DecidingAction;
+            if (ActingBattler is BattlePlayer p)
+            {
+                BattleMenu.Setup(p);
+            }
+            else // Ally or enemy
+            {
+                BattleMenu.Hide();
+                BattleMenu.DeclareCurrent(ActingBattler);
+                BattleMenu.DeclareNext(NextActingBattler);
+                if (ActingBattler is BattleAlly ally) ally.MakeDecision(FightingPlayerParty.ToList(), EnemyParty.Enemies);
+                else if (ActingBattler is BattleEnemy enemy) enemy.MakeDecision(EnemyParty.Enemies, FightingPlayerParty.ToList());
+                PrepareForAction();
+            }
         }
-        else // Ally or enemy
-        {
-            BattleMenu.Hide();
-            BattleMenu.DeclareCurrent(ActingBattler);
-            BattleMenu.DeclareNext(NextActingBattler);
-            if (ActingBattler is BattleAlly ally) ally.MakeDecision(FightingPlayerParty.ToList(), EnemyParty.Enemies);
-            else if (ActingBattler is BattleEnemy enemy) enemy.MakeDecision(EnemyParty.Enemies, FightingPlayerParty.ToList());
-            PrepareForAction();
-        }
+        else ActionEnd();
     }
 
     private List<Battler> SortBattlersBySpeed(List<Battler> battlers, int speedRandomLow, int speedRandomHigh)
