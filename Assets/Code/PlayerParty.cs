@@ -119,10 +119,13 @@ public class PlayerParty : MonoBehaviour
         b.StatConversion();
         b.HP = PlayerPrefs.GetInt(bt + "HP_" + file);
         b.SP = PlayerPrefs.GetInt(bt + "SP_" + file);
-        b.Weapons = LoadBattlersList(file, b, ResourcesMaster.Weapons, bt);
+        if (b is BattlePlayer p)
+        {
+            string sw = bt + "SelectedWeapon_" + file;
+            if (PlayerPrefs.HasKey(sw)) p.SelectedWeapon = p.Weapons.Find(x => x.Id == PlayerPrefs.GetInt(sw));
+            p.Weapons = LoadBattlersList(file, b, ResourcesMaster.Weapons, bt);
+        }
         b.States = LoadBattlersList(file, b, ResourcesMaster.States, bt);
-        string sw = bt + "SelectedWeapon_" + file;
-        if (PlayerPrefs.HasKey(sw)) b.SelectedWeapon = b.Weapons.Find(x => x.Id == PlayerPrefs.GetInt(sw));
         b.gameObject.SetActive(false);
         return b as T;
     }

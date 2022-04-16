@@ -6,19 +6,26 @@ using UnityEngine.UI;
 
 public abstract class BattlePlayer : Battler
 {
+    // Equipmet
+    public List<Weapon> Weapons;
+    public List<IToolEquippable> Equipment => Weapons.Cast<IToolEquippable>().Concat(Accessories.Cast<IToolEquippable>()).ToList();
+    public bool MaxEquipment => Weapons.Count + Accessories.Count == BattleMaster.MAX_NUMBER_OF_EQUIPS;
+
+    // Skills
     public bool HasAnySkills => Skills.Count > 0;
+    public List<SkillLearnLevel> SkillSet;
     [HideInInspector] public List<Skill> Skills = new List<Skill>();
     [HideInInspector] public bool IsDecidingAction;
 
     public Stats NaturalStats;
+    public List<BattlerClass> ClassSet;
     public int PartnerAccBoostRate = 100;
     public int PartnerCritBoostRate = 100;
     public int SavePartnerRate = 100;
     public int CounterattackRate = 100;
     public int AssistDamageRate = 100;
     public int StatBoostsRate = 100;
-    public List<BattlerClass> ClassSet;
-    public List<SkillLearnLevel> SkillSet;
+
     private bool ArrowKeyMovement;
     private BattleMenu BattleMenu;
 

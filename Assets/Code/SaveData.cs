@@ -104,10 +104,13 @@ public class SaveData
         PlayerPrefs.SetInt(bt + "Id_" + File, b.Id);
         PlayerPrefs.SetInt(bt + "HP_" + File, b.HP);
         PlayerPrefs.SetInt(bt + "SP_" + File, b.SP);
-        SaveBattlersList(b.Weapons, bt);
+        if (b is BattlePlayer p)
+        {
+            SaveBattlersList(p.Weapons, bt);
+            if (p.Weapons.Count > 0) PlayerPrefs.SetInt(bt + "SelectedWeapon_" + File, p.SelectedWeapon.Id);
+        }
         SaveBattlersList(b.Accessories, bt);
         SaveBattlersList(b.States, bt);
-        if (b.Weapons.Count > 0) PlayerPrefs.SetInt(bt + "SelectedWeapon_" + File, b.SelectedWeapon.Id);
     }
 
     private void SaveBattlersList<T>(List<T> list, string pre) where T : BaseObject

@@ -4,12 +4,12 @@ using UnityEngine.Events;
 
 public abstract class ToolUser : BaseObject
 {
-    public enum CombatRangeTypes { Close, Medium, Far, ClassDependent }
+    public enum CombatRangeTypes { Any, Close, Medium, Far }
     public CombatRangeTypes CombatRangeType;
 
     protected Battle CurrentBattle;
     protected Battler User => CurrentBattle.ActingBattler;
-    protected ActiveTool Action => CurrentBattle.ActingBattler.SelectedTool;
+    protected ActiveTool Action => CurrentBattle.ActingBattler.SelectedAction;
 
     private bool UsingUniqueBasicAttack;
     private int CurrentSkillUsed;
@@ -188,13 +188,13 @@ public abstract class ToolUser : BaseObject
         Projectile p = Instantiate(p0, User.transform);
         p.transform.position = User.transform.position;
         p.SetBattleInfo(User, Action);
-        p.Direct(Vector3.right);
+        p.Direct(User.Direction);
         return p;
     }
 
     protected void SummonBattler(BattlerAI b0)
     {
-        BattlerAI b = CurrentBattle.InstantiateBattler(b0, User.TargetFieldDestination);
+        BattlerAI b = CurrentBattle.InstantiateBattler(b0, User.ApproachDestination);
         b.IsSummon = true;
         if (b is BattleAlly a) CurrentBattle.PlayerParty.Allies.Add(a);
         else if (b is BattleEnemy e) CurrentBattle.EnemyParty.Enemies.Add(e);

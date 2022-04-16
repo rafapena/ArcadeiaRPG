@@ -90,31 +90,20 @@ MonoBehaviour:
   Id: 0
   Name: Jelly Guy
   Description: It's a bad guy! Run for your lives!
+  CombatRangeType: 1
   RowPosition: 0
   ColumnPosition: 0
   Figure: {fileID: 0}
-  Phase: 0
   Direction: {x: 0, y: 0, z: 0}
+  Movement: {x: 0, y: 0, z: 0}
   Speed: 0
+  ApproachDestination: {x: 0, y: 0, z: 0}
   MainImage: {fileID: 0}
   FaceImage: {fileID: 0}
   Level: 1
   Class: {fileID: 0}
   HP: 0
   SP: 0
-  Stats:
-    MaxHP: 30
-    Atk: 30
-    Def: 30
-    Map: 30
-    Mar: 30
-    Spd: 30
-    Tec: 30
-    Luk: 30
-    Acc: 100
-    Eva: 100
-    Crt: 100
-    Cev: 100
   StatBoosts:
     MaxHP: 0
     Atk: 0
@@ -128,14 +117,28 @@ MonoBehaviour:
     Eva: 0
     Crt: 0
     Cev: 0
-  Skills: []
-  Weapons: []
+  Stats:
+    MaxHP: 30
+    Atk: 30
+    Def: 30
+    Map: 30
+    Mar: 30
+    Spd: 30
+    Tec: 30
+    Luk: 30
+    Acc: 100
+    Eva: 100
+    Crt: 100
+    Cev: 100
   Accessories: []
   LockSelectTrigger: 0
-  SelectedTool: {fileID: 0}
+  SelectedAction: {fileID: 0}
   SelectedWeapon: {fileID: 0}
+  IsCharging: 0
   States: []
   BasicAttackSkill: {fileID: 0}
+  SelectedSingleMeeleeTarget: {fileID: 0}
+  ExecutedAction: 0
   HitCritical: 0
   HitWeakness: 0
   HitResistant: 0
@@ -170,68 +173,56 @@ MonoBehaviour:
   - Action: {fileID: 3740935258760432590}
     ClassSkillId: 0
     Priority: 0
-    Turn: 0
-    HPLow: 0
-    HPHigh: 0
-    SPLow: 0
-    SPHigh: 0
-    AllyCondition: 0
-    FoeCondition: 0
-    UserCondition: 0
-    TargetToolElement: 0
-    ActiveStates: []
-    InactiveStates: []
-    TargetElementRate: []
-    TargetStateRates: []
-    TargetStatConditions:
-      MaxHP: 0
-      Atk: 0
-      Def: 0
-      Map: 0
-      Mar: 0
-      Spd: 0
-      Tec: 0
-      Luk: 0
-      Acc: 0
-      Eva: 0
-      Crt: 0
-      Cev: 0
+    PriorityOnFail: 0
+    UserCondition:
+      HPLow: 0
+      HPHigh: 0
+      SPLow: 0
+      SPHigh: 0
+      AnyActiveStates: []
+      AllInactiveStates: []
+    TargetCondition:
+      Condition:
+        HPLow: 0
+        HPHigh: 0
+        SPLow: 0
+        SPHigh: 0
+        AnyActiveStates: []
+        AllInactiveStates: []
+      RangeType: 0
+    CurrentPriority: 0
+    PossibleTargets: []
   - Action: {fileID: 8841780359579117350}
     ClassSkillId: 0
     Priority: 0
-    Turn: 0
-    HPLow: 0
-    HPHigh: 0
-    SPLow: 0
-    SPHigh: 0
-    AllyCondition: 0
-    FoeCondition: 0
-    UserCondition: 0
-    TargetToolElement: 0
-    ActiveStates: []
-    InactiveStates: []
-    TargetElementRate: []
-    TargetStateRates: []
-    TargetStatConditions:
-      MaxHP: 0
-      Atk: 0
-      Def: 0
-      Map: 0
-      Mar: 0
-      Spd: 0
-      Tec: 0
-      Luk: 0
-      Acc: 0
-      Eva: 0
-      Crt: 0
-      Cev: 0
+    PriorityOnFail: 0
+    UserCondition:
+      HPLow: 0
+      HPHigh: 0
+      SPLow: 0
+      SPHigh: 0
+      AnyActiveStates: []
+      AllInactiveStates: []
+    TargetCondition:
+      Condition:
+        HPLow: 0
+        HPHigh: 0
+        SPLow: 0
+        SPHigh: 0
+        AnyActiveStates: []
+        AllInactiveStates: []
+      RangeType: 0
+    CurrentPriority: 0
+    PossibleTargets: []
+  IsSummon: 0
   Exp: 300
   Gold: 100
   DroppedItems: []
   DroppedWeapons: []
   MultiplyHP: 50
   ExtraTurns: 0
-  IsSummon: 0
+  JellyFist: {fileID: 8282308100824431874, guid: 9e5016818a16d734d9353a63b64b4f41,
+    type: 3}
 --- !u!114 &3740935258760432590
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -265,11 +256,10 @@ MonoBehaviour:
   Accuracy: 90
   Variance: 0
   ClassExclusives: []
-  ChangedStatesGiveRate: []
-  ChangedStatesReceiveRate: []
-  Disabled: 0
+  StatesGiveRate: []
+  StatesReceiveRate: []
   Image: {fileID: 0}
-  Basic: 1
+  Basic: 0
   ClassSkill: 0
   SPConsume: 0
   Charge: 0
@@ -294,31 +284,30 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   Id: 1
-  Name: Sime Rush
+  Name: Slime Rush
   Description: 
-  Type: 0
-  Formula: 0
-  ActionTime: 0
-  HPModType: 0
+  Type: 1
+  Formula: 1
+  ActionTime: 2
+  HPModType: 1
   SPModType: 0
   HPAmount: 0
   HPPercent: 0
   SPPecent: 0
   HPRecoil: 0
-  Scope: 0
+  Scope: 1
   Element: 0
   AlwaysHits: 0
-  Power: 10
+  Power: 20
   Range: 50
   CriticalRateBoost: 0
   Accuracy: 100
   Variance: 0
   ClassExclusives: []
-  ChangedStatesGiveRate: []
-  ChangedStatesReceiveRate: []
-  Disabled: 0
+  StatesGiveRate: []
+  StatesReceiveRate: []
   Image: {fileID: 0}
-  Basic: 1
+  Basic: 0
   ClassSkill: 0
   SPConsume: 0
   Charge: 0

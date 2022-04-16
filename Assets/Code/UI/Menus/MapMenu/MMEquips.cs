@@ -110,8 +110,8 @@ public class MMEquips : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOpera
         SelectedPlayer = PartyList.SelectedObject as BattlePlayer;
         EquippedToolsOwner.text = PartyList.SelectedObject.Name.ToUpper();
         EquippedToolsFrame.Activate();
-        EquippedTools.Refresh(PartyList.SelectedObject.Equipment, BattleMaster.MAX_NUMBER_OF_EQUIPS, true);
-        StatsList.Setup(PartyList.SelectedObject as BattlePlayer);
+        EquippedTools.Refresh(SelectedPlayer.Equipment, BattleMaster.MAX_NUMBER_OF_EQUIPS, true);
+        StatsList.Setup(SelectedPlayer);
         StatsList.gameObject.SetActive(true);
     }
 
@@ -209,7 +209,7 @@ public class MMEquips : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOpera
         else if (SelectingEquipment)
         {
             InventoryFrame.DeactivateSorter();
-            if (PartyList.SelectedObject.MaxEquipment) SetupToolSwap();
+            if (SelectedPlayer.MaxEquipment) SetupToolSwap();
             else EquipTool();
         }
     }
@@ -247,7 +247,7 @@ public class MMEquips : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOpera
         IToolEquippable tool = EquippedTools.SelectedObject as IToolEquippable;
         SelectedPlayer.Unequip(tool);
         MenuManager.PartyInfo.Inventory.Add(tool);
-        EquippedTools.Refresh(PartyList.SelectedObject.Equipment, BattleMaster.MAX_NUMBER_OF_EQUIPS, true);
+        EquippedTools.Refresh(SelectedPlayer.Equipment, BattleMaster.MAX_NUMBER_OF_EQUIPS, true);
         RefreshInventoryEquipTabs(tool, true);
     }
 
@@ -256,7 +256,7 @@ public class MMEquips : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOpera
         IToolEquippable tool = InventoryFrame.ToolList.SelectedObject as IToolEquippable;
         SelectedPlayer.Equip(tool);
         MenuManager.PartyInfo.Inventory.Remove(tool);
-        EquippedTools.Refresh(PartyList.SelectedObject.Equipment, BattleMaster.MAX_NUMBER_OF_EQUIPS, true);
+        EquippedTools.Refresh(SelectedPlayer.Equipment, BattleMaster.MAX_NUMBER_OF_EQUIPS, true);
         RefreshInventoryEquipTabs(tool);
     }
 
@@ -288,7 +288,7 @@ public class MMEquips : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOpera
         SelectedPlayer.Equip(inventoryTool);
         MenuManager.PartyInfo.Inventory.Add(equippedTool);
         MenuManager.PartyInfo.Inventory.Remove(inventoryTool);
-        EquippedTools.Refresh(PartyList.SelectedObject.Equipment, BattleMaster.MAX_NUMBER_OF_EQUIPS, true);
+        EquippedTools.Refresh(SelectedPlayer.Equipment, BattleMaster.MAX_NUMBER_OF_EQUIPS, true);
         RefreshInventoryEquipTabs(inventoryTool, true);
     }
 
@@ -299,7 +299,7 @@ public class MMEquips : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOpera
     public void AutoEquip()
     {
         if (Selection != Selections.SelectTool) return;
-        List<IToolEquippable> equips = PartyList.SelectedObject.Equipment;
+        List<IToolEquippable> equips = SelectedPlayer.Equipment;
         foreach (IToolEquippable tool in equips)
         {
             SelectedPlayer.Unequip(tool);

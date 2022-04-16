@@ -130,30 +130,20 @@ MonoBehaviour:
   Id: 0
   Name: Ally Guy
   Description: Exists in this world, temporarliy
+  CombatRangeType: 2
   RowPosition: 0
   ColumnPosition: 0
   Figure: {fileID: 0}
-  Phase: 0
+  Direction: {x: 0, y: 0, z: 0}
+  Movement: {x: 0, y: 0, z: 0}
   Speed: 0
+  TargetFieldDestination: {x: 0, y: 0, z: 0}
   MainImage: {fileID: 0}
   FaceImage: {fileID: 0}
   Level: 1
   Class: {fileID: 0}
   HP: 0
   SP: 0
-  Stats:
-    MaxHP: 40
-    Atk: 40
-    Def: 40
-    Map: 40
-    Mar: 40
-    Spd: 10
-    Tec: 40
-    Luk: 40
-    Acc: 100
-    Eva: 100
-    Crt: 100
-    Cev: 100
   StatBoosts:
     MaxHP: 0
     Atk: 0
@@ -167,14 +157,27 @@ MonoBehaviour:
     Eva: 0
     Crt: 0
     Cev: 0
-  Skills: []
-  Weapons: []
+  Stats:
+    MaxHP: 40
+    Atk: 40
+    Def: 40
+    Map: 40
+    Mar: 40
+    Spd: 10
+    Tec: 40
+    Luk: 40
+    Acc: 100
+    Eva: 100
+    Crt: 100
+    Cev: 100
   Accessories: []
   LockSelectTrigger: 0
   SelectedTool: {fileID: 0}
   SelectedWeapon: {fileID: 0}
+  IsCharging: 0
   States: []
   BasicAttackSkill: {fileID: 0}
+  ExecutedAction: 0
   HitCritical: 0
   HitWeakness: 0
   HitResistant: 0
@@ -205,5 +208,5 @@ MonoBehaviour:
   ContactSpread: 
   ElementRates: 
   StateRates: 
-  ToolAI: []
+  AIActions: []
   IsSummon: 0

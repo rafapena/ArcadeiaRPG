@@ -106,7 +106,7 @@ public class SkillSelectionList : SelectionList_Super<Skill>
         if (!skill.CanUseOutsideOfBattle && !SceneMaster.InBattle) msg = "CANNOT USE OUTSIDE OF BATTLE";
         else if (!skill.EnoughSPFrom(ReferenceBattler)) msg = "NOT ENOUGH SP TO USE";
         else if (!skill.UsedByClassUser(ReferenceBattler)) msg = "MUST BE A " + skill.ClassExclusives[0].Name.ToUpper() + " TO USE";
-        else if (!skill.UsedByWeaponUser(ReferenceBattler)) msg = "MUST HAVE A " + skill.WeaponExclusives[0].ToString().ToUpper() + " TO USE";
+        else if (!skill.CheckExclusiveWeapon(ReferenceBattler)) msg = "MUST HAVE A " + skill.WeaponExclusives[0].ToString().ToUpper() + " TO USE";
         else if (!skill.AvailableTeammateTargets(BattlersGroup)) msg = "NO AVAILABLE SELECTIONS WITHIN SCOPE";
         return msg;
     }

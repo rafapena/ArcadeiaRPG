@@ -9,7 +9,7 @@ public abstract class ActiveTool : BaseObject
 
     public enum ScopeType
     {
-        None, OneEnemy, OneArea, StraightThrough, Widespread, AllEnemies,
+        None, OneEnemy, OneArea, StraightThrough, AllEnemies,
         Self, OneAlly, OneKnockedOutAlly, AllAllies, AllKnockedOutAllies,
         TrapSetup, Planting,
         EveryoneButSelf, Everyone
@@ -33,13 +33,8 @@ public abstract class ActiveTool : BaseObject
     public int Accuracy = 100;
     public int Variance;
     public List<BattlerClass> ClassExclusives;
-    public StateRate[] ChangedStatesGiveRate;
-    public StateRate[] ChangedStatesReceiveRate;
-
-    [HideInInspector]
-    public bool Disabled;
-    private StateRate[] StatesGiveRate;
-    private StateRate[] StatesReceiveRate;
+    public StateRate[] StatesGiveRate;
+    public StateRate[] StatesReceiveRate;
 
     public bool Ranged => Range > 30;
 
@@ -158,10 +153,10 @@ public abstract class ActiveTool : BaseObject
 
     public bool UsedByClassUser(Battler battler)
     {
-        return ClassExclusives.Count == 0 || ClassExclusives.Contains(battler.Class);
+        return !battler.Class || ClassExclusives.Count == 0 || battler.Class && ClassExclusives.Contains(battler.Class);
     }
 
-    public bool AvailableTeammateTargets(List<Battler> battlersGroup)
+    public bool AvailableTeammateTargets(IEnumerable<Battler> battlersGroup)
     {
         switch (Scope)
         {

@@ -38,7 +38,7 @@ public class Projectile : MonoBehaviour
     private float GetAngleFromVectorFloat(Vector3 dir)
     {
         dir = dir.normalized;
-        float n = Mathf.Atan2(-dir.x, dir.y) * Mathf.Rad2Deg;
+        float n = Mathf.Atan2(-dir.x, dir.y) * Mathf.Rad2Deg + 90;
         if (n < 0) n += 360;
         return n;
     }

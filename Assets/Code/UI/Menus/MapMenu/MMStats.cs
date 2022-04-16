@@ -19,9 +19,9 @@ public class MMStats : MM_Super
     public Transform EquipmentList;
     public Transform WeaknessesList;
     public Transform StrengthsList;
-
-    [HideInInspector] private BattlePlayer SelectedPlayer;
-    [HideInInspector] private int SelectedPlayerIndex;
+    
+    private BattlePlayer SelectedPlayer;
+    private int SelectedPlayerIndex;
 
     public override void Open()
     {
@@ -48,13 +48,7 @@ public class MMStats : MM_Super
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- Party Buttons List --
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    public void Setup(BattlePlayer player, int index)
-    {
-        SelectedPlayer = player;
-        SelectedPlayerIndex = index;
-    }
-
+    
     public void SelectingOnButtonList()
     {
         SelectedPlayerIndex = EventSystem.current.currentSelectedGameObject.GetComponent<ListSelectable>().Index;

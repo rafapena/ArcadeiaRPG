@@ -39,8 +39,8 @@ public class Skill : ActiveTool
         Accuracy = w.Accuracy;
         CriticalRateBoost = w.CriticalRateBoost;
         ClassExclusives = w.ClassExclusives;
-        ChangedStatesGiveRate = w.ChangedStatesGiveRate;
-        ChangedStatesReceiveRate = w.ChangedStatesReceiveRate;
+        StatesGiveRate = w.StatesGiveRate;
+        StatesReceiveRate = w.StatesReceiveRate;
     }
 
     public void DisableForWarmup()
@@ -60,20 +60,6 @@ public class Skill : ActiveTool
         ChargeCount--;
     }
 
-    public List<int> SummonPlayers()
-    {
-        List<int> summonedIds = new List<int>();
-        //for (int i = 0; i < SummonedPlayers.Count; i++) if (Chance(SummonPlayerChances[i])) summonedIds.Add(SummonedPlayers[i].Id);
-        return summonedIds;
-    }
-
-    public List<int> SummonEnemies()
-    {
-        List<int> summonedIds = new List<int>();
-        //for (int i = 0; i < SummonedEnemies.Count; i++) if (Chance(SummonEnemyChances[i])) summonedIds.Add(SummonedEnemies[i].Id);
-        return summonedIds;
-    }
-
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- Use conditions --
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -88,8 +74,13 @@ public class Skill : ActiveTool
         return battler.SP >= SPConsume;
     }
 
-    public bool UsedByWeaponUser(Battler battler)
+    public bool CheckExclusiveWeapon(Battler battler)
     {
-        return WeaponExclusives.Count == 0 || WeaponExclusives.Contains(battler.SelectedWeapon.WeaponType);
+        return WeaponExclusives.Count == 0 || CheckExclusiveWeapon(battler.SelectedWeapon);
+    }
+
+    public bool CheckExclusiveWeapon(Weapon weapon)
+    {
+        return WeaponExclusives.Contains(weapon.WeaponType);
     }
 }

@@ -31,7 +31,6 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
         public DynamicTargetField SplashRange;
         public StaticTargetField SplashMeelee;
         public StaticTargetField StraightThrough;
-        public StaticTargetField Widespread;
     }
     public TargetFieldsGroup TargetFields;
 
@@ -55,7 +54,7 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
     public MenuFrame EnemyActionFrame;
     public TextMeshProUGUI EnemyActionName;
     private float SkillNameDisplayTimer;
-    private float SKILL_NAME_DISPLAY_TIME = 3f;
+    private float SKILL_NAME_DISPLAY_TIME = 2f;
     private bool ActivatedActionFrame;
 
     private void Start()
@@ -133,13 +132,20 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
         SelectItemsFrame.Deactivate();
     }
 
-    private void DeclareCurrent(BattlePlayer p)
+    public void DeclareCurrent(Battler actingBattler)
     {
         int i = 0;
-        foreach (Transform t in PartyList.transform)
+        if (actingBattler is BattlePlayer p)
         {
-            if (p.Id == PartyList.GetId(i++)) t.GetComponent<ListSelectable>().KeepHighlighted();
-            else t.GetComponent<ListSelectable>().ClearHighlights();
+            foreach (Transform t in PartyList.transform)
+            {
+                if (p.Id == PartyList.GetId(i++)) t.GetComponent<ListSelectable>().KeepHighlighted();
+                else t.GetComponent<ListSelectable>().ClearHighlights();
+            }
+        }
+        else if (actingBattler is BattlerAI ai)
+        {
+            //
         }
     }
 
@@ -150,7 +156,7 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
             int i = 0;
             foreach (Transform t in PartyList.transform) t.GetChild(6).gameObject.SetActive(nextP.Id == PartyList.GetId(i++));
         }
-        else if (nextActingBattler is BattlerAI nextA)
+        else if (nextActingBattler is BattleAlly nextA)
         {
             foreach (BattleAlly ally in CurrentBattle.PlayerParty.Allies) ally.SetNextLabel(nextA == ally);
         }
@@ -160,9 +166,13 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
         }
     }
 
-    public void ClearAllNextLabels()
+    public void ClearAllTurnIndicatorLabels()
     {
-        foreach (Transform t in PartyList.transform) t.GetChild(6).gameObject.SetActive(false);
+        foreach (Transform t in PartyList.transform)
+        {
+            t.GetComponent<ListSelectable>().ClearHighlights();
+            t.GetChild(6).gameObject.SetActive(false);
+        }
         foreach (BattleAlly ally in CurrentBattle.PlayerParty.Allies) ally.SetNextLabel(false);
         foreach (BattleEnemy enemy in CurrentBattle.EnemyParty.Enemies) enemy.SetNextLabel(false);
     }
@@ -213,7 +223,7 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
         EventSystem.current.SetSelectedGameObject(null);
 
         ActingPlayer.EnableArrowKeyMovement();
-        ActingPlayer.SelectedTool = ActingPlayer.BasicAttackSkill;
+        ActingPlayer.SelectedAction = ActingPlayer.BasicAttackSkill;
         ActingPlayer.TryConvertSkillToWeaponSettings();
         SetWeaponOnMenuAndCharacter();
         SetScopeTargetSearch();
@@ -278,13 +288,13 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
 
         ClearScope(true);
         ActingPlayer.DisableArrowKeyMovement();
-        ActingPlayer.SelectedTool = null;
+        ActingPlayer.SelectedAction = null;
     }
 
     public void SelectSkill()
     {
         if (!SelectSkillsList.CanSelectSkill) return;
-        ActingPlayer.SelectedTool = SelectSkillsList.SelectedObject;
+        ActingPlayer.SelectedAction = SelectSkillsList.SelectedObject;
         SetupForPositioning();
     }
 
@@ -309,7 +319,7 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
 
         ClearScope(true);
         ActingPlayer.DisableArrowKeyMovement();
-        ActingPlayer.SelectedTool = null;
+        ActingPlayer.SelectedAction = null;
     }
 
     private bool GetScopeUsability(IToolForInventory tool)
@@ -324,7 +334,7 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
     public void SelectToolSuccess()
     {
         SelectItemsList.ToolList.Selecting = false;
-        ActingPlayer.SelectedTool = SelectItemsList.ToolList.SelectedObject as Item;
+        ActingPlayer.SelectedAction = SelectItemsList.ToolList.SelectedObject as Item;
         SetupForPositioning();
     }
 
@@ -351,8 +361,8 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
         SelectItemsFrame.Deactivate();
         EventSystem.current.SetSelectedGameObject(null);
 
-        SelectedActiveTool.transform.GetChild(0).GetComponent<Image>().sprite = (ActingPlayer.SelectedTool is Skill sk) ? sk.Image : ActingPlayer.SelectedTool.GetComponent<SpriteRenderer>().sprite;
-        SelectedActiveTool.transform.GetChild(2).GetComponent<TextMeshProUGUI>().text = ActingPlayer.SelectedTool.Name.ToUpper();
+        SelectedActiveTool.transform.GetChild(0).GetComponent<Image>().sprite = (ActingPlayer.SelectedAction is Skill sk) ? sk.Image : ActingPlayer.SelectedAction.GetComponent<SpriteRenderer>().sprite;
+        SelectedActiveTool.transform.GetChild(2).GetComponent<TextMeshProUGUI>().text = ActingPlayer.SelectedAction.Name.ToUpper();
         JustSelectedToolTimer = Time.unscaledTime + JUST_SELECTED_TOOL_TIME_BUFFER;
 
         ActingPlayer.EnableArrowKeyMovement();
@@ -364,8 +374,8 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
     {
         if (Input.GetKeyDown(KeyCode.X))
         {
-            if (!ActingPlayer.UsingBasicAttack && ActingPlayer.SelectedTool is Skill) SetupForSelectSkill();
-            else if (ActingPlayer.SelectedTool is Item) SetupForSelectItem();
+            if (!ActingPlayer.UsingBasicAttack && ActingPlayer.SelectedAction is Skill) SetupForSelectSkill();
+            else if (ActingPlayer.SelectedAction is Item) SetupForSelectItem();
             else SetupForSelectAction();
         }
         else if (Input.GetKeyDown(KeyCode.Z)) FinalizeSelections();
@@ -381,11 +391,11 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
     private void SetScopeTargetSearch()
     {
         ClearScope(true);
-        switch (ActingPlayer.SelectedTool.Scope)
+        switch (ActingPlayer.SelectedAction.Scope)
         {
             case ActiveTool.ScopeType.OneEnemy:
                 TargetFields.Single.Activate(ActingPlayer);
-                if (ActingPlayer.SelectedTool.Ranged) AimAtNearestEnemy();
+                if (ActingPlayer.SelectedAction.Ranged) AimAtNearestEnemy();
                 else UpdateTarget = AimAtNearestEnemy;
                 break;
 
@@ -395,10 +405,6 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
 
             case ActiveTool.ScopeType.StraightThrough:
                 TargetFields.StraightThrough.Activate(ActingPlayer);
-                break;
-
-            case ActiveTool.ScopeType.Widespread:
-                TargetFields.Widespread.Activate(ActingPlayer);
                 break;
 
             case ActiveTool.ScopeType.AllEnemies:
@@ -414,13 +420,13 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
 
             case ActiveTool.ScopeType.OneAlly:
                 TargetFields.Single.Activate(ActingPlayer);
-                if (ActingPlayer.SelectedTool.Ranged) AimAtNearestPlayer();
+                if (ActingPlayer.SelectedAction.Ranged) AimAtNearestPlayer();
                 else UpdateTarget = AimAtNearestPlayer;
                 break;
 
             case ActiveTool.ScopeType.OneKnockedOutAlly:
                 TargetFields.Single.Activate(ActingPlayer);
-                if (ActingPlayer.SelectedTool.Ranged) AimAtNearestKOdPlayer();
+                if (ActingPlayer.SelectedAction.Ranged) AimAtNearestKOdPlayer();
                 else UpdateTarget = AimAtNearestKOdPlayer;
                 break;
 
@@ -450,26 +456,31 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
         }
     }
 
-    private void AimAtNearestPlayer() => TargetFields.Single.AimAt(ActingPlayer.GetNearestTarget(CurrentBattle.PlayerParty.Players.Where(x => !x.KOd)), ActingPlayer.SelectedTool.Ranged);
+    private void AimAtNearestPlayer() => TargetFields.Single.AimAt(ActingPlayer.GetNearestTarget(CurrentBattle.PlayerParty.Players.Where(x => !x.KOd)), ActingPlayer.SelectedAction.Ranged);
 
-    private void AimAtNearestKOdPlayer() => TargetFields.Single.AimAt(ActingPlayer.GetNearestTarget(CurrentBattle.PlayerParty.Players.Where(x => x.KOd)), ActingPlayer.SelectedTool.Ranged);
+    private void AimAtNearestKOdPlayer() => TargetFields.Single.AimAt(ActingPlayer.GetNearestTarget(CurrentBattle.PlayerParty.Players.Where(x => x.KOd)), ActingPlayer.SelectedAction.Ranged);
 
-    private void AimAtNearestEnemy() => TargetFields.Single.AimAt(ActingPlayer.GetNearestTarget(CurrentBattle.EnemyParty.Enemies.Where(x => !x.KOd)), ActingPlayer.SelectedTool.Ranged);
+    private void AimAtNearestEnemy()
+    {
+        Battler target = ActingPlayer.GetNearestTarget(CurrentBattle.EnemyParty.Enemies.Where(x => !x.KOd));
+        ActingPlayer.SelectedSingleMeeleeTarget = ActingPlayer.SelectedAction.Ranged ? null : target;
+        TargetFields.Single.AimAt(target, ActingPlayer.SelectedAction.Ranged);
+    }
 
     private void SetSplashTarget(float scale = 1.0f, bool isSetup = false)
     {
         TargetFieldsGroup tfg = TargetFields;
-        TargetField tf = Instantiate(ActingPlayer.SelectedTool.Ranged ? (TargetField)tfg.SplashRange : (TargetField)tfg.SplashMeelee, tfg.FieldsList);
+        TargetField tf = Instantiate(ActingPlayer.SelectedAction.Ranged ? (TargetField)tfg.SplashRange : (TargetField)tfg.SplashMeelee, tfg.FieldsList);
         tf.DisposeOnDeactivate = true;
         tf.Activate(ActingPlayer, isSetup);
         tf.transform.localScale *= scale;
         if (tf is DynamicTargetField dtf) dtf.AimAt(ActingPlayer.GetNearestTarget(CurrentBattle.EnemyParty.Enemies.Where(x => !x.KOd)), true);
     }
 
-    private void TargetAll<T>(IEnumerable<T> battlers, bool includeActingPlayer) where T : Battler
+    private void TargetAll<T>(IEnumerable<T> battlers, bool addTargetFieldToActingPlayer) where T : Battler
     {
         TargetFields.Single.Activate(ActingPlayer);
-        if (includeActingPlayer) UpdateTarget = () => TargetFields.Single.AimAt(ActingPlayer, false);
+        if (addTargetFieldToActingPlayer) UpdateTarget = () => TargetFields.Single.AimAt(ActingPlayer, false);
         foreach (T b in battlers)
         {
             if (b is BattlePlayer p && p.Id == ActingPlayer.Id) continue;
@@ -512,7 +523,7 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
     {
         if (ActingPlayer.AimingForTeammates()) return CurrentBattle.FightingPlayerParty.Any(x => x.IsSelected);
         if (ActingPlayer.AimingForEnemies()) return CurrentBattle.EnemyParty.Enemies.Any(x => x.IsSelected);
-        if (ActingPlayer.SelectedTool.Scope == ActiveTool.ScopeType.TrapSetup) return CurrentBattle.AllBattlers.All(x => !x.IsSelected);
+        if (ActingPlayer.SelectedAction.Scope == ActiveTool.ScopeType.TrapSetup) return CurrentBattle.AllBattlers.All(x => !x.IsSelected);
         return true;
     }
 

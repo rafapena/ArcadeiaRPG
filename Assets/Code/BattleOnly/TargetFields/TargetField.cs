@@ -25,16 +25,14 @@ public abstract class TargetField : MonoBehaviour
         //
     }
 
-    public abstract bool HasApproachPoints();
-
     public virtual void Activate(BattlePlayer p, bool isSetup = false)
     {
         AimingPlayer = p;
         AimingPlayerCanReverse = true;
         gameObject.SetActive(true);
-        if (p.SelectedTool == null) return;
+        if (p.SelectedAction == null) return;
         else if (isSetup) GetComponent<SpriteRenderer>().color = SetupColor;
-        else if (p.SelectedTool.Ranged) GetComponent<SpriteRenderer>().color = RangeColor;
+        else if (p.SelectedAction.Ranged) GetComponent<SpriteRenderer>().color = RangeColor;
         else GetComponent<SpriteRenderer>().color = MeeleeColor;
     }
 
@@ -54,8 +52,8 @@ public abstract class TargetField : MonoBehaviour
 
         if (AimingPlayer.AimingForEnemies() && b is BattleEnemy ||
             AimingPlayer.AimingForTeammates() && (b is BattlePlayer || b is BattleAlly) ||
-            AimingPlayer.SelectedTool.Scope == ActiveTool.ScopeType.EveryoneButSelf && b is BattlePlayer && b.Id == AimingPlayer.Id ||
-            AimingPlayer.SelectedTool.Scope == ActiveTool.ScopeType.Everyone)
+            AimingPlayer.SelectedAction.Scope == ActiveTool.ScopeType.EveryoneButSelf && b is BattlePlayer && b.Id == AimingPlayer.Id ||
+            AimingPlayer.SelectedAction.Scope == ActiveTool.ScopeType.Everyone)
         {
             b.Select(true);
         }

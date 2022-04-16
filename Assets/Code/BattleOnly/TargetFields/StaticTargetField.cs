@@ -12,6 +12,4 @@ public class StaticTargetField : TargetField
             transform.position = pos;
         }
     }
-
-    public override bool HasApproachPoints() => false;
 }

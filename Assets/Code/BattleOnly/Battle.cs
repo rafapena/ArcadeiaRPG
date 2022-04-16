@@ -73,7 +73,7 @@ public class Battle : MonoBehaviour
         SetupBackground();
         SetupPlayerParty();
         SetupEnemyParty();
-        BattleMenu.ClearAllNextLabels();
+        BattleMenu.ClearAllTurnIndicatorLabels();
         foreach (BattlePlayer p in PlayerParty.Players) Battlers.Add(p);
         foreach (BattleAlly a in PlayerParty.Allies) Battlers.Add(a);
         foreach (BattleEnemy e in EnemyParty.Enemies) Battlers.Add(e);
@@ -162,7 +162,7 @@ public class Battle : MonoBehaviour
 
     public T InstantiateBattler<T>(T newBattler, Vector3 position) where T : Battler
     {
-        T b = Instantiate(newBattler, position, Quaternion.identity, (newBattler is BattleEnemy ? PlayerPartyDump : EnemyPartyDump));
+        T b = Instantiate(newBattler, position, Quaternion.identity, (newBattler is BattleEnemy ? EnemyPartyDump : PlayerPartyDump));
 
         if (b.Class)
         {
@@ -245,7 +245,7 @@ public class Battle : MonoBehaviour
     {
         Turn++;
         LastActionOfTurn = false;
-        Battlers = SortBattlersBySpeed(Battlers);
+        Battlers = SortBattlersBySpeed(Battlers, -5, 6);
         Await(1);
         ActionStart();
     }
@@ -254,6 +254,7 @@ public class Battle : MonoBehaviour
     {
         Await(1);
         ResetSelectedTargets();
+        BattleMenu.ClearAllTurnIndicatorLabels();
         GetNextFastestAvailableBattlers();
 
         Phase = BattlePhases.DecidingAction;
@@ -264,6 +265,7 @@ public class Battle : MonoBehaviour
         else // Ally or enemy
         {
             BattleMenu.Hide();
+            BattleMenu.DeclareCurrent(ActingBattler);
             BattleMenu.DeclareNext(NextActingBattler);
             if (ActingBattler is BattleAlly ally) ally.MakeDecision(FightingPlayerParty.ToList(), EnemyParty.Enemies);
             else if (ActingBattler is BattleEnemy enemy) enemy.MakeDecision(EnemyParty.Enemies, FightingPlayerParty.ToList());
@@ -271,13 +273,13 @@ public class Battle : MonoBehaviour
         }
     }
 
-    private List<Battler> SortBattlersBySpeed(List<Battler> battlers)
+    private List<Battler> SortBattlersBySpeed(List<Battler> battlers, int speedRandomLow, int speedRandomHigh)
     {
         for (int i = 0; i < battlers.Count - 1; i++)
         {
             for (int j = i + 1; j > 0; j--)
             {
-                if (battlers[j - 1].Spd + Random.Range(-5, 6) > battlers[j].Spd + Random.Range(-5, 6)) continue;
+                if (battlers[j - 1].Spd + Random.Range(speedRandomLow, speedRandomHigh) > battlers[j].Spd + Random.Range(speedRandomLow, speedRandomHigh)) continue;
                 Battler temp = battlers[j - 1];
                 battlers[j - 1] = battlers[j];
                 battlers[j] = temp;
@@ -307,6 +309,7 @@ public class Battle : MonoBehaviour
     {
         foreach (Battler b in Battlers)
         {
+            b.SelectedSingleMeeleeTarget = null;
             b.Select(false);
             b.LockSelectTrigger = false;
         }
@@ -318,10 +321,14 @@ public class Battle : MonoBehaviour
 
     public virtual void PrepareForAction()
     {
-        if (!ActingBattler.SelectedTool.Ranged && ActingBattler.SelectedTool.Scope == ActiveTool.ScopeType.OneEnemy)
+        if (ActingBattler.SelectedAction == null)
+        {
+            ActionEnd();
+        }
+        else if (ActingBattler.SelectedSingleMeeleeTarget)
         {
             Phase = BattlePhases.PreAction;
-            ActingBattler.ApproachTarget(BattleMenu.TargetFields.Single.ApproachPointLeft, BattleMenu.TargetFields.Single.ApproachPointRight);
+            ActingBattler.ApproachTarget(ActingBattler.SelectedSingleMeeleeTarget.ApproachPointLeft, ActingBattler.SelectedSingleMeeleeTarget.ApproachPointRight);
         }
         else ExecuteAction();
     }
@@ -339,11 +346,11 @@ public class Battle : MonoBehaviour
 
     public void ExecuteAction()
     {
-        Skill skill = ActingBattler.SelectedTool as Skill;
+        Skill skill = ActingBattler.SelectedAction as Skill;
         if (IsChargingSkill(skill)) return;
 
         Phase = BattlePhases.Action;
-        if (!skill || !skill.Basic) BattleMenu.DisplayUsedAction(ActingBattler, ActingBattler.SelectedTool);
+        if (!skill || !skill.Basic) BattleMenu.DisplayUsedAction(ActingBattler, ActingBattler.SelectedAction);
 
         if (ActingBattler.UsingBasicAttack)
         {
@@ -356,7 +363,7 @@ public class Battle : MonoBehaviour
             else ActingBattler.UseSkill();
             skill.DisableForCooldown();
         }
-        else if (ActingBattler.SelectedTool is Item item)
+        else if (ActingBattler.SelectedAction is Item item)
         {
             if (ActingBattler.Class) ActingBattler.Class.UseItem(item);
             else ActingBattler.UseItem(item);
@@ -383,7 +390,11 @@ public class Battle : MonoBehaviour
         FinishActionUsage();
         if (CheckBattleEndCondition()) return;
         else if (LastActionOfTurn) TurnEnd();
-        else ActionStart();
+        else
+        {
+            Battlers = SortBattlersBySpeed(Battlers, 0, 1);
+            ActionStart();
+        }
     }
 
     private void FinishActionUsage()
@@ -391,11 +402,11 @@ public class Battle : MonoBehaviour
         if (ActingBattler.Class) ActingBattler.Class.ResetActionExecution();
         else ActingBattler.ResetActionExecution();
 
-        if (ActingBattler.SelectedTool is Skill sk)
+        if (ActingBattler.SelectedAction is Skill sk)
         {
             sk.DisableForCooldown();
         }
-        else if (ActingBattler.SelectedTool is Item it)
+        else if (ActingBattler.SelectedAction is Item it)
         {
             //Stats.Add(item.PermantentStatChanges);
             //if (it.TurnsInto) Items[Items.FindIndex(x => x.Id == it.Id)] = Instantiate(it.TurnsInto, gameObject.transform);
@@ -457,7 +468,7 @@ public class Battle : MonoBehaviour
 
     private void ClearAll()
     {
-        BattleMenu.ClearAllNextLabels();
+        BattleMenu.ClearAllTurnIndicatorLabels();
         ResetBattlerActions();
     }
 

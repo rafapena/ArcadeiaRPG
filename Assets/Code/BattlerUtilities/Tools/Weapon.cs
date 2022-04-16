@@ -26,6 +26,9 @@ public class Weapon : ActiveTool, IToolEquippable
     public int SellPrice => Price / 2;
     public bool IsCraftable => RequiredTools.Count > 0;
 
+    public ParticleSystem ChargingEffect;
+    public Projectile Projectile;
+
     public bool CanEquipWith(BattlerClass c) => (ClassExclusives.Count == 0 || ClassExclusives.Contains(c)) && (WeaponType == c.UsableWeapon1Type || WeaponType == c.UsableWeapon2Type);
 
 

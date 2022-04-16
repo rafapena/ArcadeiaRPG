@@ -5,9 +5,6 @@ public class DynamicTargetField : TargetField
     protected Vector3 Movement;
     private float Speed;
 
-    public Transform ApproachPointLeft;
-    public Transform ApproachPointRight;
-
     [SerializeField]
     private float DefaultSpeed;
 
@@ -18,8 +15,6 @@ public class DynamicTargetField : TargetField
         Movement = InputMaster.GetCustomMovementControls(KeyCode.UpArrow, KeyCode.DownArrow, KeyCode.LeftArrow, KeyCode.RightArrow);
         Figure.velocity = Movement * Speed;
     }
-
-    public override bool HasApproachPoints() => ApproachPointLeft != null && ApproachPointRight != null;
 
     public void AimAt(Battler target, bool movable)
     {

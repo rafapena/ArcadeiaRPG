@@ -398,7 +398,7 @@ public class MMInventory : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOp
     {
         int index = EventSystem.current.currentSelectedGameObject.GetComponent<ListSelectable>().Index;
         EquippedTools.SetActive(true);
-        EquippedToolList.Refresh(SelectableTeammatesEquip[index].Equipment, BattleMaster.MAX_NUMBER_OF_EQUIPS);
+        EquippedToolList.Refresh((SelectableTeammatesEquip[index] as BattlePlayer).Equipment, BattleMaster.MAX_NUMBER_OF_EQUIPS);
     }
 
     public void DeselectingTeammates()
@@ -569,7 +569,7 @@ public class MMInventory : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOp
         RefreshInventoryTabs();
         if (tool is Weapon) InventoryFrame.Refresh(MenuManager.PartyInfo.Inventory.Weapons);
         else InventoryFrame.Refresh(MenuManager.PartyInfo.Inventory.Accessories);
-        EquippedToolList.Refresh(PartyList.SelectedObject.Equipment, BattleMaster.MAX_NUMBER_OF_EQUIPS);
+        EquippedToolList.Refresh(SelectedPlayerForEquipping.Equipment, BattleMaster.MAX_NUMBER_OF_EQUIPS);
         ConfirmSwap.SetActive(false);
     }
 }

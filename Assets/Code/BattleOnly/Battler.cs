@@ -18,13 +18,16 @@ public abstract class Battler : ToolUser
     // Battler position
     public VerticalPositions RowPosition;
     public HorizontalPositions ColumnPosition;
+    public Vector3 ApproachPointLeft => HUDProperties.ApproachPoints.transform.GetChild(0).position;
+    public Vector3 ApproachPointRight => HUDProperties.ApproachPoints.transform.GetChild(1).position;
+    public Vector3 TargetPoint => HUDProperties.ApproachPoints.transform.GetChild(2).position;
 
     // Movement
     [HideInInspector] public Rigidbody2D Figure;
     [HideInInspector] public Vector3 Direction;
     [HideInInspector] public Vector3 Movement;
     [HideInInspector] public float Speed;
-    [HideInInspector] public Vector3 TargetFieldDestination;
+    [HideInInspector] public Vector3 ApproachDestination;
     private bool IsApproaching;
     private const float BATTLER_APPROACH_DISTANCE_THRESHOLD = 1.25f;
 
@@ -37,28 +40,24 @@ public abstract class Battler : ToolUser
     [HideInInspector] public int SP;
     [HideInInspector] public Stats StatBoosts;
     public Stats Stats;
-
-    // Equipmet
-    public List<Weapon> Weapons;
     public List<Accessory> Accessories;
-    public List<IToolEquippable> Equipment => Weapons.Cast<IToolEquippable>().Concat(Accessories.Cast<IToolEquippable>()).ToList();
-    public bool MaxEquipment => Weapons.Count + Accessories.Count == BattleMaster.MAX_NUMBER_OF_EQUIPS;
-    
 
     // Overall battle info
     [HideInInspector] public bool IsSelected { get; private set; }
     [HideInInspector] public bool LockSelectTrigger;
-    [HideInInspector] public ActiveTool SelectedTool;
+    [HideInInspector] public ActiveTool SelectedAction;
     [HideInInspector] public Weapon SelectedWeapon;
     [HideInInspector] public bool IsCharging;
     [HideInInspector] public List<State> States = new List<State>();
     private bool BlinkingEnabled;
 
     // Basic attack
-    public bool UsingBasicAttack => SelectedTool == BasicAttackSkill;
+    public bool UsingBasicAttack => SelectedAction == BasicAttackSkill;
+    private const string BASIC_ATTACK_FILE_LOCATION = "Prefabs/BasicAttack";
     [HideInInspector] public Skill BasicAttackSkill;
 
     // Action execution info
+    [HideInInspector] public Battler SelectedSingleMeeleeTarget;
     [HideInInspector] public bool ExecutedAction;
     [HideInInspector] public bool HitCritical;
     [HideInInspector] public bool HitWeakness;
@@ -95,15 +94,20 @@ public abstract class Battler : ToolUser
         HUDProperties.ActionHitBox.SetBattler(this);
         HUDProperties.ScopeHitBox.SetBattler(this);
         Figure = gameObject.GetComponent<Rigidbody2D>();
-        BasicAttackSkill = Resources.Load<Skill>("Prefabs/BasicAttack");
+        BasicAttackSkill = Resources.Load<Skill>(BASIC_ATTACK_FILE_LOCATION);
         MapGameObjectsToHUD();
         SetupElementRates();
         SetupStateRates();
+        if (CombatRangeType == CombatRangeTypes.Any)
+        {
+            if (Class) CombatRangeType = Class.CombatRangeType;
+            else Debug.LogError("Battler " + Name + " cannot have 'Any' as their combat range, unless they're in a class");
+        }
     }
 
     protected virtual void Start()
     {
-        //
+        Speed = 6;
     }
 
     protected abstract void MapGameObjectsToHUD();
@@ -136,7 +140,7 @@ public abstract class Battler : ToolUser
 
     protected override void Update()
     {
-        if (IsApproaching && Vector3.Distance(transform.position, TargetFieldDestination) < BATTLER_APPROACH_DISTANCE_THRESHOLD)
+        if (IsApproaching && Vector3.Distance(transform.position, ApproachDestination) < BATTLER_APPROACH_DISTANCE_THRESHOLD)
         {
             IsApproaching = false;
             Movement = Vector3.zero;
@@ -175,7 +179,7 @@ public abstract class Battler : ToolUser
         BlinkingEnabled = blinking;
     }
 
-    public void Select(bool selected)
+    public virtual void Select(bool selected)
     {
         SpriteRenderer sp = GetComponent<SpriteRenderer>();
         if (sp && !selected) sp.color = Color.white;
@@ -197,17 +201,18 @@ public abstract class Battler : ToolUser
 
     public void ResetAction()
     {
-        SelectedTool = null;
+        SelectedAction = null;
         ExecutedAction = false;
         HitCritical = false;
         HitWeakness = false;
         HitResistant = false;
+        SelectedSingleMeeleeTarget = null;
     }
 
-    public void ApproachTarget(Transform leftPoint, Transform rightPoint)
+    public void ApproachTarget(Vector3 leftPoint, Vector3 rightPoint)
     {
         IsApproaching = true;
-        Movement = GetApproachVector(ref TargetFieldDestination, leftPoint.position, rightPoint.position);
+        Movement = GetApproachVector(ref ApproachDestination, leftPoint, rightPoint);
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -290,9 +295,9 @@ public abstract class Battler : ToolUser
     /// -- ActiveTool scoping --
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public bool AimingForTeammates()
+    public bool AimingForTeammates(ActiveTool tool = null)
     {
-        switch (SelectedTool.Scope)
+        switch (tool?.Scope ?? SelectedAction.Scope)
         {
             case ActiveTool.ScopeType.OneAlly:
             case ActiveTool.ScopeType.OneKnockedOutAlly:
@@ -304,15 +309,19 @@ public abstract class Battler : ToolUser
         return false;
     }
 
-    public bool AimingForEnemies()
+    public bool AimingForOnlyKnockedOutTeammates(ActiveTool tool = null)
     {
-        switch (SelectedTool.Scope)
+        return (tool ?? SelectedAction).Scope == ActiveTool.ScopeType.OneKnockedOutAlly || (tool ?? SelectedAction).Scope == ActiveTool.ScopeType.AllKnockedOutAllies;
+    }
+
+    public bool AimingForEnemies(ActiveTool tool = null)
+    {
+        switch (tool?.Scope ?? SelectedAction.Scope)
         {
             case ActiveTool.ScopeType.OneEnemy:
             case ActiveTool.ScopeType.OneArea:
             case ActiveTool.ScopeType.AllEnemies:
             case ActiveTool.ScopeType.StraightThrough:
-            case ActiveTool.ScopeType.Widespread:
                 return true;
         }
         return false;
@@ -320,7 +329,7 @@ public abstract class Battler : ToolUser
 
     public bool TryConvertSkillToWeaponSettings()
     {
-        if (SelectedTool is Skill sk && sk.WeaponDependent)
+        if (SelectedWeapon && SelectedAction is Skill sk && sk.WeaponDependent)
         {
             sk.ConvertToWeaponSettings(SelectedWeapon);
             return true;

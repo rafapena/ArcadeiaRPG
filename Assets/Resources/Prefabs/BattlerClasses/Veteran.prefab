@@ -49,6 +49,7 @@ MonoBehaviour:
   Id: 1
   Name: Veteran
   Description: Balanced class who can utilize both physical and magaical weapons.
+  CombatRangeType: 2
   BaseStats:
     MaxHP: 70
     Atk: 65
@@ -110,9 +111,8 @@ MonoBehaviour:
   Accuracy: 100
   Variance: 0
   ClassExclusives: []
-  ChangedStatesGiveRate: []
-  ChangedStatesReceiveRate: []
-  Disabled: 0
+  StatesGiveRate: []
+  StatesReceiveRate: []
   Image: {fileID: 1465157572153278308, guid: 4adca08bd9ab25348a3e779ff2400cdf, type: 3}
   Basic: 0
   ClassSkill: 1
@@ -124,7 +124,6 @@ MonoBehaviour:
   CanUseOutsideOfBattle: 0
   WeaponDependent: 0
   WeaponExclusives: 
-  SummonChances: []
   ChargeCount: 0
   DisabledCount: 0
 --- !u!114 &4905199190673639873
@@ -160,9 +159,8 @@ MonoBehaviour:
   Accuracy: 100
   Variance: 0
   ClassExclusives: []
-  ChangedStatesGiveRate: []
-  ChangedStatesReceiveRate: []
-  Disabled: 0
+  StatesGiveRate: []
+  StatesReceiveRate: []
   Image: {fileID: 3935524927748901251, guid: 4adca08bd9ab25348a3e779ff2400cdf, type: 3}
   Basic: 0
   ClassSkill: 1
@@ -174,6 +172,5 @@ MonoBehaviour:
   CanUseOutsideOfBattle: 0
   WeaponDependent: 0
   WeaponExclusives: 
-  SummonChances: []
   ChargeCount: 0
   DisabledCount: 0

@@ -37,7 +37,7 @@ public class MapPlayer : MapExplorer
             all[i] = Instantiate(all[i], BattlersListDump);
             Battler b = all[i];
             b.Level = Party.Level;
-            if (b.Weapons.Count > 0) b.SelectedWeapon = b.Weapons[0];
+            if (b is BattlePlayer p && p.Weapons.Count > 0) p.SelectedWeapon = p.Weapons[0];
             b.StatConversion();
             b.gameObject.SetActive(false);
         }
@@ -56,7 +56,6 @@ public class MapPlayer : MapExplorer
             all[i] = Instantiate(all[i], gameObject.transform);
             Battler b = all[i];
             b.Level = Party.Level;
-            if (b.Weapons.Count > 0) b.SelectedWeapon = b.Weapons[0];
             b.StatConversion();
             b.HP = b.Stats.MaxHP;
             b.SP = 100;
@@ -64,9 +63,10 @@ public class MapPlayer : MapExplorer
             if (b is BattlePlayer p)
             {
                 p.AddLearnedSkills();
+                if (p.Weapons.Count > 0) p.SelectedWeapon = p.Weapons[0];
                 for (int j = 0; j < p.Skills.Count; j++) p.Skills[j] = Instantiate(p.Skills[j], p.transform);
+                for (int j = 0; j < p.Weapons.Count; j++) p.Weapons[j] = Instantiate(p.Weapons[j], p.transform);
             }
-            for (int j = 0; j < b.Weapons.Count; j++) b.Weapons[j] = Instantiate(b.Weapons[j], b.transform);
             for (int j = 0; j < b.States.Count; j++) b.States[j] = Instantiate(b.States[j], b.transform);
         }
         Party.UpdateAll(all);
@@ -86,7 +86,6 @@ public class MapPlayer : MapExplorer
             all[i] = Instantiate(all[i], gameObject.transform);
             Battler b = all[i];
             b.Level = Party.Level;
-            if (b.Weapons.Count > 0) b.SelectedWeapon = b.Weapons[0];
             b.StatConversion();
             b.HP = b.Stats.MaxHP / 2;
             b.SP = 100 / 2;
@@ -94,9 +93,10 @@ public class MapPlayer : MapExplorer
             if (b is BattlePlayer p)
             {
                 p.AddLearnedSkills();
+                if (p.Weapons.Count > 0) p.SelectedWeapon = p.Weapons[0];
                 for (int j = 0; j < p.Skills.Count; j++) p.Skills[j] = Instantiate(p.Skills[j], p.transform);
+                for (int j = 0; j < p.Weapons.Count; j++) p.Weapons[j] = Instantiate(p.Weapons[j], p.transform);
             }
-            for (int j = 0; j < b.Weapons.Count; j++) b.Weapons[j] = Instantiate(b.Weapons[j], b.transform);
             for (int j = 0; j < b.States.Count; j++) b.States[j] = Instantiate(b.States[j], b.transform);
         }
         Party.UpdateAll(all);
