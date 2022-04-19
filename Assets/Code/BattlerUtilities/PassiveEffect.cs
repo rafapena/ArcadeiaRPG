@@ -5,7 +5,7 @@ public abstract class PassiveEffect : BaseObject
 {
     public enum TurnSequence { ActionStart, ActionEnd, TurnEnd }
 
-    //public Stats StatModifiers;
+    public Stats StatModifiers;
     public int HPRegen;
     public int SPRegen;
     public int SPConsumeRate;

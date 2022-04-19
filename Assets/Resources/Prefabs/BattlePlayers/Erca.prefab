@@ -108,9 +108,8 @@ MonoBehaviour:
   Accuracy: 100
   Variance: 0
   ClassExclusives: []
-  ChangedStatesGiveRate: []
-  ChangedStatesReceiveRate: []
-  Disabled: 0
+  StatesGiveRate: []
+  StatesReceiveRate: []
   Image: {fileID: -7366120904289559265, guid: 4adca08bd9ab25348a3e779ff2400cdf, type: 3}
   Basic: 0
   ClassSkill: 0
@@ -122,7 +121,6 @@ MonoBehaviour:
   CanUseOutsideOfBattle: 1
   WeaponDependent: 0
   WeaponExclusives: 
-  SummonChances: []
   ChargeCount: 0
   DisabledCount: 0
 --- !u!114 &3058026110521577577
@@ -158,9 +156,8 @@ MonoBehaviour:
   Accuracy: 100
   Variance: 20
   ClassExclusives: []
-  ChangedStatesGiveRate: []
-  ChangedStatesReceiveRate: []
-  Disabled: 0
+  StatesGiveRate: []
+  StatesReceiveRate: []
   Image: {fileID: 4466658906982423498, guid: 8aeac64171f072a4c968d566207bb397, type: 3}
   Basic: 0
   ClassSkill: 0
@@ -172,7 +169,6 @@ MonoBehaviour:
   CanUseOutsideOfBattle: 0
   WeaponDependent: 0
   WeaponExclusives: 
-  SummonChances: []
   ChargeCount: 0
   DisabledCount: 0
 --- !u!114 &6238239113526363146
@@ -208,9 +204,8 @@ MonoBehaviour:
   Accuracy: 100
   Variance: 0
   ClassExclusives: []
-  ChangedStatesGiveRate: []
-  ChangedStatesReceiveRate: []
-  Disabled: 0
+  StatesGiveRate: []
+  StatesReceiveRate: []
   Image: {fileID: 7980543043835355830, guid: cc189617f76e5d442956704279d5649f, type: 3}
   Basic: 0
   ClassSkill: 0
@@ -222,7 +217,6 @@ MonoBehaviour:
   CanUseOutsideOfBattle: 0
   WeaponDependent: 0
   WeaponExclusives: 
-  SummonChances: []
   ChargeCount: 0
   DisabledCount: 0
 --- !u!114 &6876908596996911932
@@ -240,30 +234,20 @@ MonoBehaviour:
   Id: 0
   Name: Erca
   Description: First party member
+  CombatRangeType: 0
   RowPosition: 0
   ColumnPosition: 2
   Figure: {fileID: 0}
-  Phase: 0
+  Direction: {x: 0, y: 0, z: 0}
+  Movement: {x: 0, y: 0, z: 0}
   Speed: 0
+  ApproachDestination: {x: 0, y: 0, z: 0}
   MainImage: {fileID: 0}
   FaceImage: {fileID: 21300000, guid: 9e5d479eb90a61941b1065c1d83e55b9, type: 3}
   Level: 1
   Class: {fileID: 8162703085860456986, guid: 0c755c9bf65f36a4daba5c184e8a7aaa, type: 3}
   HP: 0
   SP: 0
-  Stats:
-    MaxHP: 0
-    Atk: 0
-    Def: 0
-    Map: 0
-    Mar: 0
-    Spd: 0
-    Tec: 0
-    Luk: 0
-    Acc: 0
-    Eva: 0
-    Crt: 0
-    Cev: 0
   StatBoosts:
     MaxHP: 0
     Atk: 0
@@ -277,15 +261,28 @@ MonoBehaviour:
     Eva: 0
     Crt: 0
     Cev: 0
-  Skills: []
-  Weapons:
-  - {fileID: 3552097900181454016, guid: ffa9f6fe244c85248a1bb202285c251d, type: 3}
+  Stats:
+    MaxHP: 0
+    Atk: 0
+    Def: 0
+    Map: 0
+    Mar: 0
+    Spd: 0
+    Tec: 0
+    Luk: 0
+    Acc: 0
+    Eva: 0
+    Crt: 0
+    Cev: 0
   Accessories: []
   LockSelectTrigger: 0
-  SelectedTool: {fileID: 0}
+  SelectedAction: {fileID: 0}
   SelectedWeapon: {fileID: 0}
+  IsCharging: 0
   States: []
   BasicAttackSkill: {fileID: 0}
+  SelectedSingleMeeleeTarget: {fileID: 0}
+  ExecutedAction: 0
   HitCritical: 0
   HitWeakness: 0
   HitResistant: 0
@@ -316,28 +313,8 @@ MonoBehaviour:
   ContactSpread: 
   ElementRates: 
   StateRates: 
-  NaturalStats:
-    MaxHP: 0
-    Atk: 0
-    Def: 0
-    Map: 0
-    Mar: 0
-    Spd: 0
-    Tec: 0
-    Luk: 0
-    Acc: 0
-    Eva: 0
-    Crt: 0
-    Cev: 0
-  PartnerAccBoostRate: 100
-  PartnerCritBoostRate: 100
-  SavePartnerRate: 100
-  CounterattackRate: 100
-  AssistDamageRate: 100
-  StatBoostsRate: 100
-  ClassSet:
-  - {fileID: 7546378099007312106, guid: aa68b1ce7e43d254d88764b2f4504a91, type: 3}
-  - {fileID: 8162703085860456986, guid: 0c755c9bf65f36a4daba5c184e8a7aaa, type: 3}
+  Weapons:
+  - {fileID: 3552097900181454016, guid: ffa9f6fe244c85248a1bb202285c251d, type: 3}
   SkillSet:
   - LearnedSkill: {fileID: 3058026110521577577}
     LearnLevel: 1
@@ -351,7 +328,30 @@ MonoBehaviour:
   - LearnedSkill: {fileID: 8136948550491050582}
     LearnLevel: 99
     Permanent: 1
-  CurrentSkillSet: []
+  Skills: []
+  IsDecidingAction: 0
+  NaturalStats:
+    MaxHP: 0
+    Atk: 0
+    Def: 0
+    Map: 0
+    Mar: 0
+    Spd: 0
+    Tec: 0
+    Luk: 0
+    Acc: 0
+    Eva: 0
+    Crt: 0
+    Cev: 0
+  ClassSet:
+  - {fileID: 7546378099007312106, guid: aa68b1ce7e43d254d88764b2f4504a91, type: 3}
+  - {fileID: 8162703085860456986, guid: 0c755c9bf65f36a4daba5c184e8a7aaa, type: 3}
+  PartnerAccBoostRate: 100
+  PartnerCritBoostRate: 100
+  SavePartnerRate: 100
+  CounterattackRate: 100
+  AssistDamageRate: 100
+  StatBoostsRate: 100
   Fireball: {fileID: 8282308100824431874, guid: 9e5016818a16d734d9353a63b64b4f41,
     type: 3}
   Laser: {fileID: 0}
@@ -388,9 +388,8 @@ MonoBehaviour:
   Accuracy: 100
   Variance: 0
   ClassExclusives: []
-  ChangedStatesGiveRate: []
-  ChangedStatesReceiveRate: []
-  Disabled: 0
+  StatesGiveRate: []
+  StatesReceiveRate: []
   Image: {fileID: -9076862125893698508, guid: 4adca08bd9ab25348a3e779ff2400cdf, type: 3}
   Basic: 0
   ClassSkill: 0
@@ -402,6 +401,5 @@ MonoBehaviour:
   CanUseOutsideOfBattle: 0
   WeaponDependent: 0
   WeaponExclusives: 
-  SummonChances: []
   ChargeCount: 0
   DisabledCount: 0

@@ -617,7 +617,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &1737563311615547669
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1576,8 +1576,8 @@ MonoBehaviour:
   ActionHitBox: {fileID: 4133387027503891932}
   ScopeHitBox: {fileID: 3535233068567124980}
   ApproachPoints: {fileID: 3059218291059460012}
-  StateEffects: {fileID: 3145025548088891622}
-  ActionEffects: {fileID: 7924953885807618578}
+  StateEffects: {fileID: 1737563311615547669}
+  ActionEffects: {fileID: 3286372487353191414}
   Name: {fileID: 0}
   Gauge: {fileID: 0}
   Next: {fileID: 0}
@@ -2002,11 +2002,11 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 1577450607
-  m_SortingLayer: 1
+  m_SortingLayerID: 2140026759
+  m_SortingLayer: -1
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 4989199bd0af1f545ab35595cfe8e46c, type: 3}
-  m_Color: {r: 0, g: 0, b: 0, a: 0.23529412}
+  m_Sprite: {fileID: 21300000, guid: 2d708f142211b574b87ce923446f736f, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -2493,7 +2493,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &3286372487353191414
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2543,7 +2543,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8132170240317121640}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0.17000008, y: 4.645, z: 0}
+  m_LocalPosition: {x: 0.96, y: 4.55, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2619,7 +2619,7 @@ MonoBehaviour:
   m_BoneTransforms:
   - {fileID: 8735649367153240230}
   m_Bounds:
-    m_Center: {x: -0.05158508, y: -0.0027011037, z: 0}
+    m_Center: {x: -0.8415849, y: 0.09229869, z: 0}
     m_Extent: {x: 0.9573674, y: 0.9297144, z: 0}
   m_UseBatching: 1
   m_AlwaysUpdate: 1

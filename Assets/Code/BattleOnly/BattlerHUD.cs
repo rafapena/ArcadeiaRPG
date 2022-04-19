@@ -7,10 +7,10 @@ public class BattlerHUD : MonoBehaviour
     public ActionHitBox ActionHitBox;
     public ScopeHitBox ScopeHitBox;
     public Transform ApproachPoints;
-    public GameObject StateEffects;
-    public GameObject ActionEffects;
+    public Transform StateEffects;
+    public Transform ActionEffects;
     public TextMeshProUGUI Name;
     public Gauge Gauge;
     public GameObject Next;
-    public GameObject States;
+    public Transform States;
 }

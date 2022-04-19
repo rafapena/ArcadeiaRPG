@@ -21,6 +21,14 @@ public abstract class BattlerAI : Battler
     {
         base.Awake();
         HUDProperties.Name.text = Name.ToUpper();
+        int i = 0;
+        foreach (Transform t in HUDProperties.States)
+        {
+            bool enoughStates = i < States.Count;
+            t.gameObject.SetActive(enoughStates);
+            if (enoughStates) t.gameObject.GetComponent<Image>().sprite = States[i].GetComponent<Sprite>();
+            i++;
+        }
     }
 
     protected override void Start()
