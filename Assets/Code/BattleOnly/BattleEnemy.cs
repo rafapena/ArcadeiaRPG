@@ -13,9 +13,17 @@ public abstract class BattleEnemy : BattlerAI
     protected new void Start()
     {
         base.Start();
-        Direction = Vector3.left;
+        MirrorEnemy();
         Stats.MaxHP = (int)(Stats.MaxHP * MultiplyHP);
         HP = Stats.MaxHP;
+    }
+
+    private void MirrorEnemy()
+    {
+        Direction = Vector3.left;
+        var vec = transform.localScale;
+        vec.x *= -1;
+        transform.localScale = vec;
     }
 
     protected new void Update()

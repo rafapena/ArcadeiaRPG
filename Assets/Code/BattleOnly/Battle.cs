@@ -173,7 +173,7 @@ public class Battle : MonoBehaviour
         for (int i = 0; i < b.States.Count; i++) b.States[i] = Instantiate(b.States[i], b.transform);
         b.StatBoosts.SetToZero();
         
-        b.transform.localScale = Vector3.one * 0.5f;
+        b.transform.localScale = Vector3.one * 0.7f;
         b.gameObject.SetActive(true);
         b.SetBattle(this);
         if (b is BattlePlayer p) p.SetBattleMenu(BattleMenu);

@@ -37,9 +37,11 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
     // Child GameObjects
     public MenuFrame PartyFrame;
     public PlayerSelectionList PartyList;
-    public MenuFrame OptionRunFrame;
-    public MenuFrame OptionBackFrame;
-    public MenuFrame OptionWeaponFrame;
+    public MenuFrame EnemiesFrame;
+    public PlayerSelectionList EnemiesList;
+    public GameObject OptionRun;
+    public GameObject OptionBack;
+    public GameObject OptionWeapon;
     public MenuFrame SelectActionFrame;
     public MenuFrame SelectSkillsFrame;
     public SkillSelectionList SelectSkillsList;
@@ -124,9 +126,9 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
     public void Hide()
     {
         Selection = Selections.Disabled;
-        OptionRunFrame.Deactivate();
-        OptionBackFrame.Deactivate();
-        OptionWeaponFrame.Deactivate();
+        OptionRun.gameObject.SetActive(false);
+        OptionBack.gameObject.SetActive(false);
+        OptionWeapon.gameObject.SetActive(false);
         SelectActionFrame.Deactivate();
         SelectSkillsFrame.Deactivate();
         SelectItemsFrame.Deactivate();
@@ -193,8 +195,8 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
     private void SetWeaponOnMenuAndCharacter()
     {
         SelectActionFrame.transform.GetChild(0).GetChild(0).GetComponent<Image>().sprite = ActingPlayer.SelectedWeapon.GetComponent<SpriteRenderer>().sprite;
-        OptionWeaponFrame.transform.GetChild(0).GetComponent<Image>().sprite = ActingPlayer.SelectedWeapon.GetComponent<SpriteRenderer>().sprite;
-        OptionWeaponFrame.transform.GetChild(2).gameObject.SetActive(ActingPlayer.Weapons.Count > 1);
+        OptionWeapon.transform.GetChild(0).GetComponent<Image>().sprite = ActingPlayer.SelectedWeapon.GetComponent<SpriteRenderer>().sprite;
+        OptionWeapon.transform.GetChild(2).gameObject.SetActive(ActingPlayer.Weapons.Count > 1);
     }
 
     private void SetBlinkingBattlers(bool blinking)
@@ -209,14 +211,14 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
     private void SetupForSelectAction()
     {
         Selection = Selections.Actions;
-        OptionRunFrame.Activate();
-        OptionBackFrame.Deactivate();
-        OptionWeaponFrame.Activate();
+        OptionRun.gameObject.SetActive(true);
+        OptionBack.gameObject.SetActive(false);
+        OptionWeapon.gameObject.SetActive(false);
         SetActionFrame(true);
 
         TryGrayOutIconSelection(SelectActionFrame.transform.GetChild(1).gameObject, !ActingPlayer.HasAnySkills);
         TryGrayOutIconSelection(SelectActionFrame.transform.GetChild(2).gameObject, !CurrentBattle.PlayerParty.Inventory.Items.Where(x => !x.IsKey).Any());
-        TryGrayOutIconSelection(OptionRunFrame.gameObject, CurrentBattle.EnemyParty.RunDisabled);
+        TryGrayOutIconSelection(OptionRun.gameObject, CurrentBattle.EnemyParty.RunDisabled);
         SelectActionFrame.Activate();
         SelectSkillsFrame.Deactivate();
         SelectItemsFrame.Deactivate();
@@ -275,9 +277,9 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
     private void SetupForSelectSkill()
     {
         Selection = Selections.Skills;
-        OptionRunFrame.Deactivate();
-        OptionBackFrame.Activate();
-        OptionWeaponFrame.Activate();
+        OptionRun.gameObject.SetActive(false);
+        OptionBack.gameObject.SetActive(true);
+        OptionWeapon.gameObject.SetActive(true);
         SetActionFrame(true);
 
         SelectActionFrame.Deactivate();
@@ -305,9 +307,9 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
     private void SetupForSelectItem()
     {
         Selection = Selections.Items;
-        OptionRunFrame.Deactivate();
-        OptionBackFrame.Activate();
-        OptionWeaponFrame.Deactivate();
+        OptionRun.gameObject.SetActive(false);
+        OptionBack.gameObject.SetActive(true);
+        OptionWeapon.gameObject.SetActive(false);
         SetActionFrame(true);
 
         SelectActionFrame.Deactivate();
@@ -351,9 +353,9 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
     private void SetupForPositioning()
     {
         Selection = Selections.Targeting;
-        OptionRunFrame.Deactivate();
-        OptionBackFrame.Activate();
-        OptionWeaponFrame.Deactivate();
+        OptionRun.gameObject.SetActive(false);
+        OptionBack.gameObject.SetActive(true);
+        OptionWeapon.gameObject.SetActive(false);
         SetActionFrame(false);
 
         SelectActionFrame.Activate();

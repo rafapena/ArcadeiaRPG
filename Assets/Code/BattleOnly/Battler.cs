@@ -23,13 +23,14 @@ public abstract class Battler : ToolUser
     public Vector3 TargetPoint => HUDProperties.ApproachPoints.transform.GetChild(2).position;
 
     // Movement
+    private Vector3 Position => HUDProperties.BaseHitBox.transform.position;
     [HideInInspector] public Rigidbody2D Figure;
     [HideInInspector] public Vector3 Direction;
     [HideInInspector] public Vector3 Movement;
     [HideInInspector] public float Speed;
     [HideInInspector] public Vector3 ApproachDestination;
     private bool IsApproaching;
-    private const float BATTLER_APPROACH_DISTANCE_THRESHOLD = 1.25f;
+    private const float BATTLER_APPROACH_DISTANCE_THRESHOLD = 0.3f;
 
     // General battler data
     public Sprite MainImage;
@@ -57,6 +58,7 @@ public abstract class Battler : ToolUser
     [HideInInspector] public Skill BasicAttackSkill;
 
     // Action execution info
+    private Vector3 PopupSpawnPoint => HUDProperties.ApproachPoints.transform.GetChild(2).position;
     [HideInInspector] public Battler SelectedSingleMeeleeTarget;
     [HideInInspector] public bool ExecutedAction;
     [HideInInspector] public bool HitCritical;
@@ -140,9 +142,10 @@ public abstract class Battler : ToolUser
 
     protected override void Update()
     {
-        if (IsApproaching && Vector3.Distance(transform.position, ApproachDestination) < BATTLER_APPROACH_DISTANCE_THRESHOLD)
+        if (IsApproaching && Vector3.Distance(Position, ApproachDestination) < BATTLER_APPROACH_DISTANCE_THRESHOLD)
         {
             IsApproaching = false;
+            SetPosition(ApproachDestination);
             Movement = Vector3.zero;
             CurrentBattle.NotifyToSwitchInBattlePhase();
         }
@@ -152,6 +155,12 @@ public abstract class Battler : ToolUser
 
         base.Update();
         Figure.velocity = Movement * Speed;
+    }
+
+    public void SetPosition(Vector3 newPosition)
+    {
+        var diff = Position - transform.position;
+        transform.position = newPosition - diff;
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -164,7 +173,7 @@ public abstract class Battler : ToolUser
         float minDist = float.MaxValue;
         foreach (T b in battlers)
         {
-            float dist = Vector3.Distance(transform.position, b.transform.position);
+            float dist = Vector3.Distance(Position, b.Position);
             if (dist >= minDist) continue;
             minB = b;
             minDist = dist;
@@ -188,10 +197,10 @@ public abstract class Battler : ToolUser
 
     public Vector3 GetApproachVector(ref Vector3 closestApproachPoint, Vector3 approachPointLeft, Vector3 approachPointRight)
     {
-        float dist1 = Vector3.Distance(approachPointLeft, transform.position);
-        float dist2 = Vector3.Distance(approachPointRight, transform.position);
+        float dist1 = Vector3.Distance(Position, approachPointLeft);
+        float dist2 = Vector3.Distance(Position, approachPointRight);
         closestApproachPoint = dist1 <= dist2 ? approachPointLeft : approachPointRight;
-        Vector3 distVector = closestApproachPoint - transform.position;
+        Vector3 distVector = closestApproachPoint - Position;
         return distVector.normalized * 2f;
     }
 
@@ -379,7 +388,7 @@ public abstract class Battler : ToolUser
         }
         else
         {
-            Popup popup = Instantiate(UIMaster.Popups["NoHit"], transform.position, Quaternion.identity);
+            Popup popup = Instantiate(UIMaster.Popups["NoHit"], PopupSpawnPoint, Quaternion.identity);
             popup.GetComponent<TextMesh>().text = "MISS";
         }
     }
@@ -394,16 +403,16 @@ public abstract class Battler : ToolUser
             case ActiveTool.ModType.None:
                 break;
             case ActiveTool.ModType.Damage:
-                if (Time.timeScale > 0) popup = Instantiate(UIMaster.Popups[HPorSP + "Damage"], transform.position, Quaternion.identity);
+                if (Time.timeScale > 0) popup = Instantiate(UIMaster.Popups[HPorSP + "Damage"], PopupSpawnPoint, Quaternion.identity);
                 changeHPorSPForTarget(-total);
                 break;
             case ActiveTool.ModType.Drain:
-                if (Time.timeScale > 0) popup = Instantiate(UIMaster.Popups[HPorSP + "Drain"], transform.position, Quaternion.identity);
+                if (Time.timeScale > 0) popup = Instantiate(UIMaster.Popups[HPorSP + "Drain"], PopupSpawnPoint, Quaternion.identity);
                 changeHPorSPForTarget(-total);
                 changeHPorSPForUser(total);
                 break;
             case ActiveTool.ModType.Recover:
-                if (Time.timeScale > 0) popup = Instantiate(UIMaster.Popups[HPorSP + "Recover"], transform.position, Quaternion.identity);
+                if (Time.timeScale > 0) popup = Instantiate(UIMaster.Popups[HPorSP + "Recover"], PopupSpawnPoint, Quaternion.identity);
                 changeHPorSPForTarget(total);
                 break;
         }

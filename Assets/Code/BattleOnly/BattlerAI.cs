@@ -17,20 +17,6 @@ public abstract class BattlerAI : Battler
     [HideInInspector]
     public bool IsSummon;
 
-    protected override void Awake()
-    {
-        base.Awake();
-        HUDProperties.Name.text = Name.ToUpper();
-        int i = 0;
-        foreach (Transform t in HUDProperties.States)
-        {
-            bool enoughStates = i < States.Count;
-            t.gameObject.SetActive(enoughStates);
-            if (enoughStates) t.gameObject.GetComponent<Image>().sprite = States[i].GetComponent<Sprite>();
-            i++;
-        }
-    }
-
     protected override void Start()
     {
         base.Start();
@@ -45,7 +31,7 @@ public abstract class BattlerAI : Battler
 
     public void SetNextLabel(bool visible)
     {
-        HUDProperties.Next.SetActive(visible);
+        //
     }
 
     protected override void MapGameObjectsToHUD()
@@ -231,12 +217,12 @@ public abstract class BattlerAI : Battler
     public override void MaxHPSP()
     {
         base.MaxHPSP();
-        HUDProperties.Gauge.Fill();
+        //HUDProperties.Gauge.Fill();
     }
 
     public override void ChangeHP(int val)
     {
         base.ChangeHP(val);
-        HUDProperties.Gauge.SetAndAnimate(HP, Stats.MaxHP);
+        //HUDProperties.Gauge.SetAndAnimate(HP, Stats.MaxHP);
     }
 }
