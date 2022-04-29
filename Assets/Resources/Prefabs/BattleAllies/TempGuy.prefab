@@ -1464,6 +1464,12 @@ PrefabInstance:
       propertyPath: m_LocalRotation.z
       value: 0.74663895
       objectReference: {fileID: 0}
+    - target: {fileID: 8483493002883945159, guid: e83e3687439890940985cbbbb4a41e84,
+        type: 3}
+      propertyPath: m_Controller
+      value: 
+      objectReference: {fileID: 22100000, guid: c6c1c6125d2e25942a543ac807ad6f87,
+        type: 2}
     - target: {fileID: 8564797191916981559, guid: e83e3687439890940985cbbbb4a41e84,
         type: 3}
       propertyPath: m_Controller
@@ -1577,6 +1583,31 @@ MonoBehaviour:
   ApproachDestination: {x: 0, y: 0, z: 0}
   MainImage: {fileID: 0}
   FaceImage: {fileID: 0}
+  DefaultSprite:
+    R_Arm: {fileID: 0}
+    R_Arm_Item: {fileID: 0}
+    L_Arm_Item: {fileID: 0}
+    Brows: {fileID: 0}
+    Hat: {fileID: 0}
+    Glasses: {fileID: 0}
+    Hair_Front: {fileID: 0}
+    R_Eye: {fileID: 0}
+    L_Eye: {fileID: 0}
+    Facial_Hair: {fileID: 0}
+    Facial_Feature: {fileID: 0}
+    Blush: {fileID: 0}
+    Nose: {fileID: 0}
+    Mouth: {fileID: 0}
+    Neckwear: {fileID: 0}
+    Head: {fileID: 0}
+    Torso: {fileID: 0}
+    L_Arm: {fileID: 0}
+    L_Leg: {fileID: 0}
+    R_Leg: {fileID: 0}
+    Tail: {fileID: 0}
+    Back_Accessory: {fileID: 0}
+    Hair_Back: {fileID: 0}
+    SpriteParts: []
   Level: 1
   Class: {fileID: 0}
   HP: 0

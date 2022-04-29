@@ -1,0 +1,68 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &3665205357968699090
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6467640080463945649}
+  - component: {fileID: 495320493451175999}
+  m_Layer: 0
+  m_Name: Marksman
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6467640080463945649
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3665205357968699090}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &495320493451175999
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3665205357968699090}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c9feb59ff840a2f4e8f9ed302c38157d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Id: 16
+  Name: Marksman
+  Description: Shoots things
+  CombatRangeType: 3
+  BaseStats:
+    MaxHP: 30
+    Atk: 30
+    Def: 25
+    Map: 26
+    Mar: 20
+    Spd: 25
+    Tec: 45
+    Luk: 31
+    Acc: 100
+    Eva: 100
+    Crt: 100
+    Cev: 100
+  UpgradedClass1: {fileID: 0}
+  UpgradedClass2: {fileID: 0}
+  UsableWeapon1Type: 4
+  UsableWeapon2Type: 0
+  SkillSet: []

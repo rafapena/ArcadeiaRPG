@@ -6,24 +6,25 @@ using UnityEditor.MemoryProfiler;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.iOS;
+using UnityEngine.U2D.Animation;
 using UnityEngine.UI;
 
 public abstract class Battler : ToolUser
 {
     [SerializeField]
-    public BattlerHUD HUDProperties { get; private set; }
+    public BattlerProperties Properties { get; private set; }
     public enum VerticalPositions { Top, Center, Bottom }
     public enum HorizontalPositions { Left, Center, Right }
 
     // Battler position
     public VerticalPositions RowPosition;
     public HorizontalPositions ColumnPosition;
-    public Vector3 ApproachPointLeft => HUDProperties.ApproachPoints.transform.GetChild(0).position;
-    public Vector3 ApproachPointRight => HUDProperties.ApproachPoints.transform.GetChild(1).position;
-    public Vector3 TargetPoint => HUDProperties.ApproachPoints.transform.GetChild(2).position;
+    public Vector3 ApproachPointLeft => Properties.ApproachPoints.transform.GetChild(0).position;
+    public Vector3 ApproachPointRight => Properties.ApproachPoints.transform.GetChild(1).position;
+    public Vector3 TargetPoint => Properties.ApproachPoints.transform.GetChild(2).position;
 
     // Movement
-    private Vector3 Position => HUDProperties.BaseHitBox.transform.position;
+    private Vector3 Position => Properties.BaseHitBox.transform.position;
     [HideInInspector] public Rigidbody2D Figure;
     [HideInInspector] public Vector3 Direction;
     [HideInInspector] public Vector3 Movement;
@@ -32,9 +33,12 @@ public abstract class Battler : ToolUser
     private bool IsApproaching;
     private const float BATTLER_APPROACH_DISTANCE_THRESHOLD = 0.3f;
 
-    // General battler data
+    // Appearance
     public Sprite MainImage;
     public Sprite FaceImage;
+    [HideInInspector] public SpriteAppearance DefaultSprite;
+
+    // General data
     public int Level = 1;
     public BattlerClass Class;
     [HideInInspector] public int HP;
@@ -58,7 +62,7 @@ public abstract class Battler : ToolUser
     [HideInInspector] public Skill BasicAttackSkill;
 
     // Action execution info
-    private Vector3 PopupSpawnPoint => HUDProperties.ApproachPoints.transform.GetChild(2).position;
+    private Vector3 PopupSpawnPoint => Properties.ApproachPoints.transform.GetChild(2).position;
     [HideInInspector] public Battler SelectedSingleMeeleeTarget;
     [HideInInspector] public bool ExecutedAction;
     [HideInInspector] public bool HitCritical;
@@ -92,9 +96,9 @@ public abstract class Battler : ToolUser
     protected override void Awake()
     {
         base.Awake();
-        HUDProperties = gameObject.GetComponent<BattlerHUD>();
-        HUDProperties.ActionHitBox.SetBattler(this);
-        HUDProperties.ScopeHitBox.SetBattler(this);
+        Properties = gameObject.GetComponent<BattlerProperties>();
+        Properties.ActionHitBox.SetBattler(this);
+        Properties.ScopeHitBox.SetBattler(this);
         Figure = gameObject.GetComponent<Rigidbody2D>();
         BasicAttackSkill = Resources.Load<Skill>(BASIC_ATTACK_FILE_LOCATION);
         MapGameObjectsToHUD();
@@ -162,6 +166,12 @@ public abstract class Battler : ToolUser
         var diff = Position - transform.position;
         transform.position = newPosition - diff;
     }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// -- Appearance --
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    //
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- UI --

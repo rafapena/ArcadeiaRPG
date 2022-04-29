@@ -12,7 +12,7 @@ public class BattleMaster
 
     public enum Elements { None, Fire, Ice, Thunder, Earth, Wind, Light, Dark }
 
-    public enum WeaponTypes { None, Blade, Hammer, Charm, Gun, Tools, Camera }
+    public enum WeaponTypes { None, Blade, Hammer, Staff, Gun, Tools, Camera }
     
     public enum ToolTypes { None, PhysicalOffense, PhysicalDefense, MagicalOffense, MagicalDefense, GeneralOffense, GeneralDefense }
     

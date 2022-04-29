@@ -1,8 +1,9 @@
 ﻿using TMPro;
 using UnityEngine;
 
-public class BattlerHUD : MonoBehaviour
+public class BattlerProperties : MonoBehaviour
 {
+    public Transform SpriteAppearanceList;
     public Transform PropertiesList;
     public Transform BaseHitBox;
     public ActionHitBox ActionHitBox;

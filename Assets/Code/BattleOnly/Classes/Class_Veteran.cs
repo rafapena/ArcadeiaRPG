@@ -17,7 +17,7 @@ public class Class_Veteran : BattlerClass
         //
     }
 
-    protected override void UseBasicAttack_Charm()
+    protected override void UseBasicAttack_Staff()
     {
         //
     }
@@ -34,7 +34,7 @@ public class Class_Veteran : BattlerClass
         else if (PassedTime(0.7f, 2)) Attack(HighSlash);
     }
 
-    protected override void AnimateBasicAttack_Charm()
+    protected override void AnimateBasicAttack_Staff()
     {
         //
     }

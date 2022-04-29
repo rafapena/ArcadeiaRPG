@@ -124,7 +124,7 @@ public class ObtainingWeapons : MonoBehaviour
     {
         switch (wp.WeaponType)
         {
-            case BattleMaster.WeaponTypes.Charm:
+            case BattleMaster.WeaponTypes.Staff:
                 switch (wp.Element)
                 {
                     case BattleMaster.Elements.Thunder: return GetWeakestLink(p, wp, 1, 1, 1);

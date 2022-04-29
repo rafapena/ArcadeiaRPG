@@ -26,7 +26,7 @@ public abstract class BattlerAI : Battler
 
     public void SetUI(bool show)
     {
-        HUDProperties.PropertiesList.gameObject.SetActive(show);
+        Properties.PropertiesList.gameObject.SetActive(show);
     }
 
     public void SetNextLabel(bool visible)

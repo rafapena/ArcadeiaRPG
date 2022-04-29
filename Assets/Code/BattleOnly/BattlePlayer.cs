@@ -17,6 +17,7 @@ public abstract class BattlePlayer : Battler
     [HideInInspector] public List<Skill> Skills = new List<Skill>();
     [HideInInspector] public bool IsDecidingAction;
 
+    private const string CLASS_MODELS_LIST_NAME = "ClassModels";
     public Stats NaturalStats;
     public List<BattlerClass> ClassSet;
     public int PartnerAccBoostRate = 100;
@@ -36,6 +37,7 @@ public abstract class BattlePlayer : Battler
     protected override void Start()
     {
         base.Start();
+        SetOutfitToClass();
         Direction = Vector3.right;
     }
 
@@ -76,6 +78,24 @@ public abstract class BattlePlayer : Battler
     public void EnableArrowKeyMovement() => ArrowKeyMovement = true;
 
     public void DisableArrowKeyMovement() => ArrowKeyMovement = false;
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// -- Appearance --
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public void SetOutfitToClass()
+    {
+        if (!Class) return;
+        Transform classModels = transform.Find(CLASS_MODELS_LIST_NAME);
+        if (!classModels) return;
+        foreach (Transform t in classModels) t.gameObject.SetActive(false);
+        Transform classModel = classModels.Find(Class.Name);
+        if (classModel)
+        {
+            classModel.gameObject.SetActive(true);
+            Properties.SpriteAppearanceList = classModel.transform;
+        }
+    }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- Class/Equip Management --
@@ -133,11 +153,11 @@ public abstract class BattlePlayer : Battler
     // Note: Must handle equipment management elsewhere (e.g. ChangeClass.cs)
     public void ChangeClass(BattlerClass newClass)
     {
-        IEnumerable<SkillLearnLevel> toKeep = Class.SkillSet.Where(x => x.Permanent);
         Skills.Clear();
-        foreach (SkillLearnLevel sk in toKeep) Skills.Add(sk.LearnedSkill);
+        foreach (var sk in SkillSet) Skills.Add(sk.LearnedSkill);
         Class = newClass;
         StatConversion();
+        SetOutfitToClass();
         AddLearnedSkills();
     }
 

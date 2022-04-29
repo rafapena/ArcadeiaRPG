@@ -24,8 +24,8 @@ public abstract class BattlerClass : ToolUser
     {
         base.Awake();
         if (CombatRangeType == CombatRangeTypes.Any) Debug.LogError("Battler class " + Name + " cannot have 'Any' as their combat range");
-        UseBasicAttackLists = new UnityAction[] { UseBasicAttack_Weaponless, UseBasicAttack_Blade, UseBasicAttack_Hammer, UseBasicAttack_Charm, UseBasicAttack_Gun, UseBasicAttack_Tools, UseBasicAttack_Camera };
-        AnimateBasicAttackLists = new UnityAction[] { AnimateBasicAttack_Weaponless, AnimateBasicAttack_Blade, AnimateBasicAttack_Hammer, AnimateBasicAttack_Charm, AnimateBasicAttack_Gun, AnimateBasicAttack_Tools, AnimateBasicAttack_Camera };
+        UseBasicAttackLists = new UnityAction[] { UseBasicAttack_Weaponless, UseBasicAttack_Blade, UseBasicAttack_Hammer, UseBasicAttack_Staff, UseBasicAttack_Gun, UseBasicAttack_Tools, UseBasicAttack_Camera };
+        AnimateBasicAttackLists = new UnityAction[] { AnimateBasicAttack_Weaponless, AnimateBasicAttack_Blade, AnimateBasicAttack_Hammer, AnimateBasicAttack_Staff, AnimateBasicAttack_Gun, AnimateBasicAttack_Tools, AnimateBasicAttack_Camera };
     }
 
     protected override void Update()
@@ -63,7 +63,7 @@ public abstract class BattlerClass : ToolUser
 
     protected virtual void UseBasicAttack_Hammer() { }
 
-    protected virtual void UseBasicAttack_Charm() { }
+    protected virtual void UseBasicAttack_Staff() { }
 
     protected virtual void UseBasicAttack_Gun() { }
 
@@ -77,7 +77,7 @@ public abstract class BattlerClass : ToolUser
 
     protected virtual void AnimateBasicAttack_Hammer() { }
 
-    protected virtual void AnimateBasicAttack_Charm() { }
+    protected virtual void AnimateBasicAttack_Staff() { }
 
     protected virtual void AnimateBasicAttack_Gun() { }
 
