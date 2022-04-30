@@ -4,6 +4,7 @@ using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
+using UnityEngine.U2D.Animation;
 using UnityEngine.UI;
 
 public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameOperations
@@ -66,7 +67,7 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
         ClearScope(true);
     }
 
-    private void LateUpdate()
+    private void Update()
     {
         if (DeactivateActionFrame)
         {
@@ -194,9 +195,9 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
 
     private void SetWeaponOnMenuAndCharacter()
     {
-        SelectActionFrame.transform.GetChild(0).GetChild(0).GetComponent<Image>().sprite = ActingPlayer.SelectedWeapon.GetComponent<SpriteRenderer>().sprite;
         OptionWeapon.transform.GetChild(0).GetComponent<Image>().sprite = ActingPlayer.SelectedWeapon.GetComponent<SpriteRenderer>().sprite;
         OptionWeapon.transform.GetChild(2).gameObject.SetActive(ActingPlayer.Weapons.Count > 1);
+        ActingPlayer.SetWeaponAppearance();
     }
 
     private void SetBlinkingBattlers(bool blinking)
@@ -213,7 +214,7 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
         Selection = Selections.Actions;
         OptionRun.gameObject.SetActive(true);
         OptionBack.gameObject.SetActive(false);
-        OptionWeapon.gameObject.SetActive(false);
+        OptionWeapon.gameObject.SetActive(ActingPlayer.Weapons.Count > 1);
         SetActionFrame(true);
 
         TryGrayOutIconSelection(SelectActionFrame.transform.GetChild(1).gameObject, !ActingPlayer.HasAnySkills);

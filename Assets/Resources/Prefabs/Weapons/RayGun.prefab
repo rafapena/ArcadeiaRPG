@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 4823883728301596066}
   - component: {fileID: 569194072735984721}
   m_Layer: 0
-  m_Name: BasicGun
+  m_Name: RayGun
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -74,7 +74,8 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -21522807587195298, guid: 0a78c727b4d99e241b10e1983b71faad, type: 3}
+  m_Sprite: {fileID: -3776783329477156521, guid: 0a78c727b4d99e241b10e1983b71faad,
+    type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -97,9 +98,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee7d2fd59113fb4458a662882a8bfbe6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  Id: 3
-  Name: Basic Gun
-  Description: Shoots things... using ice
+  Id: 6
+  Name: Ray Gun
+  Description: Blast stuff
   Type: 1
   Formula: 3
   ActionTime: 3
@@ -121,9 +122,6 @@ MonoBehaviour:
   StatesGiveRate: []
   StatesReceiveRate: []
   WeaponType: 4
-  AnimatingSprite: {fileID: 0}
-  AnimatingSpriteFallback: {fileID: 1246759035140315760, guid: c8ef53492de1b9e45b02963672ed6090,
-    type: 3}
   _DefaultPrice: 50
   _RequiredTools: []
   _Weight: 2

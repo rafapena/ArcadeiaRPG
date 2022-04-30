@@ -168,7 +168,14 @@ public class Battle : MonoBehaviour
         {
             b.Class = Instantiate(b.Class, b.transform);
             b.Class.SetBattle(this);
+            /*if (b is BattlePlayer p && p.Weapons.Count > 0)
+            {
+                p.SetOutfitToClass();
+                p.SelectedWeapon = p.Weapons[0];
+                p.SetWeaponAppearance();
+            }*/
         }
+        
         b.BasicAttackSkill = Instantiate(b.BasicAttackSkill, b.transform);
         for (int i = 0; i < b.States.Count; i++) b.States[i] = Instantiate(b.States[i], b.transform);
         b.StatBoosts.SetToZero();
@@ -176,7 +183,6 @@ public class Battle : MonoBehaviour
         b.transform.localScale = Vector3.one * 0.7f;
         b.gameObject.SetActive(true);
         b.SetBattle(this);
-        if (b is BattlePlayer p) p.SetBattleMenu(BattleMenu);
         return b;
     }
 

@@ -4,7 +4,6 @@ using UnityEngine;
 public class Weapon : ActiveTool, IToolEquippable
 {
     public BattleMaster.WeaponTypes WeaponType;
-    public bool CollideRange;
 
     public BaseObject Info => this;
 

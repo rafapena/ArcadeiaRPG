@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Net.Security;
 using UnityEngine;
+using UnityEngine.U2D.Animation;
 using UnityEngine.UI;
 
 public abstract class BattlePlayer : Battler
@@ -17,7 +18,14 @@ public abstract class BattlePlayer : Battler
     [HideInInspector] public List<Skill> Skills = new List<Skill>();
     [HideInInspector] public bool IsDecidingAction;
 
-    private const string CLASS_MODELS_LIST_NAME = "ClassModels";
+    // Replace weapon
+    protected virtual string ClassModelWeapon { get; set; } = "R_Arm_Item";
+    protected const string CLASS_MODELS_LIST_NAME = "ClassModels";
+    protected const string CLASS_MODEL_SPRITE_NAME = "Sprite";
+    protected Transform CurrentClassModel;
+    protected SpriteResolver Resolver;
+
+    // Stats
     public Stats NaturalStats;
     public List<BattlerClass> ClassSet;
     public int PartnerAccBoostRate = 100;
@@ -38,6 +46,11 @@ public abstract class BattlePlayer : Battler
     {
         base.Start();
         SetOutfitToClass();
+        if (Weapons.Count > 0)
+        {
+            if (!SelectedWeapon) SelectedWeapon = Weapons[0];
+            SetWeaponAppearance();
+        }
         Direction = Vector3.right;
     }
 
@@ -89,12 +102,18 @@ public abstract class BattlePlayer : Battler
         Transform classModels = transform.Find(CLASS_MODELS_LIST_NAME);
         if (!classModels) return;
         foreach (Transform t in classModels) t.gameObject.SetActive(false);
-        Transform classModel = classModels.Find(Class.Name);
-        if (classModel)
+        CurrentClassModel = classModels.Find(Class.Name);
+        if (CurrentClassModel)
         {
-            classModel.gameObject.SetActive(true);
-            Properties.SpriteAppearanceList = classModel.transform;
+            CurrentClassModel.gameObject.SetActive(true);
+            Resolver = CurrentClassModel.Find(CLASS_MODEL_SPRITE_NAME).Find(ClassModelWeapon).GetComponent<SpriteResolver>();
+            Properties.SpriteAppearanceList = CurrentClassModel.transform;
         }
+    }
+
+    public override void SetWeaponAppearance()
+    {
+        if (Resolver) Resolver.SetCategoryAndLabel(ClassModelWeapon, SelectedWeapon.Name);
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -115,17 +115,18 @@ MonoBehaviour:
   AlwaysHits: 0
   Power: 10
   Range: 50
-  CriticalRate: 2
+  CriticalRateBoost: 0
   Accuracy: 100
   Variance: 10
-  Projectile: {fileID: 4298730171705373736, guid: 60c2800cce44acf4e9c3aec06c8823bc,
-    type: 3}
   ClassExclusives: []
-  ChangedStatesGiveRate: []
-  ChangedStatesReceiveRate: []
-  Disabled: 0
+  StatesGiveRate: []
+  StatesReceiveRate: []
   WeaponType: 3
-  CollideRange: 1
+  AnimatingSprite: {fileID: -5521439595797092003, guid: 39a6c7ec6ec979f49985f8290fdd7c16,
+    type: 3}
   _DefaultPrice: 50
   _RequiredTools: []
   _Weight: 1
+  ChargingEffect: {fileID: 0}
+  Projectile: {fileID: 4298730171705373736, guid: 60c2800cce44acf4e9c3aec06c8823bc,
+    type: 3}
