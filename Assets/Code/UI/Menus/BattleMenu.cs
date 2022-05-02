@@ -69,6 +69,11 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
 
     private void Update()
     {
+        if (Input.GetKeyDown(KeyCode.Q) && (Selection == Selections.Actions || Selection == Selections.Skills)) UpdateWeapon();
+    }
+
+    private void LateUpdate()
+    {
         if (DeactivateActionFrame)
         {
             PlayerActionFrame.Deactivate();
@@ -91,7 +96,6 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
 
             case Selections.Skills:
                 if (Input.GetKeyDown(KeyCode.X)) SetupForSelectAction();
-                else if (Input.GetKeyDown(KeyCode.Q)) UpdateWeapon();
                 break;
 
             case Selections.Items:
@@ -154,7 +158,7 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
 
     public void DeclareNext(Battler nextActingBattler)
     {
-        if (nextActingBattler is BattlePlayer nextP)
+        /*if (nextActingBattler is BattlePlayer nextP)
         {
             int i = 0;
             foreach (Transform t in PartyList.transform) t.GetChild(6).gameObject.SetActive(nextP.Id == PartyList.GetId(i++));
@@ -166,7 +170,7 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
         else if (nextActingBattler is BattleEnemy nextE)
         {
             foreach (BattleEnemy enemy in CurrentBattle.EnemyParty.Enemies) enemy.SetNextLabel(nextE == enemy);
-        }
+        }*/
     }
 
     public void ClearAllTurnIndicatorLabels()
@@ -197,7 +201,7 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
     {
         OptionWeapon.transform.GetChild(0).GetComponent<Image>().sprite = ActingPlayer.SelectedWeapon.GetComponent<SpriteRenderer>().sprite;
         OptionWeapon.transform.GetChild(2).gameObject.SetActive(ActingPlayer.Weapons.Count > 1);
-        ActingPlayer.SetWeaponAppearance();
+        ActingPlayer.Properties.SpriteInfo.RightArmHold(ActingPlayer.SelectedWeapon.Name);
     }
 
     private void SetBlinkingBattlers(bool blinking)
@@ -239,7 +243,6 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
         else if (Input.GetKeyDown(KeyCode.C) && !IsDisabled(SelectActionFrame.transform.GetChild(1).gameObject)) SetupForSelectSkill();
         else if (Input.GetKeyDown(KeyCode.V) && !IsDisabled(SelectActionFrame.transform.GetChild(2).gameObject)) SetupForSelectItem();
         else if (Input.GetKeyDown(KeyCode.R)) SelectRun();
-        else if (Input.GetKeyDown(KeyCode.Q)) UpdateWeapon();
     }
 
     private bool IsDisabled(GameObject go)

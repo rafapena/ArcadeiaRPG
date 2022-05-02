@@ -18,13 +18,6 @@ public abstract class BattlePlayer : Battler
     [HideInInspector] public List<Skill> Skills = new List<Skill>();
     [HideInInspector] public bool IsDecidingAction;
 
-    // Replace weapon
-    protected virtual string ClassModelWeapon { get; set; } = "R_Arm_Item";
-    protected const string CLASS_MODELS_LIST_NAME = "ClassModels";
-    protected const string CLASS_MODEL_SPRITE_NAME = "Sprite";
-    protected Transform CurrentClassModel;
-    protected SpriteResolver Resolver;
-
     // Stats
     public Stats NaturalStats;
     public List<BattlerClass> ClassSet;
@@ -45,11 +38,11 @@ public abstract class BattlePlayer : Battler
     protected override void Start()
     {
         base.Start();
-        SetOutfitToClass();
+        if (Class) Properties.SpriteInfo.WearAttire(Class.Name);
         if (Weapons.Count > 0)
         {
             if (!SelectedWeapon) SelectedWeapon = Weapons[0];
-            SetWeaponAppearance();
+            Properties.SpriteInfo.RightArmHold(SelectedWeapon.Name);
         }
         Direction = Vector3.right;
     }
@@ -91,30 +84,6 @@ public abstract class BattlePlayer : Battler
     public void EnableArrowKeyMovement() => ArrowKeyMovement = true;
 
     public void DisableArrowKeyMovement() => ArrowKeyMovement = false;
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// -- Appearance --
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    public void SetOutfitToClass()
-    {
-        if (!Class) return;
-        Transform classModels = transform.Find(CLASS_MODELS_LIST_NAME);
-        if (!classModels) return;
-        foreach (Transform t in classModels) t.gameObject.SetActive(false);
-        CurrentClassModel = classModels.Find(Class.Name);
-        if (CurrentClassModel)
-        {
-            CurrentClassModel.gameObject.SetActive(true);
-            Resolver = CurrentClassModel.Find(CLASS_MODEL_SPRITE_NAME).Find(ClassModelWeapon).GetComponent<SpriteResolver>();
-            Properties.SpriteAppearanceList = CurrentClassModel.transform;
-        }
-    }
-
-    public override void SetWeaponAppearance()
-    {
-        if (Resolver) Resolver.SetCategoryAndLabel(ClassModelWeapon, SelectedWeapon.Name);
-    }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- Class/Equip Management --
@@ -176,7 +145,7 @@ public abstract class BattlePlayer : Battler
         foreach (var sk in SkillSet) Skills.Add(sk.LearnedSkill);
         Class = newClass;
         StatConversion();
-        SetOutfitToClass();
+        Properties.SpriteInfo.WearAttire(Class.Name);
         AddLearnedSkills();
     }
 

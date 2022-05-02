@@ -3,7 +3,8 @@ using UnityEngine;
 
 public class BattlerProperties : MonoBehaviour
 {
-    public Transform SpriteAppearanceList;
+    public SpriteAppearance SpriteInfo;
+    public Animator Animation;
     public Transform PropertiesList;
     public Transform BaseHitBox;
     public ActionHitBox ActionHitBox;

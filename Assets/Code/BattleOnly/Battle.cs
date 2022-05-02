@@ -77,7 +77,7 @@ public class Battle : MonoBehaviour
         foreach (BattlePlayer p in PlayerParty.Players) Battlers.Add(p);
         foreach (BattleAlly a in PlayerParty.Allies) Battlers.Add(a);
         foreach (BattleEnemy e in EnemyParty.Enemies) Battlers.Add(e);
-        //Await(2);
+        Await(1);
         TurnStart();
     }
 

@@ -150,6 +150,12 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 245215671985725424}
   m_PrefabAsset: {fileID: 0}
+--- !u!95 &8483493002883945159 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 8564797191916981559, guid: b89713aa0427d0c4ea5fc80cae26539f,
+    type: 3}
+  m_PrefabInstance: {fileID: 245215671985725424}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &6205369308637314439
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -164,7 +170,22 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1197053649081949927, guid: ce4f26fd8d9a5104eb5eb4366916fe4d,
         type: 3}
+      propertyPath: Animation
+      value: 
+      objectReference: {fileID: 8483493002883945159}
+    - target: {fileID: 1197053649081949927, guid: ce4f26fd8d9a5104eb5eb4366916fe4d,
+        type: 3}
+      propertyPath: SpriteInfo
+      value: 
+      objectReference: {fileID: 1600451503178479324}
+    - target: {fileID: 1197053649081949927, guid: ce4f26fd8d9a5104eb5eb4366916fe4d,
+        type: 3}
       propertyPath: SpriteAppearanceList
+      value: 
+      objectReference: {fileID: 1600451503178479324}
+    - target: {fileID: 1197053649081949927, guid: ce4f26fd8d9a5104eb5eb4366916fe4d,
+        type: 3}
+      propertyPath: SpriteInfo.SpritesList
       value: 
       objectReference: {fileID: 1600451503178479324}
     - target: {fileID: 1197136246380951605, guid: ce4f26fd8d9a5104eb5eb4366916fe4d,

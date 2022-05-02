@@ -36,7 +36,6 @@ public abstract class Battler : ToolUser
     // Appearance
     public Sprite MainImage;
     public Sprite FaceImage;
-    [HideInInspector] public SpriteAppearance DefaultSprite;
 
     // General data
     public int Level = 1;
@@ -97,11 +96,14 @@ public abstract class Battler : ToolUser
     {
         base.Awake();
         Properties = gameObject.GetComponent<BattlerProperties>();
+        Properties.SpriteInfo.GenerateSpriteResolversList();
         Properties.ActionHitBox.SetBattler(this);
         Properties.ScopeHitBox.SetBattler(this);
+
         Figure = gameObject.GetComponent<Rigidbody2D>();
         BasicAttackSkill = Resources.Load<Skill>(BASIC_ATTACK_FILE_LOCATION);
         MapGameObjectsToHUD();
+
         SetupElementRates();
         SetupStateRates();
         if (CombatRangeType == CombatRangeTypes.Any)
@@ -155,7 +157,9 @@ public abstract class Battler : ToolUser
         }
 
         if (IsSelected && BlinkingEnabled && GetComponent<SpriteRenderer>())
+        {
             GetComponent<SpriteRenderer>().color = Color.Lerp(Color.black, Color.white, Time.time % 1.5f);
+        }
 
         base.Update();
         Figure.velocity = Movement * Speed;
@@ -165,15 +169,6 @@ public abstract class Battler : ToolUser
     {
         var diff = Position - transform.position;
         transform.position = newPosition - diff;
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// -- Appearance --
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    public virtual void SetWeaponAppearance()
-    {
-        //
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
