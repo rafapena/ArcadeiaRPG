@@ -40,6 +40,7 @@ public class Battle : MonoBehaviour
 
     // Battle state tracking
     public BattlePhases Phase { get; private set; }
+    private bool StartingBattle;
     private bool NotifySwitchInBattlePhase;
     private bool LastActionOfTurn;
     [HideInInspector] public int Turn;
@@ -77,8 +78,8 @@ public class Battle : MonoBehaviour
         foreach (BattlePlayer p in PlayerParty.Players) Battlers.Add(p);
         foreach (BattleAlly a in PlayerParty.Allies) Battlers.Add(a);
         foreach (BattleEnemy e in EnemyParty.Enemies) Battlers.Add(e);
+        StartingBattle = true;
         Await(1);
-        TurnStart();
     }
 
     IEnumerable SetupContents()
@@ -193,6 +194,12 @@ public class Battle : MonoBehaviour
     private void Update()
     {
         if (Waiting) return;
+        else if (StartingBattle)
+        {
+            TurnStart();
+            StartingBattle = false;
+        }
+
         switch (Phase)
         {
             case BattlePhases.DecidingAction:

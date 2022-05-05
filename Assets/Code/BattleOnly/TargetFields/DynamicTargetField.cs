@@ -18,9 +18,9 @@ public class DynamicTargetField : TargetField
 
     public void AimAt(Battler target, bool movable)
     {
-        if (target.Properties.ScopeHitBox == null) return;
+        if (target.Sprite.ScopeHitBox == null) return;
         Speed = movable ? DefaultSpeed : 0;
-        Vector3 pos = target.Properties.ScopeHitBox.transform.position;
+        Vector3 pos = target.Sprite.ScopeHitBox.transform.position;
         transform.position = new Vector3(pos.x, pos.y, target.transform.position.z - 1);
     }
 }

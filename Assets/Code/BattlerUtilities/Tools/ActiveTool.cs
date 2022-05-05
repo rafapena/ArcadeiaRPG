@@ -9,7 +9,7 @@ public abstract class ActiveTool : BaseObject
 
     public enum ScopeType
     {
-        None, OneEnemy, OneArea, StraightThrough, AllEnemies,
+        None, OneEnemy, OneArea, WideFrontal, StraightThrough, AllEnemies,
         Self, OneAlly, OneKnockedOutAlly, AllAllies, AllKnockedOutAllies,
         TrapSetup, Planting,
         EveryoneButSelf, Everyone
@@ -129,7 +129,7 @@ public abstract class ActiveTool : BaseObject
         /*for (int i = 0; i < StatesGiveRate.Length; i++)
         {
             if (StatesGiveRate[i] <= 0) continue;
-            float tAttr = (t.StateRates[i] + 100) * u.Luk() / (100 * t.Luk());
+            float tAttr = (t.StateRates[i] + 100) * u.Rec() / (100 * t.Rec());
             float result = (StatesGiveRate[i] + 100) * tAttr / 100f * effectMagnitude;
             if (Chance((int)result)) stateIds[0].Add(i);
         }

@@ -188,7 +188,7 @@ public class ChangeClass : MonoBehaviour
         GetStarInfo(bc.BaseStats.Mar, 4);
         GetStarInfo(bc.BaseStats.Spd, 5);
         GetStarInfo(bc.BaseStats.Tec, 6);
-        GetStarInfo(bc.BaseStats.Luk, 7);
+        GetStarInfo(bc.BaseStats.Rec, 7);
     }
 
     private void SetCanWieldInfo(Image classCanWield, BattleMaster.WeaponTypes usuableWeaponType)

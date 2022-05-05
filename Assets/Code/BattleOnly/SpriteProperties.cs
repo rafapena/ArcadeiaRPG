@@ -1,16 +1,33 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 using UnityEngine;
 using UnityEngine.U2D.Animation;
 
-[System.Serializable]
-public struct SpriteAppearance
+
+public class SpriteProperties : MonoBehaviour
 {
     [SerializeField]
-    private Transform SpritesList;
+    private Transform MainSprite;
+    public Animator Animation;
 
     private Dictionary<string, SpriteComponent> SpriteMap;
+    private const string SPRITES_NAME = "Sprite";
+    private const string PROPERTIES_NAME = "Properties";
+
+    public Transform PropertiesList { get; private set; }
+
+    public Transform SpritesList { get; private set; }
+    
+    public Transform BaseHitBox { get; private set; }
+    
+    public ActionHitBox ActionHitBox { get; private set; }
+    
+    public ScopeHitBox ScopeHitBox { get; private set; }
+    
+    public Transform ApproachPoints { get; private set; }
+    
+    public Transform StateEffects { get; private set; }
+    
+    public Transform ActionEffects { get; private set; }
 
     public struct SpriteComponent
     {
@@ -24,9 +41,24 @@ public struct SpriteAppearance
         public bool EnableOrDisable => MissIndex == 2;
     }
 
-    public void GenerateSpriteResolversList()
+    private void Awake()
     {
-        if (!SpritesList) return;
+        try
+        {
+            PropertiesList = transform.GetChild(0).Find(PROPERTIES_NAME).GetComponent<Transform>();
+            SpritesList = transform.GetChild(0).Find(SPRITES_NAME).GetComponent<Transform>();
+            BaseHitBox = PropertiesList.GetChild(0).GetComponent<Transform>();
+            ActionHitBox = PropertiesList.GetChild(1).GetComponent<ActionHitBox>();
+            ScopeHitBox = PropertiesList.GetChild(2).GetComponent<ScopeHitBox>();
+            ApproachPoints = PropertiesList.GetChild(3).GetComponent<Transform>();
+            StateEffects = PropertiesList.GetChild(4).GetComponent<Transform>();
+            ActionEffects = PropertiesList.GetChild(5).GetComponent<Transform>();
+        }
+        catch
+        {
+            Debug.LogError("Failed to initialize sprite properties");
+            return;
+        }
 
         SpriteMap = new Dictionary<string, SpriteComponent>();
         foreach (Transform t in SpritesList)

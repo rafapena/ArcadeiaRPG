@@ -12,19 +12,19 @@ using UnityEngine.UI;
 public abstract class Battler : ToolUser
 {
     [SerializeField]
-    public BattlerProperties Properties { get; private set; }
+    public SpriteProperties Sprite { get; private set; }
     public enum VerticalPositions { Top, Center, Bottom }
     public enum HorizontalPositions { Left, Center, Right }
 
     // Battler position
     public VerticalPositions RowPosition;
     public HorizontalPositions ColumnPosition;
-    public Vector3 ApproachPointLeft => Properties.ApproachPoints.transform.GetChild(0).position;
-    public Vector3 ApproachPointRight => Properties.ApproachPoints.transform.GetChild(1).position;
-    public Vector3 TargetPoint => Properties.ApproachPoints.transform.GetChild(2).position;
+    public Vector3 ApproachPointLeft => Sprite.ApproachPoints.transform.GetChild(0).position;
+    public Vector3 ApproachPointRight => Sprite.ApproachPoints.transform.GetChild(1).position;
+    public Vector3 TargetPoint => Sprite.ApproachPoints.transform.GetChild(2).position;
 
     // Movement
-    private Vector3 Position => Properties.BaseHitBox.transform.position;
+    public Vector3 Position => Sprite.BaseHitBox.transform.position;
     [HideInInspector] public Rigidbody2D Figure;
     [HideInInspector] public Vector3 Direction;
     [HideInInspector] public Vector3 Movement;
@@ -36,6 +36,7 @@ public abstract class Battler : ToolUser
     // Appearance
     public Sprite MainImage;
     public Sprite FaceImage;
+    public int ColumnOverlapRank;
 
     // General data
     public int Level = 1;
@@ -61,7 +62,7 @@ public abstract class Battler : ToolUser
     [HideInInspector] public Skill BasicAttackSkill;
 
     // Action execution info
-    private Vector3 PopupSpawnPoint => Properties.ApproachPoints.transform.GetChild(2).position;
+    private Vector3 PopupSpawnPoint => Sprite.ApproachPoints.transform.GetChild(2).position;
     [HideInInspector] public Battler SelectedSingleMeeleeTarget;
     [HideInInspector] public bool ExecutedAction;
     [HideInInspector] public bool HitCritical;
@@ -95,10 +96,7 @@ public abstract class Battler : ToolUser
     protected override void Awake()
     {
         base.Awake();
-        Properties = gameObject.GetComponent<BattlerProperties>();
-        Properties.SpriteInfo.GenerateSpriteResolversList();
-        Properties.ActionHitBox.SetBattler(this);
-        Properties.ScopeHitBox.SetBattler(this);
+        Sprite = gameObject.GetComponent<SpriteProperties>();
 
         Figure = gameObject.GetComponent<Rigidbody2D>();
         BasicAttackSkill = Resources.Load<Skill>(BASIC_ATTACK_FILE_LOCATION);
@@ -115,6 +113,8 @@ public abstract class Battler : ToolUser
 
     protected virtual void Start()
     {
+        Sprite.ActionHitBox.SetBattler(this);
+        Sprite.ScopeHitBox.SetBattler(this);
         Speed = 6;
     }
 
@@ -175,13 +175,13 @@ public abstract class Battler : ToolUser
     /// -- UI --
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public T GetNearestTarget<T>(IEnumerable<T> battlers) where T : Battler
+    public T GetNearestTarget<T>(Vector3 source, IEnumerable<T> targetOptions) where T : Battler
     {
-        T minB = battlers.First();
+        T minB = targetOptions.First();
         float minDist = float.MaxValue;
-        foreach (T b in battlers)
+        foreach (T b in targetOptions)
         {
-            float dist = Vector3.Distance(Position, b.Position);
+            float dist = Vector3.Distance(source, b.Position);
             if (dist >= minDist) continue;
             minB = b;
             minDist = dist;
@@ -356,7 +356,7 @@ public abstract class Battler : ToolUser
 
     private List<int> ExecuteSteal(List<int> oneActResult, Battler target, double effectMagnitude)
     {
-        //double willSteal = effectMagnitude * 100 * Luk() / target.Luk();
+        //double willSteal = effectMagnitude * 100 * Rec() / target.Rec();
         //oneActResult.Add(SelectedSkill.Steal && Chance((int)willSteal) ? 1 : 0);
         return oneActResult;
     }
@@ -495,9 +495,9 @@ public abstract class Battler : ToolUser
     public int Def => Stats.Def;
     public int Map => Stats.Map;
     public int Mar => Stats.Mar;
+    public int Rec => Stats.Rec;
     public int Spd => Stats.Spd;
     public int Tec => Stats.Tec;
-    public int Luk => Stats.Luk;
 
     public int Acc => Stats.Acc;
     public int Eva => Stats.Eva;
@@ -510,7 +510,7 @@ public abstract class Battler : ToolUser
     public int Mar => NaturalNumber((Stats.Mar + StatBoosts.Mar) * StatModifiers.Mar / 100);
     public int Spd => NaturalNumber((Stats.Spd + StatBoosts.Spd) * StatModifiers.Spd / 100);
     public int Tec => NaturalNumber((Stats.Tec + StatBoosts.Tec) * StatModifiers.Tec / 100);
-    public int Luk => NaturalNumber((Stats.Luk + StatBoosts.Luk) * StatModifiers.Luk / 100);
+    public int Rec => NaturalNumber((Stats.Rec + StatBoosts.Rec) * StatModifiers.Rec / 100);
 
     public int Acc => (Stats.Acc + StatBoosts.Acc) * StatModifiers.Acc / 100;
     public int Eva => (Stats.Eva + StatBoosts.Eva) * StatModifiers.Eva / 100;

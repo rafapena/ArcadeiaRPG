@@ -21,6 +21,7 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
     private const float JUST_SELECTED_TOOL_TIME_BUFFER = 0.5f;
     private const float DISABLED_ICON_TRANSPARENCY = 0.3f;
     private Action UpdateTarget;
+    private bool AimRelativeToPlayer = true;
     private Selections Selection;
 
     // Target fields
@@ -201,7 +202,7 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
     {
         OptionWeapon.transform.GetChild(0).GetComponent<Image>().sprite = ActingPlayer.SelectedWeapon.GetComponent<SpriteRenderer>().sprite;
         OptionWeapon.transform.GetChild(2).gameObject.SetActive(ActingPlayer.Weapons.Count > 1);
-        ActingPlayer.Properties.SpriteInfo.RightArmHold(ActingPlayer.SelectedWeapon.Name);
+        ActingPlayer.Sprite.RightArmHold(ActingPlayer.SelectedWeapon.Name);
     }
 
     private void SetBlinkingBattlers(bool blinking)
@@ -394,7 +395,7 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
         if (resetSelectedTargets) CurrentBattle.ResetSelectedTargets();
     }
 
-    private void SetScopeTargetSearch()
+    private void SetScopeTargetSearch(bool relativeToPlayer = true)
     {
         ClearScope(true);
         switch (ActingPlayer.SelectedAction.Scope)
@@ -409,6 +410,10 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
                 SetSplashTarget();
                 break;
 
+            case ActiveTool.ScopeType.WideFrontal:
+                TargetAll(GetWideFrontalTargets(), false);
+                break;
+
             case ActiveTool.ScopeType.StraightThrough:
                 TargetFields.StraightThrough.Activate(ActingPlayer);
                 break;
@@ -419,7 +424,6 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
 
             case ActiveTool.ScopeType.Self:
                 TargetFields.Single.Activate(ActingPlayer);
-                TargetFields.Single.AimingPlayerCanReverse = false;
                 DisableTargetingForBattlers(CurrentBattle.FightingPlayerParty);
                 UpdateTarget = () => TargetFields.Single.AimAt(ActingPlayer, false);
                 break;
@@ -462,15 +466,17 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
         }
     }
 
-    private void AimAtNearestPlayer() => TargetFields.Single.AimAt(ActingPlayer.GetNearestTarget(CurrentBattle.PlayerParty.Players.Where(x => !x.KOd)), ActingPlayer.SelectedAction.Ranged);
+    private void AimAtNearestPlayer() => AimAtNearestBattler(CurrentBattle.PlayerParty.Players.Where(x => !x.KOd), TargetFields.Single, true, ActingPlayer.SelectedAction.Ranged);
 
-    private void AimAtNearestKOdPlayer() => TargetFields.Single.AimAt(ActingPlayer.GetNearestTarget(CurrentBattle.PlayerParty.Players.Where(x => x.KOd)), ActingPlayer.SelectedAction.Ranged);
+    private void AimAtNearestKOdPlayer() => AimAtNearestBattler(CurrentBattle.PlayerParty.Players.Where(x => x.KOd), TargetFields.Single, true, ActingPlayer.SelectedAction.Ranged);
 
-    private void AimAtNearestEnemy()
+    private void AimAtNearestEnemy() => AimAtNearestBattler(CurrentBattle.EnemyParty.Enemies.Where(x => !x.KOd), TargetFields.Single, false, ActingPlayer.SelectedAction.Ranged);
+
+    private void AimAtNearestBattler<T>(IEnumerable<T> targets, DynamicTargetField targetField, bool alwaysRanged, bool movable) where T : Battler
     {
-        Battler target = ActingPlayer.GetNearestTarget(CurrentBattle.EnemyParty.Enemies.Where(x => !x.KOd));
-        ActingPlayer.SelectedSingleMeeleeTarget = ActingPlayer.SelectedAction.Ranged ? null : target;
-        TargetFields.Single.AimAt(target, ActingPlayer.SelectedAction.Ranged);
+        var battler = ActingPlayer.GetNearestTarget(AimRelativeToPlayer ? ActingPlayer.Position : targetField.transform.position, targets);
+        ActingPlayer.SelectedSingleMeeleeTarget = alwaysRanged || ActingPlayer.SelectedAction.Ranged ? null : battler;
+        targetField.AimAt(battler, movable);
     }
 
     private void SetSplashTarget(float scale = 1.0f, bool isSetup = false)
@@ -480,7 +486,13 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
         tf.DisposeOnDeactivate = true;
         tf.Activate(ActingPlayer, isSetup);
         tf.transform.localScale *= scale;
-        if (tf is DynamicTargetField dtf) dtf.AimAt(ActingPlayer.GetNearestTarget(CurrentBattle.EnemyParty.Enemies.Where(x => !x.KOd)), true);
+        if (tf is DynamicTargetField dtf) AimAtNearestBattler(CurrentBattle.EnemyParty.Enemies.Where(x => !x.KOd), dtf, true, true);
+    }
+
+    private IEnumerable<Battler> GetWideFrontalTargets()
+    {
+        // TO IMPLEMENT
+        return CurrentBattle.EnemyParty.Enemies.Where(x => !x.KOd);
     }
 
     private void TargetAll<T>(IEnumerable<T> battlers, bool addTargetFieldToActingPlayer) where T : Battler
@@ -491,7 +503,6 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
         {
             if (b is BattlePlayer p && p.Id == ActingPlayer.Id) continue;
             DynamicTargetField dtf = Instantiate(TargetFields.Single, TargetFields.FieldsList);
-            dtf.AimingPlayerCanReverse = false;
             dtf.DisposeOnDeactivate = true;
             dtf.AimAt(b, false);
             b.Select(true);
@@ -514,7 +525,13 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
 
     private void FinalizeSelections()
     {
-        if (!CheckTargetField()) return;
+        if (!CheckTargetField())
+        {
+            AimRelativeToPlayer = false;
+            SetScopeTargetSearch();
+            AimRelativeToPlayer = true;
+            return;
+        }
         Selection = Selections.Disabled;
         ActingPlayer.DisableArrowKeyMovement();
         ActingPlayer.Movement = Vector3.zero;

@@ -12,9 +12,9 @@ public struct Stats
     public int Def;
     public int Map;
     public int Mar;
+    public int Rec;
     public int Spd;
     public int Tec;
-    public int Luk;
     public int Acc;
     public int Eva;
     public int Crt;
@@ -27,9 +27,9 @@ public struct Stats
         Def = other.Def;
         Map = other.Map;
         Mar = other.Mar;
+        Rec = other.Rec;
         Spd = other.Spd;
         Tec = other.Tec;
-        Luk = other.Luk;
         Acc = other.Acc;
         Crt = other.Crt;
         Eva = other.Eva;
@@ -43,9 +43,9 @@ public struct Stats
         Def = 0;
         Map = 0;
         Mar = 0;
+        Rec = 0;
         Spd = 0;
         Tec = 0;
-        Luk = 0;
         Acc = accMod;
         Eva = accMod;
         Crt = accMod;
@@ -59,9 +59,9 @@ public struct Stats
         Debug.Log("DEF: " + Def);
         Debug.Log("MAP: " + Map);
         Debug.Log("MAR: " + Mar);
+        Debug.Log("Rec: " + Rec);
         Debug.Log("SPD: " + Spd);
         Debug.Log("TEC: " + Tec);
-        Debug.Log("LUK: " + Luk);
         Debug.Log("ACC: " + Acc);
         Debug.Log("EVA: " + Eva);
         Debug.Log("CRT: " + Crt);
@@ -87,9 +87,9 @@ public struct Stats
         Def = SetStatNorms(level, Def, 0);
         Map = SetStatNorms(level, Map, 0);
         Mar = SetStatNorms(level, Mar, 0);
+        Rec = SetStatNorms(level, Rec, 0);
         Spd = SetStatNorms(level, Spd, 0);
         Tec = SetStatNorms(level, Tec, 0);
-        Luk = SetStatNorms(level, Luk, 0);
         Acc = SetOtherStatNorms(Acc, 100);
         Eva = SetOtherStatNorms(Eva, 100);
         Crt = SetOtherStatNorms(Crt, 100);
@@ -103,9 +103,9 @@ public struct Stats
         Def = SetStatNorms(level, Def, modifiers.Def);
         Map = SetStatNorms(level, Map, modifiers.Map);
         Mar = SetStatNorms(level, Mar, modifiers.Mar);
+        Rec = SetStatNorms(level, Rec, modifiers.Rec);
         Spd = SetStatNorms(level, Spd, modifiers.Spd);
         Tec = SetStatNorms(level, Tec, modifiers.Tec);
-        Luk = SetStatNorms(level, Luk, modifiers.Luk);
         Acc = SetOtherStatNorms(Acc, modifiers.Acc);
         Eva = SetOtherStatNorms(Eva, modifiers.Eva);
         Crt = SetOtherStatNorms(Crt, modifiers.Crt);
@@ -154,9 +154,9 @@ public struct Stats
         Def = opFunc(Def, other.Def);
         Map = opFunc(Map, other.Map);
         Mar = opFunc(Mar, other.Mar);
+        Rec = opFunc(Rec, other.Rec);
         Spd = opFunc(Spd, other.Spd);
         Tec = opFunc(Tec, other.Tec);
-        Luk = opFunc(Luk, other.Luk);
         Acc = opFunc(Acc, other.Acc);
         Crt = opFunc(Crt, other.Crt);
         Eva = opFunc(Eva, other.Eva);

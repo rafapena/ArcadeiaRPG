@@ -38,11 +38,11 @@ public abstract class BattlePlayer : Battler
     protected override void Start()
     {
         base.Start();
-        if (Class) Properties.SpriteInfo.WearAttire(Class.Name);
+        if (Class) Sprite.WearAttire(Class.Name);
         if (Weapons.Count > 0)
         {
             if (!SelectedWeapon) SelectedWeapon = Weapons[0];
-            Properties.SpriteInfo.RightArmHold(SelectedWeapon.Name);
+            Sprite.RightArmHold(SelectedWeapon.Name);
         }
         Direction = Vector3.right;
     }
@@ -145,7 +145,7 @@ public abstract class BattlePlayer : Battler
         foreach (var sk in SkillSet) Skills.Add(sk.LearnedSkill);
         Class = newClass;
         StatConversion();
-        Properties.SpriteInfo.WearAttire(Class.Name);
+        Sprite.WearAttire(Class.Name);
         AddLearnedSkills();
     }
 

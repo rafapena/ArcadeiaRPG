@@ -24,11 +24,6 @@ public abstract class BattlerAI : Battler
         SelectedWeapon = WeaponOptions.Any() ? (WeaponOptions.First().Action as Weapon) : null;
     }
 
-    public void SetUI(bool show)
-    {
-        Properties.PropertiesList.gameObject.SetActive(show);
-    }
-
     public void SetNextLabel(bool visible)
     {
         //
@@ -157,6 +152,7 @@ public abstract class BattlerAI : Battler
         {
             case ActiveTool.ScopeType.OneEnemy:
             case ActiveTool.ScopeType.OneArea:
+            case ActiveTool.ScopeType.WideFrontal:
             case ActiveTool.ScopeType.StraightThrough:
             case ActiveTool.ScopeType.OneAlly:
                 var pt = PossibleTargets.Where(x => !x.KOd);

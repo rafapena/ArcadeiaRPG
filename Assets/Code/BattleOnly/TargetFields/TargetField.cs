@@ -7,7 +7,6 @@ public abstract class TargetField : MonoBehaviour
     [HideInInspector] public Rigidbody2D Figure;
     public bool DisposeOnDeactivate;
     protected BattlePlayer AimingPlayer;
-    public bool AimingPlayerCanReverse;
 
     private Color SetupColor = Color.blue;
     private Color MeeleeColor = Color.red;
@@ -28,7 +27,6 @@ public abstract class TargetField : MonoBehaviour
     public virtual void Activate(BattlePlayer p, bool isSetup = false)
     {
         AimingPlayer = p;
-        AimingPlayerCanReverse = true;
         gameObject.SetActive(true);
         if (p.SelectedAction == null) return;
         else if (isSetup) GetComponent<SpriteRenderer>().color = SetupColor;

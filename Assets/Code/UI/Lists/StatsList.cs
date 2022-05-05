@@ -17,17 +17,17 @@ public class StatsList : MonoBehaviour
     public TextMeshProUGUI Def;
     public TextMeshProUGUI Map;
     public TextMeshProUGUI Mar;
+    public TextMeshProUGUI Rec;
     public TextMeshProUGUI Spd;
     public TextMeshProUGUI Tec;
-    public TextMeshProUGUI Luk;
     public TextMeshProUGUI MaxHPBoost;
     public TextMeshProUGUI StrBoost;
     public TextMeshProUGUI DefBoost;
     public TextMeshProUGUI MapBoost;
     public TextMeshProUGUI MarBoost;
+    public TextMeshProUGUI RecBoost;
     public TextMeshProUGUI SpdBoost;
     public TextMeshProUGUI TecBoost;
-    public TextMeshProUGUI LukBoost;
 
     private int[] StatsListBoosts;
 
@@ -59,9 +59,9 @@ public class StatsList : MonoBehaviour
         Def.text = player.Stats.Def.ToString();
         Map.text = player.Stats.Map.ToString();
         Mar.text = player.Stats.Mar.ToString();
+        Rec.text = player.Stats.Rec.ToString();
         Spd.text = player.Stats.Spd.ToString();
         Tec.text = player.Stats.Tec.ToString();
-        Luk.text = player.Stats.Luk.ToString();
     }
 
     private void SetStatBoosts()
@@ -71,9 +71,9 @@ public class StatsList : MonoBehaviour
         MenuMaster.SetNumberBoost(DefBoost, StatsListBoosts[2]);
         MenuMaster.SetNumberBoost(MapBoost, StatsListBoosts[3]);
         MenuMaster.SetNumberBoost(MarBoost, StatsListBoosts[4]);
-        MenuMaster.SetNumberBoost(SpdBoost, StatsListBoosts[5]);
-        MenuMaster.SetNumberBoost(TecBoost, StatsListBoosts[6]);
-        MenuMaster.SetNumberBoost(LukBoost, StatsListBoosts[7]);
+        MenuMaster.SetNumberBoost(RecBoost, StatsListBoosts[5]);
+        MenuMaster.SetNumberBoost(SpdBoost, StatsListBoosts[6]);
+        MenuMaster.SetNumberBoost(TecBoost, StatsListBoosts[7]);
     }
 
     private void SetDiffStatBoosts(BattlePlayer player, Stats other)
@@ -83,9 +83,9 @@ public class StatsList : MonoBehaviour
         StatsListBoosts[2] = other.Def - player.Stats.Def;
         StatsListBoosts[3] = other.Map - player.Stats.Map;
         StatsListBoosts[4] = other.Mar - player.Stats.Mar;
-        StatsListBoosts[5] = other.Spd - player.Stats.Spd;
-        StatsListBoosts[6] = other.Tec - player.Stats.Tec;
-        StatsListBoosts[7] = other.Luk - player.Stats.Luk;
+        StatsListBoosts[5] = other.Rec - player.Stats.Rec;
+        StatsListBoosts[6] = other.Spd - player.Stats.Spd;
+        StatsListBoosts[7] = other.Tec - player.Stats.Tec;
     }
 
     private void SetRelationStatBoosts(BattlePlayer player)
@@ -100,9 +100,9 @@ public class StatsList : MonoBehaviour
             StatsListBoosts[2] += SetRelationStatBoost(pr, p.NaturalStats.Def);
             StatsListBoosts[3] += SetRelationStatBoost(pr, p.NaturalStats.Map);
             StatsListBoosts[4] += SetRelationStatBoost(pr, p.NaturalStats.Mar);
-            StatsListBoosts[5] += SetRelationStatBoost(pr, p.NaturalStats.Spd);
-            StatsListBoosts[6] += SetRelationStatBoost(pr, p.NaturalStats.Tec);
-            StatsListBoosts[7] += SetRelationStatBoost(pr, p.NaturalStats.Luk);
+            StatsListBoosts[5] += SetRelationStatBoost(pr, p.NaturalStats.Rec);
+            StatsListBoosts[6] += SetRelationStatBoost(pr, p.NaturalStats.Spd);
+            StatsListBoosts[7] += SetRelationStatBoost(pr, p.NaturalStats.Tec);
         }
     }
 
