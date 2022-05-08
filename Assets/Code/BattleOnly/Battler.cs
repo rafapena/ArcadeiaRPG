@@ -29,14 +29,16 @@ public abstract class Battler : ToolUser
     [HideInInspector] public Vector3 Direction;
     [HideInInspector] public Vector3 Movement;
     [HideInInspector] public float Speed;
-    [HideInInspector] public Vector3 ApproachDestination;
-    private bool IsApproaching;
+    [HideInInspector] public Vector3 TargetDestination;
+    [HideInInspector] public Vector3 TurnDestination;
+    private bool IsApproachingToTarget;
+    private bool IsApproachingForNextTurn;
     private const float BATTLER_APPROACH_DISTANCE_THRESHOLD = 0.3f;
 
     // Appearance
+    public int ColumnOverlapRank { get; private set; }
     public Sprite MainImage;
     public Sprite FaceImage;
-    public int ColumnOverlapRank;
 
     // General data
     public int Level = 1;
@@ -142,80 +144,6 @@ public abstract class Battler : ToolUser
         ColumnPosition = hp;
     }
 
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// -- Updating --
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    protected override void Update()
-    {
-        if (IsApproaching && Vector3.Distance(Position, ApproachDestination) < BATTLER_APPROACH_DISTANCE_THRESHOLD)
-        {
-            IsApproaching = false;
-            SetPosition(ApproachDestination);
-            Movement = Vector3.zero;
-            CurrentBattle.NotifyToSwitchInBattlePhase();
-        }
-
-        if (IsSelected && BlinkingEnabled && GetComponent<SpriteRenderer>())
-        {
-            GetComponent<SpriteRenderer>().color = Color.Lerp(Color.black, Color.white, Time.time % 1.5f);
-        }
-
-        base.Update();
-        Figure.velocity = Movement * Speed;
-    }
-
-    public void SetPosition(Vector3 newPosition)
-    {
-        var diff = Position - transform.position;
-        transform.position = newPosition - diff;
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// -- UI --
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    public T GetNearestTarget<T>(Vector3 source, IEnumerable<T> targetOptions) where T : Battler
-    {
-        T minB = targetOptions.First();
-        float minDist = float.MaxValue;
-        foreach (T b in targetOptions)
-        {
-            float dist = Vector3.Distance(source, b.Position);
-            if (dist >= minDist) continue;
-            minB = b;
-            minDist = dist;
-        }
-        return minB;
-    }
-
-    public void SetBlinkingBattler(bool blinking)
-    {
-        SpriteRenderer sp = GetComponent<SpriteRenderer>();
-        if (sp && !blinking) sp.color = Color.white;
-        BlinkingEnabled = blinking;
-    }
-
-    public virtual void Select(bool selected)
-    {
-        SpriteRenderer sp = GetComponent<SpriteRenderer>();
-        if (sp && !selected) sp.color = Color.white;
-        IsSelected = selected;
-    }
-
-    public Vector3 GetApproachVector(ref Vector3 closestApproachPoint, Vector3 approachPointLeft, Vector3 approachPointRight)
-    {
-        float dist1 = Vector3.Distance(Position, approachPointLeft);
-        float dist2 = Vector3.Distance(Position, approachPointRight);
-        closestApproachPoint = dist1 <= dist2 ? approachPointLeft : approachPointRight;
-        Vector3 distVector = closestApproachPoint - Position;
-        return distVector.normalized * 2f;
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// -- Initializers --
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
     public void ResetAction()
     {
         SelectedAction = null;
@@ -226,10 +154,63 @@ public abstract class Battler : ToolUser
         SelectedSingleMeeleeTarget = null;
     }
 
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// -- Updating --
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    protected override void Update()
+    {
+        CheckReachedNotifyDestination(ref IsApproachingToTarget, TargetDestination, 1f);
+        CheckReachedNotifyDestination(ref IsApproachingForNextTurn, TurnDestination, 3f);
+        base.Update();
+        Figure.velocity = Movement * Speed;
+    }
+
+    private void CheckReachedNotifyDestination(ref bool isApproaching, Vector3 destination, float thresholdMod)
+    {
+        if (isApproaching && Vector3.Distance(Position, destination) < BATTLER_APPROACH_DISTANCE_THRESHOLD * thresholdMod)
+        {
+            isApproaching = false;
+            SetPosition(destination);
+            Movement = Vector3.zero;
+            CurrentBattle.NotifyToSwitchInBattlePhase();
+        }
+    }
+
+    public void SetPosition(Vector3 newPosition)
+    {
+        var diff = Position - transform.position;
+        transform.position = newPosition - diff;
+    }
+
+    public void SetColumnOverlapRank(int rank)
+    {
+        Sprite.MoveForwardInOrder(rank - ColumnOverlapRank);
+        ColumnOverlapRank = rank;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// -- UI --
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public virtual void Select(bool selected)
+    {
+        IsSelected = selected;
+    }
+
     public void ApproachTarget(Vector3 leftPoint, Vector3 rightPoint)
     {
-        IsApproaching = true;
-        Movement = GetApproachVector(ref ApproachDestination, leftPoint, rightPoint);
+        IsApproachingToTarget = true;
+        float dist1 = Vector3.Distance(Position, leftPoint);
+        float dist2 = Vector3.Distance(Position, rightPoint);
+        TargetDestination = dist1 <= dist2 ? leftPoint : rightPoint;
+        Movement = (TargetDestination - Position).normalized * 2f;
+    }
+
+    public void ApproachForNextTurn()
+    {
+        IsApproachingForNextTurn = true;
+        Movement = (TurnDestination - Position).normalized * 6f;
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -371,7 +352,7 @@ public abstract class Battler : ToolUser
         if (activeTool.Hit(user, this, effectMagnitude))
         {
             int formulaOutput = activeTool.GetFormulaOutput(user, this, effectMagnitude);
-            int directHPChange = activeTool.HPAmount + (Stats.MaxHP * activeTool.HPPercent / 100);
+            int directHPChange = activeTool.HPAmount + (MaxHP * activeTool.HPPercent / 100);
             
             int critRate = activeTool.GetCriticalHitRatio(user, this, effectMagnitude);       // UPDATES HitCritical
             float elementRate = activeTool.GetElementRateRatio(user, this);                   // UPDATES HitWeakness and HitResistant
@@ -442,7 +423,7 @@ public abstract class Battler : ToolUser
     public virtual void MaxHPSP()
     {
         KOd = false;
-        HP = Stats.MaxHP;
+        HP = MaxHP;
         SP = 100;
     }
 
@@ -450,7 +431,7 @@ public abstract class Battler : ToolUser
     {
         HP += val;
         if (HP < 0) HP = 0;
-        else if (HP > Stats.MaxHP) HP = Stats.MaxHP;
+        else if (HP > MaxHP) HP = MaxHP;
     }
 
     public virtual void ChangeSP(int val)
@@ -490,6 +471,8 @@ public abstract class Battler : ToolUser
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- Stat Management: TEMPORARY FUNCTIONS UNTIL ALL STATE MANAGEMENT HAS BEEN IMPLEMENTED --
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public int MaxHP => Stats.MaxHP;
 
     public int Atk => Stats.Atk;
     public int Def => Stats.Def;

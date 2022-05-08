@@ -38,7 +38,7 @@ public abstract class BattlerAI : Battler
     {
         if (Class) Stats.SetTo(Class.BaseStats);
         Stats.ConvertFromBaseToActual(Level);
-        HP = Stats.MaxHP;
+        HP = MaxHP;
         SP = 100;
     }
 
@@ -70,13 +70,17 @@ public abstract class BattlerAI : Battler
 
     public void MakeDecision<T, U>(IList<T> usersPartyMembers, IList<U> opponentPartyMembers) where T : Battler where U : Battler
     {
-        PossibleTargets.Clear();   
+        PossibleTargets.Clear();
+
         SelectedAction = SelectAction(usersPartyMembers, opponentPartyMembers);
         if (!SelectedAction) return;
 
-        SelectedWeapon = SelectWeapon(usersPartyMembers, opponentPartyMembers);  // MUST RUN AFTER SELECTED TOOL HAS BEEN SET
+        SelectedWeapon = SelectWeapon(usersPartyMembers, opponentPartyMembers); 
         TryConvertSkillToWeaponSettings();
+        
         SelectTargets(usersPartyMembers, opponentPartyMembers);
+
+        TurnDestination = Position;
     }
 
     protected ActiveTool SelectAction<T, U>(IList<T> usersPartyMembers, IList<U> opponentPartyMembers) where T : Battler where U : Battler
@@ -219,6 +223,6 @@ public abstract class BattlerAI : Battler
     public override void ChangeHP(int val)
     {
         base.ChangeHP(val);
-        //HUDProperties.Gauge.SetAndAnimate(HP, Stats.MaxHP);
+        //HUDProperties.Gauge.SetAndAnimate(HP, MaxHP);
     }
 }

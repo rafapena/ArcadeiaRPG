@@ -43,7 +43,7 @@ public struct AIAction
 
     private bool MetStandardConditions(AIStandardCondition c, Battler b)
     {
-        int HPPercent = 100 * b.HP / b.Stats.MaxHP;
+        int HPPercent = 100 * b.HP / b.MaxHP;
         bool hpReq = c.HPHigh == 0 || c.HPLow <= HPPercent && HPPercent <= c.HPHigh;
         bool spReq = c.SPHigh == 0 || c.SPLow <= b.SP && b.SP <= c.SPHigh;
         bool activeStatesReq = c.AnyActiveStates.Length == 0 || b.States.Any(x => c.AnyActiveStates.Contains(x));

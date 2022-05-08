@@ -13,6 +13,7 @@ public class Battle : MonoBehaviour
     public const int BASE_HITBOX_LAYER = 11;
     public const int ACTION_HITBOX_LAYER = 12;
     public const int MOVING_SCOPE_HITBOX_LAYER = 13;
+    public GameObject[] Boundaries;
 
     // Loading
     public bool Waiting => Time.unscaledTime < AwaitingTime;
@@ -47,6 +48,7 @@ public class Battle : MonoBehaviour
 
     // Manage the battlers themselves
     private List<Battler> Battlers = new List<Battler>();
+    private List<Battler> BattlersByColumn = new List<Battler>();
     public Battler ActingBattler { get; private set; }
     public Battler NextActingBattler { get; private set; }
     public IEnumerable<Battler> AllBattlers => Battlers;
@@ -67,7 +69,7 @@ public class Battle : MonoBehaviour
         Physics2D.IgnoreLayerCollision(BASE_HITBOX_LAYER, MOVING_SCOPE_HITBOX_LAYER);
     }
 
-    void Start()
+    private void Start()
     {
         SceneMaster.DeactivateStoredGameObjects();      // Hide overworld
         //StartCoroutine(SetupContents());
@@ -78,6 +80,7 @@ public class Battle : MonoBehaviour
         foreach (BattlePlayer p in PlayerParty.Players) Battlers.Add(p);
         foreach (BattleAlly a in PlayerParty.Allies) Battlers.Add(a);
         foreach (BattleEnemy e in EnemyParty.Enemies) Battlers.Add(e);
+        SortBattlersInOrderLayer();
         StartingBattle = true;
         Await(1);
     }
@@ -87,12 +90,17 @@ public class Battle : MonoBehaviour
         yield return null;
     }
 
-    void SetupBackground()
+    public void RestrictBattlerWallCollision(bool restrict)
+    {
+        foreach (var b in Boundaries) b.gameObject.SetActive(restrict);
+    }
+
+    private void SetupBackground()
     {
         //
     }
 
-    void SetupPlayerParty()
+    private void SetupPlayerParty()
     {
         PlayerParty = BattleMaster.PlayerParty;
         PlayerParty.Players = SetupPlayerPositions(PlayerParty.Players);
@@ -101,7 +109,7 @@ public class Battle : MonoBehaviour
         PlayerParty.Allies = SetupBattlers(PlayerParty.Allies, PlayerPartyDump);
     }
 
-    void SetupEnemyParty()
+    private void SetupEnemyParty()
     {
         EnemyParty = Instantiate(BattleMaster.EnemyParty, gameObject.transform);
         EnemyParty.gameObject.SetActive(false);
@@ -169,12 +177,6 @@ public class Battle : MonoBehaviour
         {
             b.Class = Instantiate(b.Class, b.transform);
             b.Class.SetBattle(this);
-            /*if (b is BattlePlayer p && p.Weapons.Count > 0)
-            {
-                p.SetOutfitToClass();
-                p.SelectedWeapon = p.Weapons[0];
-                p.SetWeaponAppearance();
-            }*/
         }
         
         b.BasicAttackSkill = Instantiate(b.BasicAttackSkill, b.transform);
@@ -185,6 +187,14 @@ public class Battle : MonoBehaviour
         b.gameObject.SetActive(true);
         b.SetBattle(this);
         return b;
+    }
+
+    private void SortBattlersInOrderLayer()
+    {
+        BattlersByColumn.AddRange(Battlers);
+        BattlersByColumn = BattlersByColumn.OrderByDescending(x => x.Position.y).ToList();
+        int i = 0;
+        foreach (var b in BattlersByColumn) b.SetColumnOverlapRank(i++);
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -199,6 +209,7 @@ public class Battle : MonoBehaviour
             TurnStart();
             StartingBattle = false;
         }
+        UpdateActingBattlerLayerOrder();
 
         switch (Phase)
         {
@@ -244,6 +255,24 @@ public class Battle : MonoBehaviour
         return false;
     }
 
+    private void UpdateActingBattlerLayerOrder()
+    {
+        int i = ActingBattler.ColumnOverlapRank;
+        var bbc = BattlersByColumn;
+        if (i > 0 && bbc[i].Position.y > bbc[i - 1].Position.y) UpdateActingBattlerLayerOrder(i--, -1);
+        if (i < bbc.Count - 1 && bbc[i].Position.y < bbc[i + 1].Position.y)  UpdateActingBattlerLayerOrder(i++, 1);
+    }
+
+    private void UpdateActingBattlerLayerOrder(int i, int inc)
+    {
+        int i1 = i + inc;
+        BattlersByColumn[i].SetColumnOverlapRank(i1);
+        BattlersByColumn[i1].SetColumnOverlapRank(i);
+        var temp = BattlersByColumn[i];
+        BattlersByColumn[i] = BattlersByColumn[i1];
+        BattlersByColumn[i1] = temp;
+    }
+
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- Turn Start --
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -269,6 +298,8 @@ public class Battle : MonoBehaviour
         ResetSelectedTargets();
         BattleMenu.ClearAllTurnIndicatorLabels();
         GetNextFastestAvailableBattlers();
+        BattleMenu.DeclareCurrent(ActingBattler);
+        BattleMenu.DeclareNext(NextActingBattler);
 
         if (ActingBattler.CanDoAction)
         {
@@ -280,8 +311,6 @@ public class Battle : MonoBehaviour
             else // Ally or enemy
             {
                 BattleMenu.Hide();
-                BattleMenu.DeclareCurrent(ActingBattler);
-                BattleMenu.DeclareNext(NextActingBattler);
                 if (ActingBattler is BattleAlly ally) ally.MakeDecision(FightingPlayerParty.ToList(), EnemyParty.Enemies);
                 else if (ActingBattler is BattleEnemy enemy) enemy.MakeDecision(EnemyParty.Enemies, FightingPlayerParty.ToList());
                 PrepareForAction();
@@ -345,6 +374,7 @@ public class Battle : MonoBehaviour
         else if (ActingBattler.SelectedSingleMeeleeTarget)
         {
             Phase = BattlePhases.PreAction;
+            RestrictBattlerWallCollision(false);
             ActingBattler.ApproachTarget(ActingBattler.SelectedSingleMeeleeTarget.ApproachPointLeft, ActingBattler.SelectedSingleMeeleeTarget.ApproachPointRight);
         }
         else ExecuteAction();
@@ -404,6 +434,7 @@ public class Battle : MonoBehaviour
     private void ActionEnd()
     {
         ActingBattler.ExecutedAction = true;
+        RestrictBattlerWallCollision(true);
         FinishActionUsage();
         if (CheckBattleEndCondition()) return;
         else if (LastActionOfTurn) TurnEnd();

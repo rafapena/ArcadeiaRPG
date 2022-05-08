@@ -11,7 +11,8 @@ public class SpriteProperties : MonoBehaviour
 
     private Dictionary<string, SpriteComponent> SpriteMap;
     private const string SPRITES_NAME = "Sprite";
-    private const string PROPERTIES_NAME = "Properties";
+    private const string PROPERTIES_NAME = "SpriteProperties";
+    private const int SPRITE_LAYER_DISTANCE = 100;
 
     public Transform PropertiesList { get; private set; }
 
@@ -26,8 +27,10 @@ public class SpriteProperties : MonoBehaviour
     public Transform ApproachPoints { get; private set; }
     
     public Transform StateEffects { get; private set; }
-    
+
     public Transform ActionEffects { get; private set; }
+
+    public GameObject SpeechBubble { get; private set; }
 
     public struct SpriteComponent
     {
@@ -53,6 +56,7 @@ public class SpriteProperties : MonoBehaviour
             ApproachPoints = PropertiesList.GetChild(3).GetComponent<Transform>();
             StateEffects = PropertiesList.GetChild(4).GetComponent<Transform>();
             ActionEffects = PropertiesList.GetChild(5).GetComponent<Transform>();
+            SpeechBubble = PropertiesList.GetChild(6).gameObject;
         }
         catch
         {
@@ -120,5 +124,15 @@ public class SpriteProperties : MonoBehaviour
             else if (!c.IgnoreOnMiss) c.Object.SetActive(false);
         }
         return swappedContent;
+    }
+
+
+    public void MoveForwardInOrder(int indexAdd)
+    {
+        foreach (Transform s in SpritesList)
+        {
+            var sprite = s.gameObject.GetComponent<SpriteRenderer>();
+            if (sprite) sprite.sortingOrder += SPRITE_LAYER_DISTANCE * indexAdd;
+        }
     }
 }

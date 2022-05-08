@@ -269,7 +269,7 @@ public class MMSpecial : MM_Super
     {
         Gauge hpg = partyList.transform.GetChild(index).GetChild(3).GetComponent<Gauge>();
         Gauge spg = partyList.transform.GetChild(index).GetChild(4).GetComponent<Gauge>();
-        hpg.SetAndAnimate(selectedTeammate.HP, selectedTeammate.Stats.MaxHP);
+        hpg.SetAndAnimate(selectedTeammate.HP, selectedTeammate.MaxHP);
         spg.SetAndAnimate(selectedTeammate.SP, BattleMaster.SP_CAP);
     }
 }

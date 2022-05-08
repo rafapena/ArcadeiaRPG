@@ -94,7 +94,7 @@ public class MMStats : MM_Super
         //CharacterInfo.GetChild(0).GetComponent<Image>().sprite = SelectedPlayer.MainImage;
         CharacterInfo.GetChild(1).GetComponent<TextMeshProUGUI>().text = SelectedPlayer.Name.ToUpper();
         CharacterInfo.GetChild(2).GetComponent<TextMeshProUGUI>().text = SelectedPlayer.Class.Name.ToUpper();
-        CharacterInfo.GetChild(3).GetComponent<Gauge>().Set(SelectedPlayer.HP, SelectedPlayer.Stats.MaxHP);
+        CharacterInfo.GetChild(3).GetComponent<Gauge>().Set(SelectedPlayer.HP, SelectedPlayer.MaxHP);
         CharacterInfo.GetChild(4).GetComponent<Gauge>().Set(SelectedPlayer.SP, 100);
         Transform states = CharacterInfo.GetChild(5).transform;
         int i = 0;

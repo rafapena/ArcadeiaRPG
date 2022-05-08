@@ -54,7 +54,7 @@ public class StatsList : MonoBehaviour
 
     private void SetValues(BattlePlayer player)
     {
-        MaxHP.text = player.Stats.MaxHP.ToString();
+        MaxHP.text = player.MaxHP.ToString();
         Str.text = player.Stats.Atk.ToString();
         Def.text = player.Stats.Def.ToString();
         Map.text = player.Stats.Map.ToString();
@@ -78,7 +78,7 @@ public class StatsList : MonoBehaviour
 
     private void SetDiffStatBoosts(BattlePlayer player, Stats other)
     {
-        StatsListBoosts[0] = other.MaxHP - player.Stats.MaxHP;
+        StatsListBoosts[0] = other.MaxHP - player.MaxHP;
         StatsListBoosts[1] = other.Atk - player.Stats.Atk;
         StatsListBoosts[2] = other.Def - player.Stats.Def;
         StatsListBoosts[3] = other.Map - player.Stats.Map;

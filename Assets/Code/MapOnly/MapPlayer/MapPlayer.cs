@@ -57,14 +57,13 @@ public class MapPlayer : MapExplorer
             Battler b = all[i];
             b.Level = Party.Level;
             b.StatConversion();
-            b.HP = b.Stats.MaxHP;
+            b.HP = b.MaxHP;
             b.SP = 100;
             b.gameObject.SetActive(false);
             if (b is BattlePlayer p)
             {
                 p.AddLearnedSkills();
                 if (p.Weapons.Count > 0) p.SelectedWeapon = p.Weapons[0];
-                for (int j = 0; j < p.Skills.Count; j++) p.Skills[j] = Instantiate(p.Skills[j], p.transform);
                 for (int j = 0; j < p.Weapons.Count; j++) p.Weapons[j] = Instantiate(p.Weapons[j], p.transform);
             }
             for (int j = 0; j < b.States.Count; j++) b.States[j] = Instantiate(b.States[j], b.transform);
@@ -87,14 +86,13 @@ public class MapPlayer : MapExplorer
             Battler b = all[i];
             b.Level = Party.Level;
             b.StatConversion();
-            b.HP = b.Stats.MaxHP / 2;
+            b.HP = b.MaxHP / 2;
             b.SP = 100 / 2;
             b.gameObject.SetActive(false);
             if (b is BattlePlayer p)
             {
                 p.AddLearnedSkills();
                 if (p.Weapons.Count > 0) p.SelectedWeapon = p.Weapons[0];
-                for (int j = 0; j < p.Skills.Count; j++) p.Skills[j] = Instantiate(p.Skills[j], p.transform);
                 for (int j = 0; j < p.Weapons.Count; j++) p.Weapons[j] = Instantiate(p.Weapons[j], p.transform);
             }
             for (int j = 0; j < b.States.Count; j++) b.States[j] = Instantiate(b.States[j], b.transform);
@@ -102,7 +100,7 @@ public class MapPlayer : MapExplorer
         Party.UpdateAll(all);
         for (int i = 0; i < Party.LoggedObjectives.Count; i++)
         {
-            Party.LoggedObjectives[i] = Instantiate(Party.LoggedObjectives[i], gameObject.transform);
+           Party.LoggedObjectives[i] = Instantiate(Party.LoggedObjectives[i], gameObject.transform);
         }
     }
     // FOR TESTING PURPOSES ONLY

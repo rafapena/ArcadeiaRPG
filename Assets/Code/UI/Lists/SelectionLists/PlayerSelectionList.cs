@@ -50,13 +50,17 @@ public class PlayerSelectionList : SelectionList_Super<Battler>
     private void AddToList<T>(Transform entry, T dataEntry) where T : Battler
     {
         ReferenceData.Add(dataEntry);
+
         GameObject go0 = entry.GetChild(0).gameObject;
         if (go0.GetComponent<Image>() == null) go0.transform.GetChild(0).GetComponent<Image>().sprite = dataEntry.FaceImage;
         else go0.GetComponent<Image>().sprite = dataEntry.FaceImage;
+        
         entry.GetChild(1).GetComponent<TextMeshProUGUI>().text = dataEntry.Name.ToUpper();
         entry.GetChild(2).GetComponent<TextMeshProUGUI>().text = dataEntry.Class?.Name.ToUpper() ?? "";
-        entry.GetChild(3).GetComponent<Gauge>().Set(dataEntry.HP, dataEntry.Stats.MaxHP);
-        entry.GetChild(4).GetComponent<Gauge>().Set(dataEntry.SP, 100);
+
+        if (entry.GetChild(3).gameObject.GetComponent<Gauge>()) entry.GetChild(3).GetComponent<Gauge>().Set(dataEntry.HP, dataEntry.MaxHP);
+        if (entry.GetChild(4).gameObject.GetComponent<Gauge>()) entry.GetChild(4).GetComponent<Gauge>().Set(dataEntry.SP, 100);
+        
         AddStates(entry, dataEntry);
         if (entry.childCount > 6) entry.GetChild(6).gameObject.SetActive(false);
     }

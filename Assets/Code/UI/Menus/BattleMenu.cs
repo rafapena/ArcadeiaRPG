@@ -61,11 +61,15 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
     private float SKILL_NAME_DISPLAY_TIME = 2f;
     private bool ActivatedActionFrame;
 
+    // Other
+    private float EnemyListHeight;
+
     private void Start()
     {
         Selection = Selections.Disabled;
         SelectItemsList.ToolList.SetEnableCondition(GetScopeUsability);
         ClearScope(true);
+        EnemyListHeight = EnemiesFrame.gameObject.GetComponent<RectTransform>().sizeDelta.y;
     }
 
     private void Update()
@@ -115,6 +119,7 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
     {
         Selection = Selections.Awaiting;
         PartyList.Refresh(CurrentBattle.PlayerParty.Players);
+        UpdateEnemyPartyList();
         SelectItemsList.SetToolListOnTab(0, CurrentBattle.PlayerParty.Inventory.Items.FindAll(x => !x.IsKey));
         ActingPlayer = p;
         p.IsDecidingAction = true;
@@ -123,8 +128,8 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
     private void PostAwaitSetup()
     {
         ActingPlayer.EnableArrowKeyMovement();
-        SetBlinkingBattlers(true);
         PartyFrame.Activate();
+        EnemiesFrame.Activate();
         DeclareCurrent(ActingPlayer);
         DeclareNext(CurrentBattle.NextActingBattler);
     }
@@ -142,7 +147,7 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
 
     public void DeclareCurrent(Battler actingBattler)
     {
-        int i = 0;
+        /*int i = 0;
         if (actingBattler is BattlePlayer p)
         {
             foreach (Transform t in PartyList.transform)
@@ -154,7 +159,7 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
         else if (actingBattler is BattlerAI ai)
         {
             //
-        }
+        }*/
     }
 
     public void DeclareNext(Battler nextActingBattler)
@@ -176,13 +181,13 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
 
     public void ClearAllTurnIndicatorLabels()
     {
-        foreach (Transform t in PartyList.transform)
+        /*foreach (Transform t in PartyList.transform)
         {
             t.GetComponent<ListSelectable>().ClearHighlights();
             t.GetChild(6).gameObject.SetActive(false);
         }
         foreach (BattleAlly ally in CurrentBattle.PlayerParty.Allies) ally.SetNextLabel(false);
-        foreach (BattleEnemy enemy in CurrentBattle.EnemyParty.Enemies) enemy.SetNextLabel(false);
+        foreach (BattleEnemy enemy in CurrentBattle.EnemyParty.Enemies) enemy.SetNextLabel(false);*/
     }
 
     private void UpdateWeapon()
@@ -205,9 +210,12 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
         ActingPlayer.Sprite.RightArmHold(ActingPlayer.SelectedWeapon.Name);
     }
 
-    private void SetBlinkingBattlers(bool blinking)
+    private void UpdateEnemyPartyList()
     {
-        foreach (Battler b in CurrentBattle.AllBattlers) b.SetBlinkingBattler(blinking);
+        EnemiesList.Refresh(CurrentBattle.EnemyParty.Enemies);
+        Vector2 size = EnemiesFrame.gameObject.GetComponent<RectTransform>().sizeDelta;
+        size.y = EnemyListHeight * CurrentBattle.EnemyParty.Enemies.Where(x => !x.KOd).Count();
+        EnemiesFrame.gameObject.GetComponent<RectTransform>().sizeDelta = size;
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -474,7 +482,7 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
 
     private void AimAtNearestBattler<T>(IEnumerable<T> targets, DynamicTargetField targetField, bool alwaysRanged, bool movable) where T : Battler
     {
-        var battler = ActingPlayer.GetNearestTarget(AimRelativeToPlayer ? ActingPlayer.Position : targetField.transform.position, targets);
+        var battler = GetNearestTarget(AimRelativeToPlayer ? ActingPlayer.Position : targetField.transform.position, targets);
         ActingPlayer.SelectedSingleMeeleeTarget = alwaysRanged || ActingPlayer.SelectedAction.Ranged ? null : battler;
         targetField.AimAt(battler, movable);
     }
@@ -510,6 +518,20 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
         }
     }
 
+    public T GetNearestTarget<T>(Vector3 source, IEnumerable<T> targetOptions) where T : Battler
+    {
+        T minB = targetOptions.First();
+        float minDist = float.MaxValue;
+        foreach (T b in targetOptions)
+        {
+            float dist = Vector3.Distance(source, b.Position);
+            if (dist >= minDist) continue;
+            minB = b;
+            minDist = dist;
+        }
+        return minB;
+    }
+
     public void DisableTargetingForBattlers<T>(IEnumerable<T> battlers) where T : Battler
     {
         foreach (Battler b in battlers)
@@ -535,11 +557,11 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
         Selection = Selections.Disabled;
         ActingPlayer.DisableArrowKeyMovement();
         ActingPlayer.Movement = Vector3.zero;
+        ActingPlayer.TurnDestination = ActingPlayer.Position;
         ActingPlayer.IsDecidingAction = false;
         Hide();
         CurrentBattle.PrepareForAction();
         ClearScope(false);
-        SetBlinkingBattlers(false);
     }
 
     private bool CheckTargetField()

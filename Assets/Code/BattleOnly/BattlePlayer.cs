@@ -56,7 +56,7 @@ public abstract class BattlePlayer : Battler
     {
         Stats.SetTo(Class.BaseStats);
         Stats.ConvertFromBaseToActual(Level, NaturalStats);
-        HP = Stats.MaxHP;
+        HP = MaxHP;
         SP = 100;
     }
 

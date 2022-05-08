@@ -14,8 +14,8 @@ public abstract class BattleEnemy : BattlerAI
     {
         base.Start();
         MirrorEnemy();
-        Stats.MaxHP = (int)(Stats.MaxHP * MultiplyHP);
-        HP = Stats.MaxHP;
+        Stats.MaxHP = (int)(MaxHP * MultiplyHP);
+        HP = MaxHP;
     }
 
     private void MirrorEnemy()

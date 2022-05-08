@@ -765,12 +765,12 @@ PrefabInstance:
     - target: {fileID: 2389281363124043788, guid: e83e3687439890940985cbbbb4a41e84,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.94896406
+      value: 0.9722208
       objectReference: {fileID: 0}
     - target: {fileID: 2389281363124043788, guid: e83e3687439890940985cbbbb4a41e84,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0.3153842
+      value: -0.23406574
       objectReference: {fileID: 0}
     - target: {fileID: 2415998443403120208, guid: e83e3687439890940985cbbbb4a41e84,
         type: 3}
@@ -861,12 +861,12 @@ PrefabInstance:
     - target: {fileID: 2866364235968202835, guid: e83e3687439890940985cbbbb4a41e84,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.9878489
+      value: 0.99307925
       objectReference: {fileID: 0}
     - target: {fileID: 2866364235968202835, guid: e83e3687439890940985cbbbb4a41e84,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0.15541731
+      value: 0.11744672
       objectReference: {fileID: 0}
     - target: {fileID: 3006904426511987422, guid: e83e3687439890940985cbbbb4a41e84,
         type: 3}
@@ -993,12 +993,12 @@ PrefabInstance:
     - target: {fileID: 3973277557525457278, guid: e83e3687439890940985cbbbb4a41e84,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.79750514
+      value: 0.8549328
       objectReference: {fileID: 0}
     - target: {fileID: 3973277557525457278, guid: e83e3687439890940985cbbbb4a41e84,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0.60331225
+      value: 0.5187389
       objectReference: {fileID: 0}
     - target: {fileID: 4136766361870939879, guid: e83e3687439890940985cbbbb4a41e84,
         type: 3}
@@ -1882,12 +1882,12 @@ PrefabInstance:
     - target: {fileID: 7765608067703152856, guid: e83e3687439890940985cbbbb4a41e84,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.94828707
+      value: 0.9474044
       objectReference: {fileID: 0}
     - target: {fileID: 7765608067703152856, guid: e83e3687439890940985cbbbb4a41e84,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0.317414
+      value: 0.320039
       objectReference: {fileID: 0}
     - target: {fileID: 7803963572473178876, guid: e83e3687439890940985cbbbb4a41e84,
         type: 3}
@@ -2097,12 +2097,12 @@ PrefabInstance:
     - target: {fileID: 8672611022536744247, guid: e83e3687439890940985cbbbb4a41e84,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.814829
+      value: 0.7871422
       objectReference: {fileID: 0}
     - target: {fileID: 8672611022536744247, guid: e83e3687439890940985cbbbb4a41e84,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: -0.5797013
+      value: -0.6167716
       objectReference: {fileID: 0}
     - target: {fileID: 8880082087862977223, guid: e83e3687439890940985cbbbb4a41e84,
         type: 3}
@@ -2178,34 +2178,10 @@ MonoBehaviour:
   Direction: {x: 0, y: 0, z: 0}
   Movement: {x: 0, y: 0, z: 0}
   Speed: 0
-  ApproachDestination: {x: 0, y: 0, z: 0}
+  TargetDestination: {x: 0, y: 0, z: 0}
+  TurnDestination: {x: 0, y: 0, z: 0}
   MainImage: {fileID: 0}
   FaceImage: {fileID: 0}
-  DefaultSprite:
-    R_Arm: {fileID: 0}
-    R_Arm_Item: {fileID: 0}
-    L_Arm_Item: {fileID: 0}
-    Brows: {fileID: 0}
-    Hat: {fileID: 0}
-    Glasses: {fileID: 0}
-    Hair_Front: {fileID: 0}
-    R_Eye: {fileID: 0}
-    L_Eye: {fileID: 0}
-    Facial_Hair: {fileID: 0}
-    Facial_Feature: {fileID: 0}
-    Blush: {fileID: 0}
-    Nose: {fileID: 0}
-    Mouth: {fileID: 0}
-    Neckwear: {fileID: 0}
-    Head: {fileID: 0}
-    Torso: {fileID: 0}
-    L_Arm: {fileID: 0}
-    L_Leg: {fileID: 0}
-    R_Leg: {fileID: 0}
-    Tail: {fileID: 0}
-    Back_Accessory: {fileID: 0}
-    Hair_Back: {fileID: 0}
-    SpriteParts: []
   Level: 1
   Class: {fileID: 0}
   HP: 0
@@ -2216,9 +2192,9 @@ MonoBehaviour:
     Def: 0
     Map: 0
     Mar: 0
+    Rec: 0
     Spd: 0
     Tec: 0
-    Luk: 0
     Acc: 0
     Eva: 0
     Crt: 0
@@ -2229,9 +2205,9 @@ MonoBehaviour:
     Def: 30
     Map: 30
     Mar: 30
+    Rec: 0
     Spd: 30
     Tec: 30
-    Luk: 30
     Acc: 30
     Eva: 30
     Crt: 30
@@ -2257,9 +2233,9 @@ MonoBehaviour:
     Def: 0
     Map: 0
     Mar: 0
+    Rec: 0
     Spd: 0
     Tec: 0
-    Luk: 0
     Acc: 0
     Eva: 0
     Crt: 0
@@ -2275,7 +2251,51 @@ MonoBehaviour:
   ContactSpread: 
   ElementRates: 
   StateRates: 
-  AIActions: []
+  AIActions:
+  - Action: {fileID: 2424636757379540111}
+    ClassSkillId: 0
+    Priority: 10
+    PriorityOnFail: 10
+    UserCondition:
+      HPLow: 0
+      HPHigh: 0
+      SPLow: 0
+      SPHigh: 0
+      AnyActiveStates: []
+      AllInactiveStates: []
+    TargetCondition:
+      Condition:
+        HPLow: 0
+        HPHigh: 0
+        SPLow: 0
+        SPHigh: 0
+        AnyActiveStates: []
+        AllInactiveStates: []
+      RangeType: 0
+    CurrentPriority: 0
+    PossibleTargets: []
+  - Action: {fileID: 5292543417821135309}
+    ClassSkillId: 0
+    Priority: 10
+    PriorityOnFail: 10
+    UserCondition:
+      HPLow: 0
+      HPHigh: 0
+      SPLow: 0
+      SPHigh: 0
+      AnyActiveStates: []
+      AllInactiveStates: []
+    TargetCondition:
+      Condition:
+        HPLow: 0
+        HPHigh: 0
+        SPLow: 0
+        SPHigh: 0
+        AnyActiveStates: []
+        AllInactiveStates: []
+      RangeType: 0
+    CurrentPriority: 0
+    PossibleTargets: []
   IsSummon: 0
   Exp: 300
   Gold: 100
@@ -2283,4 +2303,101 @@ MonoBehaviour:
   DroppedWeapons: []
   MultiplyHP: 10
   ExtraTurns: 0
-  JellyFist: {fileID: 0}
+  JellyFist: {fileID: 8282308100824431874, guid: 9e5016818a16d734d9353a63b64b4f41,
+    type: 3}
+--- !u!114 &2424636757379540111
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4965697399233449817}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 93d63bffb241f284aa147625cf04b742, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Id: 0
+  Name: Slime Jump
+  Description: 
+  Type: 1
+  Formula: 1
+  ActionTime: 2.5
+  HPModType: 1
+  SPModType: 0
+  HPAmount: 0
+  HPPercent: 0
+  SPPecent: 0
+  HPRecoil: 0
+  Scope: 1
+  Element: 0
+  AlwaysHits: 0
+  Power: 10
+  Range: 10
+  CriticalRateBoost: 0
+  Accuracy: 100
+  Variance: 0
+  ClassExclusives: []
+  StatesGiveRate: []
+  StatesReceiveRate: []
+  Image: {fileID: 0}
+  Basic: 1
+  ClassSkill: 0
+  SPConsume: 0
+  Charge: 0
+  Warmup: 0
+  Cooldown: 0
+  Steal: 0
+  CanUseOutsideOfBattle: 0
+  WeaponDependent: 0
+  WeaponExclusives: 
+  ChargeCount: 0
+  DisabledCount: 0
+--- !u!114 &5292543417821135309
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4965697399233449817}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 93d63bffb241f284aa147625cf04b742, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Id: 1
+  Name: Slime Rush
+  Description: 
+  Type: 1
+  Formula: 1
+  ActionTime: 3
+  HPModType: 1
+  SPModType: 0
+  HPAmount: 0
+  HPPercent: 0
+  SPPecent: 0
+  HPRecoil: 0
+  Scope: 1
+  Element: 0
+  AlwaysHits: 0
+  Power: 20
+  Range: 10
+  CriticalRateBoost: 0
+  Accuracy: 100
+  Variance: 0
+  ClassExclusives: []
+  StatesGiveRate: []
+  StatesReceiveRate: []
+  Image: {fileID: 0}
+  Basic: 0
+  ClassSkill: 0
+  SPConsume: 0
+  Charge: 0
+  Warmup: 0
+  Cooldown: 0
+  Steal: 0
+  CanUseOutsideOfBattle: 0
+  WeaponDependent: 0
+  WeaponExclusives: 
+  ChargeCount: 0
+  DisabledCount: 0

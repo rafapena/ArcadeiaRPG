@@ -62,7 +62,7 @@ public abstract class ToolUser : BaseObject
         if (CurrentActionTimer >= 1f)
         {
             ResetActionExecution();
-            CurrentBattle.NotifyToSwitchInBattlePhase();
+            CurrentBattle.ActingBattler.ApproachForNextTurn();
         }
     }
 
@@ -194,7 +194,7 @@ public abstract class ToolUser : BaseObject
 
     protected void SummonBattler(BattlerAI b0)
     {
-        BattlerAI b = CurrentBattle.InstantiateBattler(b0, User.ApproachDestination);
+        BattlerAI b = CurrentBattle.InstantiateBattler(b0, User.TargetDestination);
         b.IsSummon = true;
         if (b is BattleAlly a) CurrentBattle.PlayerParty.Allies.Add(a);
         else if (b is BattleEnemy e) CurrentBattle.EnemyParty.Enemies.Add(e);

@@ -476,7 +476,7 @@ public class MMInventory : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOp
         PartyList.SelectedObject.ReceiveToolEffects(PartyList.SelectedObject, InventoryFrame.ToolList.SelectedObject as Item);
         Gauge hpg = PartyList.transform.GetChild(index).GetChild(3).GetComponent<Gauge>();
         Gauge spg = PartyList.transform.GetChild(index).GetChild(4).GetComponent<Gauge>();
-        hpg.SetAndAnimate(PartyList.SelectedObject.HP, PartyList.SelectedObject.Stats.MaxHP);
+        hpg.SetAndAnimate(PartyList.SelectedObject.HP, PartyList.SelectedObject.MaxHP);
         spg.SetAndAnimate(PartyList.SelectedObject.SP, BattleMaster.SP_CAP);
     }
 
