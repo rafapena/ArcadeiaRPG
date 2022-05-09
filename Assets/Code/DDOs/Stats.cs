@@ -52,22 +52,6 @@ public struct Stats
         Cev = accMod;
     }
 
-    public void Print()
-    {
-        Debug.Log("HP: " + MaxHP);
-        Debug.Log("ATK: " + Atk);
-        Debug.Log("DEF: " + Def);
-        Debug.Log("MAP: " + Map);
-        Debug.Log("MAR: " + Mar);
-        Debug.Log("Rec: " + Rec);
-        Debug.Log("SPD: " + Spd);
-        Debug.Log("TEC: " + Tec);
-        Debug.Log("ACC: " + Acc);
-        Debug.Log("EVA: " + Eva);
-        Debug.Log("CRT: " + Crt);
-        Debug.Log("CEV: " + Cev);
-    }
-
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- Stat conversions --
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -223,6 +223,7 @@ public class MMInventory : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOp
         SelectableTeammatesUse = new List<Battler>();
         SelectableTeammatesEquip = new List<Battler>();
         SelectAllTeammates = false;
+        
         Transform CurrentUsageList;
         switch (InventoryFrame.CurrentInventoryList)
         {
@@ -250,7 +251,10 @@ public class MMInventory : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOp
             EventSystem.current.SetSelectedGameObject(CurrentUsageList.GetChild(i).gameObject);
             return;
         }
-        EventSystem.current.SetSelectedGameObject(null);    // If everything in the usage list has been disabled
+
+        // If everything in the usage list has been disabled
+        SelectingUsage.gameObject.SetActive(false);
+        InventoryFrame.UndoSelectTool();
     }
 
     private bool GetSelectableTeammatesForUsingItems()
@@ -339,7 +343,7 @@ public class MMInventory : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOp
         switch (InventoryFrame.CurrentInventoryList)
         {
             case InventorySystem.ListType.Items:
-                MenuManager.PartyInfo.Inventory.Remove<Item>(InventoryFrame.ToolList.SelectedIndex);
+                MenuManager.PartyInfo.Inventory.Remove(InventoryFrame.ToolList.SelectedObject);
                 InventoryFrame.Refresh(GetInventoryItems(false));
                 break;
             case InventorySystem.ListType.Weapons:
@@ -474,10 +478,7 @@ public class MMInventory : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOp
     {
         PartyList.SelectedObject = SelectableTeammatesUse[index];
         PartyList.SelectedObject.ReceiveToolEffects(PartyList.SelectedObject, InventoryFrame.ToolList.SelectedObject as Item);
-        Gauge hpg = PartyList.transform.GetChild(index).GetChild(3).GetComponent<Gauge>();
-        Gauge spg = PartyList.transform.GetChild(index).GetChild(4).GetComponent<Gauge>();
-        hpg.SetAndAnimate(PartyList.SelectedObject.HP, PartyList.SelectedObject.MaxHP);
-        spg.SetAndAnimate(PartyList.SelectedObject.SP, BattleMaster.SP_CAP);
+        PartyList.UpdateEntry(PartyList.SelectedObject, index);
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

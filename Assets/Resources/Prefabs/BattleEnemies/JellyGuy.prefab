@@ -2156,155 +2156,6 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 260918852331368588}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &7425486180400410211
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4965697399233449817}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 52e45f6c7e2584b47a4dcdf2c32ec049, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Id: 1
-  Name: Jelly Guy
-  Description: 
-  CombatRangeType: 1
-  RowPosition: 0
-  ColumnPosition: 0
-  Figure: {fileID: 0}
-  Direction: {x: 0, y: 0, z: 0}
-  Movement: {x: 0, y: 0, z: 0}
-  Speed: 0
-  TargetDestination: {x: 0, y: 0, z: 0}
-  TurnDestination: {x: 0, y: 0, z: 0}
-  MainImage: {fileID: 0}
-  FaceImage: {fileID: 0}
-  Level: 1
-  Class: {fileID: 0}
-  HP: 0
-  SP: 0
-  StatBoosts:
-    MaxHP: 0
-    Atk: 0
-    Def: 0
-    Map: 0
-    Mar: 0
-    Rec: 0
-    Spd: 0
-    Tec: 0
-    Acc: 0
-    Eva: 0
-    Crt: 0
-    Cev: 0
-  Stats:
-    MaxHP: 30
-    Atk: 30
-    Def: 30
-    Map: 30
-    Mar: 30
-    Rec: 0
-    Spd: 30
-    Tec: 30
-    Acc: 30
-    Eva: 30
-    Crt: 30
-    Cev: 30
-  Accessories: []
-  LockSelectTrigger: 0
-  SelectedAction: {fileID: 0}
-  SelectedWeapon: {fileID: 0}
-  IsCharging: 0
-  States: []
-  BasicAttackSkill: {fileID: 0}
-  SelectedSingleMeeleeTarget: {fileID: 0}
-  ExecutedAction: 0
-  HitCritical: 0
-  HitWeakness: 0
-  HitResistant: 0
-  ChangedElementRates: []
-  ChangedStateRates: []
-  Flying: 0
-  StatModifiers:
-    MaxHP: 0
-    Atk: 0
-    Def: 0
-    Map: 0
-    Mar: 0
-    Rec: 0
-    Spd: 0
-    Tec: 0
-    Acc: 0
-    Eva: 0
-    Crt: 0
-    Cev: 0
-  KOd: 0
-  Petrified: 0
-  CannotMove: 0
-  SPConsumeRate: 0
-  Counter: 0
-  Reflect: 0
-  DisabledToolTypes: 
-  RemoveByHit: 
-  ContactSpread: 
-  ElementRates: 
-  StateRates: 
-  AIActions:
-  - Action: {fileID: 2424636757379540111}
-    ClassSkillId: 0
-    Priority: 10
-    PriorityOnFail: 10
-    UserCondition:
-      HPLow: 0
-      HPHigh: 0
-      SPLow: 0
-      SPHigh: 0
-      AnyActiveStates: []
-      AllInactiveStates: []
-    TargetCondition:
-      Condition:
-        HPLow: 0
-        HPHigh: 0
-        SPLow: 0
-        SPHigh: 0
-        AnyActiveStates: []
-        AllInactiveStates: []
-      RangeType: 0
-    CurrentPriority: 0
-    PossibleTargets: []
-  - Action: {fileID: 5292543417821135309}
-    ClassSkillId: 0
-    Priority: 10
-    PriorityOnFail: 10
-    UserCondition:
-      HPLow: 0
-      HPHigh: 0
-      SPLow: 0
-      SPHigh: 0
-      AnyActiveStates: []
-      AllInactiveStates: []
-    TargetCondition:
-      Condition:
-        HPLow: 0
-        HPHigh: 0
-        SPLow: 0
-        SPHigh: 0
-        AnyActiveStates: []
-        AllInactiveStates: []
-      RangeType: 0
-    CurrentPriority: 0
-    PossibleTargets: []
-  IsSummon: 0
-  Exp: 300
-  Gold: 100
-  DroppedItems: []
-  DroppedWeapons: []
-  MultiplyHP: 10
-  ExtraTurns: 0
-  JellyFist: {fileID: 8282308100824431874, guid: 9e5016818a16d734d9353a63b64b4f41,
-    type: 3}
 --- !u!114 &2424636757379540111
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2401,3 +2252,153 @@ MonoBehaviour:
   WeaponExclusives: 
   ChargeCount: 0
   DisabledCount: 0
+--- !u!114 &7425486180400410211
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4965697399233449817}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52e45f6c7e2584b47a4dcdf2c32ec049, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Id: 1
+  Name: Jelly Guy
+  Description: 
+  CombatRangeType: 1
+  RowPosition: 0
+  ColumnPosition: 0
+  Figure: {fileID: 0}
+  Direction: {x: 0, y: 0, z: 0}
+  Movement: {x: 0, y: 0, z: 0}
+  Speed: 0
+  TargetDestination: {x: 0, y: 0, z: 0}
+  TurnDestination: {x: 0, y: 0, z: 0}
+  MainImage: {fileID: 0}
+  FaceImage: {fileID: 0}
+  Level: 1
+  Class: {fileID: 0}
+  HP: 0
+  SP: 0
+  StatBoosts:
+    MaxHP: 0
+    Atk: 0
+    Def: 0
+    Map: 0
+    Mar: 0
+    Rec: 0
+    Spd: 0
+    Tec: 0
+    Acc: 0
+    Eva: 0
+    Crt: 0
+    Cev: 0
+  Stats:
+    MaxHP: 30
+    Atk: 30
+    Def: 30
+    Map: 30
+    Mar: 30
+    Rec: 30
+    Spd: 30
+    Tec: 30
+    Acc: 100
+    Eva: 100
+    Crt: 100
+    Cev: 100
+  Accessories: []
+  LockSelectTrigger: 0
+  SelectedAction: {fileID: 0}
+  SelectedWeapon: {fileID: 0}
+  IsCharging: 0
+  States: []
+  CurrentListIndex: 0
+  BasicAttackSkill: {fileID: 0}
+  SelectedSingleMeeleeTarget: {fileID: 0}
+  ExecutedAction: 0
+  HitCritical: 0
+  HitWeakness: 0
+  HitResistant: 0
+  ChangedElementRates: []
+  ChangedStateRates: []
+  Flying: 0
+  StatModifiers:
+    MaxHP: 0
+    Atk: 0
+    Def: 0
+    Map: 0
+    Mar: 0
+    Rec: 0
+    Spd: 0
+    Tec: 0
+    Acc: 0
+    Eva: 0
+    Crt: 0
+    Cev: 0
+  KOd: 0
+  Petrified: 0
+  CannotMove: 0
+  SPConsumeRate: 0
+  Counter: 0
+  Reflect: 0
+  DisabledToolTypes: 
+  RemoveByHit: 
+  ContactSpread: 
+  ElementRates: 
+  StateRates: 
+  AIActions:
+  - Action: {fileID: 2424636757379540111}
+    ClassSkillId: 0
+    Priority: 10
+    PriorityOnFail: 10
+    UserCondition:
+      HPLow: 0
+      HPHigh: 0
+      SPLow: 0
+      SPHigh: 0
+      AnyActiveStates: []
+      AllInactiveStates: []
+    TargetCondition:
+      Condition:
+        HPLow: 0
+        HPHigh: 0
+        SPLow: 0
+        SPHigh: 0
+        AnyActiveStates: []
+        AllInactiveStates: []
+      RangeType: 0
+    CurrentPriority: 0
+    PossibleTargets: []
+  - Action: {fileID: 5292543417821135309}
+    ClassSkillId: 0
+    Priority: 10
+    PriorityOnFail: 10
+    UserCondition:
+      HPLow: 0
+      HPHigh: 0
+      SPLow: 0
+      SPHigh: 0
+      AnyActiveStates: []
+      AllInactiveStates: []
+    TargetCondition:
+      Condition:
+        HPLow: 0
+        HPHigh: 0
+        SPLow: 0
+        SPHigh: 0
+        AnyActiveStates: []
+        AllInactiveStates: []
+      RangeType: 0
+    CurrentPriority: 0
+    PossibleTargets: []
+  IsSummon: 0
+  Exp: 300
+  Gold: 100
+  DroppedItems: []
+  DroppedWeapons: []
+  MultiplyHP: 1
+  ExtraTurns: 0
+  JellyFist: {fileID: 8282308100824431874, guid: 9e5016818a16d734d9353a63b64b4f41,
+    type: 3}

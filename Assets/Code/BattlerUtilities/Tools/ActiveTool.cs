@@ -67,8 +67,7 @@ public abstract class ActiveTool : BaseObject
 
     public int GetFormulaOutput(Battler u, Battler t, float effectMagnitude = 1.0f)
     {
-        float weaponPower = u.SelectedWeapon != null ? u.SelectedWeapon.Power : 5;
-        float power = Power * weaponPower / 100f;
+        float power = Power * (u.SelectedWeapon?.Power ?? 5) / 100f;
 
         float formulaTotal = 0;
         float offMod = 1.5f;

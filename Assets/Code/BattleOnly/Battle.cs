@@ -42,6 +42,7 @@ public class Battle : MonoBehaviour
     // Battle state tracking
     public BattlePhases Phase { get; private set; }
     private bool StartingBattle;
+    private bool StartingAction;
     private bool NotifySwitchInBattlePhase;
     private bool LastActionOfTurn;
     [HideInInspector] public int Turn;
@@ -76,13 +77,12 @@ public class Battle : MonoBehaviour
         SetupBackground();
         SetupPlayerParty();
         SetupEnemyParty();
-        BattleMenu.ClearAllTurnIndicatorLabels();
         foreach (BattlePlayer p in PlayerParty.Players) Battlers.Add(p);
         foreach (BattleAlly a in PlayerParty.Allies) Battlers.Add(a);
         foreach (BattleEnemy e in EnemyParty.Enemies) Battlers.Add(e);
         SortBattlersInOrderLayer();
         StartingBattle = true;
-        Await(1);
+        Await(2);
     }
 
     IEnumerable SetupContents()
@@ -119,10 +119,11 @@ public class Battle : MonoBehaviour
     List<T> SetupBattlers<T>(List<T> list, Transform partyGameObject) where T : Battler
     {
         List<T> result = new List<T>();
+        int i = 0;
         foreach (Battler b0 in list)
         {
             Vector3 bpPos = partyGameObject.position + Positions[(int)b0.RowPosition][(int)b0.ColumnPosition];
-            T b = (T)InstantiateBattler(b0, bpPos);
+            T b = (T)InstantiateBattler(b0, bpPos, i++);
             result.Add(b);
         }
         return result;
@@ -169,7 +170,7 @@ public class Battle : MonoBehaviour
         return allies;
     }
 
-    public T InstantiateBattler<T>(T newBattler, Vector3 position) where T : Battler
+    public T InstantiateBattler<T>(T newBattler, Vector3 position, int index) where T : Battler
     {
         T b = Instantiate(newBattler, position, Quaternion.identity, (newBattler is BattleEnemy ? EnemyPartyDump : PlayerPartyDump));
 
@@ -203,12 +204,24 @@ public class Battle : MonoBehaviour
 
     private void Update()
     {
-        if (Waiting) return;
+        if (Waiting)
+        {
+            return;
+        }
         else if (StartingBattle)
         {
-            TurnStart();
+            BattleMenu.DisplayPartyFrames();
             StartingBattle = false;
+            TurnStart();
+            return;
         }
+        else if (StartingAction)
+        {
+            StartingAction = false;
+            ActionStart();
+            return;
+        }
+        
         UpdateActingBattlerLayerOrder();
 
         switch (Phase)
@@ -238,6 +251,12 @@ public class Battle : MonoBehaviour
                 Phase = BattlePhases.None;
                 break;
         }
+    }
+
+    public void Await(float m = 1)
+    {
+        if (Waiting) AwaitingTime += m;
+        else AwaitingTime = Time.unscaledTime + m;
     }
 
     public void NotifyToSwitchInBattlePhase()
@@ -277,25 +296,22 @@ public class Battle : MonoBehaviour
     /// -- Turn Start --
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public void Await(float m = 1)
-    {
-        if (Waiting) AwaitingTime += m;
-        else AwaitingTime = Time.unscaledTime + m;
-    }
-
     public void TurnStart()
     {
         Turn++;
         LastActionOfTurn = false;
         Battlers = SortBattlersBySpeed(Battlers, -5, 6);
+        ActionStartSetup();
+    }
+
+    public void ActionStartSetup()
+    {
         Await(1);
-        ActionStart();
+        StartingAction = true;
     }
 
     private void ActionStart()
     {
-        Await(1);
-        ResetSelectedTargets();
         BattleMenu.ClearAllTurnIndicatorLabels();
         GetNextFastestAvailableBattlers();
         BattleMenu.DeclareCurrent(ActingBattler);
@@ -434,6 +450,7 @@ public class Battle : MonoBehaviour
     private void ActionEnd()
     {
         ActingBattler.ExecutedAction = true;
+        ResetSelectedTargets();
         RestrictBattlerWallCollision(true);
         FinishActionUsage();
         if (CheckBattleEndCondition()) return;
@@ -441,7 +458,7 @@ public class Battle : MonoBehaviour
         else
         {
             Battlers = SortBattlersBySpeed(Battlers, 0, 1);
-            ActionStart();
+            ActionStartSetup();
         }
     }
 

@@ -8,16 +8,18 @@ public class Enemy_JellyGuy : BattleEnemy
 
     protected override void AnimatingSkill_0()
     {
-        if (PassedTime(0.1f, 0)) SpawnProjectile(JellyFist);
-        if (PassedTime(0.3f, 1)) SpawnProjectile(JellyFist);
-        if (PassedTime(0.6f, 2)) SpawnProjectile(JellyFist);
-        if (PassedTime(0.8f, 3)) SpawnProjectile(JellyFist);
+        float dmgPortion = 0.25f;
+        if (PassedTime(0.1f, 0)) SpawnProjectile(JellyFist, dmgPortion);
+        if (PassedTime(0.3f, 1)) SpawnProjectile(JellyFist, dmgPortion);
+        if (PassedTime(0.6f, 2)) SpawnProjectile(JellyFist, dmgPortion);
+        if (PassedTime(0.8f, 3)) SpawnProjectile(JellyFist, dmgPortion);
     }
 
     protected override void AnimatingSkill_1()
     {
-        if (PassedTime(0.7f, 0)) SpawnProjectile(JellyFist);
-        if (PassedTime(0.8f, 1)) SpawnProjectile(JellyFist);
-        if (PassedTime(0.9f, 2)) SpawnProjectile(JellyFist);
+        float dmgPortion = 0.33f;
+        if (PassedTime(0.7f, 0)) SpawnProjectile(JellyFist, dmgPortion);
+        if (PassedTime(0.8f, 1)) SpawnProjectile(JellyFist, dmgPortion);
+        if (PassedTime(0.9f, 2)) SpawnProjectile(JellyFist, dmgPortion);
     }
 }

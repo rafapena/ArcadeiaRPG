@@ -5,9 +5,10 @@ using UnityEngine.Events;
 
 public class Projectile : MonoBehaviour
 {
-    [HideInInspector] private Battler Shooter;
-    [HideInInspector] private List<Battler> Targets = new List<Battler>();
-    [HideInInspector] private ActiveTool ToolEffect;
+    private Battler Shooter;
+    private List<Battler> Targets = new List<Battler>();
+    private ActiveTool ToolEffect;
+    private float NerfPartition;
 
     private Vector3 ShootDir;
     public bool PointToDirection;
@@ -23,10 +24,11 @@ public class Projectile : MonoBehaviour
         if (Duration > 0) Destroy(gameObject, Duration);
     }
 
-    public void SetBattleInfo(Battler user, ActiveTool activeTool)
+    public void SetBattleInfo(Battler user, ActiveTool activeTool, float nerfPartition = 1f)
     {
         Shooter = user;
         ToolEffect = activeTool;
+        NerfPartition = nerfPartition;
     }
 
     protected void Update()
@@ -52,7 +54,7 @@ public class Projectile : MonoBehaviour
         if (hb && hb.Battler.IsSelected && !Targets.Contains(hb.Battler))
         {
             Targets.Add(hb.Battler);
-            hb.Battler.ReceiveToolEffects(Shooter, ToolEffect);
+            hb.Battler.ReceiveToolEffects(Shooter, ToolEffect, NerfPartition);
             if (DurationAfterCollision > 0) Explode();
         }
     }

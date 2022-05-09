@@ -90,7 +90,7 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
         {
             case Selections.Awaiting:
                 if (CurrentBattle.Waiting) break;
-                PostAwaitSetup();
+                ActingPlayer.EnableArrowKeyMovement();
                 SetupForSelectAction();
                 break;
 
@@ -115,23 +115,23 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
         }
     }
 
-    public void Setup(BattlePlayer p)
+    public void Setup(Battler b)
     {
         Selection = Selections.Awaiting;
-        PartyList.Refresh(CurrentBattle.PlayerParty.Players);
-        UpdateEnemyPartyList();
         SelectItemsList.SetToolListOnTab(0, CurrentBattle.PlayerParty.Inventory.Items.FindAll(x => !x.IsKey));
-        ActingPlayer = p;
-        p.IsDecidingAction = true;
+        if (b is BattlePlayer p)
+        {
+            ActingPlayer = p;
+            p.IsDecidingAction = true;
+        }
     }
 
-    private void PostAwaitSetup()
+    public void DisplayPartyFrames()
     {
-        ActingPlayer.EnableArrowKeyMovement();
+        PartyList.Refresh(CurrentBattle.PlayerParty.Players);
+        UpdateEnemyPartyList();
         PartyFrame.Activate();
         EnemiesFrame.Activate();
-        DeclareCurrent(ActingPlayer);
-        DeclareNext(CurrentBattle.NextActingBattler);
     }
 
     public void Hide()
@@ -205,6 +205,7 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
 
     private void SetWeaponOnMenuAndCharacter()
     {
+        if (!ActingPlayer.SelectedWeapon) return;
         OptionWeapon.transform.GetChild(0).GetComponent<Image>().sprite = ActingPlayer.SelectedWeapon.GetComponent<SpriteRenderer>().sprite;
         OptionWeapon.transform.GetChild(2).gameObject.SetActive(ActingPlayer.Weapons.Count > 1);
         ActingPlayer.Sprite.RightArmHold(ActingPlayer.SelectedWeapon.Name);
@@ -599,7 +600,15 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
     /// -- Updating party list in real-time --
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public void ChangeHP() { }
+    public void UpdatePlayerEntry(Battler b)
+    {
+        PartyList.UpdateEntry(b, b.CurrentListIndex);
+    }
+
+    public void UpdateEnemyEntry(Battler b)
+    {
+        EnemiesList.UpdateEntry(b, b.CurrentListIndex);
+    }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- Battle phase process: RUN --

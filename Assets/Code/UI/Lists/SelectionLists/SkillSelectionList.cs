@@ -39,6 +39,8 @@ public class SkillSelectionList : SelectionList_Super<Skill>
     public void Deactivate()
     {
         Container.GetComponent<MenuFrame>().Deactivate();
+        InfoFrame.SetActive(false);
+        CannotUseFrame.SetActive(false);
     }
 
     public void Refresh(BattlePlayer b, List<Battler> bg)

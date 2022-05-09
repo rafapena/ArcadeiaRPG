@@ -29,8 +29,8 @@ public class Class_Rookie : BattlerClass
 
     protected override void AnimateBasicAttack_Blade()
     {
-        if (PassedTime(0.4f, 0)) Attack(HighSlash);
-        else if (PassedTime(0.7f, 1)) Attack(WideSlash);
+        if (PassedTime(0.4f, 0)) Attack(HighSlash, 0.4f);
+        else if (PassedTime(0.7f, 1)) Attack(WideSlash, 0.6f);
     }
 
     protected override void AnimateBasicAttack_Staff()
@@ -38,9 +38,9 @@ public class Class_Rookie : BattlerClass
         //
     }
 
-    protected void Attack(Projectile p)
+    protected void Attack(Projectile p, float dmgPortion)
     {
         User.Figure.AddForce(Vector3.one * 3);
-        SpawnProjectile(p);
+        SpawnProjectile(p, dmgPortion);
     }
 }

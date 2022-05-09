@@ -86,8 +86,8 @@ public class MapPlayer : MapExplorer
             Battler b = all[i];
             b.Level = Party.Level;
             b.StatConversion();
-            b.HP = b.MaxHP / 2;
-            b.SP = 100 / 2;
+            //b.HP = b.MaxHP / 2;
+            //b.SP = 100 / 2;
             b.gameObject.SetActive(false);
             if (b is BattlePlayer p)
             {

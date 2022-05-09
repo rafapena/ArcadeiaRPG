@@ -250,26 +250,18 @@ public class MMSpecial : MM_Super
     {
         PartyTargetsList.SelectedObject = SelectableTeammates[index];
         PartyTargetsList.SelectedObject.ReceiveToolEffects(PartyUserList.SelectedObject, SkillsList.SelectedObject);
-        UpdateGauges(PartyTargetsList, index, PartyTargetsList.SelectedObject);
+        PartyTargetsList.UpdateEntry(PartyTargetsList.SelectedObject, index);
     }
 
     private void ApplyEffectsToUser()
     {
         PartyUserList.SelectedObject.ChangeSP(-SkillsList.SelectedObject.SPConsume);
-        UpdateGauges(PartyUserList, PartyUserList.SelectedIndex, PartyUserList.SelectedObject);
+        PartyUserList.UpdateEntry(PartyUserList.SelectedObject, PartyUserList.SelectedIndex);
         for (int i = 0; i < SelectableTeammates.Count; i++)
         {
             if (SelectableTeammates[i].Id != PartyUserList.SelectedObject.Id) continue;
-            UpdateGauges(PartyTargetsList, i, PartyUserList.SelectedObject);
+            PartyTargetsList.UpdateEntry(PartyUserList.SelectedObject, i);
             break;
         }
-    }
-
-    private void UpdateGauges(PlayerSelectionList partyList, int index, Battler selectedTeammate)
-    {
-        Gauge hpg = partyList.transform.GetChild(index).GetChild(3).GetComponent<Gauge>();
-        Gauge spg = partyList.transform.GetChild(index).GetChild(4).GetComponent<Gauge>();
-        hpg.SetAndAnimate(selectedTeammate.HP, selectedTeammate.MaxHP);
-        spg.SetAndAnimate(selectedTeammate.SP, BattleMaster.SP_CAP);
     }
 }

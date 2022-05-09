@@ -59,7 +59,6 @@ public class ResourcesMaster : MonoBehaviour
         Players = SortById(Resources.LoadAll<BattlePlayer>("Prefabs/BattlePlayers"));
         Classes = SortById(Resources.LoadAll<BattlerClass>("Prefabs/BattlerClasses"));
         Enemies = SortById(Resources.LoadAll<BattleEnemy>("Prefabs/BattleEnemies"));
-        EnemyParties = SortById(Resources.LoadAll<EnemyParty>("Prefabs/EnemyParties"));
         //Environments = SortById(Resources.LoadAll<Environment>("Prefabs/Environments"));
         Items = SortById(Resources.LoadAll<Item>("Prefabs/Items"));
         Objectives = SortById(Resources.LoadAll<Objective>("Prefabs/Objectives"));

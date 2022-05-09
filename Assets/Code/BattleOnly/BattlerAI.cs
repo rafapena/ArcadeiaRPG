@@ -20,6 +20,7 @@ public abstract class BattlerAI : Battler
     protected override void Start()
     {
         base.Start();
+        StatConversion();
         CleanupAIActionList();
         SelectedWeapon = WeaponOptions.Any() ? (WeaponOptions.First().Action as Weapon) : null;
     }
@@ -32,14 +33,6 @@ public abstract class BattlerAI : Battler
     protected override void MapGameObjectsToHUD()
     {
         // StateEffects
-    }
-
-    public override void StatConversion()
-    {
-        if (Class) Stats.SetTo(Class.BaseStats);
-        Stats.ConvertFromBaseToActual(Level);
-        HP = MaxHP;
-        SP = 100;
     }
 
     private void CleanupAIActionList()
@@ -208,21 +201,5 @@ public abstract class BattlerAI : Battler
     private void PositionIn()
     {
         //
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// -- General HP/SP Management --
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    public override void MaxHPSP()
-    {
-        base.MaxHPSP();
-        //HUDProperties.Gauge.Fill();
-    }
-
-    public override void ChangeHP(int val)
-    {
-        base.ChangeHP(val);
-        //HUDProperties.Gauge.SetAndAnimate(HP, MaxHP);
     }
 }

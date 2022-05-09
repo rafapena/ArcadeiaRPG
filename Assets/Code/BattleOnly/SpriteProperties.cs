@@ -30,6 +30,8 @@ public class SpriteProperties : MonoBehaviour
 
     public Transform ActionEffects { get; private set; }
 
+    public GameObject TurnIndicator { get; private set; }
+
     public GameObject SpeechBubble { get; private set; }
 
     public struct SpriteComponent
@@ -56,7 +58,8 @@ public class SpriteProperties : MonoBehaviour
             ApproachPoints = PropertiesList.GetChild(3).GetComponent<Transform>();
             StateEffects = PropertiesList.GetChild(4).GetComponent<Transform>();
             ActionEffects = PropertiesList.GetChild(5).GetComponent<Transform>();
-            SpeechBubble = PropertiesList.GetChild(6).gameObject;
+            TurnIndicator = PropertiesList.GetChild(6).gameObject;
+            SpeechBubble = PropertiesList.GetChild(7).gameObject;
         }
         catch
         {

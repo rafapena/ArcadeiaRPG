@@ -52,14 +52,6 @@ public abstract class BattlePlayer : Battler
         // StateEffects
     }
 
-    public override void StatConversion()
-    {
-        Stats.SetTo(Class.BaseStats);
-        Stats.ConvertFromBaseToActual(Level, NaturalStats);
-        HP = MaxHP;
-        SP = 100;
-    }
-
     public void AddLearnedSkills()
     {
         IEnumerable<SkillLearnLevel> skills = SkillSet.Concat(Class.SkillSet).OrderBy(x => x.LearnLevel).Where(x => x.LearnLevel <= Level).ToList();
@@ -150,21 +142,12 @@ public abstract class BattlePlayer : Battler
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// -- General HP/SP Management --
+    /// -- Receiving ActiveTool Effects --
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public override void MaxHPSP()
+    public override void ReceiveToolEffects(Battler user, ActiveTool activeTool, float nerfPartition = 1f)
     {
-        base.MaxHPSP();
-    }
-
-    public override void ChangeHP(int val)
-    {
-        base.ChangeHP(val);
-    }
-
-    public override void ChangeSP(int val)
-    {
-        base.ChangeSP(val);
+        base.ReceiveToolEffects(user, activeTool);
+        if (CurrentBattle?.BattleMenu ?? false) CurrentBattle.BattleMenu.UpdatePlayerEntry(this);
     }
 }

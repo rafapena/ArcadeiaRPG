@@ -34,7 +34,10 @@ public class PlayerSelectionList : SelectionList_Super<Battler>
                 SetVerticalPointer(transform.GetChild(i - 1), entry.transform);
                 DuplicateHorizontalPointers(transform.GetChild(i - 1), entry.transform);
             }
+
+            dataEntry.CurrentListIndex = i;
             AddToList(entry.transform, dataEntry);
+            
             ListSelectable e = entry.GetComponent<ListSelectable>();
             if (i % 2 == 1) e.SetMainAlpha(ENTRY_ALTERNATE_ALPHA);
             e.Index = i;
@@ -58,8 +61,10 @@ public class PlayerSelectionList : SelectionList_Super<Battler>
         entry.GetChild(1).GetComponent<TextMeshProUGUI>().text = dataEntry.Name.ToUpper();
         entry.GetChild(2).GetComponent<TextMeshProUGUI>().text = dataEntry.Class?.Name.ToUpper() ?? "";
 
-        if (entry.GetChild(3).gameObject.GetComponent<Gauge>()) entry.GetChild(3).GetComponent<Gauge>().Set(dataEntry.HP, dataEntry.MaxHP);
-        if (entry.GetChild(4).gameObject.GetComponent<Gauge>()) entry.GetChild(4).GetComponent<Gauge>().Set(dataEntry.SP, 100);
+        var hpg = entry.GetChild(3).gameObject.GetComponent<Gauge>();
+        var spg = entry.GetChild(4).gameObject.GetComponent<Gauge>();
+        if (hpg) hpg.Set(dataEntry.HP, dataEntry.MaxHP);
+        if (spg) spg.Set(dataEntry.SP, 100);
         
         AddStates(entry, dataEntry);
         if (entry.childCount > 6) entry.GetChild(6).gameObject.SetActive(false);
@@ -79,8 +84,15 @@ public class PlayerSelectionList : SelectionList_Super<Battler>
         for (; i < statesGO.childCount; i++) statesGO.GetChild(i).gameObject.SetActive(false);
     }
 
-    public int GetId(int index)
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// -- Real-time updates --
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    public void UpdateEntry<T>(T battler, int index) where T : Battler
     {
-        return ReferenceData[index].Id;
+        Gauge hpg = transform.GetChild(index).GetChild(3).GetComponent<Gauge>();
+        Gauge spg = transform.GetChild(index).GetChild(4).GetComponent<Gauge>();
+        hpg.SetAndAnimate(battler.HP, battler.MaxHP);
+        spg.SetAndAnimate(battler.SP, BattleMaster.SP_CAP);
     }
 }

@@ -183,21 +183,29 @@ public abstract class ToolUser : BaseObject
     /// -- Action utilities --
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    protected Projectile SpawnProjectile(Projectile p0)
+    protected Projectile SpawnProjectile(Projectile p0, float nerfPartition = 1f)
     {
         Projectile p = Instantiate(p0, User.transform);
         p.transform.position = User.transform.position;
-        p.SetBattleInfo(User, Action);
+        p.SetBattleInfo(User, Action, nerfPartition);
         p.Direct(User.Direction);
         return p;
     }
 
-    protected void SummonBattler(BattlerAI b0)
+    protected void SummonBattler(BattlerAI b)
     {
-        BattlerAI b = CurrentBattle.InstantiateBattler(b0, User.TargetDestination);
-        b.IsSummon = true;
-        if (b is BattleAlly a) CurrentBattle.PlayerParty.Allies.Add(a);
-        else if (b is BattleEnemy e) CurrentBattle.EnemyParty.Enemies.Add(e);
+        if (b is BattleAlly a0)
+        {
+            var a = CurrentBattle.InstantiateBattler(a0, User.TargetDestination, CurrentBattle.PlayerParty.Players.Count + CurrentBattle.PlayerParty.Allies.Count + 1);
+            CurrentBattle.PlayerParty.Allies.Add(a);
+            a.IsSummon = true;
+        }
+        else if (b is BattleEnemy e0)
+        {
+            var e = CurrentBattle.InstantiateBattler(e0, User.TargetDestination, CurrentBattle.EnemyParty.Enemies.Count + 1);
+            CurrentBattle.EnemyParty.Enemies.Add(e);
+            e.IsSummon = true;
+        }
     }
 
 

@@ -56,7 +56,7 @@ public abstract class Battler : ToolUser
     [HideInInspector] public Weapon SelectedWeapon;
     [HideInInspector] public bool IsCharging;
     [HideInInspector] public List<State> States = new List<State>();
-    private bool BlinkingEnabled;
+    [HideInInspector] public int CurrentListIndex;
 
     // Basic attack
     public bool UsingBasicAttack => SelectedAction == BasicAttackSkill;
@@ -122,7 +122,13 @@ public abstract class Battler : ToolUser
 
     protected abstract void MapGameObjectsToHUD();
 
-    public abstract void StatConversion();
+    public virtual void StatConversion()
+    {
+        if (Class) Stats.SetTo(Class.BaseStats);
+        Stats.ConvertFromBaseToActual(Level);
+        HP = MaxHP;
+        SP = 100;
+    }
 
     private void SetupElementRates()
     {
@@ -346,7 +352,7 @@ public abstract class Battler : ToolUser
     /// -- Receiving ActiveTool Effects --
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public void ReceiveToolEffects(Battler user, ActiveTool activeTool)
+    public virtual void ReceiveToolEffects(Battler user, ActiveTool activeTool, float nerfPartition = 1f)
     {
         float effectMagnitude = 1.0f;
         if (activeTool.Hit(user, this, effectMagnitude))
@@ -358,10 +364,8 @@ public abstract class Battler : ToolUser
             float elementRate = activeTool.GetElementRateRatio(user, this);                   // UPDATES HitWeakness and HitResistant
             int ratesTotal = (int)(critRate * elementRate);
 
-            int totalHPChange = (formulaOutput + directHPChange) * ratesTotal;
-            int totalSPChange = (formulaOutput + activeTool.SPPecent) * ratesTotal;
-            int realHPTotal = activeTool.GetTotalWithVariance(totalHPChange);
-            int realSPTotal = activeTool.GetTotalWithVariance(totalSPChange);
+            int realHPTotal = (int)(activeTool.GetTotalWithVariance((formulaOutput + directHPChange) * ratesTotal) * nerfPartition);
+            int realSPTotal = (int)(activeTool.GetTotalWithVariance((formulaOutput + activeTool.SPPecent) * ratesTotal) * nerfPartition);
             if (activeTool.HPModType != ActiveTool.ModType.None && realHPTotal <= 0) realHPTotal = 1;
             if (activeTool.SPModType != ActiveTool.ModType.None && realSPTotal <= 0) realSPTotal = 1;
 
@@ -415,10 +419,6 @@ public abstract class Battler : ToolUser
         if (GetComponent<SpriteRenderer>()) GetComponent<SpriteRenderer>().enabled = !KOd;
         else if (GetComponent<Animator>()) GetComponent<Animator>().enabled = !KOd;
     }
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// -- General HP/SP Management --
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public virtual void MaxHPSP()
     {
