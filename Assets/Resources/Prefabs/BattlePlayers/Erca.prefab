@@ -319,6 +319,11 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 908942086059878578, guid: e83e3687439890940985cbbbb4a41e84,
+        type: 3}
+      propertyPath: Animation
+      value: 
+      objectReference: {fileID: 1923822402826620012}
     - target: {fileID: 917594730377098682, guid: e83e3687439890940985cbbbb4a41e84,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -3642,6 +3647,12 @@ PrefabInstance:
         type: 3}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: e83e3687439890940985cbbbb4a41e84, type: 3}
+--- !u!95 &1923822402826620012 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 8483493002883945159, guid: e83e3687439890940985cbbbb4a41e84,
+    type: 3}
+  m_PrefabInstance: {fileID: 8001104025049341611}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &2918027521017405822 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5149667342464974805, guid: e83e3687439890940985cbbbb4a41e84,
@@ -3808,13 +3819,15 @@ MonoBehaviour:
   Name: Erca
   Description: First party member
   CombatRangeType: 0
+  Sprite: {fileID: 7175526935337104921}
   RowPosition: 0
   ColumnPosition: 2
   Figure: {fileID: 0}
   Direction: {x: 0, y: 0, z: 0}
   Movement: {x: 0, y: 0, z: 0}
   Speed: 0
-  ApproachDestination: {x: 0, y: 0, z: 0}
+  TargetDestination: {x: 0, y: 0, z: 0}
+  TurnDestination: {x: 0, y: 0, z: 0}
   MainImage: {fileID: 0}
   FaceImage: {fileID: 21300000, guid: 9e5d479eb90a61941b1065c1d83e55b9, type: 3}
   Level: 1
@@ -3827,9 +3840,9 @@ MonoBehaviour:
     Def: 0
     Map: 0
     Mar: 0
+    Rec: 0
     Spd: 0
     Tec: 0
-    Luk: 0
     Acc: 0
     Eva: 0
     Crt: 0
@@ -3840,9 +3853,9 @@ MonoBehaviour:
     Def: 0
     Map: 0
     Mar: 0
+    Rec: 0
     Spd: 0
     Tec: 0
-    Luk: 0
     Acc: 0
     Eva: 0
     Crt: 0
@@ -3853,6 +3866,7 @@ MonoBehaviour:
   SelectedWeapon: {fileID: 0}
   IsCharging: 0
   States: []
+  CurrentListIndex: 0
   BasicAttackSkill: {fileID: 0}
   SelectedSingleMeeleeTarget: {fileID: 0}
   ExecutedAction: 0
@@ -3868,9 +3882,9 @@ MonoBehaviour:
     Def: 0
     Map: 0
     Mar: 0
+    Rec: 0
     Spd: 0
     Tec: 0
-    Luk: 0
     Acc: 0
     Eva: 0
     Crt: 0
@@ -3907,9 +3921,9 @@ MonoBehaviour:
     Def: 0
     Map: 0
     Mar: 0
+    Rec: 0
     Spd: 0
     Tec: 0
-    Luk: 0
     Acc: 0
     Eva: 0
     Crt: 0
@@ -3974,6 +3988,18 @@ MonoBehaviour:
   WeaponExclusives: 
   ChargeCount: 0
   DisabledCount: 0
+--- !u!114 &7175526935337104921 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 908942086059878578, guid: e83e3687439890940985cbbbb4a41e84,
+    type: 3}
+  m_PrefabInstance: {fileID: 8001104025049341611}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2a5d13a274b3764d9a8a74352d0b695, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!4 &7656525529964803131 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 380783826105887376, guid: e83e3687439890940985cbbbb4a41e84,

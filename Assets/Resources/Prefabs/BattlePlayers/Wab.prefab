@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 399710335168838284}
   - component: {fileID: 6483023768945186743}
-  - component: {fileID: 400207457001987166}
   - component: {fileID: 3588944525326980205}
   m_Layer: 0
   m_Name: Wab
@@ -56,20 +55,6 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
---- !u!114 &400207457001987166
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 323052835437560043}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a2a5d13a274b3764d9a8a74352d0b695, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  MainSprite: {fileID: 4810969966611500601}
-  Animation: {fileID: 4453852971296057128}
 --- !u!114 &3588944525326980205
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -86,6 +71,7 @@ MonoBehaviour:
   Name: Wab
   Description: 
   CombatRangeType: 0
+  Sprite: {fileID: 3245406271437038973}
   RowPosition: 0
   ColumnPosition: 0
   Figure: {fileID: 0}
@@ -132,6 +118,7 @@ MonoBehaviour:
   SelectedWeapon: {fileID: 0}
   IsCharging: 0
   States: []
+  CurrentListIndex: 0
   BasicAttackSkill: {fileID: 0}
   SelectedSingleMeeleeTarget: {fileID: 0}
   ExecutedAction: 0
@@ -779,6 +766,16 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 496747215006172843}
     m_Modifications:
+    - target: {fileID: 102291102105007479, guid: f51d329cf4098f347ba7b6669fbfdf74,
+        type: 3}
+      propertyPath: Animation
+      value: 
+      objectReference: {fileID: 4453852971296057128}
+    - target: {fileID: 102291102105007479, guid: f51d329cf4098f347ba7b6669fbfdf74,
+        type: 3}
+      propertyPath: SpritesList
+      value: 
+      objectReference: {fileID: 4810969966611500601}
     - target: {fileID: 508230869355989100, guid: f51d329cf4098f347ba7b6669fbfdf74,
         type: 3}
       propertyPath: m_SizeDelta.x
@@ -1006,6 +1003,18 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f51d329cf4098f347ba7b6669fbfdf74, type: 3}
+--- !u!114 &3245406271437038973 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 102291102105007479, guid: f51d329cf4098f347ba7b6669fbfdf74,
+    type: 3}
+  m_PrefabInstance: {fileID: 3198284678296670218}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2a5d13a274b3764d9a8a74352d0b695, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!224 &6932751082322041350 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 5500164638407395852, guid: f51d329cf4098f347ba7b6669fbfdf74,

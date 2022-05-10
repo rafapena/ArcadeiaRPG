@@ -188,6 +188,18 @@ MonoBehaviour:
   m_CategoryHash: 0
   m_labelHash: 0
   m_SpriteKey: 0
+--- !u!114 &407830634746230811 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7306093887274166113, guid: 445db8c3c0083004aa1cc1d44fcfe625,
+    type: 3}
+  m_PrefabInstance: {fileID: 6975110878638317434}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2a5d13a274b3764d9a8a74352d0b695, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1598591504686111028 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8566907397974967886, guid: 445db8c3c0083004aa1cc1d44fcfe625,
@@ -315,13 +327,15 @@ MonoBehaviour:
   Name: Tiberious
   Description: Second party member
   CombatRangeType: 0
+  Sprite: {fileID: 407830634746230811}
   RowPosition: 0
   ColumnPosition: 0
   Figure: {fileID: 0}
   Direction: {x: 0, y: 0, z: 0}
   Movement: {x: 0, y: 0, z: 0}
   Speed: 0
-  ApproachDestination: {x: 0, y: 0, z: 0}
+  TargetDestination: {x: 0, y: 0, z: 0}
+  TurnDestination: {x: 0, y: 0, z: 0}
   MainImage: {fileID: 0}
   FaceImage: {fileID: 21300000, guid: e9aa33f1d2f117246bbb151d26121f8b, type: 3}
   Level: 1
@@ -334,9 +348,9 @@ MonoBehaviour:
     Def: 0
     Map: 0
     Mar: 0
+    Rec: 0
     Spd: 0
     Tec: 0
-    Luk: 0
     Acc: 0
     Eva: 0
     Crt: 0
@@ -347,9 +361,9 @@ MonoBehaviour:
     Def: 0
     Map: 0
     Mar: 0
+    Rec: 0
     Spd: 0
     Tec: 0
-    Luk: 0
     Acc: 0
     Eva: 0
     Crt: 0
@@ -360,6 +374,7 @@ MonoBehaviour:
   SelectedWeapon: {fileID: 0}
   IsCharging: 0
   States: []
+  CurrentListIndex: 0
   BasicAttackSkill: {fileID: 0}
   SelectedSingleMeeleeTarget: {fileID: 0}
   ExecutedAction: 0
@@ -375,9 +390,9 @@ MonoBehaviour:
     Def: 0
     Map: 0
     Mar: 0
+    Rec: 0
     Spd: 0
     Tec: 0
-    Luk: 0
     Acc: 0
     Eva: 0
     Crt: 0
@@ -404,9 +419,9 @@ MonoBehaviour:
     Def: 0
     Map: 0
     Mar: 0
+    Rec: 0
     Spd: 0
     Tec: 0
-    Luk: 0
     Acc: 0
     Eva: 0
     Crt: 0

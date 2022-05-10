@@ -9,7 +9,7 @@ using UnityEngine.UI;
 
 public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameOperations
 {
-    private enum Selections { Awaiting, Actions, Skills, Items, Targeting, Running, Disabled }
+    private enum Selections { Actions, Skills, Items, Targeting, Running, Disabled }
 
     // Battle tracking
     public Battle CurrentBattle;
@@ -88,12 +88,6 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
 
         switch (Selection)
         {
-            case Selections.Awaiting:
-                if (CurrentBattle.Waiting) break;
-                ActingPlayer.EnableArrowKeyMovement();
-                SetupForSelectAction();
-                break;
-
             case Selections.Actions:
                 UpdateTarget?.Invoke();
                 SelectingAction();
@@ -115,23 +109,24 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
         }
     }
 
+    public void RefreshPartyFrames()
+    {
+        PartyList.Refresh(CurrentBattle.PlayerParty.Players);
+        UpdateEnemyPartyList();
+        PartyFrame.Activate();
+        EnemiesFrame.Activate();
+    }
+
     public void Setup(Battler b)
     {
-        Selection = Selections.Awaiting;
         SelectItemsList.SetToolListOnTab(0, CurrentBattle.PlayerParty.Inventory.Items.FindAll(x => !x.IsKey));
         if (b is BattlePlayer p)
         {
             ActingPlayer = p;
             p.IsDecidingAction = true;
         }
-    }
-
-    public void DisplayPartyFrames()
-    {
-        PartyList.Refresh(CurrentBattle.PlayerParty.Players);
-        UpdateEnemyPartyList();
-        PartyFrame.Activate();
-        EnemiesFrame.Activate();
+        ActingPlayer.EnableArrowKeyMovement();
+        SetupForSelectAction();
     }
 
     public void Hide()
@@ -143,51 +138,6 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
         SelectActionFrame.Deactivate();
         SelectSkillsFrame.Deactivate();
         SelectItemsFrame.Deactivate();
-    }
-
-    public void DeclareCurrent(Battler actingBattler)
-    {
-        /*int i = 0;
-        if (actingBattler is BattlePlayer p)
-        {
-            foreach (Transform t in PartyList.transform)
-            {
-                if (p.Id == PartyList.GetId(i++)) t.GetComponent<ListSelectable>().KeepHighlighted();
-                else t.GetComponent<ListSelectable>().ClearHighlights();
-            }
-        }
-        else if (actingBattler is BattlerAI ai)
-        {
-            //
-        }*/
-    }
-
-    public void DeclareNext(Battler nextActingBattler)
-    {
-        /*if (nextActingBattler is BattlePlayer nextP)
-        {
-            int i = 0;
-            foreach (Transform t in PartyList.transform) t.GetChild(6).gameObject.SetActive(nextP.Id == PartyList.GetId(i++));
-        }
-        else if (nextActingBattler is BattleAlly nextA)
-        {
-            foreach (BattleAlly ally in CurrentBattle.PlayerParty.Allies) ally.SetNextLabel(nextA == ally);
-        }
-        else if (nextActingBattler is BattleEnemy nextE)
-        {
-            foreach (BattleEnemy enemy in CurrentBattle.EnemyParty.Enemies) enemy.SetNextLabel(nextE == enemy);
-        }*/
-    }
-
-    public void ClearAllTurnIndicatorLabels()
-    {
-        /*foreach (Transform t in PartyList.transform)
-        {
-            t.GetComponent<ListSelectable>().ClearHighlights();
-            t.GetChild(6).gameObject.SetActive(false);
-        }
-        foreach (BattleAlly ally in CurrentBattle.PlayerParty.Allies) ally.SetNextLabel(false);
-        foreach (BattleEnemy enemy in CurrentBattle.EnemyParty.Enemies) enemy.SetNextLabel(false);*/
     }
 
     private void UpdateWeapon()
@@ -213,7 +163,7 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
 
     private void UpdateEnemyPartyList()
     {
-        EnemiesList.Refresh(CurrentBattle.EnemyParty.Enemies);
+        EnemiesList.Refresh(CurrentBattle.EnemyParty.Enemies.Where(x => !x.KOd).ToList());
         Vector2 size = EnemiesFrame.gameObject.GetComponent<RectTransform>().sizeDelta;
         size.y = EnemyListHeight * CurrentBattle.EnemyParty.Enemies.Where(x => !x.KOd).Count();
         EnemiesFrame.gameObject.GetComponent<RectTransform>().sizeDelta = size;

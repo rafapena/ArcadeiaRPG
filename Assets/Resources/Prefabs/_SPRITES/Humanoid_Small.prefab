@@ -2185,10 +2185,40 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 5080328183572055474}
     m_Modifications:
+    - target: {fileID: 102291102105007479, guid: f51d329cf4098f347ba7b6669fbfdf74,
+        type: 3}
+      propertyPath: Animation
+      value: 
+      objectReference: {fileID: 8564797191916981559}
+    - target: {fileID: 102291102105007479, guid: f51d329cf4098f347ba7b6669fbfdf74,
+        type: 3}
+      propertyPath: SpritesList
+      value: 
+      objectReference: {fileID: 1536532809921866028}
     - target: {fileID: 699987851846813442, guid: f51d329cf4098f347ba7b6669fbfdf74,
         type: 3}
       propertyPath: m_Name
       value: SpriteProperties
+      objectReference: {fileID: 0}
+    - target: {fileID: 1448074480265671835, guid: f51d329cf4098f347ba7b6669fbfdf74,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0.13
+      objectReference: {fileID: 0}
+    - target: {fileID: 1448074480265671835, guid: f51d329cf4098f347ba7b6669fbfdf74,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 1.3120999
+      objectReference: {fileID: 0}
+    - target: {fileID: 4861699845698925276, guid: f51d329cf4098f347ba7b6669fbfdf74,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0.11
+      objectReference: {fileID: 0}
+    - target: {fileID: 4861699845698925276, guid: f51d329cf4098f347ba7b6669fbfdf74,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 1.3
       objectReference: {fileID: 0}
     - target: {fileID: 5500164638407395852, guid: f51d329cf4098f347ba7b6669fbfdf74,
         type: 3}
@@ -2293,6 +2323,26 @@ PrefabInstance:
     - target: {fileID: 5500164638407395852, guid: f51d329cf4098f347ba7b6669fbfdf74,
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6644601767391884499, guid: f51d329cf4098f347ba7b6669fbfdf74,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8373898932794009522, guid: f51d329cf4098f347ba7b6669fbfdf74,
+        type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0.110000014
+      objectReference: {fileID: 0}
+    - target: {fileID: 8373898932794009522, guid: f51d329cf4098f347ba7b6669fbfdf74,
+        type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 1.3
+      objectReference: {fileID: 0}
+    - target: {fileID: 8997464906318050892, guid: f51d329cf4098f347ba7b6669fbfdf74,
+        type: 3}
+      propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []

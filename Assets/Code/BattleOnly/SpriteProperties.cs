@@ -5,34 +5,22 @@ using UnityEngine.U2D.Animation;
 
 public class SpriteProperties : MonoBehaviour
 {
-    [SerializeField]
-    private Transform MainSprite;
+    public Transform SpritesList;
     public Animator Animation;
+    public Transform BaseHitBox;
+    public ActionHitBox ActionHitBox;
+    public ScopeHitBox ScopeHitBox;
+    public Transform ApproachPointLeft;
+    public Transform ApproachPointRight;
+    public Transform ApproachPointCenter;
+    public Transform StateEffects;
+    public Transform ActionEffects;
+    public Transform TurnIndicators;
+    public GameObject SpeechBubble;
 
+    public Vector3 TargetPoint => ApproachPointCenter.position;
     private Dictionary<string, SpriteComponent> SpriteMap;
-    private const string SPRITES_NAME = "Sprite";
-    private const string PROPERTIES_NAME = "SpriteProperties";
     private const int SPRITE_LAYER_DISTANCE = 100;
-
-    public Transform PropertiesList { get; private set; }
-
-    public Transform SpritesList { get; private set; }
-    
-    public Transform BaseHitBox { get; private set; }
-    
-    public ActionHitBox ActionHitBox { get; private set; }
-    
-    public ScopeHitBox ScopeHitBox { get; private set; }
-    
-    public Transform ApproachPoints { get; private set; }
-    
-    public Transform StateEffects { get; private set; }
-
-    public Transform ActionEffects { get; private set; }
-
-    public GameObject TurnIndicator { get; private set; }
-
-    public GameObject SpeechBubble { get; private set; }
 
     public struct SpriteComponent
     {
@@ -48,25 +36,6 @@ public class SpriteProperties : MonoBehaviour
 
     private void Awake()
     {
-        try
-        {
-            PropertiesList = transform.GetChild(0).Find(PROPERTIES_NAME).GetComponent<Transform>();
-            SpritesList = transform.GetChild(0).Find(SPRITES_NAME).GetComponent<Transform>();
-            BaseHitBox = PropertiesList.GetChild(0).GetComponent<Transform>();
-            ActionHitBox = PropertiesList.GetChild(1).GetComponent<ActionHitBox>();
-            ScopeHitBox = PropertiesList.GetChild(2).GetComponent<ScopeHitBox>();
-            ApproachPoints = PropertiesList.GetChild(3).GetComponent<Transform>();
-            StateEffects = PropertiesList.GetChild(4).GetComponent<Transform>();
-            ActionEffects = PropertiesList.GetChild(5).GetComponent<Transform>();
-            TurnIndicator = PropertiesList.GetChild(6).gameObject;
-            SpeechBubble = PropertiesList.GetChild(7).gameObject;
-        }
-        catch
-        {
-            Debug.LogError("Failed to initialize sprite properties");
-            return;
-        }
-
         SpriteMap = new Dictionary<string, SpriteComponent>();
         foreach (Transform t in SpritesList)
         {
@@ -137,5 +106,22 @@ public class SpriteProperties : MonoBehaviour
             var sprite = s.gameObject.GetComponent<SpriteRenderer>();
             if (sprite) sprite.sortingOrder += SPRITE_LAYER_DISTANCE * indexAdd;
         }
+        MoveParticleSystemFoward(StateEffects, indexAdd);
+        MoveParticleSystemFoward(ActionEffects, indexAdd);
+        MoveParticleSystemFoward(TurnIndicators, indexAdd);
+    }
+
+    private void MoveParticleSystemFoward(Transform list, int indexAdd)
+    {
+        foreach (Transform t in list)
+        {
+            t.gameObject.GetComponent<ParticleSystem>().GetComponent<Renderer>().sortingOrder += SPRITE_LAYER_DISTANCE * indexAdd;
+        }
+    }
+
+    public void HandleTurnIndicators(bool current, bool next)
+    {
+        TurnIndicators.transform.GetChild(0).gameObject.SetActive(current);
+        TurnIndicators.transform.GetChild(1).gameObject.SetActive(next);
     }
 }

@@ -70,8 +70,8 @@ public abstract class ActiveTool : BaseObject
         float power = Power * (u.SelectedWeapon?.Power ?? 5) / 100f;
 
         float formulaTotal = 0;
-        float offMod = 1.5f;
-        float defMod = 1.25f;
+        float offMod = 2f;
+        float defMod = 1f;
         float tecMod = 3;
         float gunOffenseReduce = 4f;
         switch (Formula)

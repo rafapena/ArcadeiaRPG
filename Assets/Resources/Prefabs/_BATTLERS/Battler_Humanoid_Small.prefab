@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 5080328183572055474}
   - component: {fileID: 1109532764033161184}
-  - component: {fileID: 5080394019845792608}
   m_Layer: 0
   m_Name: Battler_Humanoid_Small
   m_TagString: Untagged
@@ -55,20 +54,6 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
---- !u!114 &5080394019845792608
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5149667342464974805}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a2a5d13a274b3764d9a8a74352d0b695, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  MainSprite: {fileID: 1600451503178479324}
-  Animation: {fileID: 8483493002883945159}
 --- !u!1001 &245215671985725424
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -95,6 +80,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 1.692
+      objectReference: {fileID: 0}
+    - target: {fileID: 403852441774944591, guid: b89713aa0427d0c4ea5fc80cae26539f,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2472266081791188988, guid: b89713aa0427d0c4ea5fc80cae26539f,
         type: 3}
@@ -211,6 +201,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: Humanoid_Small
       objectReference: {fileID: 0}
+    - target: {fileID: 5149667342464974805, guid: b89713aa0427d0c4ea5fc80cae26539f,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5955781212732962534, guid: b89713aa0427d0c4ea5fc80cae26539f,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6178759121154768683, guid: b89713aa0427d0c4ea5fc80cae26539f,
         type: 3}
       propertyPath: m_Bounds.m_Extent.x
@@ -256,6 +256,11 @@ PrefabInstance:
       propertyPath: m_LocalRotation.z
       value: 0.320039
       objectReference: {fileID: 0}
+    - target: {fileID: 8235988356032803961, guid: b89713aa0427d0c4ea5fc80cae26539f,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8334478705276535098, guid: b89713aa0427d0c4ea5fc80cae26539f,
         type: 3}
       propertyPath: m_Bounds.m_Center.x
@@ -293,21 +298,9 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b89713aa0427d0c4ea5fc80cae26539f, type: 3}
---- !u!4 &1600451503178479324 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 1536532809921866028, guid: b89713aa0427d0c4ea5fc80cae26539f,
-    type: 3}
-  m_PrefabInstance: {fileID: 245215671985725424}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &5037238569134365250 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5080328183572055474, guid: b89713aa0427d0c4ea5fc80cae26539f,
-    type: 3}
-  m_PrefabInstance: {fileID: 245215671985725424}
-  m_PrefabAsset: {fileID: 0}
---- !u!95 &8483493002883945159 stripped
-Animator:
-  m_CorrespondingSourceObject: {fileID: 8564797191916981559, guid: b89713aa0427d0c4ea5fc80cae26539f,
     type: 3}
   m_PrefabInstance: {fileID: 245215671985725424}
   m_PrefabAsset: {fileID: 0}

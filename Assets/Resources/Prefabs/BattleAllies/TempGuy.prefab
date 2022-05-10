@@ -1552,6 +1552,18 @@ PrefabInstance:
     - {fileID: 8047808681747534396, guid: e83e3687439890940985cbbbb4a41e84, type: 3}
     - {fileID: 56355760739864382, guid: e83e3687439890940985cbbbb4a41e84, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: e83e3687439890940985cbbbb4a41e84, type: 3}
+--- !u!114 &1081935189856852030 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 908942086059878578, guid: e83e3687439890940985cbbbb4a41e84,
+    type: 3}
+  m_PrefabInstance: {fileID: 260918852331368588}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2a5d13a274b3764d9a8a74352d0b695, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &4965697399233449817 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5149667342464974805, guid: e83e3687439890940985cbbbb4a41e84,
@@ -1574,40 +1586,17 @@ MonoBehaviour:
   Name: Ally Guy
   Description: 
   CombatRangeType: 1
+  Sprite: {fileID: 1081935189856852030}
   RowPosition: 0
   ColumnPosition: 0
   Figure: {fileID: 0}
   Direction: {x: 0, y: 0, z: 0}
   Movement: {x: 0, y: 0, z: 0}
   Speed: 0
-  ApproachDestination: {x: 0, y: 0, z: 0}
+  TargetDestination: {x: 0, y: 0, z: 0}
+  TurnDestination: {x: 0, y: 0, z: 0}
   MainImage: {fileID: 0}
   FaceImage: {fileID: 0}
-  DefaultSprite:
-    R_Arm: {fileID: 0}
-    R_Arm_Item: {fileID: 0}
-    L_Arm_Item: {fileID: 0}
-    Brows: {fileID: 0}
-    Hat: {fileID: 0}
-    Glasses: {fileID: 0}
-    Hair_Front: {fileID: 0}
-    R_Eye: {fileID: 0}
-    L_Eye: {fileID: 0}
-    Facial_Hair: {fileID: 0}
-    Facial_Feature: {fileID: 0}
-    Blush: {fileID: 0}
-    Nose: {fileID: 0}
-    Mouth: {fileID: 0}
-    Neckwear: {fileID: 0}
-    Head: {fileID: 0}
-    Torso: {fileID: 0}
-    L_Arm: {fileID: 0}
-    L_Leg: {fileID: 0}
-    R_Leg: {fileID: 0}
-    Tail: {fileID: 0}
-    Back_Accessory: {fileID: 0}
-    Hair_Back: {fileID: 0}
-    SpriteParts: []
   Level: 1
   Class: {fileID: 0}
   HP: 0
@@ -1618,9 +1607,9 @@ MonoBehaviour:
     Def: 0
     Map: 0
     Mar: 0
+    Rec: 0
     Spd: 0
     Tec: 0
-    Luk: 0
     Acc: 0
     Eva: 0
     Crt: 0
@@ -1631,9 +1620,9 @@ MonoBehaviour:
     Def: 40
     Map: 40
     Mar: 40
+    Rec: 0
     Spd: 40
     Tec: 40
-    Luk: 40
     Acc: 100
     Eva: 100
     Crt: 100
@@ -1644,6 +1633,7 @@ MonoBehaviour:
   SelectedWeapon: {fileID: 0}
   IsCharging: 0
   States: []
+  CurrentListIndex: 0
   BasicAttackSkill: {fileID: 0}
   SelectedSingleMeeleeTarget: {fileID: 0}
   ExecutedAction: 0
@@ -1659,9 +1649,9 @@ MonoBehaviour:
     Def: 0
     Map: 0
     Mar: 0
+    Rec: 0
     Spd: 0
     Tec: 0
-    Luk: 0
     Acc: 0
     Eva: 0
     Crt: 0

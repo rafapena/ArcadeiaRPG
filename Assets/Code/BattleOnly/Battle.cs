@@ -80,6 +80,7 @@ public class Battle : MonoBehaviour
         foreach (BattlePlayer p in PlayerParty.Players) Battlers.Add(p);
         foreach (BattleAlly a in PlayerParty.Allies) Battlers.Add(a);
         foreach (BattleEnemy e in EnemyParty.Enemies) Battlers.Add(e);
+        ClearAllTurnIndicators();
         SortBattlersInOrderLayer();
         StartingBattle = true;
         Await(2);
@@ -210,13 +211,13 @@ public class Battle : MonoBehaviour
         }
         else if (StartingBattle)
         {
-            BattleMenu.DisplayPartyFrames();
             StartingBattle = false;
             TurnStart();
             return;
         }
         else if (StartingAction)
         {
+            BattleMenu.RefreshPartyFrames();
             StartingAction = false;
             ActionStart();
             return;
@@ -307,24 +308,23 @@ public class Battle : MonoBehaviour
     public void ActionStartSetup()
     {
         Await(1);
+        ClearAllTurnIndicators();
+        GetNextFastestAvailableBattlers();
+        ActingBattler.Sprite.HandleTurnIndicators(true, false);
+        NextActingBattler.Sprite.HandleTurnIndicators(false, true);
         StartingAction = true;
     }
 
     private void ActionStart()
     {
-        BattleMenu.ClearAllTurnIndicatorLabels();
-        GetNextFastestAvailableBattlers();
-        BattleMenu.DeclareCurrent(ActingBattler);
-        BattleMenu.DeclareNext(NextActingBattler);
-
+        Phase = BattlePhases.DecidingAction;
         if (ActingBattler.CanDoAction)
         {
-            Phase = BattlePhases.DecidingAction;
             if (ActingBattler is BattlePlayer p)
             {
                 BattleMenu.Setup(p);
             }
-            else // Ally or enemy
+            else  // Battler AI
             {
                 BattleMenu.Hide();
                 if (ActingBattler is BattleAlly ally) ally.MakeDecision(FightingPlayerParty.ToList(), EnemyParty.Enemies);
@@ -335,7 +335,7 @@ public class Battle : MonoBehaviour
         else ActionEnd();
     }
 
-    private List<Battler> SortBattlersBySpeed(List<Battler> battlers, int speedRandomLow, int speedRandomHigh)
+    private List<Battler> SortBattlersBySpeed(List<Battler> battlers, int speedRandomLow = 0, int speedRandomHigh = 0)
     {
         for (int i = 0; i < battlers.Count - 1; i++)
         {
@@ -355,15 +355,20 @@ public class Battle : MonoBehaviour
         int actingBattlerSet = 0;
         foreach (Battler b in Battlers)
         {
-            if (b.ExecutedAction) continue;
+            if (b.ExecutedAction || b.KOd) continue;
             else if (actingBattlerSet == 0) ActingBattler = b;
             else if (actingBattlerSet == 1) NextActingBattler = b;
             actingBattlerSet++;
         }
         if (actingBattlerSet == 1)
         {
-            NextActingBattler = Battlers[0];
             LastActionOfTurn = true;
+            foreach (Battler b in Battlers)
+            {
+                if (ActingBattler == b || b.KOd) continue;
+                NextActingBattler = b;
+                break;
+            }
         }
     }
 
@@ -375,6 +380,11 @@ public class Battle : MonoBehaviour
             b.Select(false);
             b.LockSelectTrigger = false;
         }
+    }
+
+    private void ClearAllTurnIndicators()
+    {
+        foreach (var b in Battlers) b.Sprite.HandleTurnIndicators(false, false);
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -391,13 +401,15 @@ public class Battle : MonoBehaviour
         {
             Phase = BattlePhases.PreAction;
             RestrictBattlerWallCollision(false);
-            ActingBattler.ApproachTarget(ActingBattler.SelectedSingleMeeleeTarget.ApproachPointLeft, ActingBattler.SelectedSingleMeeleeTarget.ApproachPointRight);
+            var sp = ActingBattler.SelectedSingleMeeleeTarget.Sprite;
+            ActingBattler.ApproachTarget(sp.ApproachPointLeft.position, sp.ApproachPointRight.position);
         }
         else ExecuteAction();
     }
 
     private bool IsChargingSkill(Skill skill)
     {
+        if (!skill) return false;
         skill.StartCharge();
         if (skill.ChargeCount == 0) return false;
         //BattleState = BattleStates.
@@ -455,11 +467,7 @@ public class Battle : MonoBehaviour
         FinishActionUsage();
         if (CheckBattleEndCondition()) return;
         else if (LastActionOfTurn) TurnEnd();
-        else
-        {
-            Battlers = SortBattlersBySpeed(Battlers, 0, 1);
-            ActionStartSetup();
-        }
+        else ActionStartSetup();
     }
 
     private void FinishActionUsage()
@@ -533,7 +541,7 @@ public class Battle : MonoBehaviour
 
     private void ClearAll()
     {
-        BattleMenu.ClearAllTurnIndicatorLabels();
+        ClearAllTurnIndicators();
         ResetBattlerActions();
     }
 

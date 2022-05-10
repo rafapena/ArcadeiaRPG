@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 5080328183572055474}
   - component: {fileID: 1942368906028640393}
-  - component: {fileID: 5080394019845792608}
   m_Layer: 0
   m_Name: Battler_Humanoid_Medium
   m_TagString: Untagged
@@ -55,20 +54,6 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
---- !u!114 &5080394019845792608
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5149667342464974805}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a2a5d13a274b3764d9a8a74352d0b695, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  MainSprite: {fileID: 3635895047824538129}
-  Animation: {fileID: 7226442345908942624}
 --- !u!1001 &1339045373956045335
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -79,12 +64,12 @@ PrefabInstance:
     - target: {fileID: 139812839015113067, guid: d71a65e6d9290964c9ef6724d0abb442,
         type: 3}
       propertyPath: m_Bounds.m_Center.x
-      value: -1.123394
+      value: -1.1233943
       objectReference: {fileID: 0}
     - target: {fileID: 139812839015113067, guid: d71a65e6d9290964c9ef6724d0abb442,
         type: 3}
       propertyPath: m_Bounds.m_Extent.x
-      value: 0.065
+      value: 0.06500006
       objectReference: {fileID: 0}
     - target: {fileID: 251343468405207353, guid: d71a65e6d9290964c9ef6724d0abb442,
         type: 3}
@@ -109,7 +94,7 @@ PrefabInstance:
     - target: {fileID: 2265077966706033668, guid: d71a65e6d9290964c9ef6724d0abb442,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.040072042
+      value: 0.04007206
       objectReference: {fileID: 0}
     - target: {fileID: 2591214339234196131, guid: d71a65e6d9290964c9ef6724d0abb442,
         type: 3}
@@ -234,7 +219,7 @@ PrefabInstance:
     - target: {fileID: 6047526025104566762, guid: d71a65e6d9290964c9ef6724d0abb442,
         type: 3}
       propertyPath: m_Bounds.m_Center.x
-      value: 0.35059434
+      value: 0.35059428
       objectReference: {fileID: 0}
     - target: {fileID: 6047526025104566762, guid: d71a65e6d9290964c9ef6724d0abb442,
         type: 3}
@@ -294,7 +279,7 @@ PrefabInstance:
     - target: {fileID: 7293287548962623827, guid: d71a65e6d9290964c9ef6724d0abb442,
         type: 3}
       propertyPath: m_Bounds.m_Extent.x
-      value: 0.1920718
+      value: 0.19207191
       objectReference: {fileID: 0}
     - target: {fileID: 7293287548962623827, guid: d71a65e6d9290964c9ef6724d0abb442,
         type: 3}
@@ -343,21 +328,9 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: d71a65e6d9290964c9ef6724d0abb442, type: 3}
---- !u!4 &3635895047824538129 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 2369023028037763078, guid: d71a65e6d9290964c9ef6724d0abb442,
-    type: 3}
-  m_PrefabInstance: {fileID: 1339045373956045335}
-  m_PrefabAsset: {fileID: 0}
 --- !u!4 &6058974534381371301 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 5080328183572055474, guid: d71a65e6d9290964c9ef6724d0abb442,
-    type: 3}
-  m_PrefabInstance: {fileID: 1339045373956045335}
-  m_PrefabAsset: {fileID: 0}
---- !u!95 &7226442345908942624 stripped
-Animator:
-  m_CorrespondingSourceObject: {fileID: 8564797191916981559, guid: d71a65e6d9290964c9ef6724d0abb442,
     type: 3}
   m_PrefabInstance: {fileID: 1339045373956045335}
   m_PrefabAsset: {fileID: 0}

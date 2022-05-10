@@ -67,7 +67,7 @@ public class PlayerSelectionList : SelectionList_Super<Battler>
         if (spg) spg.Set(dataEntry.SP, 100);
         
         AddStates(entry, dataEntry);
-        if (entry.childCount > 6) entry.GetChild(6).gameObject.SetActive(false);
+        entry.GetChild(6).gameObject.SetActive(dataEntry.KOd);
     }
 
     private void AddStates<T>(Transform entry, T teammate) where T : Battler
@@ -90,9 +90,12 @@ public class PlayerSelectionList : SelectionList_Super<Battler>
     
     public void UpdateEntry<T>(T battler, int index) where T : Battler
     {
-        Gauge hpg = transform.GetChild(index).GetChild(3).GetComponent<Gauge>();
-        Gauge spg = transform.GetChild(index).GetChild(4).GetComponent<Gauge>();
+        Transform entry = transform.GetChild(index);
+        Gauge hpg = entry.GetChild(3).GetComponent<Gauge>();
+        Gauge spg = entry.GetChild(4).GetComponent<Gauge>();
         hpg.SetAndAnimate(battler.HP, battler.MaxHP);
         spg.SetAndAnimate(battler.SP, BattleMaster.SP_CAP);
+        AddStates(entry, battler);
+        entry.GetChild(6).gameObject.SetActive(battler.KOd);
     }
 }

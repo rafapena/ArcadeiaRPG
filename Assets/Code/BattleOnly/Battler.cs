@@ -11,17 +11,13 @@ using UnityEngine.UI;
 
 public abstract class Battler : ToolUser
 {
-    [SerializeField]
-    public SpriteProperties Sprite { get; private set; }
+    public SpriteProperties Sprite;
     public enum VerticalPositions { Top, Center, Bottom }
     public enum HorizontalPositions { Left, Center, Right }
 
     // Battler position
     public VerticalPositions RowPosition;
     public HorizontalPositions ColumnPosition;
-    public Vector3 ApproachPointLeft => Sprite.ApproachPoints.transform.GetChild(0).position;
-    public Vector3 ApproachPointRight => Sprite.ApproachPoints.transform.GetChild(1).position;
-    public Vector3 TargetPoint => Sprite.ApproachPoints.transform.GetChild(2).position;
 
     // Movement
     public Vector3 Position => Sprite.BaseHitBox.transform.position;
@@ -64,7 +60,6 @@ public abstract class Battler : ToolUser
     [HideInInspector] public Skill BasicAttackSkill;
 
     // Action execution info
-    private Vector3 PopupSpawnPoint => Sprite.ApproachPoints.transform.GetChild(2).position;
     [HideInInspector] public Battler SelectedSingleMeeleeTarget;
     [HideInInspector] public bool ExecutedAction;
     [HideInInspector] public bool HitCritical;
@@ -98,7 +93,6 @@ public abstract class Battler : ToolUser
     protected override void Awake()
     {
         base.Awake();
-        Sprite = gameObject.GetComponent<SpriteProperties>();
 
         Figure = gameObject.GetComponent<Rigidbody2D>();
         BasicAttackSkill = Resources.Load<Skill>(BASIC_ATTACK_FILE_LOCATION);
@@ -381,7 +375,7 @@ public abstract class Battler : ToolUser
         }
         else
         {
-            Popup popup = Instantiate(UIMaster.Popups["NoHit"], PopupSpawnPoint, Quaternion.identity);
+            Popup popup = Instantiate(UIMaster.Popups["NoHit"], Sprite.TargetPoint, Quaternion.identity);
             popup.GetComponent<TextMesh>().text = "MISS";
         }
     }
@@ -396,16 +390,16 @@ public abstract class Battler : ToolUser
             case ActiveTool.ModType.None:
                 break;
             case ActiveTool.ModType.Damage:
-                if (Time.timeScale > 0) popup = Instantiate(UIMaster.Popups[HPorSP + "Damage"], PopupSpawnPoint, Quaternion.identity);
+                if (Time.timeScale > 0) popup = Instantiate(UIMaster.Popups[HPorSP + "Damage"], Sprite.TargetPoint, Quaternion.identity);
                 changeHPorSPForTarget(-total);
                 break;
             case ActiveTool.ModType.Drain:
-                if (Time.timeScale > 0) popup = Instantiate(UIMaster.Popups[HPorSP + "Drain"], PopupSpawnPoint, Quaternion.identity);
+                if (Time.timeScale > 0) popup = Instantiate(UIMaster.Popups[HPorSP + "Drain"], Sprite.TargetPoint, Quaternion.identity);
                 changeHPorSPForTarget(-total);
                 changeHPorSPForUser(total);
                 break;
             case ActiveTool.ModType.Recover:
-                if (Time.timeScale > 0) popup = Instantiate(UIMaster.Popups[HPorSP + "Recover"], PopupSpawnPoint, Quaternion.identity);
+                if (Time.timeScale > 0) popup = Instantiate(UIMaster.Popups[HPorSP + "Recover"], Sprite.TargetPoint, Quaternion.identity);
                 changeHPorSPForTarget(total);
                 break;
         }
