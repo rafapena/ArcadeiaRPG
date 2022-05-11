@@ -69,7 +69,10 @@ public abstract class BattlePlayer : Battler
 
     protected override void Update()
     {
-        if (IsDecidingAction) Movement = ArrowKeyMovement ? InputMaster.GetCustomMovementControls(KeyCode.W, KeyCode.S, KeyCode.A, KeyCode.D) : Vector3.zero;
+        if (IsDecidingAction)
+        {
+            Movement = ArrowKeyMovement ? InputMaster.GetCustomMovementControls(KeyCode.W, KeyCode.S, KeyCode.A, KeyCode.D) : Vector3.zero;
+        }
         base.Update();
     }
 

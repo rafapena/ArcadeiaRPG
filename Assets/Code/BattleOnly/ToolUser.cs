@@ -59,11 +59,13 @@ public abstract class ToolUser : BaseObject
 
     protected void TryNotifyActionCompletion()
     {
-        if (CurrentActionTimer >= 1f)
-        {
-            ResetActionExecution();
-            CurrentBattle.ActingBattler.ApproachForNextTurn();
-        }
+        if (CurrentActionTimer < 1f) return;
+        ResetActionExecution();
+        CurrentBattle.ActingBattler.ApproachForNextTurn();
+
+        User.Sprite.Animation.SetBool(Battler.AnimParams.Running.ToString(), true);
+        User.Sprite.Animation.SetInteger(Battler.AnimParams.Action.ToString(), 0);
+        User.Sprite.Animation.SetTrigger(Battler.AnimParams.DoneAction.ToString());
     }
 
     public void StartUseTimer()
@@ -89,6 +91,7 @@ public abstract class ToolUser : BaseObject
         StartUseTimer();
         UseUniqueBasicAttack();
         UsingUniqueBasicAttack = true;
+        User.Sprite.Animation.SetInteger(Battler.AnimParams.Action.ToString(), 1);
     }
 
     protected virtual void UseUniqueBasicAttack() { }
@@ -105,6 +108,9 @@ public abstract class ToolUser : BaseObject
         StartUseTimer();
         UseSkillsLists[Action.Id].Invoke();
         CurrentSkillUsed = Action.Id;
+
+        int paramAction = this is BattlerClass ? Battler.CLASS_PARAM_ACTION : Battler.CHARACTER_PARAM_ACTION;
+        User.Sprite.Animation.SetInteger(Battler.AnimParams.Action.ToString(), paramAction + Action.Id);
     }
 
     protected virtual void UseSkill_0() { }
@@ -147,6 +153,7 @@ public abstract class ToolUser : BaseObject
         int mode = (int)selectedItem.UseType;
         ItemUseList[mode].Invoke();
         CurrentItemModeUsed = mode;
+        User.Sprite.Animation.SetInteger(Battler.AnimParams.Action.ToString(), Battler.ITEM_PARAM_ACTION + mode);
     }
 
     protected virtual void ItemUse_0()

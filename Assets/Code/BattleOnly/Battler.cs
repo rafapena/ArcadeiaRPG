@@ -36,6 +36,12 @@ public abstract class Battler : ToolUser
     public Sprite MainImage;
     public Sprite FaceImage;
 
+    // Animation management
+    public enum AnimParams { Running, Victory, Action, DoneAction, Blocking, GetHit, Recovered, KOd }
+    public const int CLASS_PARAM_ACTION = 10;
+    public const int CHARACTER_PARAM_ACTION = 20;
+    public const int ITEM_PARAM_ACTION = 30;
+
     // General data
     public int Level = 1;
     public BattlerClass Class;
@@ -44,6 +50,8 @@ public abstract class Battler : ToolUser
     [HideInInspector] public Stats StatBoosts;
     public Stats Stats;
     public List<Accessory> Accessories;
+    [HideInInspector] public bool HasLowHP;
+    private float LOW_HP_THRESHOLD = 0.3f;
 
     // Overall battle info
     [HideInInspector] public bool IsSelected { get; private set; }
@@ -163,6 +171,7 @@ public abstract class Battler : ToolUser
         CheckReachedNotifyDestination(ref IsApproachingToTarget, TargetDestination, 1f);
         CheckReachedNotifyDestination(ref IsApproachingForNextTurn, TurnDestination, 3f);
         base.Update();
+        Sprite.Animation.SetBool(AnimParams.Running.ToString(), Movement != Vector3.zero);
         Figure.velocity = Movement * Speed;
     }
 
@@ -389,18 +398,25 @@ public abstract class Battler : ToolUser
         {
             case ActiveTool.ModType.None:
                 break;
+
+            // if (Time.timeScale > 0) popup = ...
             case ActiveTool.ModType.Damage:
-                if (Time.timeScale > 0) popup = Instantiate(UIMaster.Popups[HPorSP + "Damage"], Sprite.TargetPoint, Quaternion.identity);
+                popup = Instantiate(UIMaster.Popups[HPorSP + "Damage"], Sprite.TargetPoint, Quaternion.identity);
                 changeHPorSPForTarget(-total);
+                Sprite.Animation.SetTrigger(AnimParams.GetHit.ToString());
                 break;
+
             case ActiveTool.ModType.Drain:
-                if (Time.timeScale > 0) popup = Instantiate(UIMaster.Popups[HPorSP + "Drain"], Sprite.TargetPoint, Quaternion.identity);
+                popup = Instantiate(UIMaster.Popups[HPorSP + "Drain"], Sprite.TargetPoint, Quaternion.identity);
                 changeHPorSPForTarget(-total);
                 changeHPorSPForUser(total);
+                Sprite.Animation.SetTrigger(AnimParams.GetHit.ToString());
                 break;
+
             case ActiveTool.ModType.Recover:
-                if (Time.timeScale > 0) popup = Instantiate(UIMaster.Popups[HPorSP + "Recover"], Sprite.TargetPoint, Quaternion.identity);
+                popup = Instantiate(UIMaster.Popups[HPorSP + "Recover"], Sprite.TargetPoint, Quaternion.identity);
                 changeHPorSPForTarget(total);
+                Sprite.Animation.SetTrigger(AnimParams.Recovered.ToString());
                 break;
         }
         if (popup) popup.GetComponent<TextMesh>().text = total.ToString();
@@ -409,9 +425,11 @@ public abstract class Battler : ToolUser
     private void CheckKO()
     {
         KOd = (HP <= 0 || Petrified);
-        if (KOd) ResetAction();
-        if (GetComponent<SpriteRenderer>()) GetComponent<SpriteRenderer>().enabled = !KOd;
-        else if (GetComponent<Animator>()) GetComponent<Animator>().enabled = !KOd;
+        if (KOd)
+        {
+            ResetAction();
+            Sprite.Animation.SetTrigger(AnimParams.KOd.ToString());
+        }
     }
 
     public virtual void MaxHPSP()
@@ -426,6 +444,7 @@ public abstract class Battler : ToolUser
         HP += val;
         if (HP < 0) HP = 0;
         else if (HP > MaxHP) HP = MaxHP;
+        HasLowHP = HP / (float)MaxHP <= LOW_HP_THRESHOLD;
     }
 
     public virtual void ChangeSP(int val)

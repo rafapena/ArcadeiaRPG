@@ -360,7 +360,12 @@ public class Battle : MonoBehaviour
             else if (actingBattlerSet == 1) NextActingBattler = b;
             actingBattlerSet++;
         }
-        if (actingBattlerSet == 1)
+        if (actingBattlerSet == 0)
+        {
+            ResetBattlerActions();
+            GetNextFastestAvailableBattlers();
+        }
+        else if (actingBattlerSet == 1)
         {
             LastActionOfTurn = true;
             foreach (Battler b in Battlers)
@@ -548,6 +553,7 @@ public class Battle : MonoBehaviour
     private void DeclareWin()
     {
         Phase = BattlePhases.Won;
+        foreach (var b in FightingPlayerParty) b.Sprite.Animation.SetTrigger(Battler.AnimParams.Victory.ToString());
         ClearAll();
     }
 

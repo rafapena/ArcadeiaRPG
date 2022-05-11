@@ -55,6 +55,7 @@ public abstract class BattlerClass : ToolUser
         int mode = (int)(selectedWeapon?.WeaponType ?? 0);
         UseBasicAttackLists[mode].Invoke();
         CurrentBasicAttackWeaponUsed = mode;
+        User.Sprite.Animation.SetInteger(Battler.AnimParams.Action.ToString(), mode + 1);
     }
 
     protected virtual void UseBasicAttack_Weaponless() { }
