@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
@@ -11,28 +12,24 @@ public class GameOver : MonoBehaviour
     public GameObject ReturnToMenuButton;
     public AudioSource ButtonClickSFX;
     public MenuFrame SelectionFrame;
-
-    private float IntroTimer;
-    public float IntroTime;
+    private float INTRO_TIME = 3f;
 
     private void Start()
     {
         SelectionFrame.Deactivate();
-        IntroTimer = Time.unscaledTime + IntroTime;
+        StartCoroutine(SetupGameOverScreen());
     }
 
-    private void Update()
+    private IEnumerator SetupGameOverScreen()
     {
-        if (!SelectionFrame.Activated && Time.unscaledTime > IntroTimer)
+        yield return new WaitForSecondsRealtime(INTRO_TIME);
+        SelectionFrame.Activate();
+        if (GameplayMaster.NoFileSelected())
         {
-            SelectionFrame.Activate();
-            if (GameplayMaster.NoFileSelected())
-            {
-                MenuMaster.DisableSelection(ref ReloadButton);
-                EventSystem.current.SetSelectedGameObject(ReturnToMenuButton);
-            }
-            else EventSystem.current.SetSelectedGameObject(ReloadButton);
+            MenuMaster.DisableSelection(ref ReloadButton);
+            EventSystem.current.SetSelectedGameObject(ReturnToMenuButton);
         }
+        else EventSystem.current.SetSelectedGameObject(ReloadButton);
     }
 
     public void ReloadFromLastSave()

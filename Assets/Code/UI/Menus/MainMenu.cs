@@ -26,6 +26,7 @@ public class MainMenu : MonoBehaviour
     public GameObject OptionsMenu;
     public OptionsFrame OptionsFrame;
 
+    private bool FinishedIntro => Time.time > IntroTimer;
     private float IntroTimer;
     private float INTRO_TIMER_BUFFER = 0.6f;//3f;
     private bool FileSelecting = false;
@@ -47,7 +48,7 @@ public class MainMenu : MonoBehaviour
 
     private void Update()
     {
-        if (!PressedKey && FinishedIntro())
+        if (!PressedKey && FinishedIntro)
         {
             PressAnyKeyInput.SetActive(Time.time % 1 < 0.5f);
             if (Input.anyKeyDown)
@@ -68,11 +69,6 @@ public class MainMenu : MonoBehaviour
                 CheckSaves();
             }
         }
-    }
-
-    private bool FinishedIntro()
-    {
-        return Time.time > IntroTimer;
     }
 
     public void StartNew()

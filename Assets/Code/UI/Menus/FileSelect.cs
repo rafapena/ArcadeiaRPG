@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -9,7 +10,7 @@ public class FileSelect : MonoBehaviour
     public enum FileMode { Save, LoadOrDelete }
     public static FileMode FileSelectMode;
 
-    public enum Selections { Files, OverwriteConfirm, SelectFileMode, DeleteConfirm, Waiting, Success }
+    public enum Selections { Files, OverwriteConfirm, SelectFileMode, DeleteConfirm }
     private Selections Selection;
 
     public MenuFrame MainFrame;
@@ -31,10 +32,7 @@ public class FileSelect : MonoBehaviour
     public TextMeshProUGUI CurrentLocationLabel;
     public TextMeshProUGUI GoldLabel;
 
-    private float WriteWaitingTimer;
-    private const float WRITE_WAITING_TIMER_LIMIT = 1f;
-    private float SuccessWaitingTimer;
-    private const float SUCCESS_WAITING_TIMER_LIMIT = 1f;
+    private bool Waiting;
 
     private void Start()
     {
@@ -75,12 +73,6 @@ public class FileSelect : MonoBehaviour
             case Selections.DeleteConfirm:
                 if (goingBack) UndoDeleteConfirm();
                 break;
-            case Selections.Waiting:
-                if (!WaitingForWriting()) DeclareSuccess();
-                break;
-            case Selections.Success:
-                if (!WaitingForSuccess()) ReturnToFileSelect();
-                break;
         }
     }
 
@@ -96,7 +88,7 @@ public class FileSelect : MonoBehaviour
 
     private bool SetupFileInfo(bool bypassWaiting = false)
     {
-        if (Waiting() && !bypassWaiting) return false;
+        if (Waiting && !bypassWaiting) return false;
         FilesList.SetSelected();
         SaveData saveData = FilesList.SelectedObject;
         if (saveData == null || !saveData.FileDataExists)
@@ -118,7 +110,7 @@ public class FileSelect : MonoBehaviour
 
     public void SelectFile()
     {
-        if (Waiting() || !MenuMaster.ReadyToSelectInMenu) return;
+        if (Waiting || !MenuMaster.ReadyToSelectInMenu) return;
         bool selectedNonEmptyFile = SetupFileInfo();
         FilesList.UnhighlightAll();
         SelectModeFrame.SetActive(false);
@@ -209,7 +201,7 @@ public class FileSelect : MonoBehaviour
     {
         FilesList.SelectedObject.SaveGame();
         OverwriteConfirmationFrame.SetActive(false);
-        AwaitWrite("Saving...");
+        StartCoroutine(AwaitWrite("Saving..."));
     }
 
     public void LoadGame()
@@ -224,42 +216,25 @@ public class FileSelect : MonoBehaviour
         FilesList.SelectedObject.DeleteGame();
         SelectModeFrame.SetActive(false);
         DeleteConfirmationFrame.SetActive(false);
-        AwaitWrite("Deleting...");
+        StartCoroutine(AwaitWrite("Deleting..."));
     }
 
-    private void AwaitWrite(string waitingMessage)
+    private IEnumerator AwaitWrite(string waitingMessage)
     {
-        Selection = Selections.Waiting;
+        Waiting = true;
         FilesList.SelectedButton.KeepSelected();
-        WriteWaitingTimer = Time.unscaledTime + WRITE_WAITING_TIMER_LIMIT;
         WaitingFrame.SetActive(true);
         WaitingFrame.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = waitingMessage;
-    }
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// -- Waiting and Success --
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    public bool WaitingForWriting()
-    {
-        return WriteWaitingTimer > Time.unscaledTime;
-    }
-
-    public bool WaitingForSuccess()
-    {
-        return SuccessWaitingTimer > Time.unscaledTime;
-    }
-
-    public bool Waiting()
-    {
-        return Selection == Selections.Waiting || Selection == Selections.Success;
+        yield return new WaitUntil(() => !FilesList.SelectedObject.CurrentlyWritingData);
+        DeclareSuccess();
+        yield return new WaitForSecondsRealtime(1);
+        ReturnToFileSelect();
+        Waiting = false;
     }
 
     public void DeclareSuccess()
     {
-        Selection = Selections.Success;
         WaitingFrame.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = (FileSelectMode == FileMode.LoadOrDelete) ? "Deletion Successful" : "Save Successful";
-        SuccessWaitingTimer = Time.unscaledTime + SUCCESS_WAITING_TIMER_LIMIT;
         GameObject selected = FilesList.SelectedButton.gameObject;
         FilesList.Refresh();
         EventSystem.current.SetSelectedGameObject(selected);

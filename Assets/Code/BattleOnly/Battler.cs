@@ -168,22 +168,9 @@ public abstract class Battler : ToolUser
 
     protected override void Update()
     {
-        CheckReachedNotifyDestination(ref IsApproachingToTarget, TargetDestination, 1f);
-        CheckReachedNotifyDestination(ref IsApproachingForNextTurn, TurnDestination, 3f);
         base.Update();
         Sprite.Animation.SetBool(AnimParams.Running.ToString(), Movement != Vector3.zero);
         Figure.velocity = Movement * Speed;
-    }
-
-    private void CheckReachedNotifyDestination(ref bool isApproaching, Vector3 destination, float thresholdMod)
-    {
-        if (isApproaching && Vector3.Distance(Position, destination) < BATTLER_APPROACH_DISTANCE_THRESHOLD * thresholdMod)
-        {
-            isApproaching = false;
-            SetPosition(destination);
-            Movement = Vector3.zero;
-            CurrentBattle.NotifyToSwitchInBattlePhase();
-        }
     }
 
     public void SetPosition(Vector3 newPosition)
@@ -199,7 +186,7 @@ public abstract class Battler : ToolUser
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// -- UI --
+    /// -- Approaching --
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public virtual void Select(bool selected)
@@ -220,6 +207,22 @@ public abstract class Battler : ToolUser
     {
         IsApproachingForNextTurn = true;
         Movement = (TurnDestination - Position).normalized * 6f;
+    }
+
+    public bool HasApproachedTarget() => CheckReachedNotifyDestination(ref IsApproachingToTarget, TargetDestination, 1f);
+
+    public bool HasApproachedNextTurnDestination() => CheckReachedNotifyDestination(ref IsApproachingForNextTurn, TurnDestination, 3f);
+
+    private bool CheckReachedNotifyDestination(ref bool isApproaching, Vector3 destination, float thresholdMod)
+    {
+        if (isApproaching && Vector3.Distance(Position, destination) < BATTLER_APPROACH_DISTANCE_THRESHOLD * thresholdMod)
+        {
+            isApproaching = false;
+            SetPosition(destination);
+            Movement = Vector3.zero;
+            return true;
+        }
+        return false;
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -396,25 +399,21 @@ public abstract class Battler : ToolUser
         Popup popup = null;
         switch (modType)
         {
-            case ActiveTool.ModType.None:
-                break;
-
-            // if (Time.timeScale > 0) popup = ...
             case ActiveTool.ModType.Damage:
-                popup = Instantiate(UIMaster.Popups[HPorSP + "Damage"], Sprite.TargetPoint, Quaternion.identity);
+                if (SceneMaster.InBattle) popup = Instantiate(UIMaster.Popups[HPorSP + "Damage"], Sprite.TargetPoint, Quaternion.identity);
                 changeHPorSPForTarget(-total);
                 Sprite.Animation.SetTrigger(AnimParams.GetHit.ToString());
                 break;
 
             case ActiveTool.ModType.Drain:
-                popup = Instantiate(UIMaster.Popups[HPorSP + "Drain"], Sprite.TargetPoint, Quaternion.identity);
+                if (SceneMaster.InBattle) popup = Instantiate(UIMaster.Popups[HPorSP + "Drain"], Sprite.TargetPoint, Quaternion.identity);
                 changeHPorSPForTarget(-total);
                 changeHPorSPForUser(total);
                 Sprite.Animation.SetTrigger(AnimParams.GetHit.ToString());
                 break;
 
             case ActiveTool.ModType.Recover:
-                popup = Instantiate(UIMaster.Popups[HPorSP + "Recover"], Sprite.TargetPoint, Quaternion.identity);
+                if (SceneMaster.InBattle) popup = Instantiate(UIMaster.Popups[HPorSP + "Recover"], Sprite.TargetPoint, Quaternion.identity);
                 changeHPorSPForTarget(total);
                 Sprite.Animation.SetTrigger(AnimParams.Recovered.ToString());
                 break;

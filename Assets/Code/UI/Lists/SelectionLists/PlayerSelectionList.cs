@@ -67,7 +67,7 @@ public class PlayerSelectionList : SelectionList_Super<Battler>
         if (spg) spg.Set(dataEntry.SP, 100);
         
         AddStates(entry, dataEntry);
-        entry.GetChild(6).gameObject.SetActive(dataEntry.KOd);
+        if (entry.childCount > 6) entry.GetChild(6).gameObject.SetActive(dataEntry.KOd);
     }
 
     private void AddStates<T>(Transform entry, T teammate) where T : Battler

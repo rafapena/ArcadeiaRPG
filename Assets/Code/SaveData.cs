@@ -21,6 +21,8 @@ public class SaveData
     public string Location;
     public int Gold;
 
+    public bool CurrentlyWritingData { get; private set; }
+
     public SaveData(int file)
     {
         File = file;
@@ -37,6 +39,7 @@ public class SaveData
 
     public void SaveGame()
     {
+        CurrentlyWritingData = true;
         GameplayMaster.SetLastManagedFile(File);
         DeleteParty();
         DeleteMapContent();
@@ -51,6 +54,7 @@ public class SaveData
         SaveParty();
         SaveMapContent();
         PlayerPrefs.SetString("SceneName", MapMaster.SceneName);
+        CurrentlyWritingData = false;
     }
 
     public void LoadGame()
@@ -65,8 +69,10 @@ public class SaveData
 
     public void DeleteGame()
     {
+        CurrentlyWritingData = true;
         PlayerPrefs.DeleteKey("File_" + File);
         DeleteParty();
+        CurrentlyWritingData = false;
     }
 
     public static void SetupForNewGame()

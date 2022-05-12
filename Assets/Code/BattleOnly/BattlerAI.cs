@@ -17,9 +17,9 @@ public abstract class BattlerAI : Battler
     [HideInInspector]
     public bool IsSummon;
 
-    protected override void Start()
+    protected override void Awake()
     {
-        base.Start();
+        base.Awake();
         StatConversion();
         CleanupAIActionList();
         SelectedWeapon = WeaponOptions.Any() ? (WeaponOptions.First().Action as Weapon) : null;

@@ -61,7 +61,7 @@ public abstract class ToolUser : BaseObject
     {
         if (CurrentActionTimer < 1f) return;
         ResetActionExecution();
-        CurrentBattle.ActingBattler.ApproachForNextTurn();
+        StartCoroutine(CurrentBattle.ExecuteActionDone());
 
         User.Sprite.Animation.SetBool(Battler.AnimParams.Running.ToString(), true);
         User.Sprite.Animation.SetInteger(Battler.AnimParams.Action.ToString(), 0);
@@ -203,13 +203,13 @@ public abstract class ToolUser : BaseObject
     {
         if (b is BattleAlly a0)
         {
-            var a = CurrentBattle.InstantiateBattler(a0, User.TargetDestination, CurrentBattle.PlayerParty.Players.Count + CurrentBattle.PlayerParty.Allies.Count + 1);
+            var a = CurrentBattle.InstantiateBattler(a0, User.TargetDestination);
             CurrentBattle.PlayerParty.Allies.Add(a);
             a.IsSummon = true;
         }
         else if (b is BattleEnemy e0)
         {
-            var e = CurrentBattle.InstantiateBattler(e0, User.TargetDestination, CurrentBattle.EnemyParty.Enemies.Count + 1);
+            var e = CurrentBattle.InstantiateBattler(e0, User.TargetDestination);
             CurrentBattle.EnemyParty.Enemies.Add(e);
             e.IsSummon = true;
         }

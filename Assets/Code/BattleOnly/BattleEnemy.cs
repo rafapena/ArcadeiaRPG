@@ -10,12 +10,17 @@ public abstract class BattleEnemy : BattlerAI
     public float MultiplyHP = 1f;
     public int ExtraTurns;
 
-    protected new void Start()
+    protected override void Awake()
+    {
+        base.Awake();
+        Stats.MaxHP = (int)(MaxHP * MultiplyHP);
+        HP = MaxHP;
+    }
+
+    protected override void Start()
     {
         base.Start();
         MirrorEnemy();
-        Stats.MaxHP = (int)(MaxHP * MultiplyHP);
-        HP = MaxHP;
     }
 
     private void MirrorEnemy()

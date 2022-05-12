@@ -7,17 +7,11 @@ using UnityEngine.UI;
 
 public class Battle : MonoBehaviour
 {
-    public enum BattlePhases { None, DecidingAction, PreAction, Action, RunningAway, Won, GameOver }
-
     // Collision detection
     public const int BASE_HITBOX_LAYER = 11;
     public const int ACTION_HITBOX_LAYER = 12;
     public const int MOVING_SCOPE_HITBOX_LAYER = 13;
     public GameObject[] Boundaries;
-
-    // Loading
-    public bool Waiting => Time.unscaledTime < AwaitingTime;
-    private float AwaitingTime;
 
     // UI
     public BattleCamera BattleCamera;
@@ -31,7 +25,7 @@ public class Battle : MonoBehaviour
 
     // Raw locations based on battler's horizontal/vertical positions
     private static readonly float uX = 1.5f;
-    private static readonly float uY = 1.6f;
+    private static readonly float uY = 1f;
     private readonly Vector3[][] Positions = new Vector3[][]
     {
         new Vector3[] { new Vector3(-uX, uY), new Vector3(0, uY), new Vector3(uX, uY) },
@@ -40,24 +34,18 @@ public class Battle : MonoBehaviour
     };
 
     // Battle state tracking
-    public BattlePhases Phase { get; private set; }
-    private bool StartingBattle;
-    private bool StartingAction;
-    private bool NotifySwitchInBattlePhase;
+    public int Turn { get; private set; }
     private bool LastActionOfTurn;
-    [HideInInspector] public int Turn;
 
-    // Manage the battlers themselves
+    // Grouping battlers
+    public Transform PlayerPartyDump;
+    public Transform EnemyPartyDump;
     private List<Battler> Battlers = new List<Battler>();
     private List<Battler> BattlersByColumn = new List<Battler>();
     public Battler ActingBattler { get; private set; }
     public Battler NextActingBattler { get; private set; }
     public IEnumerable<Battler> AllBattlers => Battlers;
     public IEnumerable<Battler> FightingPlayerParty => PlayerParty.Players.Cast<Battler>().Concat(PlayerParty.Allies);
-
-    // Lists dump
-    public Transform PlayerPartyDump;
-    public Transform EnemyPartyDump;
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- Setup --
@@ -72,59 +60,39 @@ public class Battle : MonoBehaviour
 
     private void Start()
     {
-        SceneMaster.DeactivateStoredGameObjects();      // Hide overworld
-        //StartCoroutine(SetupContents());
-        SetupBackground();
-        SetupPlayerParty();
-        SetupEnemyParty();
-        foreach (BattlePlayer p in PlayerParty.Players) Battlers.Add(p);
-        foreach (BattleAlly a in PlayerParty.Allies) Battlers.Add(a);
-        foreach (BattleEnemy e in EnemyParty.Enemies) Battlers.Add(e);
-        ClearAllTurnIndicators();
-        SortBattlersInOrderLayer();
-        StartingBattle = true;
-        Await(2);
-    }
+        // Hide overworld
+        SceneMaster.DeactivateStoredGameObjects();
 
-    IEnumerable SetupContents()
-    {
-        yield return null;
-    }
-
-    public void RestrictBattlerWallCollision(bool restrict)
-    {
-        foreach (var b in Boundaries) b.gameObject.SetActive(restrict);
-    }
-
-    private void SetupBackground()
-    {
-        //
-    }
-
-    private void SetupPlayerParty()
-    {
+        // Setup player party
+        PlayerParty = BattleMaster.PlayerParty;
         PlayerParty = BattleMaster.PlayerParty;
         PlayerParty.Players = SetupPlayerPositions(PlayerParty.Players);
         PlayerParty.Allies = SetupAllyPositions(PlayerParty.Allies);
         PlayerParty.Players = SetupBattlers(PlayerParty.Players, PlayerPartyDump);
         PlayerParty.Allies = SetupBattlers(PlayerParty.Allies, PlayerPartyDump);
-    }
 
-    private void SetupEnemyParty()
-    {
+        // Setup enemy party
         EnemyParty = Instantiate(BattleMaster.EnemyParty, gameObject.transform);
         EnemyParty.gameObject.SetActive(false);
         EnemyParty.Enemies = SetupBattlers(EnemyParty.Enemies, EnemyPartyDump);
+
+        // Group into battlers list
+        foreach (BattlePlayer p in PlayerParty.Players) Battlers.Add(p);
+        foreach (BattleAlly a in PlayerParty.Allies) Battlers.Add(a);
+        foreach (BattleEnemy e in EnemyParty.Enemies) Battlers.Add(e);
+        SortBattlersInOrderLayer();
+
+        // Start battle
+        StartCoroutine(ProcessFirstTurn());
     }
 
     List<T> SetupBattlers<T>(List<T> list, Transform partyGameObject) where T : Battler
     {
         List<T> result = new List<T>();
-        int i = 0;
         foreach (Battler b0 in list)
         {
             Vector3 bpPos = partyGameObject.position + Positions[(int)b0.RowPosition][(int)b0.ColumnPosition];
-            T b = (T)InstantiateBattler(b0, bpPos, i++);
+            T b = (T)InstantiateBattler(b0, bpPos);
             result.Add(b);
         }
         return result;
@@ -171,7 +139,7 @@ public class Battle : MonoBehaviour
         return allies;
     }
 
-    public T InstantiateBattler<T>(T newBattler, Vector3 position, int index) where T : Battler
+    public T InstantiateBattler<T>(T newBattler, Vector3 position) where T : Battler
     {
         T b = Instantiate(newBattler, position, Quaternion.identity, (newBattler is BattleEnemy ? EnemyPartyDump : PlayerPartyDump));
 
@@ -199,84 +167,30 @@ public class Battle : MonoBehaviour
         foreach (var b in BattlersByColumn) b.SetColumnOverlapRank(i++);
     }
 
+    public void RestrictBattlerWallCollision(bool restrict)
+    {
+        foreach (var b in Boundaries) b.gameObject.SetActive(restrict);
+    }
+
+    private IEnumerator ProcessFirstTurn()
+    {
+        yield return new WaitForSeconds(1);
+        TurnReset();
+        yield return ActionStart();
+    }    
+
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- Update --
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     private void Update()
     {
-        if (Waiting)
-        {
-            return;
-        }
-        else if (StartingBattle)
-        {
-            StartingBattle = false;
-            TurnStart();
-            return;
-        }
-        else if (StartingAction)
-        {
-            BattleMenu.RefreshPartyFrames();
-            StartingAction = false;
-            ActionStart();
-            return;
-        }
-        
         UpdateActingBattlerLayerOrder();
-
-        switch (Phase)
-        {
-            case BattlePhases.DecidingAction:
-                if (NotifiedToSwitchInBattlePhase()) PrepareForAction();
-                break;
-
-            case BattlePhases.PreAction:
-                if (NotifiedToSwitchInBattlePhase()) ExecuteAction();
-                break;
-
-            case BattlePhases.Action:
-                if (NotifiedToSwitchInBattlePhase()) ActionEnd();
-                break;
-
-            case BattlePhases.RunningAway:
-                break;
-
-            case BattlePhases.Won:
-                BattleWinMenu.Setup();
-                Phase = BattlePhases.None;
-                break;
-
-            case BattlePhases.GameOver:
-                SetupGameOver();
-                Phase = BattlePhases.None;
-                break;
-        }
-    }
-
-    public void Await(float m = 1)
-    {
-        if (Waiting) AwaitingTime += m;
-        else AwaitingTime = Time.unscaledTime + m;
-    }
-
-    public void NotifyToSwitchInBattlePhase()
-    {
-        NotifySwitchInBattlePhase = true;
-    }
-
-    private bool NotifiedToSwitchInBattlePhase()
-    {
-        if (NotifySwitchInBattlePhase)
-        {
-            NotifySwitchInBattlePhase = false;
-            return true;
-        }
-        return false;
     }
 
     private void UpdateActingBattlerLayerOrder()
     {
+        if (!ActingBattler) return;
         int i = ActingBattler.ColumnOverlapRank;
         var bbc = BattlersByColumn;
         if (i > 0 && bbc[i].Position.y > bbc[i - 1].Position.y) UpdateActingBattlerLayerOrder(i--, -1);
@@ -294,45 +208,24 @@ public class Battle : MonoBehaviour
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// -- Turn Start --
+    /// -- Turn Reset --
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public void TurnStart()
+    public void TurnReset()
     {
         Turn++;
         LastActionOfTurn = false;
+        ResetBattlerActions();
         Battlers = SortBattlersBySpeed(Battlers, -5, 6);
-        ActionStartSetup();
     }
 
-    public void ActionStartSetup()
+    private void ResetBattlerActions()
     {
-        Await(1);
-        ClearAllTurnIndicators();
-        GetNextFastestAvailableBattlers();
-        ActingBattler.Sprite.HandleTurnIndicators(true, false);
-        NextActingBattler.Sprite.HandleTurnIndicators(false, true);
-        StartingAction = true;
-    }
-
-    private void ActionStart()
-    {
-        Phase = BattlePhases.DecidingAction;
-        if (ActingBattler.CanDoAction)
+        foreach (Battler b in AllBattlers)
         {
-            if (ActingBattler is BattlePlayer p)
-            {
-                BattleMenu.Setup(p);
-            }
-            else  // Battler AI
-            {
-                BattleMenu.Hide();
-                if (ActingBattler is BattleAlly ally) ally.MakeDecision(FightingPlayerParty.ToList(), EnemyParty.Enemies);
-                else if (ActingBattler is BattleEnemy enemy) enemy.MakeDecision(EnemyParty.Enemies, FightingPlayerParty.ToList());
-                PrepareForAction();
-            }
+            b.ResetAction();
+            b.Select(false);
         }
-        else ActionEnd();
     }
 
     private List<Battler> SortBattlersBySpeed(List<Battler> battlers, int speedRandomLow = 0, int speedRandomHigh = 0)
@@ -350,41 +243,56 @@ public class Battle : MonoBehaviour
         return battlers;
     }
 
-    private void GetNextFastestAvailableBattlers()
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// -- Action Start --
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    private IEnumerator ActionStart()
     {
-        int actingBattlerSet = 0;
-        foreach (Battler b in Battlers)
+        if (!DeclareActingBattlers())
         {
-            if (b.ExecutedAction || b.KOd) continue;
-            else if (actingBattlerSet == 0) ActingBattler = b;
-            else if (actingBattlerSet == 1) NextActingBattler = b;
-            actingBattlerSet++;
+            TurnReset();
+            yield return ActionStart();
         }
-        if (actingBattlerSet == 0)
+        else if (!ActingBattler.CanDoAction)
         {
-            ResetBattlerActions();
-            GetNextFastestAvailableBattlers();
+            BattleMenu.RefreshPartyFrames();
+            yield return new WaitForSeconds(2.5f);
+            ActionEnd();
         }
-        else if (actingBattlerSet == 1)
+        else if (ActingBattler is BattlePlayer p)
         {
-            LastActionOfTurn = true;
-            foreach (Battler b in Battlers)
-            {
-                if (ActingBattler == b || b.KOd) continue;
-                NextActingBattler = b;
-                break;
-            }
+            yield return new WaitForSeconds(1);
+            BattleMenu.RefreshPartyFrames();
+            BattleMenu.Setup(p);
+        }
+        else  // Battler AI
+        {
+            BattleMenu.RefreshPartyFrames();
+            yield return new WaitForSeconds(1);
+            if (ActingBattler is BattleAlly ally) ally.MakeDecision(FightingPlayerParty.ToList(), EnemyParty.Enemies);
+            else if (ActingBattler is BattleEnemy enemy) enemy.MakeDecision(EnemyParty.Enemies, FightingPlayerParty.ToList());
+            yield return PrepareForAction();
         }
     }
 
-    public void ResetSelectedTargets()
+    private bool DeclareActingBattlers()
     {
-        foreach (Battler b in Battlers)
+        ClearAllTurnIndicators();
+
+        ActingBattler = Battlers.FirstOrDefault(x => !x.ExecutedAction && !x.KOd);
+        if (!ActingBattler) return false;
+
+        NextActingBattler = Battlers.FirstOrDefault(x => x != ActingBattler && !x.ExecutedAction && !x.KOd);
+        if (!NextActingBattler)
         {
-            b.SelectedSingleMeeleeTarget = null;
-            b.Select(false);
-            b.LockSelectTrigger = false;
+            LastActionOfTurn = true;
+            NextActingBattler = Battlers.FirstOrDefault(x => x != ActingBattler && !x.KOd);
         }
+        
+        ActingBattler.Sprite.HandleTurnIndicators(true, false);
+        NextActingBattler.Sprite.HandleTurnIndicators(false, true);
+        return true;
     }
 
     private void ClearAllTurnIndicators()
@@ -393,23 +301,25 @@ public class Battle : MonoBehaviour
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// -- Action execution --
+    /// -- Action Execution --
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public virtual void PrepareForAction()
+    public IEnumerator PrepareForAction()
     {
         if (ActingBattler.SelectedAction == null)
         {
+            yield return new WaitForSeconds(1);
             ActionEnd();
+            yield break;
         }
-        else if (ActingBattler.SelectedSingleMeeleeTarget)
+        if (ActingBattler.SelectedSingleMeeleeTarget)
         {
-            Phase = BattlePhases.PreAction;
             RestrictBattlerWallCollision(false);
             var sp = ActingBattler.SelectedSingleMeeleeTarget.Sprite;
             ActingBattler.ApproachTarget(sp.ApproachPointLeft.position, sp.ApproachPointRight.position);
+            yield return new WaitUntil(ActingBattler.HasApproachedTarget);
         }
-        else ExecuteAction();
+        yield return ExecuteAction();
     }
 
     private bool IsChargingSkill(Skill skill)
@@ -424,13 +334,17 @@ public class Battle : MonoBehaviour
         return true;
     }
 
-    public void ExecuteAction()
+    private IEnumerator ExecuteAction()
     {
         Skill skill = ActingBattler.SelectedAction as Skill;
-        if (IsChargingSkill(skill)) return;
+        if (IsChargingSkill(skill))
+        {
+            yield return new WaitForSeconds(2);
+            ActionEnd();
+            yield break;
+        }
 
-        Phase = BattlePhases.Action;
-        if (!skill || !skill.Basic) BattleMenu.DisplayUsedAction(ActingBattler, ActingBattler.SelectedAction);
+        if (!skill || !skill.Basic) StartCoroutine(BattleMenu.DisplayUsedAction(ActingBattler, ActingBattler.SelectedAction));
 
         if (ActingBattler.UsingBasicAttack)
         {
@@ -450,14 +364,11 @@ public class Battle : MonoBehaviour
         }
     }
 
-    public void RunAway()
+    public IEnumerator ExecuteActionDone()
     {
-        Phase = BattlePhases.RunningAway;
-    }
-
-    public void RunFailed()
-    {
-        BattleMenu.RunFailed();
+        ActingBattler.ApproachForNextTurn();
+        yield return new WaitUntil(ActingBattler.HasApproachedNextTurnDestination);
+        ActionEnd();
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -470,9 +381,21 @@ public class Battle : MonoBehaviour
         ResetSelectedTargets();
         RestrictBattlerWallCollision(true);
         FinishActionUsage();
-        if (CheckBattleEndCondition()) return;
-        else if (LastActionOfTurn) TurnEnd();
-        else ActionStartSetup();
+        if (!CheckBattleEndCondition())
+        {
+            if (LastActionOfTurn) TurnReset();
+            StartCoroutine(ActionStart());
+        }
+    }
+
+    public void ResetSelectedTargets()
+    {
+        foreach (Battler b in Battlers)
+        {
+            b.SelectedSingleMeeleeTarget = null;
+            b.Select(false);
+            b.LockSelectTrigger = false;
+        }
     }
 
     private void FinishActionUsage()
@@ -496,21 +419,14 @@ public class Battle : MonoBehaviour
     {
         if (EnemyPartyDefeated)
         {
-            switch (EnemyParty.PartyMode)
-            {
-                case EnemyParty.EnemyPartyModes.Regular:
-                    DeclareWin();
-                    break;
-                case EnemyParty.EnemyPartyModes.Boss:
-                    break;
-                case EnemyParty.EnemyPartyModes.FinalBoss:
-                    break;
-            }
+            BattleMenu.RefreshPartyFrames();
+            if (EnemyParty.PartyMode != EnemyParty.EnemyPartyModes.FinalBoss) StartCoroutine(DeclareWin());
+            else SceneMaster.EndBattle(PlayerParty);
             return true;
         }
         else if (PlayerPartyDefeated)
         {
-            if (EnemyParty.GameOverOnLose) DeclareGameOver();
+            if (EnemyParty.GameOverOnLose) StartCoroutine(DeclareGameOver());
             else SceneMaster.EndBattle(PlayerParty);
             return true;
         }
@@ -518,31 +434,31 @@ public class Battle : MonoBehaviour
     }
 
     private bool EnemyPartyDefeated => EnemyParty.Enemies.All(x => x.KOd);
-    private bool PlayerPartyDefeated => PlayerParty.Players.All(x => x.KOd) && PlayerParty.Allies.All(x => x.KOd);
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// -- End of turn --
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    private void TurnEnd()
-    {
-        ResetBattlerActions();
-        BattleMenu.EndTurn();
-        TurnStart();
-    }
-
-    private void ResetBattlerActions()
-    {
-        foreach (Battler b in AllBattlers)
-        {
-            b.ResetAction();
-            b.Select(false);
-        }
-    }
+    private bool PlayerPartyDefeated => PlayerParty.Players.All(x => x.KOd) && (PlayerParty.Allies.Count == 0 || PlayerParty.Allies.All(x => x.KOd));
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- End of battle --
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public void RunAway()
+    {
+        ClearAll();
+    }
+
+    private IEnumerator DeclareWin()
+    {
+        ClearAll();
+        foreach (var b in FightingPlayerParty) b.Sprite.Animation.SetTrigger(Battler.AnimParams.Victory.ToString());
+        yield return new WaitForSeconds(2);
+        BattleWinMenu.Setup();
+    }
+
+    private IEnumerator DeclareGameOver()
+    {
+        ClearAll();
+        yield return new WaitForSeconds(3);
+        SceneMaster.OpenGameOver();
+    }
 
     private void ClearAll()
     {
@@ -550,26 +466,8 @@ public class Battle : MonoBehaviour
         ResetBattlerActions();
     }
 
-    private void DeclareWin()
-    {
-        Phase = BattlePhases.Won;
-        foreach (var b in FightingPlayerParty) b.Sprite.Animation.SetTrigger(Battler.AnimParams.Victory.ToString());
-        ClearAll();
-    }
-
-    private void DeclareGameOver()
-    {
-        Phase = BattlePhases.GameOver;
-        ClearAll();
-    }
-
-    private void SetupGameOver()
-    {
-        SceneMaster.OpenGameOver();
-    }
-
     private void OnDestroy()
     {
-        SceneMaster.ActivateStoredGameObjects();      // Return overworld
+        SceneMaster.ActivateStoredGameObjects();    // Return overworld
     }
 }

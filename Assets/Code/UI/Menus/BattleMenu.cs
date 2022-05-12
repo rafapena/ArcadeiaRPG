@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using TMPro;
@@ -52,14 +53,11 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
     public GameObject SelectedActiveTool;
 
     // Skill management
-    private bool DeactivateActionFrame => ActivatedActionFrame && Time.time > SkillNameDisplayTimer;
     public MenuFrame PlayerActionFrame;
     public TextMeshProUGUI PlayerActionName;
     public MenuFrame EnemyActionFrame;
     public TextMeshProUGUI EnemyActionName;
-    private float SkillNameDisplayTimer;
-    private float SKILL_NAME_DISPLAY_TIME = 2f;
-    private bool ActivatedActionFrame;
+    private const float DISPLAY_SKILL_USE_TIME = 3f;
 
     // Other
     private float EnemyListHeight;
@@ -79,13 +77,6 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
 
     private void LateUpdate()
     {
-        if (DeactivateActionFrame)
-        {
-            PlayerActionFrame.Deactivate();
-            EnemyActionFrame.Deactivate();
-            ActivatedActionFrame = false;
-        }
-
         switch (Selection)
         {
             case Selections.Actions:
@@ -511,7 +502,7 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
         ActingPlayer.TurnDestination = ActingPlayer.Position;
         ActingPlayer.IsDecidingAction = false;
         Hide();
-        CurrentBattle.PrepareForAction();
+        StartCoroutine(CurrentBattle.PrepareForAction());
         ClearScope(false);
     }
 
@@ -523,27 +514,26 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
         return true;
     }
 
-    public void DisplayUsedAction(Battler battler, ActiveTool action)
+    public IEnumerator DisplayUsedAction(Battler battler, ActiveTool action)
     {
-        if (action is Skill sk && sk.Basic) return;
-
+        if (action is Skill sk && sk.Basic)
+        {
+            yield return null;
+        }
         else if (battler is BattleEnemy)
         {
             EnemyActionFrame.Activate();
             EnemyActionName.text = action.Name;
+            yield return new WaitForSeconds(DISPLAY_SKILL_USE_TIME);
+            EnemyActionFrame.Deactivate();
         }
         else  // Player or ally
         {
             PlayerActionFrame.Activate();
             PlayerActionName.text = action.Name;
+            yield return new WaitForSeconds(DISPLAY_SKILL_USE_TIME);
+            PlayerActionFrame.Deactivate();
         }
-        SkillNameDisplayTimer = Time.time + SKILL_NAME_DISPLAY_TIME;
-        ActivatedActionFrame = true;
-    }
-
-    public void EndTurn()
-    {
-        // Handle states
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
