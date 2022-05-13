@@ -50,8 +50,6 @@ public abstract class Battler : ToolUser
     [HideInInspector] public Stats StatBoosts;
     public Stats Stats;
     public List<Accessory> Accessories;
-    [HideInInspector] public bool HasLowHP;
-    private float LOW_HP_THRESHOLD = 0.3f;
 
     // Overall battle info
     [HideInInspector] public bool IsSelected { get; private set; }
@@ -79,7 +77,6 @@ public abstract class Battler : ToolUser
     public StateRate[] ChangedStateRates;
     public bool Flying;
     [HideInInspector] public Stats StatModifiers;
-    [HideInInspector] public bool KOd;
     [HideInInspector] public bool Petrified;
     [HideInInspector] public int CannotMove;
     [HideInInspector] public int SPConsumeRate;
@@ -92,6 +89,11 @@ public abstract class Battler : ToolUser
     // Size of array == All elements and states, respectively. Takes values from ChangedElementRates and ChangedStateRates
     [HideInInspector] public int[] ElementRates;
     [HideInInspector] public int[] StateRates;
+
+    public bool KOd => HP <= 0 || Petrified;
+
+    public bool HasLowHP => HP / (float)MaxHP <= LOW_HP_THRESHOLD;
+    private float LOW_HP_THRESHOLD = 0.3f;
 
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -383,7 +385,7 @@ public abstract class Battler : ToolUser
 
             ChangeAndDisplayPopup(realHPTotal, activeTool.HPModType, "HP", user.ChangeHP, ChangeHP);
             ChangeAndDisplayPopup(realSPTotal, activeTool.SPModType, "SP", user.ChangeSP, ChangeSP);
-            CheckKO();
+            if (KOd) GetKOd();
         }
         else
         {
@@ -421,19 +423,14 @@ public abstract class Battler : ToolUser
         if (popup) popup.GetComponent<TextMesh>().text = total.ToString();
     }
 
-    private void CheckKO()
+    protected virtual void GetKOd()
     {
-        KOd = (HP <= 0 || Petrified);
-        if (KOd)
-        {
-            ResetAction();
-            Sprite.Animation.SetTrigger(AnimParams.KOd.ToString());
-        }
+        ResetAction();
+        Sprite.Animation.SetTrigger(AnimParams.KOd.ToString());
     }
 
     public virtual void MaxHPSP()
     {
-        KOd = false;
         HP = MaxHP;
         SP = 100;
     }
@@ -443,7 +440,6 @@ public abstract class Battler : ToolUser
         HP += val;
         if (HP < 0) HP = 0;
         else if (HP > MaxHP) HP = MaxHP;
-        HasLowHP = HP / (float)MaxHP <= LOW_HP_THRESHOLD;
     }
 
     public virtual void ChangeSP(int val)

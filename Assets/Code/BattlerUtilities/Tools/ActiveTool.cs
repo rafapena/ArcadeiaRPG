@@ -17,7 +17,6 @@ public abstract class ActiveTool : BaseObject
 
     public BattleMaster.ToolTypes Type;
     public BattleMaster.ToolFormulas Formula;
-    public float ActionTime;
     public ModType HPModType;
     public ModType SPModType;
     public int HPAmount;

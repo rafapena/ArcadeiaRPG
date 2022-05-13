@@ -20,8 +20,7 @@ public class SpriteProperties : MonoBehaviour
 
     public Vector3 TargetPoint => ApproachPointCenter.position;
     private Dictionary<string, SpriteComponent> SpriteMap;
-    private const int SPRITE_LAYER_DISTANCE = 100;
-    private string CurrentAnimState = "";
+    public const int SPRITE_LAYER_DISTANCE = 100;
 
     public struct SpriteComponent
     {
@@ -97,12 +96,6 @@ public class SpriteProperties : MonoBehaviour
             else if (!c.IgnoreOnMiss) c.Object.SetActive(false);
         }
         return swappedContent;
-    }
-
-    public void SetAnimation(string newAnimState)
-    {
-        if (CurrentAnimState.Equals(newAnimState)) return;
-        Animation.Play(newAnimState);
     }
 
     public void MoveForwardInOrder(int indexAdd)

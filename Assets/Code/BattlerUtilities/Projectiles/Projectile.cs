@@ -29,6 +29,7 @@ public class Projectile : MonoBehaviour
         Shooter = user;
         ToolEffect = activeTool;
         NerfPartition = nerfPartition;
+        GetComponent<SpriteRenderer>().sortingOrder += SpriteProperties.SPRITE_LAYER_DISTANCE * user.ColumnOverlapRank;
     }
 
     protected void Update()

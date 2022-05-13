@@ -176,7 +176,7 @@ public class Battle : MonoBehaviour
     {
         yield return new WaitForSeconds(1);
         TurnReset();
-        yield return ActionStart();
+        StartCoroutine(ActionStart());
     }    
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -252,7 +252,7 @@ public class Battle : MonoBehaviour
         if (!DeclareActingBattlers())
         {
             TurnReset();
-            yield return ActionStart();
+            StartCoroutine(ActionStart());
         }
         else if (!ActingBattler.CanDoAction)
         {
@@ -265,6 +265,8 @@ public class Battle : MonoBehaviour
             yield return new WaitForSeconds(1);
             BattleMenu.RefreshPartyFrames();
             BattleMenu.Setup(p);
+            yield return new WaitUntil(BattleMenu.SelectedAction);
+            yield return BattleMenu.SelectedRunningAway ? RunAway() : ExecuteAction();
         }
         else  // Battler AI
         {
@@ -272,7 +274,7 @@ public class Battle : MonoBehaviour
             yield return new WaitForSeconds(1);
             if (ActingBattler is BattleAlly ally) ally.MakeDecision(FightingPlayerParty.ToList(), EnemyParty.Enemies);
             else if (ActingBattler is BattleEnemy enemy) enemy.MakeDecision(EnemyParty.Enemies, FightingPlayerParty.ToList());
-            yield return PrepareForAction();
+            yield return ExecuteAction();
         }
     }
 
@@ -304,14 +306,18 @@ public class Battle : MonoBehaviour
     /// -- Action Execution --
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public IEnumerator PrepareForAction()
+    private IEnumerator ExecuteAction()
     {
-        if (ActingBattler.SelectedAction == null)
+        // Skipping action
+        Skill skill = ActingBattler.SelectedAction as Skill;
+        if (ActingBattler.SelectedAction == null || IsChargingSkill(skill))
         {
-            yield return new WaitForSeconds(1);
+            yield return new WaitForSeconds(2);
             ActionEnd();
             yield break;
         }
+
+        // Approach target for meelee attacks
         if (ActingBattler.SelectedSingleMeeleeTarget)
         {
             RestrictBattlerWallCollision(false);
@@ -319,7 +325,16 @@ public class Battle : MonoBehaviour
             ActingBattler.ApproachTarget(sp.ApproachPointLeft.position, sp.ApproachPointRight.position);
             yield return new WaitUntil(ActingBattler.HasApproachedTarget);
         }
-        yield return ExecuteAction();
+
+        // Display action usage popup then run action animation
+        if (!skill?.Basic ?? true) StartCoroutine(BattleMenu.DisplayUsedAction(ActingBattler, ActingBattler.SelectedAction));
+        yield return UseAction(skill);
+        
+        // Return back in place to complete action
+        yield return new WaitForSeconds(1);
+        ActingBattler.ApproachForNextTurn();
+        yield return new WaitUntil(ActingBattler.HasApproachedNextTurnDestination);
+        ActionEnd();
     }
 
     private bool IsChargingSkill(Skill skill)
@@ -327,48 +342,30 @@ public class Battle : MonoBehaviour
         if (!skill) return false;
         skill.StartCharge();
         if (skill.ChargeCount == 0) return false;
-        //BattleState = BattleStates.
-        //ActingBattler.Phase = Battler.Phases.UsingAction;
         skill.Charge1Turn();
-        ActingBattler.AnimatingCharging();
+        ActingBattler.UsingCharging();
         return true;
     }
 
-    private IEnumerator ExecuteAction()
+    private IEnumerator UseAction(Skill skill)
     {
-        Skill skill = ActingBattler.SelectedAction as Skill;
-        if (IsChargingSkill(skill))
-        {
-            yield return new WaitForSeconds(2);
-            ActionEnd();
-            yield break;
-        }
-
-        if (!skill || !skill.Basic) StartCoroutine(BattleMenu.DisplayUsedAction(ActingBattler, ActingBattler.SelectedAction));
-
+        bool classDependent = ActingBattler.Class || (skill?.ClassSkill ?? false);
         if (ActingBattler.UsingBasicAttack)
         {
-            if (ActingBattler.Class) ActingBattler.Class.UseBasicAttack(ActingBattler.SelectedWeapon);
+            if (classDependent) ActingBattler.Class.UseBasicAttack(ActingBattler.SelectedWeapon);
             else ActingBattler.UseBasicAttack();
         }
         else if (skill)
         {
-            if (skill.ClassSkill) ActingBattler.Class.UseSkill();
+            if (classDependent) ActingBattler.Class.UseSkill();
             else ActingBattler.UseSkill();
-            skill.DisableForCooldown();
         }
         else if (ActingBattler.SelectedAction is Item item)
         {
-            if (ActingBattler.Class) ActingBattler.Class.UseItem(item);
+            if (classDependent) ActingBattler.Class.UseItem(item);
             else ActingBattler.UseItem(item);
         }
-    }
-
-    public IEnumerator ExecuteActionDone()
-    {
-        ActingBattler.ApproachForNextTurn();
-        yield return new WaitUntil(ActingBattler.HasApproachedNextTurnDestination);
-        ActionEnd();
+        yield return classDependent ? new WaitUntil(ActingBattler.Class.NotifyActionCompletion) : new WaitUntil(ActingBattler.NotifyActionCompletion);
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -440,9 +437,10 @@ public class Battle : MonoBehaviour
     /// -- End of battle --
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public void RunAway()
+    public IEnumerator RunAway()
     {
         ClearAll();
+        yield return null;
     }
 
     private IEnumerator DeclareWin()

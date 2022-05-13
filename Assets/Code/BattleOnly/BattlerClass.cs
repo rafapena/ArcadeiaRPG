@@ -13,8 +13,7 @@ public abstract class BattlerClass : ToolUser
     public List<SkillLearnLevel> SkillSet;
 
     private int CurrentBasicAttackWeaponUsed;
-    private UnityAction[] UseBasicAttackLists;
-    private UnityAction[] AnimateBasicAttackLists;
+    private UnityAction[] UsingBasicAttackList;
 
     public bool IsBaseClass => UpgradedClass1 != null;
     
@@ -24,16 +23,15 @@ public abstract class BattlerClass : ToolUser
     {
         base.Awake();
         if (CombatRangeType == CombatRangeTypes.Any) Debug.LogError("Battler class " + Name + " cannot have 'Any' as their combat range");
-        UseBasicAttackLists = new UnityAction[] { UseBasicAttack_Weaponless, UseBasicAttack_Blade, UseBasicAttack_Hammer, UseBasicAttack_Staff, UseBasicAttack_Gun, UseBasicAttack_Tools, UseBasicAttack_Camera };
-        AnimateBasicAttackLists = new UnityAction[] { AnimateBasicAttack_Weaponless, AnimateBasicAttack_Blade, AnimateBasicAttack_Hammer, AnimateBasicAttack_Staff, AnimateBasicAttack_Gun, AnimateBasicAttack_Tools, AnimateBasicAttack_Camera };
+        UsingBasicAttackList = new UnityAction[] { UsingBasicAttack_Weaponless, UsingBasicAttack_Blade, UsingBasicAttack_Hammer, UsingBasicAttack_Staff, UsingBasicAttack_Gun, UsingBasicAttack_Tools, UsingBasicAttack_Camera };
     }
 
     protected override void Update()
     {
         if (CurrentBasicAttackWeaponUsed >= 0)
         {
-            AnimateBasicAttackLists[CurrentBasicAttackWeaponUsed].Invoke();
-            TryNotifyActionCompletion();
+            UsingBasicAttackList[CurrentBasicAttackWeaponUsed].Invoke();
+            NotifyActionCompletion();
         }
         else base.Update();
     }
@@ -51,38 +49,23 @@ public abstract class BattlerClass : ToolUser
     public void UseBasicAttack(Weapon selectedWeapon)
     {
         ResetActionExecution();
-        StartUseTimer();
+        ActionSwitch = 0;
         int mode = (int)(selectedWeapon?.WeaponType ?? 0);
-        UseBasicAttackLists[mode].Invoke();
         CurrentBasicAttackWeaponUsed = mode;
         User.Sprite.Animation.SetInteger(Battler.AnimParams.Action.ToString(), mode + 1);
     }
 
-    protected virtual void UseBasicAttack_Weaponless() { }
+    protected virtual void UsingBasicAttack_Weaponless() { }
 
-    protected virtual void UseBasicAttack_Blade() { }
+    protected virtual void UsingBasicAttack_Blade() { }
 
-    protected virtual void UseBasicAttack_Hammer() { }
+    protected virtual void UsingBasicAttack_Hammer() { }
 
-    protected virtual void UseBasicAttack_Staff() { }
+    protected virtual void UsingBasicAttack_Staff() { }
 
-    protected virtual void UseBasicAttack_Gun() { }
+    protected virtual void UsingBasicAttack_Gun() { }
 
-    protected virtual void UseBasicAttack_Tools() { }
+    protected virtual void UsingBasicAttack_Tools() { }
 
-    protected virtual void UseBasicAttack_Camera() { }
-
-    protected virtual void AnimateBasicAttack_Weaponless() { }
-
-    protected virtual void AnimateBasicAttack_Blade() { }
-
-    protected virtual void AnimateBasicAttack_Hammer() { }
-
-    protected virtual void AnimateBasicAttack_Staff() { }
-
-    protected virtual void AnimateBasicAttack_Gun() { }
-
-    protected virtual void AnimateBasicAttack_Tools() { }
-
-    protected virtual void AnimateBasicAttack_Camera() { }
+    protected virtual void UsingBasicAttack_Camera() { }
 }

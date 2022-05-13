@@ -4,32 +4,17 @@ using UnityEngine;
 
 public class Class_Marksman: BattlerClass
 {
-    protected override void UseBasicAttack_Weaponless()
+    protected override void UsingBasicAttack_Weaponless()
     {
         //
     }
 
-    protected override void UseBasicAttack_Blade()
+    protected override void UsingBasicAttack_Blade()
     {
         //
     }
 
-    protected override void UseBasicAttack_Staff()
-    {
-        //
-    }
-
-    protected override void AnimateBasicAttack_Weaponless()
-    {
-        //
-    }
-
-    protected override void AnimateBasicAttack_Blade()
-    {
-        //
-    }
-
-    protected override void AnimateBasicAttack_Staff()
+    protected override void UsingBasicAttack_Staff()
     {
         //
     }

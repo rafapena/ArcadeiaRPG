@@ -8,48 +8,30 @@ public abstract class ToolUser : BaseObject
     public CombatRangeTypes CombatRangeType;
 
     protected Battle CurrentBattle;
-    protected Battler User => CurrentBattle.ActingBattler;
-    protected ActiveTool Action => CurrentBattle.ActingBattler.SelectedAction;
+    protected Battler User => CurrentBattle?.ActingBattler;
+    protected ActiveTool Action => User?.SelectedAction;
+    protected float CurrentActionTimer => User.Sprite.Animation.GetCurrentAnimatorStateInfo(0).normalizedTime;
 
-    private bool UsingUniqueBasicAttack;
+    private bool UniqueBasicAttackUsed;
     private int CurrentSkillUsed;
     private int CurrentItemModeUsed;
-    private UnityAction[] UseSkillsLists;
-    private UnityAction[] AnimateSkillsLists;
-    private UnityAction[] ItemUseList;
-    private UnityAction[] AnimateItemUseList;
-
-    public float CurrentActionTimer => (Time.time - UsingActionStartingTimer) / Action.ActionTime;      // Must always be in range [0.0, 1.0)
-    protected float UsingActionStartingTimer;
+    private UnityAction[] UsingSkillsList;
+    private UnityAction[] UsingItemsList;
     protected int ActionSwitch;
 
     protected override void Awake()
     {
         base.Awake();
         ResetActionExecution();
-        UseSkillsLists = new UnityAction[] { UseSkill_0, UseSkill_1, UseSkill_2, UseSkill_3, UseSkill_4, UseSkill_5 };
-        AnimateSkillsLists = new UnityAction[] { AnimatingSkill_0, AnimatingSkill_1, AnimatingSkill_2, AnimatingSkill_3, AnimatingSkill_4, AnimatingSkill_5 };
-        ItemUseList = new UnityAction[] { ItemUse_0, ItemUse_1, ItemUse_2 };
-        AnimateItemUseList = new UnityAction[] { AnimatingItemUse_0, AnimatingItemUse_1, AnimatingItemUse_2 };
+        UsingSkillsList = new UnityAction[] { UsingSkill_0, UsingSkill_1, UsingSkill_2, UsingSkill_3, UsingSkill_4, UsingSkill_5 };
+        UsingItemsList = new UnityAction[] { UsingItem_0, UsingItem_1, UsingItem_2 };
     }
 
     protected virtual void Update()
     {
-        if (UsingUniqueBasicAttack)
-        {
-            AnimateUniqueBasicAttack();
-            TryNotifyActionCompletion();
-        }
-        else if (CurrentSkillUsed >= 0)
-        {
-            AnimateSkillsLists[CurrentSkillUsed].Invoke();
-            TryNotifyActionCompletion();
-        }
-        else if (CurrentItemModeUsed >= 0)
-        {
-            AnimateItemUseList[CurrentItemModeUsed].Invoke();
-            TryNotifyActionCompletion();
-        }
+        if (UniqueBasicAttackUsed) UsingUniqueBasicAttack();
+        else if (CurrentSkillUsed >= 0) UsingSkillsList[CurrentSkillUsed].Invoke();
+        else if (CurrentItemModeUsed >= 0) UsingItemsList[CurrentItemModeUsed].Invoke();
     }
 
     public void SetBattle(Battle battle)
@@ -57,26 +39,19 @@ public abstract class ToolUser : BaseObject
         CurrentBattle = battle;
     }
 
-    protected void TryNotifyActionCompletion()
+    public bool NotifyActionCompletion()
     {
-        if (CurrentActionTimer < 1f) return;
+        if (CurrentActionTimer < 1f) return false;
         ResetActionExecution();
-        StartCoroutine(CurrentBattle.ExecuteActionDone());
-
         User.Sprite.Animation.SetBool(Battler.AnimParams.Running.ToString(), true);
         User.Sprite.Animation.SetInteger(Battler.AnimParams.Action.ToString(), 0);
         User.Sprite.Animation.SetTrigger(Battler.AnimParams.DoneAction.ToString());
-    }
-
-    public void StartUseTimer()
-    {
-        UsingActionStartingTimer = Time.time;
-        ActionSwitch = 0;
+        return true;
     }
 
     public virtual void ResetActionExecution()
     {
-        UsingUniqueBasicAttack = false;
+        UniqueBasicAttackUsed = false;
         CurrentSkillUsed = -1;
         CurrentItemModeUsed = -1;
     }
@@ -88,15 +63,12 @@ public abstract class ToolUser : BaseObject
     public void UseBasicAttack()
     {
         ResetActionExecution();
-        StartUseTimer();
-        UseUniqueBasicAttack();
-        UsingUniqueBasicAttack = true;
+        ActionSwitch = 0;
+        UniqueBasicAttackUsed = true;
         User.Sprite.Animation.SetInteger(Battler.AnimParams.Action.ToString(), 1);
     }
 
-    protected virtual void UseUniqueBasicAttack() { }
-
-    protected virtual void AnimateUniqueBasicAttack() { }
+    protected virtual void UsingUniqueBasicAttack() { }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- Skill usage --
@@ -105,39 +77,25 @@ public abstract class ToolUser : BaseObject
     public void UseSkill()
     {
         ResetActionExecution();
-        StartUseTimer();
-        UseSkillsLists[Action.Id].Invoke();
+        ActionSwitch = 0;
         CurrentSkillUsed = Action.Id;
-
         int paramAction = this is BattlerClass ? Battler.CLASS_PARAM_ACTION : Battler.CHARACTER_PARAM_ACTION;
         User.Sprite.Animation.SetInteger(Battler.AnimParams.Action.ToString(), paramAction + Action.Id);
     }
 
-    protected virtual void UseSkill_0() { }
+    protected virtual void UsingSkill_0() { }
 
-    protected virtual void UseSkill_1() { }
+    protected virtual void UsingSkill_1() { }
 
-    protected virtual void UseSkill_2() { }
+    protected virtual void UsingSkill_2() { }
 
-    protected virtual void UseSkill_3() { }
+    protected virtual void UsingSkill_3() { }
 
-    protected virtual void UseSkill_4() { }
+    protected virtual void UsingSkill_4() { }
 
-    protected virtual void UseSkill_5() { }
+    protected virtual void UsingSkill_5() { }
 
-    protected virtual void AnimatingSkill_0() { }
-
-    protected virtual void AnimatingSkill_1() { }
-
-    protected virtual void AnimatingSkill_2() { }
-
-    protected virtual void AnimatingSkill_3() { }
-
-    protected virtual void AnimatingSkill_4() { }
-
-    protected virtual void AnimatingSkill_5() { }
-
-    public virtual void AnimatingCharging()
+    public virtual void UsingCharging()
     {
         //
     }
@@ -149,39 +107,23 @@ public abstract class ToolUser : BaseObject
     public void UseItem(Item selectedItem)
     {
         ResetActionExecution();
-        StartUseTimer();
+        ActionSwitch = 0;
         int mode = (int)selectedItem.UseType;
-        ItemUseList[mode].Invoke();
         CurrentItemModeUsed = mode;
         User.Sprite.Animation.SetInteger(Battler.AnimParams.Action.ToString(), Battler.ITEM_PARAM_ACTION + mode);
     }
 
-    protected virtual void ItemUse_0()
+    protected virtual void UsingItem_0()
     {
         //
     }
 
-    protected virtual void ItemUse_1()
+    protected virtual void UsingItem_1()
     {
         //
     }
 
-    protected virtual void ItemUse_2()
-    {
-        //
-    }
-
-    protected virtual void AnimatingItemUse_0()
-    {
-        //
-    }
-
-    protected virtual void AnimatingItemUse_1()
-    {
-        //
-    }
-
-    protected virtual void AnimatingItemUse_2()
+    protected virtual void UsingItem_2()
     {
         //
     }
@@ -214,7 +156,6 @@ public abstract class ToolUser : BaseObject
             e.IsSummon = true;
         }
     }
-
 
     protected bool PassedTime(float time, int actionSwitchNumber)
     {

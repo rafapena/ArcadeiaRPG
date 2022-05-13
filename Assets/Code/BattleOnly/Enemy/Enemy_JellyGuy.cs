@@ -6,7 +6,7 @@ public class Enemy_JellyGuy : BattleEnemy
 {
     public Projectile JellyFist;
 
-    protected override void AnimatingSkill_0()
+    protected override void UsingSkill_0()
     {
         float dmgPortion = 0.25f;
         if (PassedTime(0.1f, 0)) SpawnProjectile(JellyFist, dmgPortion);
@@ -15,7 +15,7 @@ public class Enemy_JellyGuy : BattleEnemy
         if (PassedTime(0.8f, 3)) SpawnProjectile(JellyFist, dmgPortion);
     }
 
-    protected override void AnimatingSkill_1()
+    protected override void UsingSkill_1()
     {
         float dmgPortion = 0.33f;
         if (PassedTime(0.7f, 0)) SpawnProjectile(JellyFist, dmgPortion);

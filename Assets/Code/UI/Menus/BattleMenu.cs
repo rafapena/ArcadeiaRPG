@@ -10,7 +10,7 @@ using UnityEngine.UI;
 
 public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameOperations
 {
-    private enum Selections { Actions, Skills, Items, Targeting, Running, Disabled }
+    private enum Selections { Actions, Skills, Items, Targeting, Disabled, Running }
 
     // Battle tracking
     public Battle CurrentBattle;
@@ -61,6 +61,10 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
 
     // Other
     private float EnemyListHeight;
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// -- Setup + Standard Operations --
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     private void Start()
     {
@@ -502,9 +506,10 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
         ActingPlayer.TurnDestination = ActingPlayer.Position;
         ActingPlayer.IsDecidingAction = false;
         Hide();
-        StartCoroutine(CurrentBattle.PrepareForAction());
         ClearScope(false);
     }
+
+    public bool SelectedAction() => Selection == Selections.Disabled || SelectedRunningAway;
 
     private bool CheckTargetField()
     {
@@ -556,14 +561,11 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
 
     private void SelectRun()
     {
-        Selection = Selections.Running;
         Hide();
+        Selection = Selections.Running;
         ClearScope(true);
         CurrentBattle.RunAway();
     }
 
-    public void RunFailed()
-    {
-        //
-    }
+    public bool SelectedRunningAway => Selection == Selections.Running;
 }

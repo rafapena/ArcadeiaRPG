@@ -25,7 +25,6 @@ public class Skill : ActiveTool
         if (!w) return;
         Type = w.Type;
         Formula = w.Formula;
-        ActionTime = w.ActionTime;
         HPModType = w.HPModType;
         SPModType = w.SPModType;
         HPAmount = w.HPAmount;
