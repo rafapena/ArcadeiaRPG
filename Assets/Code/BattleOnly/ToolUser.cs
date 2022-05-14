@@ -18,6 +18,7 @@ public abstract class ToolUser : BaseObject
     private UnityAction[] UsingSkillsList;
     private UnityAction[] UsingItemsList;
     protected int ActionSwitch;
+    protected string CurrentAnimStateName;
 
     protected override void Awake()
     {
@@ -29,9 +30,21 @@ public abstract class ToolUser : BaseObject
 
     protected virtual void Update()
     {
-        if (UniqueBasicAttackUsed) UsingUniqueBasicAttack();
-        else if (CurrentSkillUsed >= 0) UsingSkillsList[CurrentSkillUsed].Invoke();
-        else if (CurrentItemModeUsed >= 0) UsingItemsList[CurrentItemModeUsed].Invoke();
+        if (UniqueBasicAttackUsed)
+        {
+            UsingUniqueBasicAttack();
+            TryNotifyActionCompletion();
+        }
+        else if (CurrentSkillUsed >= 0)
+        {
+            UsingSkillsList[CurrentSkillUsed].Invoke();
+            TryNotifyActionCompletion();
+        }
+        else if (CurrentItemModeUsed >= 0)
+        {
+            UsingItemsList[CurrentItemModeUsed].Invoke();
+            TryNotifyActionCompletion();
+        }
     }
 
     public void SetBattle(Battle battle)
@@ -39,30 +52,23 @@ public abstract class ToolUser : BaseObject
         CurrentBattle = battle;
     }
 
-    public bool NotifyActionCompletion()
+    public void TryNotifyActionCompletion()
     {
-        /*Debug.Log(CurrentActionTimer);
-        if (User.Sprite.Animation.GetCurrentAnimatorStateInfo(0).IsName("Idle")) Debug.Log("IDLE");
-        else if (User.Sprite.Animation.GetCurrentAnimatorStateInfo(0).IsName("Running")) Debug.Log("RUNNING");
-        else if (User.Sprite.Animation.GetCurrentAnimatorStateInfo(0).IsName("BasicAttack")) Debug.Log("ATTACK PUNCH");
-        else if (User.Sprite.Animation.GetCurrentAnimatorStateInfo(0).IsName("BasicAttackBlade")) Debug.Log("ATTACK SWORD");*/
-
-        if (CurrentActionTimer < 1f) return false;
+        if (CurrentActionTimer < 1f || !User.Sprite.Animation.GetCurrentAnimatorStateInfo(0).IsName(CurrentAnimStateName)) return;
         ResetActionExecution();
         User.Sprite.Animation.SetBool(Battler.AnimParams.Running.ToString(), true);
         User.Sprite.Animation.SetInteger(Battler.AnimParams.Action.ToString(), 0);
         User.Sprite.Animation.SetTrigger(Battler.AnimParams.DoneAction.ToString());
-        return true;
+        StartCoroutine(CurrentBattle.NotifyActionCompletion());
     }
 
-    public virtual void ResetActionExecution()
+    protected virtual void ResetActionExecution()
     {
         ActionSwitch = 0;
         UniqueBasicAttackUsed = false;
         CurrentSkillUsed = -1;
         CurrentItemModeUsed = -1;
     }
-
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- Basic attack usage --
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -72,6 +78,7 @@ public abstract class ToolUser : BaseObject
         ResetActionExecution();
         UniqueBasicAttackUsed = true;
         User.Sprite.Animation.SetInteger(Battler.AnimParams.Action.ToString(), 1);
+        CurrentAnimStateName = "BasicAttack";
     }
 
     protected virtual void UsingUniqueBasicAttack() { }
@@ -86,6 +93,7 @@ public abstract class ToolUser : BaseObject
         CurrentSkillUsed = Action.Id;
         int paramAction = this is BattlerClass ? Battler.CLASS_PARAM_ACTION : Battler.CHARACTER_PARAM_ACTION;
         User.Sprite.Animation.SetInteger(Battler.AnimParams.Action.ToString(), paramAction + Action.Id);
+        CurrentAnimStateName = (this is BattlerClass ? "ClassSkill" : "CharacterSkill") + Action.Id;
     }
 
     protected virtual void UsingSkill_0() { }
@@ -110,6 +118,7 @@ public abstract class ToolUser : BaseObject
         int mode = (int)selectedItem.UseType;
         CurrentItemModeUsed = mode;
         User.Sprite.Animation.SetInteger(Battler.AnimParams.Action.ToString(), Battler.ITEM_PARAM_ACTION + mode);
+        CurrentAnimStateName = "Item" + mode;
     }
 
     protected virtual void UsingItem_0()
@@ -159,7 +168,7 @@ public abstract class ToolUser : BaseObject
 
     protected bool PassedTime(float time, int actionSwitchNumber)
     {
-        if (ActionSwitch == actionSwitchNumber && CurrentActionTimer > time)
+        if (ActionSwitch == actionSwitchNumber && CurrentActionTimer > time && User.Sprite.Animation.GetCurrentAnimatorStateInfo(0).IsName(CurrentAnimStateName))
         {
             ActionSwitch++;
             return true;

@@ -94,7 +94,6 @@ public abstract class Battler : ToolUser
     public bool HasLowHP => HP / (float)MaxHP <= LOW_HP_THRESHOLD;
     private float LOW_HP_THRESHOLD = 0.3f;
 
-
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- Setup --
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -188,6 +187,22 @@ public abstract class Battler : ToolUser
         var vec = transform.localScale;
         vec.x *= -1;
         transform.localScale = vec;
+    }
+
+    public void PrintCurrentAnimationState()
+    {
+        var animStateList = new string[]
+        {
+            "Running", "Blocking", "Dodging", "Recovering", "GetHit", "GetKOd", "Idle", "Victory1", "Victory2", "Victory3",
+            "BasicAttack", "BasicAttackBlade","BasicAttackHammer", "BasicAttackStaff", "BasicAttackGun", "BasicAttackOther",
+            "ClassSkill0", "ClassSkill1", "ClassSkill2", "ClassSkill3", "ClassSkill4",
+            "CharacterSkill0", "CharacterSkill1", "CharacterSkill2", "Item0", "Item1", "Item2"
+        };
+        Debug.Log(Name + " --> ");
+        foreach (string s in animStateList)
+        {
+            if (Sprite.Animation.GetCurrentAnimatorStateInfo(0).IsName(s)) Debug.Log(s.ToUpper());
+        }
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

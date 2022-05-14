@@ -529,23 +529,23 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
         return true;
     }
 
-    public IEnumerator DisplayUsedAction(Battler battler, ActiveTool action)
+    public IEnumerator DisplayUsedAction(Battler battler, string action)
     {
-        if (action is Skill sk && sk.Basic)
+        if (action.Equals(string.Empty))
         {
-            yield return null;
+            yield break;
         }
         else if (battler is BattleEnemy)
         {
             EnemyActionFrame.Activate();
-            EnemyActionName.text = action.Name;
+            EnemyActionName.text = action;
             yield return new WaitForSeconds(DISPLAY_SKILL_USE_TIME);
             EnemyActionFrame.Deactivate();
         }
         else  // Player or ally
         {
             PlayerActionFrame.Activate();
-            PlayerActionName.text = action.Name;
+            PlayerActionName.text = action;
             yield return new WaitForSeconds(DISPLAY_SKILL_USE_TIME);
             PlayerActionFrame.Deactivate();
         }

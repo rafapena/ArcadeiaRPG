@@ -319,51 +319,52 @@ public class Battle : MonoBehaviour
 
     private IEnumerator ExecuteAction()
     {
-        if (ActingBattler.SelectedAction)
+        // Skip null actions
+        if (!ActingBattler.SelectedAction)
         {
-            // Approach target for meelee attacks
-            if (ActingBattler.SelectedSingleMeeleeTarget)
-            {
-                RestrictBattlerWallCollision(false);
-                var sp = ActingBattler.SelectedSingleMeeleeTarget.Sprite;
-                ActingBattler.ApproachTarget(sp.ApproachPointLeft.position, sp.ApproachPointRight.position);
-                yield return new WaitUntil(ActingBattler.HasApproachedTarget);
-            }
-
-            // Display action usage popup then run action animation
-            if (!(ActingBattler.SelectedAction as Skill)?.Basic ?? true) StartCoroutine(BattleMenu.DisplayUsedAction(ActingBattler, ActingBattler.SelectedAction));
-            yield return UseAction(ActingBattler.SelectedAction);
-
-            // Return back in place to complete action
             yield return new WaitForSeconds(1);
-            ActingBattler.ApproachForNextTurn();
-            yield return new WaitUntil(ActingBattler.HasApproachedNextTurnDestination);
+            ActionEnd();
+            yield break;
         }
-        ActionEnd();
-    }
 
-    private IEnumerator UseAction(ActiveTool action)
-    {
-        Skill skill = action as Skill;
-        bool classDependent = ActingBattler.Class || (skill?.ClassSkill ?? false);
+        // Approach target for meelee attacks
+        if (ActingBattler.SelectedSingleMeeleeTarget)
+        {
+            RestrictBattlerWallCollision(false);
+            var sp = ActingBattler.SelectedSingleMeeleeTarget.Sprite;
+            ActingBattler.ApproachTarget(sp.ApproachPointLeft.position, sp.ApproachPointRight.position);
+            yield return new WaitUntil(ActingBattler.HasApproachedTarget);
+        }
+
+        // Display action usage popup
+        Skill skill = ActingBattler.SelectedAction as Skill;
+        if (!skill?.Basic ?? true) StartCoroutine(BattleMenu.DisplayUsedAction(ActingBattler, ActingBattler.SelectedAction?.Name ?? string.Empty));
+
+        // Use action
+        ActingBattler.Sprite.Animation.SetTrigger(Battler.AnimParams.DoAction.ToString());
         if (ActingBattler.UsingBasicAttack)
         {
-            if (classDependent) ActingBattler.Class.UseBasicAttack(ActingBattler.SelectedWeapon);
+            if (ActingBattler.Class) ActingBattler.Class.UseBasicAttack(ActingBattler.SelectedWeapon);
             else ActingBattler.UseBasicAttack();
         }
         else if (skill)
         {
             skill.StartCharge();
-            if (classDependent) ActingBattler.Class.UseSkill();
+            if (skill.ClassSkill) ActingBattler.Class.UseSkill();
             else ActingBattler.UseSkill();
         }
         else if (ActingBattler.SelectedAction is Item item)
         {
-            if (classDependent) ActingBattler.Class.UseItem(item);
+            if (ActingBattler.Class) ActingBattler.Class.UseItem(item);
             else ActingBattler.UseItem(item);
         }
-        ActingBattler.Sprite.Animation.SetTrigger(Battler.AnimParams.DoAction.ToString());
-        yield return classDependent ? new WaitUntil(ActingBattler.Class.NotifyActionCompletion) : new WaitUntil(ActingBattler.NotifyActionCompletion);
+    }
+
+    public IEnumerator NotifyActionCompletion()
+    {
+        ActingBattler.ApproachForNextTurn();
+        yield return new WaitUntil(ActingBattler.HasApproachedNextTurnDestination);
+        ActionEnd();
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -396,9 +397,6 @@ public class Battle : MonoBehaviour
 
     private void FinishActionUsage()
     {
-        if (ActingBattler.Class) ActingBattler.Class.ResetActionExecution();
-        else ActingBattler.ResetActionExecution();
-
         if (ActingBattler.SelectedAction is Skill sk)
         {
             sk.DisableForCooldown();
