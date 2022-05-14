@@ -1592,12 +1592,12 @@ MonoBehaviour:
   Figure: {fileID: 0}
   Direction: {x: 0, y: 0, z: 0}
   Movement: {x: 0, y: 0, z: 0}
-  Speed: 0
+  SpriteSpeed: 0
   TargetDestination: {x: 0, y: 0, z: 0}
   TurnDestination: {x: 0, y: 0, z: 0}
   MainImage: {fileID: 0}
   FaceImage: {fileID: 0}
-  Level: 1
+  Level: 10
   Class: {fileID: 0}
   HP: 0
   SP: 0
@@ -1620,7 +1620,7 @@ MonoBehaviour:
     Def: 40
     Map: 40
     Mar: 40
-    Rec: 0
+    Rec: 40
     Spd: 40
     Tec: 40
     Acc: 100
@@ -1656,7 +1656,6 @@ MonoBehaviour:
     Eva: 0
     Crt: 0
     Cev: 0
-  KOd: 0
   Petrified: 0
   CannotMove: 0
   SPConsumeRate: 0

@@ -10,39 +10,26 @@ public abstract class BattleEnemy : BattlerAI
     public float MultiplyHP = 1f;
     public int ExtraTurns;
 
-    protected override void Awake()
-    {
-        base.Awake();
-        Stats.MaxHP = (int)(MaxHP * MultiplyHP);
-        HP = MaxHP;
-    }
-
     protected override void Start()
     {
         base.Start();
-        MirrorEnemy();
+        Mirror();
     }
 
-    private void MirrorEnemy()
+    public override void StatConversion()
     {
-        Direction = Vector3.left;
-        var vec = transform.localScale;
-        vec.x *= -1;
-        transform.localScale = vec;
-    }
-
-    protected new void Update()
-    {
-        base.Update();
+        base.StatConversion();
+        Stats.MaxHP = (int)(MaxHP * MultiplyHP);
+        HP = MaxHP;
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- Receiving ActiveTool Effects --
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public override void ReceiveToolEffects(Battler user, ActiveTool activeTool, float nerfPartition = 1f)
+    public override void ReceiveToolEffects(Battler user, ActiveTool activeTool, float nerfPartition)
     {
-        base.ReceiveToolEffects(user, activeTool);
+        base.ReceiveToolEffects(user, activeTool, nerfPartition);
         if (CurrentBattle?.BattleMenu ?? false) CurrentBattle.BattleMenu.UpdateEnemyEntry(this);
     }
 }

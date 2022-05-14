@@ -28,11 +28,7 @@ public abstract class BattlerClass : ToolUser
 
     protected override void Update()
     {
-        if (CurrentBasicAttackWeaponUsed >= 0)
-        {
-            UsingBasicAttackList[CurrentBasicAttackWeaponUsed].Invoke();
-            NotifyActionCompletion();
-        }
+        if (CurrentBasicAttackWeaponUsed >= 0) UsingBasicAttackList[CurrentBasicAttackWeaponUsed].Invoke();
         else base.Update();
     }
 
@@ -49,10 +45,10 @@ public abstract class BattlerClass : ToolUser
     public void UseBasicAttack(Weapon selectedWeapon)
     {
         ResetActionExecution();
-        ActionSwitch = 0;
         int mode = (int)(selectedWeapon?.WeaponType ?? 0);
         CurrentBasicAttackWeaponUsed = mode;
         User.Sprite.Animation.SetInteger(Battler.AnimParams.Action.ToString(), mode + 1);
+        Debug.Log(mode + 1);
     }
 
     protected virtual void UsingBasicAttack_Weaponless() { }

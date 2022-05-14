@@ -29,7 +29,6 @@ public abstract class BattlePlayer : Battler
     public int StatBoostsRate = 100;
 
     private bool ArrowKeyMovement;
-    private BattleMenu BattleMenu;
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- Setup --
@@ -47,20 +46,10 @@ public abstract class BattlePlayer : Battler
         Direction = Vector3.right;
     }
 
-    protected override void MapGameObjectsToHUD()
-    {
-        // StateEffects
-    }
-
     public void AddLearnedSkills()
     {
         IEnumerable<SkillLearnLevel> skills = SkillSet.Concat(Class.SkillSet).OrderBy(x => x.LearnLevel).Where(x => x.LearnLevel <= Level).ToList();
         foreach (SkillLearnLevel sk in skills) Skills.Add(sk.LearnedSkill);
-    }
-
-    public void SetBattleMenu(BattleMenu bm)
-    {
-        BattleMenu = bm;
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -148,9 +137,9 @@ public abstract class BattlePlayer : Battler
     /// -- Receiving ActiveTool Effects --
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public override void ReceiveToolEffects(Battler user, ActiveTool activeTool, float nerfPartition = 1f)
+    public override void ReceiveToolEffects(Battler user, ActiveTool activeTool, float nerfPartition)
     {
-        base.ReceiveToolEffects(user, activeTool);
+        base.ReceiveToolEffects(user, activeTool, nerfPartition);
         if (CurrentBattle?.BattleMenu ?? false) CurrentBattle.BattleMenu.UpdatePlayerEntry(this);
     }
 }

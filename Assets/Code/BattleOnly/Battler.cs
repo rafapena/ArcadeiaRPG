@@ -24,12 +24,14 @@ public abstract class Battler : ToolUser
     [HideInInspector] public Rigidbody2D Figure;
     [HideInInspector] public Vector3 Direction;
     [HideInInspector] public Vector3 Movement;
-    [HideInInspector] public float Speed;
+    [HideInInspector] public float SpriteSpeed;
     [HideInInspector] public Vector3 TargetDestination;
     [HideInInspector] public Vector3 TurnDestination;
     private bool IsApproachingToTarget;
     private bool IsApproachingForNextTurn;
     private const float BATTLER_APPROACH_DISTANCE_THRESHOLD = 0.3f;
+    private const float BATTLER_ESCAPE_SPEED = 0.7f;
+    private const float BATTLER_APPROACH_SPEED = 2.5f;
 
     // Appearance
     public int ColumnOverlapRank { get; private set; }
@@ -37,7 +39,7 @@ public abstract class Battler : ToolUser
     public Sprite FaceImage;
 
     // Animation management
-    public enum AnimParams { Running, Victory, Action, DoneAction, Blocking, GetHit, Recovered, KOd }
+    public enum AnimParams { Action, Victory, Running, Block, Dodge, DoAction, DoneAction, GetHit, Recovered, KOd }
     public const int CLASS_PARAM_ACTION = 10;
     public const int CHARACTER_PARAM_ACTION = 20;
     public const int ITEM_PARAM_ACTION = 30;
@@ -60,12 +62,9 @@ public abstract class Battler : ToolUser
     [HideInInspector] public List<State> States = new List<State>();
     [HideInInspector] public int CurrentListIndex;
 
-    // Basic attack
-    public bool UsingBasicAttack => SelectedAction == BasicAttackSkill;
-    private const string BASIC_ATTACK_FILE_LOCATION = "Prefabs/BasicAttack";
-    [HideInInspector] public Skill BasicAttackSkill;
-
     // Action execution info
+    public bool UsingBasicAttack => SelectedAction == BasicAttackSkill;
+    [HideInInspector] public Skill BasicAttackSkill;
     [HideInInspector] public Battler SelectedSingleMeeleeTarget;
     [HideInInspector] public bool ExecutedAction;
     [HideInInspector] public bool HitCritical;
@@ -103,10 +102,8 @@ public abstract class Battler : ToolUser
     protected override void Awake()
     {
         base.Awake();
-
         Figure = gameObject.GetComponent<Rigidbody2D>();
-        BasicAttackSkill = Resources.Load<Skill>(BASIC_ATTACK_FILE_LOCATION);
-        MapGameObjectsToHUD();
+        BasicAttackSkill = Instantiate(ResourcesMaster.BasicAttackRawPrefab, transform);
 
         SetupElementRates();
         SetupStateRates();
@@ -121,10 +118,8 @@ public abstract class Battler : ToolUser
     {
         Sprite.ActionHitBox.SetBattler(this);
         Sprite.ScopeHitBox.SetBattler(this);
-        Speed = 6;
+        SpriteSpeed = 6;
     }
-
-    protected abstract void MapGameObjectsToHUD();
 
     public virtual void StatConversion()
     {
@@ -172,7 +167,7 @@ public abstract class Battler : ToolUser
     {
         base.Update();
         Sprite.Animation.SetBool(AnimParams.Running.ToString(), Movement != Vector3.zero);
-        Figure.velocity = Movement * Speed;
+        Figure.velocity = Movement * SpriteSpeed;
     }
 
     public void SetPosition(Vector3 newPosition)
@@ -187,8 +182,16 @@ public abstract class Battler : ToolUser
         ColumnOverlapRank = rank;
     }
 
+    public void Mirror()
+    {
+        Direction = Direction == Vector3.left ? Vector3.right : Vector3.left;
+        var vec = transform.localScale;
+        vec.x *= -1;
+        transform.localScale = vec;
+    }
+
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// -- Approaching --
+    /// -- Approaching / Escaping --
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public virtual void Select(bool selected)
@@ -202,18 +205,24 @@ public abstract class Battler : ToolUser
         float dist1 = Vector3.Distance(Position, leftPoint);
         float dist2 = Vector3.Distance(Position, rightPoint);
         TargetDestination = dist1 <= dist2 ? leftPoint : rightPoint;
-        Movement = (TargetDestination - Position).normalized * 2f;
+        Movement = (TargetDestination - Position).normalized * BATTLER_APPROACH_SPEED;
     }
 
     public void ApproachForNextTurn()
     {
         IsApproachingForNextTurn = true;
-        Movement = (TurnDestination - Position).normalized * 6f;
+        Movement = (TurnDestination - Position).normalized * BATTLER_APPROACH_SPEED * 2;
     }
 
-    public bool HasApproachedTarget() => CheckReachedNotifyDestination(ref IsApproachingToTarget, TargetDestination, 1f);
+    public void SetToEscapeMode(bool mode, bool mirror)
+    {
+        if (mirror) Mirror();
+        Movement = mode ? Vector3.left * BATTLER_ESCAPE_SPEED : Vector3.zero;
+    }
 
-    public bool HasApproachedNextTurnDestination() => CheckReachedNotifyDestination(ref IsApproachingForNextTurn, TurnDestination, 3f);
+    public bool HasApproachedTarget() => CheckReachedNotifyDestination(ref IsApproachingToTarget, TargetDestination, SpriteSpeed / 6f);
+
+    public bool HasApproachedNextTurnDestination() => CheckReachedNotifyDestination(ref IsApproachingForNextTurn, TurnDestination, SpriteSpeed / 2f);
 
     private bool CheckReachedNotifyDestination(ref bool isApproaching, Vector3 destination, float thresholdMod)
     {
@@ -360,7 +369,7 @@ public abstract class Battler : ToolUser
     /// -- Receiving ActiveTool Effects --
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public virtual void ReceiveToolEffects(Battler user, ActiveTool activeTool, float nerfPartition = 1f)
+    public virtual void ReceiveToolEffects(Battler user, ActiveTool activeTool, float nerfPartition)
     {
         float effectMagnitude = 1.0f;
         if (activeTool.Hit(user, this, effectMagnitude))

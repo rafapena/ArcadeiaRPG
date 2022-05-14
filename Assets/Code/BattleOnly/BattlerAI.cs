@@ -20,19 +20,9 @@ public abstract class BattlerAI : Battler
     protected override void Awake()
     {
         base.Awake();
-        StatConversion();
         CleanupAIActionList();
+        BasicAttackSkill = ActionOptions.Any() ? ActionOptions.Select(x => x.Action as Skill).FirstOrDefault(y => y == ResourcesMaster.BasicAttackRawPrefab) : null;
         SelectedWeapon = WeaponOptions.Any() ? (WeaponOptions.First().Action as Weapon) : null;
-    }
-
-    public void SetNextLabel(bool visible)
-    {
-        //
-    }
-
-    protected override void MapGameObjectsToHUD()
-    {
-        // StateEffects
     }
 
     private void CleanupAIActionList()
@@ -46,15 +36,6 @@ public abstract class BattlerAI : Battler
         ActionOptions = AIActions.Where(x =>
             x.Action is Item it && it.UsedByClassUser(this) ||
             x.Action is Skill sk && sk.UsedByClassUser(this) && (sk.WeaponExclusives.Count == 0 || WeaponOptions.Select(y => y.Action as Weapon).Any(y => (x.Action as Skill).CheckExclusiveWeapon(y))) );
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// -- Deciding action and target --
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    protected override void Update()
-    {
-        base.Update();
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

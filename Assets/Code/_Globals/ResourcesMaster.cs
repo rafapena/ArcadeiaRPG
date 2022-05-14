@@ -12,6 +12,9 @@ public class ResourcesMaster : MonoBehaviour
     public const float DEFAULT_MASTER_SFX_VOLUME = 0.8f;
     public const int DEFAULT_TEXT_DELAY_INDEX = 1;
 
+    public static Skill BasicAttackRawPrefab { get; private set; }
+    public const string BASIC_ATTACK_FILE_LOCATION = "Prefabs/BasicAttack";
+
     public static Accessory[] Accessories { get; private set; }
 
     public static BattleAlly[] Allies { get; private set; }
@@ -40,7 +43,8 @@ public class ResourcesMaster : MonoBehaviour
         if (IsSetup) return;
         IsSetup = true;
         SetupOptions();
-        SetupLists();   
+        SetupLists();
+        BasicAttackRawPrefab = Resources.Load<Skill>(BASIC_ATTACK_FILE_LOCATION);
     }
 
     private void SetupOptions()

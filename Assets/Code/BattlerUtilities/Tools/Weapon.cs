@@ -32,5 +32,5 @@ public class Weapon : ActiveTool, IToolEquippable
 
 
     // For equipping weapons from store/crafter
-    public int GetValue(float p, float r, float c) => (int)(Power * p + Range * r + CriticalRateBoost * c);
+    public int GetValue(float p, float r, float c) => (int)(Power * p + CriticalRateBoost * c);
 }

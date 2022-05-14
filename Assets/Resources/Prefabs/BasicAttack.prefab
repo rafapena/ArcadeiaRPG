@@ -9,7 +9,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3248169618960043792}
-  - component: {fileID: 8384673876078120243}
   - component: {fileID: 3752993136341733753}
   m_Layer: 0
   m_Name: BasicAttack
@@ -33,59 +32,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!212 &8384673876078120243
-SpriteRenderer:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7569271499837528704}
-  m_Enabled: 1
-  m_CastShadows: 0
-  m_ReceiveShadows: 0
-  m_DynamicOccludee: 1
-  m_StaticShadowCaster: 0
-  m_MotionVectors: 1
-  m_LightProbeUsage: 1
-  m_ReflectionProbeUsage: 1
-  m_RayTracingMode: 0
-  m_RayTraceProcedural: 0
-  m_RenderingLayerMask: 1
-  m_RendererPriority: 0
-  m_Materials:
-  - {fileID: 10754, guid: 0000000000000000f000000000000000, type: 0}
-  m_StaticBatchInfo:
-    firstSubMesh: 0
-    subMeshCount: 0
-  m_StaticBatchRoot: {fileID: 0}
-  m_ProbeAnchor: {fileID: 0}
-  m_LightProbeVolumeOverride: {fileID: 0}
-  m_ScaleInLightmap: 1
-  m_ReceiveGI: 1
-  m_PreserveUVs: 0
-  m_IgnoreNormalsForChartDetection: 0
-  m_ImportantGI: 0
-  m_StitchLightmapSeams: 1
-  m_SelectedEditorRenderState: 0
-  m_MinimumChartSize: 4
-  m_AutoUVMaxDistance: 0.5
-  m_AutoUVMaxAngle: 89
-  m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
-  m_SortingOrder: 0
-  m_Sprite: {fileID: 7980543043835355830, guid: cc189617f76e5d442956704279d5649f,
-    type: 3}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_FlipX: 0
-  m_FlipY: 0
-  m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
-  m_AdaptiveModeThreshold: 0.5
-  m_SpriteTileMode: 0
-  m_WasSpriteAssigned: 1
-  m_MaskInteraction: 0
-  m_SpriteSortPoint: 0
 --- !u!114 &3752993136341733753
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -101,9 +47,8 @@ MonoBehaviour:
   Id: 0
   Name: Attack
   Description: 
-  Type: 3
-  Formula: 2
-  ActionTime: 3
+  Type: 1
+  Formula: 1
   HPModType: 1
   SPModType: 0
   HPAmount: 0
@@ -111,18 +56,17 @@ MonoBehaviour:
   SPPecent: 0
   HPRecoil: 0
   Scope: 1
-  Element: 1
+  Range: 1
+  Element: 0
   AlwaysHits: 0
   Power: 10
-  Range: 50
   CriticalRateBoost: 0
   Accuracy: 100
   Variance: 10
   ClassExclusives: []
-  ChangedStatesGiveRate: []
-  ChangedStatesReceiveRate: []
-  Disabled: 0
-  Image: {fileID: 0}
+  StatesGiveRate: []
+  StatesReceiveRate: []
+  Image: {fileID: 1465157572153278308, guid: 4adca08bd9ab25348a3e779ff2400cdf, type: 3}
   Basic: 1
   ClassSkill: 0
   SPConsume: 0

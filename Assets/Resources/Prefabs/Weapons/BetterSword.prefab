@@ -103,7 +103,6 @@ MonoBehaviour:
   Description: A sword that's better
   Type: 1
   Formula: 1
-  ActionTime: 3
   HPModType: 1
   SPModType: 0
   HPAmount: 0
@@ -111,10 +110,10 @@ MonoBehaviour:
   SPPecent: 0
   HPRecoil: 0
   Scope: 1
+  Range: 1
   Element: 0
   AlwaysHits: 0
   Power: 10
-  Range: 3
   CriticalRateBoost: 0
   Accuracy: 100
   Variance: 10
@@ -122,8 +121,6 @@ MonoBehaviour:
   StatesGiveRate: []
   StatesReceiveRate: []
   WeaponType: 1
-  AnimatingSprite: {fileID: -9096242278044660095, guid: 39a6c7ec6ec979f49985f8290fdd7c16,
-    type: 3}
   _DefaultPrice: 50
   _RequiredTools: []
   _Weight: 2

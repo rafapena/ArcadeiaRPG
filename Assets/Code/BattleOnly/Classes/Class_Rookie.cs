@@ -9,8 +9,8 @@ public class Class_Rookie : BattlerClass
 
     protected override void UsingBasicAttack_Blade()
     {
-        if (PassedTime(0.4f, 0)) Attack(HighSlash, 0.4f);
-        else if (PassedTime(0.7f, 1)) Attack(WideSlash, 0.6f);
+        if (PassedTime(0.1f, 0)) Attack(HighSlash, 0.4f);
+        else if (PassedTime(0.2f, 1)) Attack(WideSlash, 0.6f);
     }
 
     protected void Attack(Projectile p, float dmgPortion)

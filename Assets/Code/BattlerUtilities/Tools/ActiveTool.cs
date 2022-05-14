@@ -7,6 +7,8 @@ public abstract class ActiveTool : BaseObject
 {
     public enum ModType { None, Damage, Recover, Drain }
 
+    public enum RangeTypes { None, Meelee, Ranged, Anywhere }
+
     public enum ScopeType
     {
         None, OneEnemy, OneArea, WideFrontal, StraightThrough, AllEnemies,
@@ -24,10 +26,10 @@ public abstract class ActiveTool : BaseObject
     public int SPPecent;
     public int HPRecoil;
     public ScopeType Scope;
+    public RangeTypes Range;
     public BattleMaster.Elements Element;
     public bool AlwaysHits;
     public int Power = 10;
-    public int Range = 50;
     public int CriticalRateBoost = 0;
     public int Accuracy = 100;
     public int Variance;
@@ -35,7 +37,7 @@ public abstract class ActiveTool : BaseObject
     public StateRate[] StatesGiveRate;
     public StateRate[] StatesReceiveRate;
 
-    public bool Ranged => Range > 30;
+    public bool Ranged => Range == RangeTypes.Ranged || Range == RangeTypes.Anywhere;
 
     protected override void Awake()
     {

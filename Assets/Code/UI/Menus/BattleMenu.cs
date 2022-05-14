@@ -10,7 +10,7 @@ using UnityEngine.UI;
 
 public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameOperations
 {
-    private enum Selections { Actions, Skills, Items, Targeting, Disabled, Running }
+    private enum Selections { Actions, Skills, Items, Targeting, Disabled, Escaping }
 
     // Battle tracking
     public Battle CurrentBattle;
@@ -112,6 +112,12 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
         EnemiesFrame.Activate();
     }
 
+    public void RemovePartyFrames()
+    {
+        PartyFrame.Deactivate();
+        EnemiesFrame.Deactivate();
+    }
+
     public void Setup(Battler b)
     {
         SelectItemsList.SetToolListOnTab(0, CurrentBattle.PlayerParty.Inventory.Items.FindAll(x => !x.IsKey));
@@ -197,7 +203,7 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
         else if (Input.GetKeyDown(KeyCode.Z)) FinalizeSelections();
         else if (Input.GetKeyDown(KeyCode.C) && !IsDisabled(SelectActionFrame.transform.GetChild(1).gameObject)) SetupForSelectSkill();
         else if (Input.GetKeyDown(KeyCode.V) && !IsDisabled(SelectActionFrame.transform.GetChild(2).gameObject)) SetupForSelectItem();
-        else if (Input.GetKeyDown(KeyCode.R)) SelectRun();
+        else if (Input.GetKeyDown(KeyCode.R)) SelectEscape();
     }
 
     private bool IsDisabled(GameObject go)
@@ -500,16 +506,20 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
             AimRelativeToPlayer = true;
             return;
         }
-        Selection = Selections.Disabled;
-        ActingPlayer.DisableArrowKeyMovement();
-        ActingPlayer.Movement = Vector3.zero;
-        ActingPlayer.TurnDestination = ActingPlayer.Position;
-        ActingPlayer.IsDecidingAction = false;
+        FinalizeDecision();
         Hide();
         ClearScope(false);
     }
 
-    public bool SelectedAction() => Selection == Selections.Disabled || SelectedRunningAway;
+    public bool SelectedAction() => !ActingPlayer.IsDecidingAction;
+
+    private void FinalizeDecision()
+    {
+        ActingPlayer.DisableArrowKeyMovement();
+        ActingPlayer.Movement = Vector3.zero;
+        ActingPlayer.TurnDestination = ActingPlayer.Position;
+        ActingPlayer.IsDecidingAction = false;
+    }
 
     private bool CheckTargetField()
     {
@@ -556,16 +566,17 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// -- Battle phase process: RUN --
+    /// -- Battle phase process: ESCAPE --
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private void SelectRun()
+    private void SelectEscape()
     {
         Hide();
-        Selection = Selections.Running;
+        Selection = Selections.Escaping;
+        FinalizeDecision();
         ClearScope(true);
-        CurrentBattle.RunAway();
+        CurrentBattle.Escape();
     }
 
-    public bool SelectedRunningAway => Selection == Selections.Running;
+    public bool SelectedEscape => Selection == Selections.Escaping;
 }

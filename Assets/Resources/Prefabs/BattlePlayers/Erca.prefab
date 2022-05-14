@@ -1512,12 +1512,22 @@ PrefabInstance:
     - target: {fileID: 3973277557525457278, guid: e83e3687439890940985cbbbb4a41e84,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.8549327
+      value: -0.056535594
+      objectReference: {fileID: 0}
+    - target: {fileID: 3973277557525457278, guid: e83e3687439890940985cbbbb4a41e84,
+        type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3973277557525457278, guid: e83e3687439890940985cbbbb4a41e84,
+        type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3973277557525457278, guid: e83e3687439890940985cbbbb4a41e84,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0.518739
+      value: 0.99840057
       objectReference: {fileID: 0}
     - target: {fileID: 3973635867302483889, guid: e83e3687439890940985cbbbb4a41e84,
         type: 3}
@@ -3180,22 +3190,22 @@ PrefabInstance:
     - target: {fileID: 7293763408737967920, guid: e83e3687439890940985cbbbb4a41e84,
         type: 3}
       propertyPath: m_Bounds.m_Center.x
-      value: -2.9639385
+      value: -2.6158829
       objectReference: {fileID: 0}
     - target: {fileID: 7293763408737967920, guid: e83e3687439890940985cbbbb4a41e84,
         type: 3}
       propertyPath: m_Bounds.m_Center.y
-      value: -0.099136114
+      value: -0.5282568
       objectReference: {fileID: 0}
     - target: {fileID: 7293763408737967920, guid: e83e3687439890940985cbbbb4a41e84,
         type: 3}
       propertyPath: m_Bounds.m_Extent.x
-      value: 0.46398354
+      value: 0.23496342
       objectReference: {fileID: 0}
     - target: {fileID: 7293763408737967920, guid: e83e3687439890940985cbbbb4a41e84,
         type: 3}
       propertyPath: m_Bounds.m_Extent.y
-      value: 0.2618702
+      value: 0.4834112
       objectReference: {fileID: 0}
     - target: {fileID: 7345424236258877870, guid: e83e3687439890940985cbbbb4a41e84,
         type: 3}
@@ -3325,12 +3335,12 @@ PrefabInstance:
     - target: {fileID: 7765608067703152856, guid: e83e3687439890940985cbbbb4a41e84,
         type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.94740444
+      value: 0.9999986
       objectReference: {fileID: 0}
     - target: {fileID: 7765608067703152856, guid: e83e3687439890940985cbbbb4a41e84,
         type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0.3200389
+      value: 0.0016653432
       objectReference: {fileID: 0}
     - target: {fileID: 7785745052796628067, guid: e83e3687439890940985cbbbb4a41e84,
         type: 3}
@@ -3871,7 +3881,6 @@ MonoBehaviour:
   Description: 
   Type: 3
   Formula: 2
-  ActionTime: 4
   HPModType: 1
   SPModType: 0
   HPAmount: 0
@@ -3879,10 +3888,10 @@ MonoBehaviour:
   SPPecent: 0
   HPRecoil: 0
   Scope: 5
+  Range: 3
   Element: 0
   AlwaysHits: 0
   Power: 35
-  Range: 50
   CriticalRateBoost: 0
   Accuracy: 100
   Variance: 0
@@ -3919,7 +3928,6 @@ MonoBehaviour:
   Description: Strongest attack
   Type: 0
   Formula: 0
-  ActionTime: 0
   HPModType: 0
   SPModType: 0
   HPAmount: 0
@@ -3927,10 +3935,10 @@ MonoBehaviour:
   SPPecent: 0
   HPRecoil: 0
   Scope: 0
+  Range: 3
   Element: 0
   AlwaysHits: 0
   Power: 10
-  Range: 50
   CriticalRateBoost: 0
   Accuracy: 100
   Variance: 0
@@ -3967,7 +3975,6 @@ MonoBehaviour:
   Description: Heals all
   Type: 4
   Formula: 2
-  ActionTime: 2
   HPModType: 2
   SPModType: 0
   HPAmount: 0
@@ -3975,10 +3982,10 @@ MonoBehaviour:
   SPPecent: 0
   HPRecoil: 0
   Scope: 9
+  Range: 3
   Element: 0
   AlwaysHits: 0
   Power: 10
-  Range: 100
   CriticalRateBoost: 0
   Accuracy: 100
   Variance: 0
@@ -4020,7 +4027,7 @@ MonoBehaviour:
   Figure: {fileID: 0}
   Direction: {x: 0, y: 0, z: 0}
   Movement: {x: 0, y: 0, z: 0}
-  Speed: 0
+  SpriteSpeed: 0
   TargetDestination: {x: 0, y: 0, z: 0}
   TurnDestination: {x: 0, y: 0, z: 0}
   MainImage: {fileID: 0}
@@ -4084,7 +4091,6 @@ MonoBehaviour:
     Eva: 0
     Crt: 0
     Cev: 0
-  KOd: 0
   Petrified: 0
   CannotMove: 0
   SPConsumeRate: 0
@@ -4152,7 +4158,6 @@ MonoBehaviour:
   Description: Throw fireballs
   Type: 3
   Formula: 2
-  ActionTime: 3
   HPModType: 1
   SPModType: 0
   HPAmount: 0
@@ -4160,10 +4165,10 @@ MonoBehaviour:
   SPPecent: 0
   HPRecoil: 0
   Scope: 1
+  Range: 2
   Element: 1
   AlwaysHits: 0
   Power: 20
-  Range: 50
   CriticalRateBoost: 0
   Accuracy: 100
   Variance: 20

@@ -86,7 +86,7 @@ public class Battle : MonoBehaviour
         StartCoroutine(ProcessFirstTurn());
     }
 
-    List<T> SetupBattlers<T>(List<T> list, Transform partyGameObject) where T : Battler
+    private List<T> SetupBattlers<T>(List<T> list, Transform partyGameObject) where T : Battler
     {
         List<T> result = new List<T>();
         foreach (Battler b0 in list)
@@ -98,7 +98,7 @@ public class Battle : MonoBehaviour
         return result;
     }
 
-    List<BattlePlayer> SetupPlayerPositions(List<BattlePlayer> party)
+    private List<BattlePlayer> SetupPlayerPositions(List<BattlePlayer> party)
     {
         switch (party.Count)
         {
@@ -124,7 +124,7 @@ public class Battle : MonoBehaviour
         return party;
     }
 
-    List<BattleAlly> SetupAllyPositions(List<BattleAlly> allies)
+    private List<BattleAlly> SetupAllyPositions(List<BattleAlly> allies)
     {
         switch (allies.Count)
         {
@@ -148,8 +148,9 @@ public class Battle : MonoBehaviour
             b.Class = Instantiate(b.Class, b.transform);
             b.Class.SetBattle(this);
         }
-        
-        b.BasicAttackSkill = Instantiate(b.BasicAttackSkill, b.transform);
+
+        if (b is BattleEnemy) b.StatConversion();
+
         for (int i = 0; i < b.States.Count; i++) b.States[i] = Instantiate(b.States[i], b.transform);
         b.StatBoosts.SetToZero();
         
@@ -211,12 +212,13 @@ public class Battle : MonoBehaviour
     /// -- Turn Reset --
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public void TurnReset()
+    private void TurnReset()
     {
         Turn++;
         LastActionOfTurn = false;
         ResetBattlerActions();
-        Battlers = SortBattlersBySpeed(Battlers, -5, 6);
+        SortBattlersBySpeed(-5, 6);
+        UpdateBattlersSpriteSpeed();
     }
 
     private void ResetBattlerActions()
@@ -228,19 +230,28 @@ public class Battle : MonoBehaviour
         }
     }
 
-    private List<Battler> SortBattlersBySpeed(List<Battler> battlers, int speedRandomLow = 0, int speedRandomHigh = 0)
+    private void SortBattlersBySpeed(int speedRandomLow = 0, int speedRandomHigh = 0)
     {
-        for (int i = 0; i < battlers.Count - 1; i++)
+        for (int i = 0; i < Battlers.Count - 1; i++)
         {
             for (int j = i + 1; j > 0; j--)
             {
-                if (battlers[j - 1].Spd + Random.Range(speedRandomLow, speedRandomHigh) > battlers[j].Spd + Random.Range(speedRandomLow, speedRandomHigh)) continue;
-                Battler temp = battlers[j - 1];
-                battlers[j - 1] = battlers[j];
-                battlers[j] = temp;
+                if (Battlers[j - 1].Spd + Random.Range(speedRandomLow, speedRandomHigh) > Battlers[j].Spd + Random.Range(speedRandomLow, speedRandomHigh)) continue;
+                Battler temp = Battlers[j - 1];
+                Battlers[j - 1] = Battlers[j];
+                Battlers[j] = temp;
             }
         }
-        return battlers;
+    }
+
+    private void UpdateBattlersSpriteSpeed()
+    {
+        int maxSpeed = Battlers[0].Spd;
+        int minSpeed = Battlers[Battlers.Count - 1].Spd;
+        foreach (var b in Battlers)
+        {
+            b.SpriteSpeed = ((b.Spd - minSpeed) / (float)(maxSpeed - minSpeed)) * 4 + 3;
+        }
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -266,7 +277,7 @@ public class Battle : MonoBehaviour
             BattleMenu.RefreshPartyFrames();
             BattleMenu.Setup(p);
             yield return new WaitUntil(BattleMenu.SelectedAction);
-            yield return BattleMenu.SelectedRunningAway ? RunAway() : ExecuteAction();
+            yield return BattleMenu.SelectedEscape ? Escape() : ExecuteAction();
         }
         else  // Battler AI
         {
@@ -308,47 +319,32 @@ public class Battle : MonoBehaviour
 
     private IEnumerator ExecuteAction()
     {
-        // Skipping action
-        Skill skill = ActingBattler.SelectedAction as Skill;
-        if (ActingBattler.SelectedAction == null || IsChargingSkill(skill))
+        if (ActingBattler.SelectedAction)
         {
-            yield return new WaitForSeconds(2);
-            ActionEnd();
-            yield break;
-        }
+            // Approach target for meelee attacks
+            if (ActingBattler.SelectedSingleMeeleeTarget)
+            {
+                RestrictBattlerWallCollision(false);
+                var sp = ActingBattler.SelectedSingleMeeleeTarget.Sprite;
+                ActingBattler.ApproachTarget(sp.ApproachPointLeft.position, sp.ApproachPointRight.position);
+                yield return new WaitUntil(ActingBattler.HasApproachedTarget);
+            }
 
-        // Approach target for meelee attacks
-        if (ActingBattler.SelectedSingleMeeleeTarget)
-        {
-            RestrictBattlerWallCollision(false);
-            var sp = ActingBattler.SelectedSingleMeeleeTarget.Sprite;
-            ActingBattler.ApproachTarget(sp.ApproachPointLeft.position, sp.ApproachPointRight.position);
-            yield return new WaitUntil(ActingBattler.HasApproachedTarget);
-        }
+            // Display action usage popup then run action animation
+            if (!(ActingBattler.SelectedAction as Skill)?.Basic ?? true) StartCoroutine(BattleMenu.DisplayUsedAction(ActingBattler, ActingBattler.SelectedAction));
+            yield return UseAction(ActingBattler.SelectedAction);
 
-        // Display action usage popup then run action animation
-        if (!skill?.Basic ?? true) StartCoroutine(BattleMenu.DisplayUsedAction(ActingBattler, ActingBattler.SelectedAction));
-        yield return UseAction(skill);
-        
-        // Return back in place to complete action
-        yield return new WaitForSeconds(1);
-        ActingBattler.ApproachForNextTurn();
-        yield return new WaitUntil(ActingBattler.HasApproachedNextTurnDestination);
+            // Return back in place to complete action
+            yield return new WaitForSeconds(1);
+            ActingBattler.ApproachForNextTurn();
+            yield return new WaitUntil(ActingBattler.HasApproachedNextTurnDestination);
+        }
         ActionEnd();
     }
 
-    private bool IsChargingSkill(Skill skill)
+    private IEnumerator UseAction(ActiveTool action)
     {
-        if (!skill) return false;
-        skill.StartCharge();
-        if (skill.ChargeCount == 0) return false;
-        skill.Charge1Turn();
-        ActingBattler.UsingCharging();
-        return true;
-    }
-
-    private IEnumerator UseAction(Skill skill)
-    {
+        Skill skill = action as Skill;
         bool classDependent = ActingBattler.Class || (skill?.ClassSkill ?? false);
         if (ActingBattler.UsingBasicAttack)
         {
@@ -357,6 +353,7 @@ public class Battle : MonoBehaviour
         }
         else if (skill)
         {
+            skill.StartCharge();
             if (classDependent) ActingBattler.Class.UseSkill();
             else ActingBattler.UseSkill();
         }
@@ -365,6 +362,7 @@ public class Battle : MonoBehaviour
             if (classDependent) ActingBattler.Class.UseItem(item);
             else ActingBattler.UseItem(item);
         }
+        ActingBattler.Sprite.Animation.SetTrigger(Battler.AnimParams.DoAction.ToString());
         yield return classDependent ? new WaitUntil(ActingBattler.Class.NotifyActionCompletion) : new WaitUntil(ActingBattler.NotifyActionCompletion);
     }
 
@@ -375,6 +373,7 @@ public class Battle : MonoBehaviour
     private void ActionEnd()
     {
         ActingBattler.ExecutedAction = true;
+        (ActingBattler.SelectedAction as Skill)?.Charge1Turn();
         ResetSelectedTargets();
         RestrictBattlerWallCollision(true);
         FinishActionUsage();
@@ -434,19 +433,25 @@ public class Battle : MonoBehaviour
     private bool PlayerPartyDefeated => PlayerParty.Players.All(x => x.KOd) && (PlayerParty.Allies.Count == 0 || PlayerParty.Allies.All(x => x.KOd));
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// -- End of battle --
+    /// -- End of Battle --
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public IEnumerator RunAway()
+    public IEnumerator Escape()
     {
         ClearAll();
-        yield return null;
+        RestrictBattlerWallCollision(false);
+        yield return new WaitForSeconds(1);
+        foreach (var b in Battlers) b.SetToEscapeMode(true, b is not BattleEnemy);
+        yield return new WaitForSeconds(3);
+        foreach (var e in EnemyParty.Enemies) e.SetToEscapeMode(false, false);
+        yield return new WaitForSeconds(1);
+        SceneMaster.EndBattle(PlayerParty);
     }
 
     private IEnumerator DeclareWin()
     {
         ClearAll();
-        foreach (var b in FightingPlayerParty) b.Sprite.Animation.SetTrigger(Battler.AnimParams.Victory.ToString());
+        foreach (var b in FightingPlayerParty) b.Sprite.Animation.SetInteger(Battler.AnimParams.Victory.ToString(), 1);
         yield return new WaitForSeconds(2);
         BattleWinMenu.Setup();
     }
@@ -462,6 +467,7 @@ public class Battle : MonoBehaviour
     {
         ClearAllTurnIndicators();
         ResetBattlerActions();
+        BattleMenu.RemovePartyFrames();
     }
 
     private void OnDestroy()

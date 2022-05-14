@@ -249,7 +249,7 @@ public class MMSpecial : MM_Super
     private void UseSkill(int index)
     {
         PartyTargetsList.SelectedObject = SelectableTeammates[index];
-        PartyTargetsList.SelectedObject.ReceiveToolEffects(PartyUserList.SelectedObject, SkillsList.SelectedObject);
+        PartyTargetsList.SelectedObject.ReceiveToolEffects(PartyUserList.SelectedObject, SkillsList.SelectedObject, 1f);
         PartyTargetsList.UpdateEntry(PartyTargetsList.SelectedObject, index);
     }
 

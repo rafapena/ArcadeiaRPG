@@ -41,6 +41,12 @@ public abstract class ToolUser : BaseObject
 
     public bool NotifyActionCompletion()
     {
+        /*Debug.Log(CurrentActionTimer);
+        if (User.Sprite.Animation.GetCurrentAnimatorStateInfo(0).IsName("Idle")) Debug.Log("IDLE");
+        else if (User.Sprite.Animation.GetCurrentAnimatorStateInfo(0).IsName("Running")) Debug.Log("RUNNING");
+        else if (User.Sprite.Animation.GetCurrentAnimatorStateInfo(0).IsName("BasicAttack")) Debug.Log("ATTACK PUNCH");
+        else if (User.Sprite.Animation.GetCurrentAnimatorStateInfo(0).IsName("BasicAttackBlade")) Debug.Log("ATTACK SWORD");*/
+
         if (CurrentActionTimer < 1f) return false;
         ResetActionExecution();
         User.Sprite.Animation.SetBool(Battler.AnimParams.Running.ToString(), true);
@@ -51,6 +57,7 @@ public abstract class ToolUser : BaseObject
 
     public virtual void ResetActionExecution()
     {
+        ActionSwitch = 0;
         UniqueBasicAttackUsed = false;
         CurrentSkillUsed = -1;
         CurrentItemModeUsed = -1;
@@ -63,7 +70,6 @@ public abstract class ToolUser : BaseObject
     public void UseBasicAttack()
     {
         ResetActionExecution();
-        ActionSwitch = 0;
         UniqueBasicAttackUsed = true;
         User.Sprite.Animation.SetInteger(Battler.AnimParams.Action.ToString(), 1);
     }
@@ -77,7 +83,6 @@ public abstract class ToolUser : BaseObject
     public void UseSkill()
     {
         ResetActionExecution();
-        ActionSwitch = 0;
         CurrentSkillUsed = Action.Id;
         int paramAction = this is BattlerClass ? Battler.CLASS_PARAM_ACTION : Battler.CHARACTER_PARAM_ACTION;
         User.Sprite.Animation.SetInteger(Battler.AnimParams.Action.ToString(), paramAction + Action.Id);
@@ -95,11 +100,6 @@ public abstract class ToolUser : BaseObject
 
     protected virtual void UsingSkill_5() { }
 
-    public virtual void UsingCharging()
-    {
-        //
-    }
-
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- Item usage --
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -107,7 +107,6 @@ public abstract class ToolUser : BaseObject
     public void UseItem(Item selectedItem)
     {
         ResetActionExecution();
-        ActionSwitch = 0;
         int mode = (int)selectedItem.UseType;
         CurrentItemModeUsed = mode;
         User.Sprite.Animation.SetInteger(Battler.AnimParams.Action.ToString(), Battler.ITEM_PARAM_ACTION + mode);
@@ -146,6 +145,7 @@ public abstract class ToolUser : BaseObject
         if (b is BattleAlly a0)
         {
             var a = CurrentBattle.InstantiateBattler(a0, User.TargetDestination);
+            a.StatConversion();
             CurrentBattle.PlayerParty.Allies.Add(a);
             a.IsSummon = true;
         }

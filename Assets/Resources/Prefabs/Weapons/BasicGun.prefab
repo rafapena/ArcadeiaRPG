@@ -102,7 +102,6 @@ MonoBehaviour:
   Description: Shoots things... using ice
   Type: 1
   Formula: 3
-  ActionTime: 3
   HPModType: 1
   SPModType: 0
   HPAmount: 0
@@ -110,10 +109,10 @@ MonoBehaviour:
   SPPecent: 0
   HPRecoil: 0
   Scope: 1
+  Range: 3
   Element: 2
   AlwaysHits: 0
   Power: 10
-  Range: 80
   CriticalRateBoost: 0
   Accuracy: 100
   Variance: 10
@@ -121,9 +120,6 @@ MonoBehaviour:
   StatesGiveRate: []
   StatesReceiveRate: []
   WeaponType: 4
-  AnimatingSprite: {fileID: 0}
-  AnimatingSpriteFallback: {fileID: 1246759035140315760, guid: c8ef53492de1b9e45b02963672ed6090,
-    type: 3}
   _DefaultPrice: 50
   _RequiredTools: []
   _Weight: 2
