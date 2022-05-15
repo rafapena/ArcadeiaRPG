@@ -2220,18 +2220,6 @@ PrefabInstance:
     - {fileID: 8047808681747534396, guid: e83e3687439890940985cbbbb4a41e84, type: 3}
     - {fileID: 56355760739864382, guid: e83e3687439890940985cbbbb4a41e84, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: e83e3687439890940985cbbbb4a41e84, type: 3}
---- !u!114 &1081935189856852030 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 908942086059878578, guid: e83e3687439890940985cbbbb4a41e84,
-    type: 3}
-  m_PrefabInstance: {fileID: 260918852331368588}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a2a5d13a274b3764d9a8a74352d0b695, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &4965697399233449817 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5149667342464974805, guid: e83e3687439890940985cbbbb4a41e84,
@@ -2285,7 +2273,7 @@ MonoBehaviour:
   WeaponExclusives: 
   ChargeCount: 0
   DisabledCount: 0
---- !u!114 &7425486180400410211
+--- !u!114 &7782647800381940266
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -2294,16 +2282,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 4965697399233449817}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 52e45f6c7e2584b47a4dcdf2c32ec049, type: 3}
+  m_Script: {fileID: 11500000, guid: 5886faf046f10aa4ea6fbf208411f835, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   Id: 1
   Name: Jelly Guy
   Description: 
-  CombatRangeType: 1
-  Sprite: {fileID: 1081935189856852030}
-  RowPosition: 0
-  ColumnPosition: 0
   Figure: {fileID: 0}
   Direction: {x: 0, y: 0, z: 0}
   Movement: {x: 0, y: 0, z: 0}
@@ -2312,8 +2296,10 @@ MonoBehaviour:
   TurnDestination: {x: 0, y: 0, z: 0}
   MainImage: {fileID: 0}
   FaceImage: {fileID: 0}
-  Level: 10
+  Sprite: {fileID: 0}
+  Level: 1
   Class: {fileID: 0}
+  CombatRangeType: 1
   HP: 0
   SP: 0
   StatBoosts:
@@ -2336,12 +2322,12 @@ MonoBehaviour:
     Map: 30
     Mar: 30
     Rec: 30
-    Spd: 70
+    Spd: 30
     Tec: 30
-    Acc: 100
-    Eva: 100
-    Crt: 100
-    Cev: 100
+    Acc: 30
+    Eva: 30
+    Crt: 30
+    Cev: 30
   Accessories: []
   LockSelectTrigger: 0
   SelectedAction: {fileID: 0}
@@ -2349,6 +2335,8 @@ MonoBehaviour:
   IsCharging: 0
   States: []
   CurrentListIndex: 0
+  RowPosition: 0
+  ColumnPosition: 0
   BasicAttackSkill: {fileID: 0}
   SelectedSingleMeeleeTarget: {fileID: 0}
   ExecutedAction: 0
@@ -2386,7 +2374,7 @@ MonoBehaviour:
       type: 3}
     ClassSkillId: 0
     Priority: 10
-    PriorityOnFail: 10
+    PriorityOnFail: 0
     UserCondition:
       HPLow: 0
       HPHigh: 0
@@ -2408,7 +2396,7 @@ MonoBehaviour:
   - Action: {fileID: 5292543417821135309}
     ClassSkillId: 0
     Priority: 10
-    PriorityOnFail: 10
+    PriorityOnFail: 0
     UserCondition:
       HPLow: 0
       HPHigh: 0
@@ -2434,5 +2422,21 @@ MonoBehaviour:
   DroppedWeapons: []
   MultiplyHP: 1
   ExtraTurns: 0
-  JellyFist: {fileID: 8282308100824431874, guid: 9e5016818a16d734d9353a63b64b4f41,
+--- !u!1 &5156231397462331561 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4904531540095836197, guid: e83e3687439890940985cbbbb4a41e84,
     type: 3}
+  m_PrefabInstance: {fileID: 260918852331368588}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &5112552912940775700
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5156231397462331561}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 33842d27aedc38d40b92a03bda1ae755, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

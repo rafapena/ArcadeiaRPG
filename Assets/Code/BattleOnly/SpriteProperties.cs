@@ -8,8 +8,8 @@ public class SpriteProperties : MonoBehaviour
     public Transform SpritesList;
     public Animator Animation;
     public Transform BaseHitBox;
-    public ActionHitBox ActionHitBox;
-    public ScopeHitBox ScopeHitBox;
+    public BattlerHitbox ActionHitbox;
+    public BattlerHitbox ScopeHitbox;
     public Transform ApproachPointLeft;
     public Transform ApproachPointRight;
     public Transform ApproachPointCenter;

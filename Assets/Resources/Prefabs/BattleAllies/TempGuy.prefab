@@ -1552,25 +1552,13 @@ PrefabInstance:
     - {fileID: 8047808681747534396, guid: e83e3687439890940985cbbbb4a41e84, type: 3}
     - {fileID: 56355760739864382, guid: e83e3687439890940985cbbbb4a41e84, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: e83e3687439890940985cbbbb4a41e84, type: 3}
---- !u!114 &1081935189856852030 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 908942086059878578, guid: e83e3687439890940985cbbbb4a41e84,
-    type: 3}
-  m_PrefabInstance: {fileID: 260918852331368588}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a2a5d13a274b3764d9a8a74352d0b695, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1 &4965697399233449817 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 5149667342464974805, guid: e83e3687439890940985cbbbb4a41e84,
     type: 3}
   m_PrefabInstance: {fileID: 260918852331368588}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &-4998551341316997890
+--- !u!114 &7660155867343399249
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -1579,16 +1567,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 4965697399233449817}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3f6d7ba38adc66644a1d8982b859e602, type: 3}
+  m_Script: {fileID: 11500000, guid: c5148861e866d1145ada773abf2c5dbf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   Id: 0
   Name: Ally Guy
-  Description: 
-  CombatRangeType: 1
-  Sprite: {fileID: 1081935189856852030}
-  RowPosition: 0
-  ColumnPosition: 0
+  Description: Allies with you
   Figure: {fileID: 0}
   Direction: {x: 0, y: 0, z: 0}
   Movement: {x: 0, y: 0, z: 0}
@@ -1597,8 +1581,10 @@ MonoBehaviour:
   TurnDestination: {x: 0, y: 0, z: 0}
   MainImage: {fileID: 0}
   FaceImage: {fileID: 0}
-  Level: 10
+  Sprite: {fileID: 0}
+  Level: 1
   Class: {fileID: 0}
+  CombatRangeType: 1
   HP: 0
   SP: 0
   StatBoosts:
@@ -1634,6 +1620,8 @@ MonoBehaviour:
   IsCharging: 0
   States: []
   CurrentListIndex: 0
+  RowPosition: 0
+  ColumnPosition: 0
   BasicAttackSkill: {fileID: 0}
   SelectedSingleMeeleeTarget: {fileID: 0}
   ExecutedAction: 0
@@ -1668,3 +1656,21 @@ MonoBehaviour:
   StateRates: 
   AIActions: []
   IsSummon: 0
+--- !u!1 &5156231397462331561 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4904531540095836197, guid: e83e3687439890940985cbbbb4a41e84,
+    type: 3}
+  m_PrefabInstance: {fileID: 260918852331368588}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &4348071894944245761
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5156231397462331561}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3d5e6ead7fe5d1148a639745c46e8b27, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 

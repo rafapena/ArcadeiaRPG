@@ -120,7 +120,7 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 5680884326412189411}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &400232691818606767
+--- !u!114 &2008034214646324178
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -129,26 +129,24 @@ MonoBehaviour:
   m_GameObject: {fileID: 694052540818129206}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e31366d102b9af1498c81b48033a7c9d, type: 3}
+  m_Script: {fileID: 11500000, guid: be653f48522d4434ebb04f01fc13592c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   Id: 2
   Name: Centura
   Description: Third party member
-  CombatRangeType: 0
-  Sprite: {fileID: 1989075250644551587}
-  RowPosition: 0
-  ColumnPosition: 0
   Figure: {fileID: 0}
   Direction: {x: 0, y: 0, z: 0}
   Movement: {x: 0, y: 0, z: 0}
-  Speed: 0
+  SpriteSpeed: 0
   TargetDestination: {x: 0, y: 0, z: 0}
   TurnDestination: {x: 0, y: 0, z: 0}
   MainImage: {fileID: 0}
   FaceImage: {fileID: 21300000, guid: 5a9e62eb14233e44ea3dccc2630a01c9, type: 3}
+  Sprite: {fileID: 0}
   Level: 1
-  Class: {fileID: 4581687647832721056, guid: 7aaaa019e3db5d942886f40abeae3b51, type: 3}
+  Class: {fileID: 5258667688617427559, guid: 7aaaa019e3db5d942886f40abeae3b51, type: 3}
+  CombatRangeType: 0
   HP: 0
   SP: 0
   StatBoosts:
@@ -184,6 +182,8 @@ MonoBehaviour:
   IsCharging: 0
   States: []
   CurrentListIndex: 0
+  RowPosition: 0
+  ColumnPosition: 0
   BasicAttackSkill: {fileID: 0}
   SelectedSingleMeeleeTarget: {fileID: 0}
   ExecutedAction: 0
@@ -206,7 +206,6 @@ MonoBehaviour:
     Eva: 0
     Crt: 0
     Cev: 0
-  KOd: 0
   Petrified: 0
   CannotMove: 0
   SPConsumeRate: 0
@@ -236,22 +235,40 @@ MonoBehaviour:
     Crt: 0
     Cev: 0
   ClassSet:
-  - {fileID: 4581687647832721056, guid: 7aaaa019e3db5d942886f40abeae3b51, type: 3}
+  - {fileID: 5258667688617427559, guid: 7aaaa019e3db5d942886f40abeae3b51, type: 3}
   PartnerAccBoostRate: 100
   PartnerCritBoostRate: 100
   SavePartnerRate: 100
   CounterattackRate: 100
   AssistDamageRate: 100
   StatBoostsRate: 100
---- !u!114 &1989075250644551587 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 6146308846707112256, guid: 7030ceb2351b34e4497069298d76e79d,
+--- !u!1 &1960468503394499361 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6188638055269287362, guid: 7030ceb2351b34e4497069298d76e79d,
     type: 3}
   m_PrefabInstance: {fileID: 5680884326412189411}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+--- !u!114 &364365836226392979
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1960468503394499361}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a2a5d13a274b3764d9a8a74352d0b695, type: 3}
+  m_Script: {fileID: 11500000, guid: d9b418c249e1368449fba3aaa9878a56, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &6723529488978663295
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1960468503394499361}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 66effc44585218547a8c83a8937f4e50, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 

@@ -36,6 +36,7 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
         public StaticTargetField StraightThrough;
     }
     public TargetFieldsGroup TargetFields;
+    public Transform EscapeCatchHitboxes;
 
     // Child GameObjects
     public MenuFrame PartyFrame;

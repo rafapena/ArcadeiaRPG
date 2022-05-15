@@ -10,6 +10,8 @@ public class BattleMaster
     public const int DEFAULT_RATE = 100;
     public const int SP_CAP = 100;
 
+    public enum CombatRangeTypes { Any, Close, Medium, Far }
+
     public enum Elements { None, Fire, Ice, Thunder, Earth, Wind, Light, Dark }
 
     public enum WeaponTypes { None, Blade, Hammer, Staff, Gun, Tools, Camera }

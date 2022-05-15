@@ -42,24 +42,22 @@ public abstract class TargetField : MonoBehaviour
 
     public void NotifyTriggerEnter(Collider2D collision)
     {
-        ScopeHitBox bhb = collision.gameObject.GetComponent<ScopeHitBox>();
-        if (!bhb || AimingPlayer == null) return;
-
-        Battler b = bhb.Battler;
-        if (b.LockSelectTrigger) return;
-
-        if (AimingPlayer.AimingForEnemies() && b is BattleEnemy ||
+        if (collision.gameObject.CompareTag(Battle.SCOPE_HITBOX_TAG) && AimingPlayer)
+        {
+            Battler b = collision.gameObject.GetComponent<BattlerHitbox>().Battler;
+            if (AimingPlayer.AimingForEnemies() && b is BattleEnemy ||
             AimingPlayer.AimingForTeammates() && (b is BattlePlayer || b is BattleAlly) ||
             AimingPlayer.SelectedAction.Scope == ActiveTool.ScopeType.EveryoneButSelf && b is BattlePlayer && b.Id == AimingPlayer.Id ||
             AimingPlayer.SelectedAction.Scope == ActiveTool.ScopeType.Everyone)
-        {
-            b.Select(true);
+            {
+                b.Select(true);
+            }
         }
     }
 
     public void NotifyTriggerExit(Collider2D collision)
     {
-        ScopeHitBox hb = collision.gameObject.GetComponent<ScopeHitBox>();
-        if (hb && !hb.Battler.LockSelectTrigger && AimingPlayer != null && AimingPlayer.IsDecidingAction) hb.Battler.Select(false);
+        Battler b = collision.gameObject.CompareTag(Battle.SCOPE_HITBOX_TAG) ? collision.gameObject.GetComponent<BattlerHitbox>()?.Battler : null;
+        if (b && !b.LockSelectTrigger && AimingPlayer != null && AimingPlayer.IsDecidingAction) b.Select(false);
     }
 }

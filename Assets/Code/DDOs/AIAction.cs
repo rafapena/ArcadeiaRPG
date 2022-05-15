@@ -37,7 +37,7 @@ public struct AIAction
 
     private bool MetTargetRequirements(Battler target)
     {
-        bool metRangeConditions = (target.CombatRangeType == TargetCondition.RangeType || target.CombatRangeType == ToolUser.CombatRangeTypes.Any || TargetCondition.RangeType == ToolUser.CombatRangeTypes.Any);
+        bool metRangeConditions = (target.CombatRangeType == TargetCondition.RangeType || target.CombatRangeType == BattleMaster.CombatRangeTypes.Any || TargetCondition.RangeType == BattleMaster.CombatRangeTypes.Any);
         return MetStandardConditions(TargetCondition.Condition, target) && metRangeConditions;
     }
 
@@ -69,5 +69,5 @@ public struct AIStandardCondition
 public struct AITargetCondition
 {
     public AIStandardCondition Condition;
-    public ToolUser.CombatRangeTypes RangeType;
+    public BattleMaster.CombatRangeTypes RangeType;
 }

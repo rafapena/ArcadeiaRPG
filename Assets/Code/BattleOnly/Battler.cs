@@ -9,15 +9,11 @@ using UnityEngine.iOS;
 using UnityEngine.U2D.Animation;
 using UnityEngine.UI;
 
-public abstract class Battler : ToolUser
+public abstract class Battler : BaseObject
 {
-    public SpriteProperties Sprite;
+    public Battle CurrentBattle { get; private set; }
     public enum VerticalPositions { Top, Center, Bottom }
     public enum HorizontalPositions { Left, Center, Right }
-
-    // Battler position
-    public VerticalPositions RowPosition;
-    public HorizontalPositions ColumnPosition;
 
     // Movement
     public Vector3 Position => Sprite.BaseHitBox.transform.position;
@@ -37,9 +33,11 @@ public abstract class Battler : ToolUser
     public int ColumnOverlapRank { get; private set; }
     public Sprite MainImage;
     public Sprite FaceImage;
+    [HideInInspector] public SpriteProperties Sprite;
 
     // Animation management
     public enum AnimParams { Action, Victory, Running, Block, Dodge, DoAction, DoneAction, GetHit, Recovered, KOd }
+    private string CurrentAnimStateName;
     public const int CLASS_PARAM_ACTION = 10;
     public const int CHARACTER_PARAM_ACTION = 20;
     public const int ITEM_PARAM_ACTION = 30;
@@ -47,6 +45,7 @@ public abstract class Battler : ToolUser
     // General data
     public int Level = 1;
     public BattlerClass Class;
+    public BattleMaster.CombatRangeTypes CombatRangeType;
     [HideInInspector] public int HP;
     [HideInInspector] public int SP;
     [HideInInspector] public Stats StatBoosts;
@@ -61,6 +60,8 @@ public abstract class Battler : ToolUser
     [HideInInspector] public bool IsCharging;
     [HideInInspector] public List<State> States = new List<State>();
     [HideInInspector] public int CurrentListIndex;
+    public VerticalPositions RowPosition;
+    public HorizontalPositions ColumnPosition;
 
     // Action execution info
     public bool UsingBasicAttack => SelectedAction == BasicAttackSkill;
@@ -101,12 +102,15 @@ public abstract class Battler : ToolUser
     protected override void Awake()
     {
         base.Awake();
+
         Figure = gameObject.GetComponent<Rigidbody2D>();
         BasicAttackSkill = Instantiate(ResourcesMaster.BasicAttackRawPrefab, transform);
+        Sprite = transform.GetChild(0)?.GetChild(0)?.GetComponent<SpriteProperties>();
+        if (!Sprite) Debug.LogError("Sprite must be set up in the correct hierarchy");
 
         SetupElementRates();
         SetupStateRates();
-        if (CombatRangeType == CombatRangeTypes.Any)
+        if (CombatRangeType == BattleMaster.CombatRangeTypes.Any)
         {
             if (Class) CombatRangeType = Class.CombatRangeType;
             else Debug.LogError("Battler " + Name + " cannot have 'Any' as their combat range, unless they're in a class");
@@ -115,8 +119,8 @@ public abstract class Battler : ToolUser
 
     protected virtual void Start()
     {
-        Sprite.ActionHitBox.SetBattler(this);
-        Sprite.ScopeHitBox.SetBattler(this);
+        Sprite.ActionHitbox.SetBattler(this);
+        Sprite.ScopeHitbox.SetBattler(this);
         SpriteSpeed = 6;
     }
 
@@ -158,13 +162,17 @@ public abstract class Battler : ToolUser
         SelectedSingleMeeleeTarget = null;
     }
 
+    public void SetBattle(Battle battle)
+    {
+        CurrentBattle = battle;
+    }    
+
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- Updating --
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    protected override void Update()
+    protected virtual void Update()
     {
-        base.Update();
         Sprite.Animation.SetBool(AnimParams.Running.ToString(), Movement != Vector3.zero);
         Figure.velocity = Movement * SpriteSpeed;
     }
@@ -378,6 +386,41 @@ public abstract class Battler : ToolUser
         //double willSteal = effectMagnitude * 100 * Rec() / target.Rec();
         //oneActResult.Add(SelectedSkill.Steal && Chance((int)willSteal) ? 1 : 0);
         return oneActResult;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// -- Using ActiveTool Effects --
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public void UseBasicAttack(Weapon weapon)
+    {
+        Sprite.Animation.SetInteger(AnimParams.Action.ToString(), (int)weapon.WeaponType + 1);
+        CurrentAnimStateName = "BasicAttack" + weapon.WeaponType.ToString();
+    }
+
+    public void UseSkill(Skill skill)
+    {
+        skill.StartCharge();
+        int paramAction = skill.ClassSkill ? CLASS_PARAM_ACTION : CHARACTER_PARAM_ACTION;
+        CurrentAnimStateName = (skill.ClassSkill ? "ClassSkill" : "CharacterSkill") + skill.Id;
+        Sprite.Animation.SetInteger(AnimParams.Action.ToString(), paramAction + skill.Id);
+    }
+
+    public void UseItem(Item item)
+    {
+        int mode = (int)item.UseType;
+        CurrentAnimStateName = "Item" + mode;
+        Sprite.Animation.SetInteger(AnimParams.Action.ToString(), ITEM_PARAM_ACTION + mode);
+    }
+
+    public bool NotifyActionCompletion()
+    {
+        var animInfo = Sprite.Animation.GetCurrentAnimatorStateInfo(0);
+        if (animInfo.normalizedTime > 1f && animInfo.IsName(CurrentAnimStateName)) return false;
+        Sprite.Animation.SetBool(AnimParams.Running.ToString(), true);
+        Sprite.Animation.SetInteger(AnimParams.Action.ToString(), 0);
+        Sprite.Animation.SetTrigger(AnimParams.DoneAction.ToString());
+        return true;
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

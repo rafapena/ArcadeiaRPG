@@ -173,8 +173,8 @@ MonoBehaviour:
   SpritesList: {fileID: 0}
   Animation: {fileID: 0}
   BaseHitBox: {fileID: 3886187622256006222}
-  ActionHitBox: {fileID: 5867057182812457772}
-  ScopeHitBox: {fileID: 4916398939476678518}
+  ActionHitbox: {fileID: 1042543707548773969}
+  ScopeHitbox: {fileID: 6682312250039075226}
   ApproachPointLeft: {fileID: 104490952618336665}
   ApproachPointRight: {fileID: 1613706192914501264}
   ApproachPointCenter: {fileID: 7499492468053033249}
@@ -14670,11 +14670,11 @@ GameObject:
   m_Component:
   - component: {fileID: 5858750764864587871}
   - component: {fileID: 1253996808336152001}
-  - component: {fileID: 4916398939476678518}
+  - component: {fileID: 6682312250039075226}
   - component: {fileID: 4670655903206841437}
   m_Layer: 0
   m_Name: Shadow
-  m_TagString: Untagged
+  m_TagString: ScopeHitbox
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -14725,7 +14725,7 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 1.1201886, y: 0.98481214}
   m_EdgeRadius: 0
---- !u!114 &4916398939476678518
+--- !u!114 &6682312250039075226
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -14734,7 +14734,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 2961677082223956604}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b55eb7442afb8254e9ff4cbae07fb6ad, type: 3}
+  m_Script: {fileID: 11500000, guid: d2ec958ce9eee38459cebc69db46281d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!212 &4670655903206841437
@@ -19838,10 +19838,10 @@ GameObject:
   m_Component:
   - component: {fileID: 937513654814677865}
   - component: {fileID: 703925128109871508}
-  - component: {fileID: 5867057182812457772}
+  - component: {fileID: 1042543707548773969}
   m_Layer: 12
   m_Name: ActionHitBox
-  m_TagString: Untagged
+  m_TagString: ActionHitbox
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -19892,7 +19892,7 @@ BoxCollider2D:
   serializedVersion: 2
   m_Size: {x: 8.940926, y: 9.570129}
   m_EdgeRadius: 0
---- !u!114 &5867057182812457772
+--- !u!114 &1042543707548773969
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -19901,7 +19901,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 6089516407209736773}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7b148f6879665f842a278fd770083c68, type: 3}
+  m_Script: {fileID: 11500000, guid: d2ec958ce9eee38459cebc69db46281d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &6644601767391884499

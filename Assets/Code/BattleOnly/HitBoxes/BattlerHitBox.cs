@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public abstract class BattlerHitBox : MonoBehaviour
+public class BattlerHitbox : MonoBehaviour
 {
     public Battler Battler { get; private set; }
 

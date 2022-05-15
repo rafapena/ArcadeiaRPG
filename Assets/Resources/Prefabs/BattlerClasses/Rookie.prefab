@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6467640080463945649}
-  - component: {fileID: 7546378099007312106}
+  - component: {fileID: -615138847852756419}
   m_Layer: 0
   m_Name: Rookie
   m_TagString: Untagged
@@ -32,7 +32,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &7546378099007312106
+--- !u!114 &-615138847852756419
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -41,7 +41,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 3665205357968699090}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dd6f5b5683524ed4192229c64834bc1d, type: 3}
+  m_Script: {fileID: 11500000, guid: d606f9e6c895ed940be686b3890c02f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   Id: 1
@@ -67,7 +67,3 @@ MonoBehaviour:
   UsableWeapon1Type: 1
   UsableWeapon2Type: 0
   SkillSet: []
-  HighSlash: {fileID: 6276369190406296654, guid: 19a6a66bb0b7a0646bf30df8f8835dff,
-    type: 3}
-  WideSlash: {fileID: 8282308100824431874, guid: 9e5016818a16d734d9353a63b64b4f41,
-    type: 3}

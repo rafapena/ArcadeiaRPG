@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1157716223317125595}
-  - component: {fileID: 8162703085860456986}
+  - component: {fileID: -1260743132243859632}
   - component: {fileID: 876429023132985256}
   - component: {fileID: 4905199190673639873}
   m_Layer: 0
@@ -34,7 +34,7 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &8162703085860456986
+--- !u!114 &-1260743132243859632
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -43,13 +43,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 4808169265435286164}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c73fcbfb1032f1744bbb84540a1039cc, type: 3}
+  m_Script: {fileID: 11500000, guid: d606f9e6c895ed940be686b3890c02f8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   Id: 1
   Name: Veteran
   Description: Balanced class who can utilize both physical and magaical weapons.
-  CombatRangeType: 2
+  CombatRangeType: 0
   BaseStats:
     MaxHP: 70
     Atk: 65
@@ -72,10 +72,6 @@ MonoBehaviour:
     LearnLevel: 1
   - LearnedSkill: {fileID: 4905199190673639873}
     LearnLevel: 2
-  HighSlash: {fileID: 6276369190406296654, guid: 19a6a66bb0b7a0646bf30df8f8835dff,
-    type: 3}
-  WideSlash: {fileID: 8282308100824431874, guid: 9e5016818a16d734d9353a63b64b4f41,
-    type: 3}
 --- !u!114 &876429023132985256
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -93,7 +89,6 @@ MonoBehaviour:
   Description: 
   Type: 1
   Formula: 1
-  ActionTime: 4
   HPModType: 1
   SPModType: 0
   HPAmount: 0
@@ -101,10 +96,10 @@ MonoBehaviour:
   SPPecent: 0
   HPRecoil: 0
   Scope: 1
+  Range: 10
   Element: 0
   AlwaysHits: 0
   Power: 35
-  Range: 10
   CriticalRateBoost: 0
   Accuracy: 100
   Variance: 0
@@ -141,7 +136,6 @@ MonoBehaviour:
   Description: 
   Type: 6
   Formula: 0
-  ActionTime: 3
   HPModType: 0
   SPModType: 0
   HPAmount: 0
@@ -149,10 +143,10 @@ MonoBehaviour:
   SPPecent: 0
   HPRecoil: 0
   Scope: 9
+  Range: 100
   Element: 0
   AlwaysHits: 0
   Power: 0
-  Range: 100
   CriticalRateBoost: 0
   Accuracy: 100
   Variance: 0

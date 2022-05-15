@@ -120,7 +120,7 @@ GameObject:
     type: 3}
   m_PrefabInstance: {fileID: 5680884326412189411}
   m_PrefabAsset: {fileID: 0}
---- !u!114 &-1914503837591282635
+--- !u!114 &-9131441895739667952
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -129,26 +129,24 @@ MonoBehaviour:
   m_GameObject: {fileID: 694052540818129206}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3c738471201f8ae4f83776af0fd78b96, type: 3}
+  m_Script: {fileID: 11500000, guid: be653f48522d4434ebb04f01fc13592c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   Id: 4
   Name: Ray
   Description: 
-  CombatRangeType: 0
-  Sprite: {fileID: 1989075250644551587}
-  RowPosition: 0
-  ColumnPosition: 0
   Figure: {fileID: 0}
   Direction: {x: 0, y: 0, z: 0}
   Movement: {x: 0, y: 0, z: 0}
-  Speed: 0
+  SpriteSpeed: 0
   TargetDestination: {x: 0, y: 0, z: 0}
   TurnDestination: {x: 0, y: 0, z: 0}
   MainImage: {fileID: 0}
   FaceImage: {fileID: 21300000, guid: 9c9595bb46c9daf4ba93ed84fefdedad, type: 3}
+  Sprite: {fileID: 0}
   Level: 1
-  Class: {fileID: -7842130950455317456, guid: ee2e14ee730022c4e913ae919c5ee47e, type: 3}
+  Class: {fileID: 486297901180145014, guid: ee2e14ee730022c4e913ae919c5ee47e, type: 3}
+  CombatRangeType: 0
   HP: 0
   SP: 0
   StatBoosts:
@@ -184,6 +182,8 @@ MonoBehaviour:
   IsCharging: 0
   States: []
   CurrentListIndex: 0
+  RowPosition: 0
+  ColumnPosition: 0
   BasicAttackSkill: {fileID: 0}
   SelectedSingleMeeleeTarget: {fileID: 0}
   ExecutedAction: 0
@@ -206,7 +206,6 @@ MonoBehaviour:
     Eva: 0
     Crt: 0
     Cev: 0
-  KOd: 0
   Petrified: 0
   CannotMove: 0
   SPConsumeRate: 0
@@ -236,22 +235,40 @@ MonoBehaviour:
     Crt: 0
     Cev: 0
   ClassSet:
-  - {fileID: -7842130950455317456, guid: ee2e14ee730022c4e913ae919c5ee47e, type: 3}
+  - {fileID: 486297901180145014, guid: ee2e14ee730022c4e913ae919c5ee47e, type: 3}
   PartnerAccBoostRate: 100
   PartnerCritBoostRate: 100
   SavePartnerRate: 100
   CounterattackRate: 100
   AssistDamageRate: 100
   StatBoostsRate: 100
---- !u!114 &1989075250644551587 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 6146308846707112256, guid: 7030ceb2351b34e4497069298d76e79d,
+--- !u!1 &1960468503394499361 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6188638055269287362, guid: 7030ceb2351b34e4497069298d76e79d,
     type: 3}
   m_PrefabInstance: {fileID: 5680884326412189411}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+--- !u!114 &5653869960647384937
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1960468503394499361}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a2a5d13a274b3764d9a8a74352d0b695, type: 3}
+  m_Script: {fileID: 11500000, guid: 97f95b45dbf173841ba736034aa1ed02, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &5296005804585594451
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1960468503394499361}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6258baa38817fb24cb8e97efde3a667f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 

@@ -49,14 +49,15 @@ public class Projectile : MonoBehaviour
     // BulletHurtBox manages player damage: This ensures that specific hitboxes can be ignored
     private void OnTriggerEnter2D(Collider2D collider)
     {
-        if (collider.gameObject.CompareTag("Invisible")) return;
-
-        ActionHitBox hb = collider.gameObject.GetComponent<ActionHitBox>();
-        if (hb && hb.Battler.IsSelected && !Targets.Contains(hb.Battler))
+        if (collider.gameObject.CompareTag(Battle.ACTION_HITBOX_TAG))
         {
-            Targets.Add(hb.Battler);
-            hb.Battler.ReceiveToolEffects(Shooter, ToolEffect, NerfPartition);
-            if (DurationAfterCollision > 0) Explode();
+            BattlerHitbox hb = collider.gameObject.GetComponent<BattlerHitbox>();
+            if (hb && hb.Battler.IsSelected && !Targets.Contains(hb.Battler))
+            {
+                Targets.Add(hb.Battler);
+                hb.Battler.ReceiveToolEffects(Shooter, ToolEffect, NerfPartition);
+                if (DurationAfterCollision > 0) Explode();
+            }
         }
     }
 

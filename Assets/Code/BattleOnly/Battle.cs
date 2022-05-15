@@ -8,6 +8,8 @@ using UnityEngine.UI;
 public class Battle : MonoBehaviour
 {
     // Collision detection
+    public const string ACTION_HITBOX_TAG = "ActionHitbox";
+    public const string SCOPE_HITBOX_TAG = "ScopeHitbox";
     public const int BASE_HITBOX_LAYER = 11;
     public const int ACTION_HITBOX_LAYER = 12;
     public const int MOVING_SCOPE_HITBOX_LAYER = 13;
@@ -142,13 +144,6 @@ public class Battle : MonoBehaviour
     public T InstantiateBattler<T>(T newBattler, Vector3 position) where T : Battler
     {
         T b = Instantiate(newBattler, position, Quaternion.identity, (newBattler is BattleEnemy ? EnemyPartyDump : PlayerPartyDump));
-
-        if (b.Class)
-        {
-            b.Class = Instantiate(b.Class, b.transform);
-            b.Class.SetBattle(this);
-        }
-
         if (b is BattleEnemy) b.StatConversion();
 
         for (int i = 0; i < b.States.Count; i++) b.States[i] = Instantiate(b.States[i], b.transform);
@@ -342,26 +337,13 @@ public class Battle : MonoBehaviour
 
         // Use action
         ActingBattler.Sprite.Animation.SetTrigger(Battler.AnimParams.DoAction.ToString());
-        if (ActingBattler.UsingBasicAttack)
-        {
-            if (ActingBattler.Class) ActingBattler.Class.UseBasicAttack(ActingBattler.SelectedWeapon);
-            else ActingBattler.UseBasicAttack();
-        }
-        else if (skill)
-        {
-            skill.StartCharge();
-            if (skill.ClassSkill) ActingBattler.Class.UseSkill();
-            else ActingBattler.UseSkill();
-        }
-        else if (ActingBattler.SelectedAction is Item item)
-        {
-            if (ActingBattler.Class) ActingBattler.Class.UseItem(item);
-            else ActingBattler.UseItem(item);
-        }
-    }
+        if (ActingBattler.UsingBasicAttack) ActingBattler.UseBasicAttack(ActingBattler.SelectedWeapon);
+        else if (skill) ActingBattler.UseSkill(skill);
+        else if (ActingBattler.SelectedAction is Item item) ActingBattler.UseItem(item);
+        yield return new WaitUntil(ActingBattler.NotifyActionCompletion);
 
-    public IEnumerator NotifyActionCompletion()
-    {
+        // Complete action
+        ActingBattler.Sprite.Animation.SetTrigger(Battler.AnimParams.DoneAction.ToString());
         ActingBattler.ApproachForNextTurn();
         yield return new WaitUntil(ActingBattler.HasApproachedNextTurnDestination);
         ActionEnd();

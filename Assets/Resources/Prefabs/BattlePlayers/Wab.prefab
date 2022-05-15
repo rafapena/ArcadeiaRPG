@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 399710335168838284}
   - component: {fileID: 6483023768945186743}
-  - component: {fileID: 3588944525326980205}
+  - component: {fileID: -5909847340613243276}
   m_Layer: 0
   m_Name: Wab
   m_TagString: Untagged
@@ -55,7 +55,7 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 4
---- !u!114 &3588944525326980205
+--- !u!114 &-5909847340613243276
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -64,26 +64,24 @@ MonoBehaviour:
   m_GameObject: {fileID: 323052835437560043}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7f3368fb3704afd40af3d32b4d88af39, type: 3}
+  m_Script: {fileID: 11500000, guid: be653f48522d4434ebb04f01fc13592c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   Id: 3
   Name: Wab
   Description: 
-  CombatRangeType: 0
-  Sprite: {fileID: 3245406271437038973}
-  RowPosition: 0
-  ColumnPosition: 0
   Figure: {fileID: 0}
   Direction: {x: 0, y: 0, z: 0}
   Movement: {x: 0, y: 0, z: 0}
-  Speed: 0
+  SpriteSpeed: 0
   TargetDestination: {x: 0, y: 0, z: 0}
   TurnDestination: {x: 0, y: 0, z: 0}
   MainImage: {fileID: 0}
   FaceImage: {fileID: 21300000, guid: a6b80e4f1542b60468006fd72a745b1f, type: 3}
+  Sprite: {fileID: 0}
   Level: 1
-  Class: {fileID: 495320493451175999, guid: 72e0eb033ae00de4d899e9f277c8bb88, type: 3}
+  Class: {fileID: 5611943354639330531, guid: 72e0eb033ae00de4d899e9f277c8bb88, type: 3}
+  CombatRangeType: 0
   HP: 0
   SP: 0
   StatBoosts:
@@ -119,6 +117,8 @@ MonoBehaviour:
   IsCharging: 0
   States: []
   CurrentListIndex: 0
+  RowPosition: 0
+  ColumnPosition: 0
   BasicAttackSkill: {fileID: 0}
   SelectedSingleMeeleeTarget: {fileID: 0}
   ExecutedAction: 0
@@ -141,7 +141,6 @@ MonoBehaviour:
     Eva: 0
     Crt: 0
     Cev: 0
-  KOd: 0
   Petrified: 0
   CannotMove: 0
   SPConsumeRate: 0
@@ -172,7 +171,7 @@ MonoBehaviour:
     Crt: 0
     Cev: 0
   ClassSet:
-  - {fileID: 495320493451175999, guid: 72e0eb033ae00de4d899e9f277c8bb88, type: 3}
+  - {fileID: 5611943354639330531, guid: 72e0eb033ae00de4d899e9f277c8bb88, type: 3}
   PartnerAccBoostRate: 100
   PartnerCritBoostRate: 100
   SavePartnerRate: 100
@@ -478,6 +477,8 @@ GameObject:
   - component: {fileID: 496747215006172843}
   - component: {fileID: 4453852971296057128}
   - component: {fileID: 3118885421756970200}
+  - component: {fileID: 191027370484124101}
+  - component: {fileID: 7903505981890976454}
   - component: {fileID: 6920551859757886370}
   m_Layer: 0
   m_Name: Duck
@@ -553,6 +554,30 @@ MonoBehaviour:
     showGizmo: 1
   - color: {r: 0, g: 1, b: 0, a: 1}
     showGizmo: 1
+--- !u!114 &191027370484124101
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6981152057060901134}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7ea3d3feddbf5b438d16116ac68b095, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &7903505981890976454
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6981152057060901134}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6a519589bc7ff484ba31d4ade87e6299, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!114 &6920551859757886370
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1003,18 +1028,6 @@ PrefabInstance:
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f51d329cf4098f347ba7b6669fbfdf74, type: 3}
---- !u!114 &3245406271437038973 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 102291102105007479, guid: f51d329cf4098f347ba7b6669fbfdf74,
-    type: 3}
-  m_PrefabInstance: {fileID: 3198284678296670218}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a2a5d13a274b3764d9a8a74352d0b695, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!224 &6932751082322041350 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 5500164638407395852, guid: f51d329cf4098f347ba7b6669fbfdf74,
