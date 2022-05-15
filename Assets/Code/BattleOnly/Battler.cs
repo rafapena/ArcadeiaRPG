@@ -416,7 +416,7 @@ public abstract class Battler : BaseObject
     public bool NotifyActionCompletion()
     {
         var animInfo = Sprite.Animation.GetCurrentAnimatorStateInfo(0);
-        if (animInfo.normalizedTime > 1f && animInfo.IsName(CurrentAnimStateName)) return false;
+        if (animInfo.normalizedTime <= 1f || !animInfo.IsName(CurrentAnimStateName)) return false;
         Sprite.Animation.SetBool(AnimParams.Running.ToString(), true);
         Sprite.Animation.SetInteger(AnimParams.Action.ToString(), 0);
         Sprite.Animation.SetTrigger(AnimParams.DoneAction.ToString());
