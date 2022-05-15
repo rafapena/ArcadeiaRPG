@@ -4,5 +4,10 @@ using UnityEngine.U2D.Animation;
 
 public class ActionSet_JellyGuy : BattleActionSet
 {
-    //
+    public Projectile Bash;
+
+    public void Tackle()
+    {
+        SpawnProjectile(Bash, 1f);
+    }
 }

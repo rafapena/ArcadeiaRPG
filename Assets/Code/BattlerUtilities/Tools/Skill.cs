@@ -42,21 +42,17 @@ public class Skill : ActiveTool
         StatesReceiveRate = w.StatesReceiveRate;
     }
 
-    public void DisableForWarmup()
-    {
-        DisabledCount = Warmup;
-    }
-    public void DisableForCooldown()
-    {
-        DisabledCount = Cooldown;
-    }
-    public void StartCharge()
-    {
-        ChargeCount = Charge;
-    }
-    public void Charge1Turn()
+    public void DisableForWarmup() => DisabledCount = Warmup;
+
+    public void DisableForCooldown() => DisabledCount = Cooldown;
+
+    public void StartCharge() => ChargeCount = Charge;
+
+    public override void ApplyActionEndEffects()
     {
         if (ChargeCount > 0) ChargeCount--;
+        if (DisabledCount > 0) DisabledCount--;
+        else DisableForCooldown();
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -21,7 +21,7 @@ public class Battle : MonoBehaviour
     public BattleWin BattleWinMenu;
 
     // Data transferred from Map
-    [HideInInspector] public Environment Enviornment;
+    [HideInInspector] public Surrounding Enviornment;
     [HideInInspector] public PlayerParty PlayerParty;
     [HideInInspector] public EnemyParty EnemyParty;
 
@@ -143,14 +143,29 @@ public class Battle : MonoBehaviour
 
     public T InstantiateBattler<T>(T newBattler, Vector3 position) where T : Battler
     {
+        // Clone battler and stats
         T b = Instantiate(newBattler, position, Quaternion.identity, (newBattler is BattleEnemy ? EnemyPartyDump : PlayerPartyDump));
         if (b is BattleEnemy) b.StatConversion();
 
+        // Class and skills
+        var skills = gameObject.GetComponentsInChildren<Skill>();
+        foreach (var skill in skills) skill.DisableForWarmup();
+        if (b.Class)
+        {
+            b.Class = Instantiate(b.Class, b.transform);
+            var classSkills = b.Class.gameObject.GetComponentsInChildren<Skill>();
+            foreach (var skill in classSkills) skill.DisableForWarmup();
+        }
+
+        // States setup
         for (int i = 0; i < b.States.Count; i++) b.States[i] = Instantiate(b.States[i], b.transform);
         b.StatBoosts.SetToZero();
         
+        // GameObject management
         b.transform.localScale = Vector3.one * 0.7f;
         b.gameObject.SetActive(true);
+
+        // Link battle to battler
         b.SetBattle(this);
         return b;
     }
@@ -242,11 +257,13 @@ public class Battle : MonoBehaviour
     private void UpdateBattlersSpriteSpeed()
     {
         int maxSpeed = Battlers[0].Spd;
-        int minSpeed = Battlers[Battlers.Count - 1].Spd;
-        foreach (var b in Battlers)
+        int minSpeed = Battlers[0].Spd;
+        foreach (var b in Battlers.Skip(1))
         {
-            b.SpriteSpeed = ((b.Spd - minSpeed) / (float)(maxSpeed - minSpeed)) * 4 + 3;
+            if (b.Spd > maxSpeed) maxSpeed = b.Spd;
+            else if (b.Spd < minSpeed) minSpeed = b.Spd;
         }
+        foreach (var b in Battlers) b.SpriteSpeed = ((b.Spd - minSpeed) / (float)(maxSpeed - minSpeed)) * 4 + 3;
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -272,7 +289,7 @@ public class Battle : MonoBehaviour
             BattleMenu.RefreshPartyFrames();
             BattleMenu.Setup(p);
             yield return new WaitUntil(BattleMenu.SelectedAction);
-            yield return BattleMenu.SelectedEscape ? Escape() : ExecuteAction();
+            yield return BattleMenu.SelectedEscape ? AttemptEscape() : ExecuteAction();
         }
         else  // Battler AI
         {
@@ -349,6 +366,32 @@ public class Battle : MonoBehaviour
         ActionEnd();
     }
 
+    private IEnumerator AttemptEscape()
+    {
+        ClearAll();
+        RestrictBattlerWallCollision(false);
+        BattleMenu.AddEscapeHitboxes();
+        yield return new WaitForSeconds(1);
+        foreach (var b in Battlers) b.SetToEscapeMode(true, b is not BattleEnemy);
+        yield return new WaitForSeconds(3);
+        yield return Escape();
+    }
+
+    public IEnumerator NotifyEscapeFailure()
+    {
+        BattleMenu.RemoveEscapeHitboxes();
+        StopCoroutine(AttemptEscape());
+        StartCoroutine(BattleMenu.DisplayUsedAction(ActingBattler, "COULD NOT ESCAPE"));
+        yield return new WaitForSeconds(2);
+        foreach (var b in Battlers)
+        {
+            b.SetToEscapeMode(false, b is not BattleEnemy);
+            b.ApproachForNextTurn();
+        }
+        yield return new WaitUntil(() => Battlers.All(x => x.HasApproachedNextTurnDestination()));
+        ActionEnd();
+    }
+
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- End of Action --
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -356,10 +399,9 @@ public class Battle : MonoBehaviour
     private void ActionEnd()
     {
         ActingBattler.ExecutedAction = true;
-        (ActingBattler.SelectedAction as Skill)?.Charge1Turn();
+        if (ActingBattler.SelectedAction is Skill skill) skill.ApplyActionEndEffects();
         ResetSelectedTargets();
         RestrictBattlerWallCollision(true);
-        FinishActionUsage();
         if (!CheckBattleEndCondition())
         {
             if (LastActionOfTurn) TurnReset();
@@ -379,11 +421,7 @@ public class Battle : MonoBehaviour
 
     private void FinishActionUsage()
     {
-        if (ActingBattler.SelectedAction is Skill sk)
-        {
-            sk.DisableForCooldown();
-        }
-        else if (ActingBattler.SelectedAction is Item it)
+        if (ActingBattler.SelectedAction is Item it)
         {
             //Stats.Add(item.PermantentStatChanges);
             //if (it.TurnsInto) Items[Items.FindIndex(x => x.Id == it.Id)] = Instantiate(it.TurnsInto, gameObject.transform);
@@ -396,13 +434,13 @@ public class Battle : MonoBehaviour
         if (EnemyPartyDefeated)
         {
             BattleMenu.RefreshPartyFrames();
-            if (EnemyParty.PartyMode != EnemyParty.EnemyPartyModes.FinalBoss) StartCoroutine(DeclareWin());
+            if (EnemyParty.ShowVictoryWhenDefeated) StartCoroutine(DeclareWin());
             else SceneMaster.EndBattle(PlayerParty);
             return true;
         }
         else if (PlayerPartyDefeated)
         {
-            if (EnemyParty.GameOverOnLose) StartCoroutine(DeclareGameOver());
+            if (EnemyParty.HasGameOverScreen) StartCoroutine(DeclareGameOver());
             else SceneMaster.EndBattle(PlayerParty);
             return true;
         }
@@ -416,15 +454,11 @@ public class Battle : MonoBehaviour
     /// -- End of Battle --
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public IEnumerator Escape()
-    {
-        ClearAll();
-        RestrictBattlerWallCollision(false);
-        yield return new WaitForSeconds(1);
-        foreach (var b in Battlers) b.SetToEscapeMode(true, b is not BattleEnemy);
-        yield return new WaitForSeconds(3);
+    private IEnumerator Escape()
+    {   
         foreach (var e in EnemyParty.Enemies) e.SetToEscapeMode(false, false);
-        yield return new WaitForSeconds(1);
+        StartCoroutine(BattleMenu.DisplayUsedAction(ActingBattler, "ESCAPED!"));
+        yield return new WaitForSeconds(2);
         SceneMaster.EndBattle(PlayerParty);
     }
 

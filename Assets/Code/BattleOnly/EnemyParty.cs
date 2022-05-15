@@ -3,13 +3,11 @@ using UnityEngine;
 
 public class EnemyParty : MonoBehaviour
 {
-    public enum EnemyPartyModes { Regular, Boss, FinalBoss }
-
     public List<BattleEnemy> Enemies;
     public List<Item> ItemInventory;
     public bool RunDisabled;
-    public EnemyPartyModes PartyMode;
-    public bool GameOverOnLose = true;
+    public bool ShowVictoryWhenDefeated = true;
+    public bool HasGameOverScreen = true;
 
     [HideInInspector] public int[][] IndexMapping;
 

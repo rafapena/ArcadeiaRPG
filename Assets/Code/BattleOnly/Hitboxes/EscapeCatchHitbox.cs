@@ -8,7 +8,7 @@ public class EscapeCatchHitbox : MonoBehaviour
     {
         if (collider.gameObject.GetComponent<BattlePlayer>() || collider.gameObject.GetComponent<BattleAlly>())
         {
-            //CurrentBattle.FailEscape();
+            StartCoroutine(BattleMenu.CurrentBattle.NotifyEscapeFailure());
         }
     }
 }

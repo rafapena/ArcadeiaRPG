@@ -3,7 +3,7 @@ using UnityEngine;
 
 public abstract class MapOverworld : MonoBehaviour
 {
-    public Environment Region;
+    public Surrounding Region;
 
     protected virtual void Start()
     {

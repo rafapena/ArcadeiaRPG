@@ -21,11 +21,11 @@ public class BattleMaster
     public enum ToolFormulas { None, PhysicalStandard, MagicalStandard, PhysicalGun, MagicalGun }
 
     // Variables used to transitioning between scenes
-    public static Environment EnvironmentSettings { get; private set; }
+    public static Surrounding EnvironmentSettings { get; private set; }
     public static PlayerParty PlayerParty { get; private set; }
     public static EnemyParty EnemyParty { get; private set; }
 
-    public static void Setup(Environment environmentSettings, PlayerParty playerParty, EnemyParty enemyParty)
+    public static void Setup(Surrounding environmentSettings, PlayerParty playerParty, EnemyParty enemyParty)
     {
         EnvironmentSettings = environmentSettings;
         PlayerParty = playerParty;

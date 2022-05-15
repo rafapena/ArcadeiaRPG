@@ -576,7 +576,16 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
         Selection = Selections.Escaping;
         FinalizeDecision();
         ClearScope(true);
-        CurrentBattle.Escape();
+    }
+
+    public void AddEscapeHitboxes()
+    {
+        //
+    }
+
+    public void RemoveEscapeHitboxes()
+    {
+        //
     }
 
     public bool SelectedEscape => Selection == Selections.Escaping;

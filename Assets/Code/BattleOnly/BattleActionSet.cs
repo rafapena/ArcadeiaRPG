@@ -5,11 +5,17 @@ using UnityEngine.U2D.Animation;
 public abstract class BattleActionSet : MonoBehaviour
 {
     protected Battler User;
+    private float ProjectileMultuplier;
 
     public void Awake()
     {
         User = transform.parent?.gameObject.GetComponent<Battler>();
         if (!User) Debug.LogError("A battler action set does not have a battler as a game object");
+    }
+
+    public void SetProjectileMultiplier(float multiplier)
+    {
+        ProjectileMultuplier = multiplier;
     }
 
     public Projectile SpawnProjectile(Projectile p0, float nerfPartition = 1f)
@@ -21,20 +27,34 @@ public abstract class BattleActionSet : MonoBehaviour
         return p;
     }
 
-    public void SummonBattler(BattlerAI b)
+    public void ChargeEffect(ParticleSystem ps)
     {
-        if (b is BattleAlly a0)
-        {
-            var a = User.CurrentBattle.InstantiateBattler(a0, User.TargetDestination);
-            a.StatConversion();
-            User.CurrentBattle.PlayerParty.Allies.Add(a);
-            a.IsSummon = true;
-        }
-        else if (b is BattleEnemy e0)
-        {
-            var e = User.CurrentBattle.InstantiateBattler(e0, User.TargetDestination);
-            User.CurrentBattle.EnemyParty.Enemies.Add(e);
-            e.IsSummon = true;
-        }
+        //
+    }
+
+    public void FireBasicWeaponProjectile(float nerf)
+    {
+        ProjectileMultuplier = nerf;
+        if (User.SelectedWeapon.Ranged) FireAimedProjectile(User.SelectedWeapon.Projectile);
+        else MeeleeProjectile(User.SelectedWeapon.Projectile);
+    }
+
+    public void MeeleeProjectile(Projectile p)
+    {
+        //
+    }
+
+    public void FireAimedProjectile(Projectile p)
+    {
+        //
+    }
+
+    public void SummonBattler(BattlerAI b0)
+    {
+        var b = User.CurrentBattle.InstantiateBattler(b0, User.ScopedTargetDestination);
+        b.StatConversion();
+        b.IsSummon = true;
+        if (b is BattleAlly a) User.CurrentBattle.PlayerParty.Allies.Add(a);
+        else if (b is BattleEnemy e) User.CurrentBattle.EnemyParty.Enemies.Add(e);
     }
 }

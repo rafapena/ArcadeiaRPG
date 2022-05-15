@@ -12,8 +12,13 @@ public class ResourcesMaster : MonoBehaviour
     public const float DEFAULT_MASTER_SFX_VOLUME = 0.8f;
     public const int DEFAULT_TEXT_DELAY_INDEX = 1;
 
-    public static Skill BasicAttackRawPrefab { get; private set; }
+    public static Skill BasicAttackSkill { get; private set; }
     public const string BASIC_ATTACK_FILE_LOCATION = "Prefabs/BasicAttack";
+
+    public static Projectile WeaponlessPlayerProjectile { get; set; }
+    public const string WEAPONLESS_PLAYER_PROJECTILE_FILE_LOCATION = "Prefabs/WeaponlessPlayerProjectile";
+
+    public static Skill WeaponlessAttackProjectile { get; private set; }
 
     public static Accessory[] Accessories { get; private set; }
 
@@ -27,7 +32,7 @@ public class ResourcesMaster : MonoBehaviour
 
     public static EnemyParty[] EnemyParties { get; private set; }
     
-    public static Environment[] Environments { get; private set; }
+    public static Surrounding[] Surroundings { get; private set; }
     
     public static Item[] Items { get; private set; }
     
@@ -44,7 +49,8 @@ public class ResourcesMaster : MonoBehaviour
         IsSetup = true;
         SetupOptions();
         SetupLists();
-        BasicAttackRawPrefab = Resources.Load<Skill>(BASIC_ATTACK_FILE_LOCATION);
+        BasicAttackSkill = Resources.Load<Skill>(BASIC_ATTACK_FILE_LOCATION);
+        WeaponlessPlayerProjectile = Resources.Load<Projectile>(WEAPONLESS_PLAYER_PROJECTILE_FILE_LOCATION);
     }
 
     private void SetupOptions()
@@ -63,7 +69,7 @@ public class ResourcesMaster : MonoBehaviour
         Players = SortById(Resources.LoadAll<BattlePlayer>("Prefabs/BattlePlayers"));
         Classes = SortById(Resources.LoadAll<BattlerClass>("Prefabs/BattlerClasses"));
         Enemies = SortById(Resources.LoadAll<BattleEnemy>("Prefabs/BattleEnemies"));
-        //Environments = SortById(Resources.LoadAll<Environment>("Prefabs/Environments"));
+        Surroundings = SortById(Resources.LoadAll<Surrounding>("Prefabs/Surroundings"));
         Items = SortById(Resources.LoadAll<Item>("Prefabs/Items"));
         Objectives = SortById(Resources.LoadAll<Objective>("Prefabs/Objectives"));
         States = SortById(Resources.LoadAll<State>("Prefabs/States"));

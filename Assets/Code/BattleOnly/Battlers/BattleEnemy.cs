@@ -32,4 +32,9 @@ public class BattleEnemy : BattlerAI
         base.ReceiveToolEffects(user, activeTool, nerfPartition);
         if (CurrentBattle?.BattleMenu ?? false) CurrentBattle.BattleMenu.UpdateEnemyEntry(this);
     }
+
+    protected override void GetKOd()
+    {
+        base.GetKOd();
+    }
 }

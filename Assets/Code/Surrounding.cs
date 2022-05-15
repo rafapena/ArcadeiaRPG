@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class Environment
+public class Surrounding : BaseObject
 {
     public PassiveEffect Effect;
 

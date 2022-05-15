@@ -21,7 +21,7 @@ public abstract class Battler : BaseObject
     [HideInInspector] public Vector3 Direction;
     [HideInInspector] public Vector3 Movement;
     [HideInInspector] public float SpriteSpeed;
-    [HideInInspector] public Vector3 TargetDestination;
+    [HideInInspector] public Vector3 ScopedTargetDestination;
     [HideInInspector] public Vector3 TurnDestination;
     private bool IsApproachingToTarget;
     private bool IsApproachingForNextTurn;
@@ -38,9 +38,13 @@ public abstract class Battler : BaseObject
     // Animation management
     public enum AnimParams { Action, Victory, Running, Block, Dodge, DoAction, DoneAction, GetHit, Recovered, KOd }
     private string CurrentAnimStateName;
-    public const int CLASS_PARAM_ACTION = 10;
-    public const int CHARACTER_PARAM_ACTION = 20;
-    public const int ITEM_PARAM_ACTION = 30;
+    private const string BASIC_ATTACK_STATE_PREFIX = "BasicAttack";
+    private const string CLASS_SKILL_STATE_PREFIX = "ClassSkill";
+    private const string CHARACTER_SKILL_STATE_PREFIX = "CharacterSkill";
+    private const string ITEM_STATE_PREFIX = "Item";
+    private const int CLASS_PARAM_ACTION = 10;
+    private const int CHARACTER_PARAM_ACTION = 20;
+    private const int ITEM_PARAM_ACTION = 30;
 
     // General data
     public int Level = 1;
@@ -104,7 +108,7 @@ public abstract class Battler : BaseObject
         base.Awake();
 
         Figure = gameObject.GetComponent<Rigidbody2D>();
-        BasicAttackSkill = Instantiate(ResourcesMaster.BasicAttackRawPrefab, transform);
+        BasicAttackSkill = Instantiate(ResourcesMaster.BasicAttackSkill, transform);
         Sprite = transform.GetChild(0)?.GetChild(0)?.GetComponent<SpriteProperties>();
         if (!Sprite) Debug.LogError("Sprite must be set up in the correct hierarchy");
 
@@ -121,7 +125,6 @@ public abstract class Battler : BaseObject
     {
         Sprite.ActionHitbox.SetBattler(this);
         Sprite.ScopeHitbox.SetBattler(this);
-        SpriteSpeed = 6;
     }
 
     public virtual void StatConversion()
@@ -227,8 +230,8 @@ public abstract class Battler : BaseObject
         IsApproachingToTarget = true;
         float dist1 = Vector3.Distance(Position, leftPoint);
         float dist2 = Vector3.Distance(Position, rightPoint);
-        TargetDestination = dist1 <= dist2 ? leftPoint : rightPoint;
-        Movement = (TargetDestination - Position).normalized * BATTLER_APPROACH_SPEED;
+        ScopedTargetDestination = dist1 <= dist2 ? leftPoint : rightPoint;
+        Movement = (ScopedTargetDestination - Position).normalized * BATTLER_APPROACH_SPEED;
     }
 
     public void ApproachForNextTurn()
@@ -240,10 +243,11 @@ public abstract class Battler : BaseObject
     public void SetToEscapeMode(bool mode, bool mirror)
     {
         if (mirror) Mirror();
+        if (mode) TurnDestination = Position;
         Movement = mode ? Vector3.left * BATTLER_ESCAPE_SPEED : Vector3.zero;
     }
 
-    public bool HasApproachedTarget() => CheckReachedNotifyDestination(ref IsApproachingToTarget, TargetDestination, SpriteSpeed / 6f);
+    public bool HasApproachedTarget() => CheckReachedNotifyDestination(ref IsApproachingToTarget, ScopedTargetDestination, SpriteSpeed / 6f);
 
     public bool HasApproachedNextTurnDestination() => CheckReachedNotifyDestination(ref IsApproachingForNextTurn, TurnDestination, SpriteSpeed / 2f);
 
@@ -394,22 +398,22 @@ public abstract class Battler : BaseObject
 
     public void UseBasicAttack(Weapon weapon)
     {
-        Sprite.Animation.SetInteger(AnimParams.Action.ToString(), (int)weapon.WeaponType + 1);
-        CurrentAnimStateName = "BasicAttack" + weapon.WeaponType.ToString();
+        Sprite.Animation.SetInteger(AnimParams.Action.ToString(), (int)(weapon?.WeaponType ?? 0) + 1);
+        CurrentAnimStateName = BASIC_ATTACK_STATE_PREFIX + (weapon?.WeaponType.ToString() ?? string.Empty);
     }
 
     public void UseSkill(Skill skill)
     {
         skill.StartCharge();
         int paramAction = skill.ClassSkill ? CLASS_PARAM_ACTION : CHARACTER_PARAM_ACTION;
-        CurrentAnimStateName = (skill.ClassSkill ? "ClassSkill" : "CharacterSkill") + skill.Id;
+        CurrentAnimStateName = (skill.ClassSkill ? CLASS_SKILL_STATE_PREFIX : CHARACTER_SKILL_STATE_PREFIX) + skill.Id;
         Sprite.Animation.SetInteger(AnimParams.Action.ToString(), paramAction + skill.Id);
     }
 
     public void UseItem(Item item)
     {
         int mode = (int)item.UseType;
-        CurrentAnimStateName = "Item" + mode;
+        CurrentAnimStateName = ITEM_STATE_PREFIX + mode;
         Sprite.Animation.SetInteger(AnimParams.Action.ToString(), ITEM_PARAM_ACTION + mode);
     }
 
