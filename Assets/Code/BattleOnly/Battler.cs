@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using TMPro;
@@ -16,7 +17,7 @@ public abstract class Battler : BaseObject
     public enum HorizontalPositions { Left, Center, Right }
 
     // Movement
-    public Vector3 Position => Sprite.BaseHitBox.transform.position;
+    public Vector3 Position => Sprite.BaseHitBox.position;
     [HideInInspector] public Rigidbody2D Figure;
     [HideInInspector] public Vector3 Direction;
     [HideInInspector] public Vector3 Movement;
@@ -50,18 +51,17 @@ public abstract class Battler : BaseObject
     public int Level = 1;
     public BattlerClass Class;
     public BattleMaster.CombatRangeTypes CombatRangeType;
-    [HideInInspector] public int HP;
-    [HideInInspector] public int SP;
     [HideInInspector] public Stats StatBoosts;
     public Stats Stats;
     public List<Accessory> Accessories;
+    public int HP { get; private set; }
+    public int SP { get; private set; }
 
     // Overall battle info
     [HideInInspector] public bool IsSelected { get; private set; }
     [HideInInspector] public bool LockSelectTrigger;
     [HideInInspector] public ActiveTool SelectedAction;
     [HideInInspector] public Weapon SelectedWeapon;
-    [HideInInspector] public bool IsCharging;
     [HideInInspector] public List<State> States = new List<State>();
     [HideInInspector] public int CurrentListIndex;
     public VerticalPositions RowPosition;
@@ -79,7 +79,6 @@ public abstract class Battler : BaseObject
     // PassiveEffect dependent info
     public ElementRate[] ChangedElementRates;
     public StateRate[] ChangedStateRates;
-    public bool Flying;
     [HideInInspector] public Stats StatModifiers;
     [HideInInspector] public bool Petrified;
     [HideInInspector] public int CannotMove;
@@ -95,7 +94,6 @@ public abstract class Battler : BaseObject
     [HideInInspector] public int[] StateRates;
 
     public bool KOd => HP <= 0 || Petrified;
-
     public bool HasLowHP => HP / (float)MaxHP <= LOW_HP_THRESHOLD;
     private float LOW_HP_THRESHOLD = 0.3f;
 
@@ -108,9 +106,9 @@ public abstract class Battler : BaseObject
         base.Awake();
 
         Figure = gameObject.GetComponent<Rigidbody2D>();
-        BasicAttackSkill = Instantiate(ResourcesMaster.BasicAttackSkill, transform);
         Sprite = transform.GetChild(0)?.GetChild(0)?.GetComponent<SpriteProperties>();
         if (!Sprite) Debug.LogError("Sprite must be set up in the correct hierarchy");
+        if (CurrentBattle) BasicAttackSkill = Instantiate(CurrentBattle.BasicAttack, transform);
 
         SetupElementRates();
         SetupStateRates();
@@ -132,7 +130,7 @@ public abstract class Battler : BaseObject
         if (Class) Stats.SetTo(Class.BaseStats);
         Stats.ConvertFromBaseToActual(Level);
         HP = MaxHP;
-        SP = 100;
+        SP = BattleMaster.SP_CAP;
     }
 
     private void SetupElementRates()
@@ -236,12 +234,14 @@ public abstract class Battler : BaseObject
 
     public void ApproachForNextTurn()
     {
+        if (KOd) return;
         IsApproachingForNextTurn = true;
         Movement = (TurnDestination - Position).normalized * BATTLER_APPROACH_SPEED * 2;
     }
 
     public void SetToEscapeMode(bool mode, bool mirror)
     {
+        if (!CanEscape) return;
         if (mirror) Mirror();
         if (mode) TurnDestination = Position;
         Movement = mode ? Vector3.left * BATTLER_ESCAPE_SPEED : Vector3.zero;
@@ -253,7 +253,7 @@ public abstract class Battler : BaseObject
 
     private bool CheckReachedNotifyDestination(ref bool isApproaching, Vector3 destination, float thresholdMod)
     {
-        if (isApproaching && Vector3.Distance(Position, destination) < BATTLER_APPROACH_DISTANCE_THRESHOLD * thresholdMod)
+        if (KOd || isApproaching && Vector3.Distance(Position, destination) < BATTLER_APPROACH_DISTANCE_THRESHOLD * thresholdMod)
         {
             isApproaching = false;
             SetPosition(destination);
@@ -417,7 +417,7 @@ public abstract class Battler : BaseObject
         Sprite.Animation.SetInteger(AnimParams.Action.ToString(), ITEM_PARAM_ACTION + mode);
     }
 
-    public bool NotifyActionCompletion()
+    public bool ActionAnimationCompleted()
     {
         var animInfo = Sprite.Animation.GetCurrentAnimatorStateInfo(0);
         if (animInfo.normalizedTime <= 1f || !animInfo.IsName(CurrentAnimStateName)) return false;
@@ -454,9 +454,8 @@ public abstract class Battler : BaseObject
             //oneTarget.Add(states[1].Count);
             //foreach (int stateReceiveId in states[1]) oneTarget.Add(stateReceiveId);
 
-            ChangeAndDisplayPopup(realHPTotal, activeTool.HPModType, "HP", user.ChangeHP, ChangeHP);
-            ChangeAndDisplayPopup(realSPTotal, activeTool.SPModType, "SP", user.ChangeSP, ChangeSP);
-            if (KOd) GetKOd();
+            SetHPSPAndDisplayPopup(realHPTotal, activeTool.HPModType, "HP", user.AddHP, AddHP);
+            SetHPSPAndDisplayPopup(realSPTotal, activeTool.SPModType, "SP", user.AddSP, AddSP);
         }
         else
         {
@@ -466,65 +465,91 @@ public abstract class Battler : BaseObject
     }
 
     // Helper for function above
-    public delegate void ChangeFunc(int total);
-    public void ChangeAndDisplayPopup(int total, ActiveTool.ModType modType, string HPorSP, ChangeFunc changeHPorSPForUser, ChangeFunc changeHPorSPForTarget)
+    public delegate void SetFunc(int total);
+    public void SetHPSPAndDisplayPopup(int total, ActiveTool.ModType modType, string HPorSP, SetFunc setHPorSPForUser, SetFunc setHPorSPForTarget)
     {
         Popup popup = null;
         switch (modType)
         {
             case ActiveTool.ModType.Damage:
                 if (SceneMaster.InBattle) popup = Instantiate(UIMaster.Popups[HPorSP + "Damage"], Sprite.TargetPoint, Quaternion.identity);
-                changeHPorSPForTarget(-total);
+                setHPorSPForTarget(-total);
                 Sprite.Animation.SetTrigger(AnimParams.GetHit.ToString());
                 break;
 
             case ActiveTool.ModType.Drain:
                 if (SceneMaster.InBattle) popup = Instantiate(UIMaster.Popups[HPorSP + "Drain"], Sprite.TargetPoint, Quaternion.identity);
-                changeHPorSPForTarget(-total);
-                changeHPorSPForUser(total);
+                setHPorSPForTarget(-total);
+                setHPorSPForUser(total);
                 Sprite.Animation.SetTrigger(AnimParams.GetHit.ToString());
                 break;
 
             case ActiveTool.ModType.Recover:
                 if (SceneMaster.InBattle) popup = Instantiate(UIMaster.Popups[HPorSP + "Recover"], Sprite.TargetPoint, Quaternion.identity);
-                changeHPorSPForTarget(total);
+                setHPorSPForTarget(total);
                 Sprite.Animation.SetTrigger(AnimParams.Recovered.ToString());
                 break;
         }
         if (popup) popup.GetComponent<TextMesh>().text = total.ToString();
     }
 
+    protected virtual void Revive()
+    {
+        //
+    }
+
     protected virtual void GetKOd()
     {
+        HP = 0;
         ResetAction();
         Sprite.Animation.SetTrigger(AnimParams.KOd.ToString());
+        TurnDestination = Position;
     }
 
-    public virtual void MaxHPSP()
+    protected IEnumerator ApplyKOEffect(ParticleSystem ps, float slowdownSeconds, bool knockAway)
     {
-        HP = MaxHP;
-        SP = 100;
+        var p = Instantiate(ps, Sprite.ActionEffects);
+        Destroy(p.gameObject, p.main.duration * 10);
+
+        Time.timeScale = 0.1f;
+        yield return new WaitForSecondsRealtime(slowdownSeconds);
+        Time.timeScale = 1;
+        
+        Sprite.SpritesList.gameObject.SetActive(knockAway);
+        Sprite.BaseHitBox.gameObject.SetActive(!knockAway);
+        Sprite.ScopeHitbox.gameObject.SetActive(knockAway);
+        if (knockAway)
+        {
+            Movement = Vector3.left * 3;
+            yield return new WaitForSeconds(1f);
+            Movement = Vector3.zero;
+        }
     }
 
-    public virtual void ChangeHP(int val)
+    public virtual void AddHP(int val)
     {
         HP += val;
-        if (HP < 0) HP = 0;
+        if (HP <= 0) GetKOd();
         else if (HP > MaxHP) HP = MaxHP;
+        if (HP <= val && HP > 0 && CurrentBattle.Turn > 0) Revive();
     }
 
-    public virtual void ChangeSP(int val)
+    public virtual void AddSP(int val)
     {
         SP += val;
         if (SP < 0) SP = 0;
-        else if (SP > 100) SP = 100;
+        else if (SP > BattleMaster.SP_CAP) SP = BattleMaster.SP_CAP;
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- Applying Passive Effects --
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public bool CanDoAction => !KOd && CannotMove <= 0 && !IsCharging;
+    public bool CanDoAction => CanEscape && !IsCharging;
+
+    public bool CanEscape => !KOd && CannotMove <= 0;
+
+    public bool IsCharging => ((SelectedAction as Skill)?.ChargeCount ?? 0) > 0;
 
     /*
     public void ApplyStartActionEffects(Environment e)

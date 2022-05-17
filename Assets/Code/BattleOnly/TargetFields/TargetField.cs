@@ -9,8 +9,9 @@ public abstract class TargetField : MonoBehaviour
     protected BattlePlayer AimingPlayer;
 
     private Color SetupColor = Color.blue;
-    private Color MeeleeColor = Color.red;
+    private Color AidColor = Color.green;
     private Color RangeColor = Color.yellow;
+    private Color MeeleeColor = Color.red;
 
     // Start is called before the first frame update
     protected virtual void Start()
@@ -30,6 +31,7 @@ public abstract class TargetField : MonoBehaviour
         gameObject.SetActive(true);
         if (p.SelectedAction == null) return;
         else if (isSetup) GetComponent<SpriteRenderer>().color = SetupColor;
+        else if (p.AimingForTeammates()) GetComponent<SpriteRenderer>().color = AidColor;
         else if (p.SelectedAction.Ranged) GetComponent<SpriteRenderer>().color = RangeColor;
         else GetComponent<SpriteRenderer>().color = MeeleeColor;
     }

@@ -2,13 +2,19 @@ using UnityEngine;
 
 public class EscapeCatchHitbox : MonoBehaviour
 {
-    public BattleMenu BattleMenu;
+    public Battle CurrentBattle;
+    [HideInInspector] public Battler Followee;
+
+    private void Update()
+    {
+        if (Followee) transform.position = Followee.Position;
+    }
 
     private void OnTriggerEnter2D(Collider2D collider)
     {
-        if (collider.gameObject.GetComponent<BattlePlayer>() || collider.gameObject.GetComponent<BattleAlly>())
+        if (collider.gameObject.CompareTag(Battle.SCOPE_HITBOX_TAG) && collider.gameObject.GetComponent<BattlerHitbox>()?.Battler is BattleEnemy)
         {
-            StartCoroutine(BattleMenu.CurrentBattle.NotifyEscapeFailure());
+            CurrentBattle.NotifyEscapeFailure();
         }
     }
 }

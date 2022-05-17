@@ -21,7 +21,7 @@ public abstract class BattleActionSet : MonoBehaviour
     public Projectile SpawnProjectile(Projectile p0, float nerfPartition = 1f)
     {
         Projectile p = Instantiate(p0, User.transform);
-        p.transform.position = User.transform.position;
+        p.transform.position = User.Sprite.ObjectSpawnPoint.position;
         p.SetBattleInfo(User, User.SelectedAction, nerfPartition);
         p.Direct(User.Direction);
         return p;

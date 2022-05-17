@@ -21,7 +21,7 @@ public abstract class BattlerAI : Battler
     {
         base.Awake();
         CleanupAIActionList();
-        BasicAttackSkill = ActionOptions.Any() ? ActionOptions.Select(x => x.Action as Skill).FirstOrDefault(y => y == ResourcesMaster.BasicAttackSkill) : null;
+        BasicAttackSkill = ActionOptions.Any() && CurrentBattle ? ActionOptions.Select(x => x.Action as Skill).FirstOrDefault(y => y == CurrentBattle.BasicAttack) : null;
         SelectedWeapon = WeaponOptions.Any() ? (WeaponOptions.First().Action as Weapon) : null;
     }
 

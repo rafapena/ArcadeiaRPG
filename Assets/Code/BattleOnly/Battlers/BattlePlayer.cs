@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Security;
 using UnityEngine;
@@ -141,5 +142,16 @@ public class BattlePlayer : Battler
     {
         base.ReceiveToolEffects(user, activeTool, nerfPartition);
         if (CurrentBattle?.BattleMenu ?? false) CurrentBattle.BattleMenu.UpdatePlayerEntry(this);
+    }
+
+    protected override void Revive()
+    {
+        base.Revive();
+    }
+
+    protected override void GetKOd()
+    {
+        base.GetKOd();
+        StartCoroutine(ApplyKOEffect(CurrentBattle.PlayerKOParticles, 1f, true));
     }
 }

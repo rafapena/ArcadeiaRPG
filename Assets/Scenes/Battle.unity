@@ -2594,7 +2594,7 @@ RectTransform:
   m_GameObject: {fileID: 619364251}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 2, y: 2, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 133090968}
@@ -2686,7 +2686,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 85b9e2932462de34391147d730786c98, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  BattleMenu: {fileID: 1897374001}
+  CurrentBattle: {fileID: 1998927561}
+  Followee: {fileID: 0}
 --- !u!1 &621682376
 GameObject:
   m_ObjectHideFlags: 0
@@ -13786,6 +13787,18 @@ MonoBehaviour:
   BattleCamera: {fileID: 1601396897}
   BattleMenu: {fileID: 1897374001}
   BattleWinMenu: {fileID: 791128601}
+  BasicAttack: {fileID: 3752993136341733753, guid: 4140e643d48af86419ab27f8808015ea,
+    type: 3}
+  BasicWeaponlessProjectile: {fileID: 8282308100824431874, guid: ceaaf59fe1437db49ab7260097536cc3,
+    type: 3}
+  PlayerKOParticles: {fileID: 1976688045362339349, guid: 049f76eab9ddd9542a96e12f7b1205b9,
+    type: 3}
+  EnemyKOParticles:
+  - {fileID: 1976688045362339349, guid: 049f76eab9ddd9542a96e12f7b1205b9, type: 3}
+  - {fileID: 1976688045362339349, guid: 049f76eab9ddd9542a96e12f7b1205b9, type: 3}
+  - {fileID: 1976688045362339349, guid: 049f76eab9ddd9542a96e12f7b1205b9, type: 3}
+  - {fileID: 1976688045362339349, guid: 049f76eab9ddd9542a96e12f7b1205b9, type: 3}
+  Enviornment: {fileID: 0}
   PlayerParty: {fileID: 0}
   EnemyParty: {fileID: 0}
   PlayerPartyDump: {fileID: 1047801743}

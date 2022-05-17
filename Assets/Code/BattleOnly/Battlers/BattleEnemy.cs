@@ -1,8 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class BattleEnemy : BattlerAI
 {
+    public enum EnemyTypes { Regular, MiniBoss, Boss, FinalBoss }
+
+    public EnemyTypes EnemyType;
     public int Exp;
     public int Gold;
     public ItemDropRate[] DroppedItems;
@@ -20,7 +24,7 @@ public class BattleEnemy : BattlerAI
     {
         base.StatConversion();
         Stats.MaxHP = (int)(MaxHP * MultiplyHP);
-        HP = MaxHP;
+        AddHP(MaxHP);
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -33,8 +37,16 @@ public class BattleEnemy : BattlerAI
         if (CurrentBattle?.BattleMenu ?? false) CurrentBattle.BattleMenu.UpdateEnemyEntry(this);
     }
 
+    protected override void Revive()
+    {
+        base.Revive();
+    }
+
     protected override void GetKOd()
     {
         base.GetKOd();
+        var ps = CurrentBattle.EnemyKOParticles[(int)EnemyType];
+        float sec = EnemyType == EnemyTypes.Regular ? 0 : 2.5f;
+        StartCoroutine(ApplyKOEffect(ps, sec, false));
     }
 }

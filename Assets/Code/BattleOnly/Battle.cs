@@ -20,6 +20,12 @@ public class Battle : MonoBehaviour
     public BattleMenu BattleMenu;
     public BattleWin BattleWinMenu;
 
+    // Constants
+    public Skill BasicAttack;
+    public Projectile BasicWeaponlessProjectile;
+    public ParticleSystem PlayerKOParticles;
+    public ParticleSystem[] EnemyKOParticles;
+
     // Data transferred from Map
     [HideInInspector] public Surrounding Enviornment;
     [HideInInspector] public PlayerParty PlayerParty;
@@ -143,9 +149,17 @@ public class Battle : MonoBehaviour
 
     public T InstantiateBattler<T>(T newBattler, Vector3 position) where T : Battler
     {
-        // Clone battler and stats
+        // Clone battler and link battle
         T b = Instantiate(newBattler, position, Quaternion.identity, (newBattler is BattleEnemy ? EnemyPartyDump : PlayerPartyDump));
-        if (b is BattleEnemy) b.StatConversion();
+        b.SetBattle(this);
+
+        // Stats
+        if (b is not BattleEnemy)
+        {
+            b.AddHP(newBattler.HP);
+            b.AddSP(newBattler.SP);
+        }
+        else b.StatConversion();
 
         // Class and skills
         var skills = gameObject.GetComponentsInChildren<Skill>();
@@ -164,9 +178,6 @@ public class Battle : MonoBehaviour
         // GameObject management
         b.transform.localScale = Vector3.one * 0.7f;
         b.gameObject.SetActive(true);
-
-        // Link battle to battler
-        b.SetBattle(this);
         return b;
     }
 
@@ -289,7 +300,7 @@ public class Battle : MonoBehaviour
             BattleMenu.RefreshPartyFrames();
             BattleMenu.Setup(p);
             yield return new WaitUntil(BattleMenu.SelectedAction);
-            yield return BattleMenu.SelectedEscape ? AttemptEscape() : ExecuteAction();
+            yield return BattleMenu.Escaping ? AttemptEscape() : ExecuteAction();
         }
         else  // Battler AI
         {
@@ -357,7 +368,7 @@ public class Battle : MonoBehaviour
         if (ActingBattler.UsingBasicAttack) ActingBattler.UseBasicAttack(ActingBattler.SelectedWeapon);
         else if (skill) ActingBattler.UseSkill(skill);
         else if (ActingBattler.SelectedAction is Item item) ActingBattler.UseItem(item);
-        yield return new WaitUntil(ActingBattler.NotifyActionCompletion);
+        yield return new WaitUntil(ActingBattler.ActionAnimationCompleted);
 
         // Complete action
         ActingBattler.Sprite.Animation.SetTrigger(Battler.AnimParams.DoneAction.ToString());
@@ -368,27 +379,31 @@ public class Battle : MonoBehaviour
 
     private IEnumerator AttemptEscape()
     {
-        ClearAll();
+        BattleMenu.RemovePartyFrames();
         RestrictBattlerWallCollision(false);
         BattleMenu.AddEscapeHitboxes();
         yield return new WaitForSeconds(1);
         foreach (var b in Battlers) b.SetToEscapeMode(true, b is not BattleEnemy);
         yield return new WaitForSeconds(3);
-        yield return Escape();
+        if (BattleMenu.Escaping) yield return Escape();
     }
 
-    public IEnumerator NotifyEscapeFailure()
+    public void NotifyEscapeFailure()
     {
         BattleMenu.RemoveEscapeHitboxes();
-        StopCoroutine(AttemptEscape());
         StartCoroutine(BattleMenu.DisplayUsedAction(ActingBattler, "COULD NOT ESCAPE"));
+        StartCoroutine(EscapeFailureSequence());
+    }
+
+    private IEnumerator EscapeFailureSequence()
+    {
+        foreach (var b in Battlers) b.SetToEscapeMode(false, b is not BattleEnemy);
         yield return new WaitForSeconds(2);
         foreach (var b in Battlers)
         {
-            b.SetToEscapeMode(false, b is not BattleEnemy);
             b.ApproachForNextTurn();
+            yield return new WaitUntil(b.HasApproachedNextTurnDestination);
         }
-        yield return new WaitUntil(() => Battlers.All(x => x.HasApproachedNextTurnDestination()));
         ActionEnd();
     }
 
@@ -455,7 +470,8 @@ public class Battle : MonoBehaviour
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     private IEnumerator Escape()
-    {   
+    {
+        ClearAll();
         foreach (var e in EnemyParty.Enemies) e.SetToEscapeMode(false, false);
         StartCoroutine(BattleMenu.DisplayUsedAction(ActingBattler, "ESCAPED!"));
         yield return new WaitForSeconds(2);

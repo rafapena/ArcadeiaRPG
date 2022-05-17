@@ -117,8 +117,8 @@ public class PlayerParty : MonoBehaviour
         Battler b = Instantiate(list[PlayerPrefs.GetInt(bt + "Id_" + file)], mp.BattlersListDump);
         b.Level = Level;
         b.StatConversion();
-        b.HP = PlayerPrefs.GetInt(bt + "HP_" + file);
-        b.SP = PlayerPrefs.GetInt(bt + "SP_" + file);
+        b.AddHP(PlayerPrefs.GetInt(bt + "HP_" + file) - b.MaxHP);
+        b.AddSP(PlayerPrefs.GetInt(bt + "SP_" + file) - BattleMaster.SP_CAP);
         if (b is BattlePlayer p)
         {
             string sw = bt + "SelectedWeapon_" + file;

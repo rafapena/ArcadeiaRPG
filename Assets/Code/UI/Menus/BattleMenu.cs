@@ -580,13 +580,23 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
 
     public void AddEscapeHitboxes()
     {
-        //
+        foreach (var b in CurrentBattle.FightingPlayerParty)
+        {
+            if (b.KOd) return;
+            Transform t = Instantiate(EscapeCatchHitboxes.GetChild(0), EscapeCatchHitboxes);
+            var e = t.GetComponent<EscapeCatchHitbox>();
+            e.Followee = b;
+        }
     }
 
     public void RemoveEscapeHitboxes()
     {
-        //
+        Selection = Selections.Disabled;
+        for (int i = EscapeCatchHitboxes.childCount - 1; i >= 1; i--)
+        {
+            Destroy(EscapeCatchHitboxes.GetChild(i).gameObject);
+        }
     }
 
-    public bool SelectedEscape => Selection == Selections.Escaping;
+    public bool Escaping => Selection == Selections.Escaping;
 }

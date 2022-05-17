@@ -10,12 +10,14 @@ public class SpriteProperties : MonoBehaviour
     public Transform BaseHitBox;
     public BattlerHitbox ActionHitbox;
     public BattlerHitbox ScopeHitbox;
+    public Transform ObjectSpawnPoint;
     public Transform ApproachPointLeft;
     public Transform ApproachPointRight;
     public Transform ApproachPointCenter;
     public Transform StateEffects;
     public Transform ActionEffects;
-    public Transform TurnIndicators;
+    public GameObject CurrentTurnParticles;
+    public GameObject NextTurnParticles;
     public GameObject SpeechBubble;
 
     public Vector3 TargetPoint => ApproachPointCenter.position;
@@ -105,22 +107,20 @@ public class SpriteProperties : MonoBehaviour
             var sprite = s.gameObject.GetComponent<SpriteRenderer>();
             if (sprite) sprite.sortingOrder += SPRITE_LAYER_DISTANCE * indexAdd;
         }
-        MoveParticleSystemFoward(StateEffects, indexAdd);
-        MoveParticleSystemFoward(ActionEffects, indexAdd);
-        MoveParticleSystemFoward(TurnIndicators, indexAdd);
+        MoveParticleSystemFoward(CurrentTurnParticles.transform, indexAdd);
+        MoveParticleSystemFoward(NextTurnParticles.transform, indexAdd);
+        foreach (Transform p in ActionEffects) MoveParticleSystemFoward(p, indexAdd);
+        foreach (Transform p in StateEffects) MoveParticleSystemFoward(p, indexAdd);
     }
 
-    private void MoveParticleSystemFoward(Transform list, int indexAdd)
+    private void MoveParticleSystemFoward(Transform t, int indexAdd)
     {
-        foreach (Transform t in list)
-        {
-            t.gameObject.GetComponent<ParticleSystem>().GetComponent<Renderer>().sortingOrder += SPRITE_LAYER_DISTANCE * indexAdd;
-        }
+        t.GetComponent<ParticleSystem>().GetComponent<Renderer>().sortingOrder += SPRITE_LAYER_DISTANCE * indexAdd;
     }
 
     public void HandleTurnIndicators(bool current, bool next)
     {
-        TurnIndicators.transform.GetChild(0).gameObject.SetActive(current);
-        TurnIndicators.transform.GetChild(1).gameObject.SetActive(next);
+        CurrentTurnParticles.SetActive(current);
+        NextTurnParticles.SetActive(next);
     }
 }

@@ -255,7 +255,7 @@ public class MMSpecial : MM_Super
 
     private void ApplyEffectsToUser()
     {
-        PartyUserList.SelectedObject.ChangeSP(-SkillsList.SelectedObject.SPConsume);
+        PartyUserList.SelectedObject.AddSP(-SkillsList.SelectedObject.SPConsume);
         PartyUserList.UpdateEntry(PartyUserList.SelectedObject, PartyUserList.SelectedIndex);
         for (int i = 0; i < SelectableTeammates.Count; i++)
         {
