@@ -9,11 +9,11 @@ public class ActionSet_Rookie : BattleActionSet
 
     public void WeakBasicSlash()
     {
-        SpawnProjectile(WideBlade, 0.4f);
+        MeeleeProjectile(WideBlade, 0.4f, false);
     }
 
     public void StrongBasicSlash()
     {
-        SpawnProjectile(HighBlade, 0.6f);
+        MeeleeProjectile(HighBlade, 0.6f, true);
     }
 }

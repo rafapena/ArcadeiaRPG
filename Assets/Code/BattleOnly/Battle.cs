@@ -44,6 +44,12 @@ public class Battle : MonoBehaviour
     // Battle state tracking
     public int Turn { get; private set; }
     private bool LastActionOfTurn;
+    
+    // Grouping battle surroundings
+    public Transform ActiveProjectiles;
+    public Transform ActiveHazards;
+    public Transform ActiveFields;
+    public Transform ActivePopups;
 
     // Grouping battlers
     public Transform PlayerPartyDump;
@@ -351,10 +357,10 @@ public class Battle : MonoBehaviour
         }
 
         // Approach target for meelee attacks
-        if (ActingBattler.SelectedSingleMeeleeTarget)
+        if (ActingBattler.SingleSelectedTarget && !ActingBattler.SelectedAction.Ranged)
         {
             RestrictBattlerWallCollision(false);
-            var sp = ActingBattler.SelectedSingleMeeleeTarget.Sprite;
+            var sp = ActingBattler.SingleSelectedTarget.Sprite;
             ActingBattler.ApproachTarget(sp.ApproachPointLeft.position, sp.ApproachPointRight.position);
             yield return new WaitUntil(ActingBattler.HasApproachedTarget);
         }
@@ -374,6 +380,7 @@ public class Battle : MonoBehaviour
         ActingBattler.Sprite.Animation.SetTrigger(Battler.AnimParams.DoneAction.ToString());
         ActingBattler.ApproachForNextTurn();
         yield return new WaitUntil(ActingBattler.HasApproachedNextTurnDestination);
+        yield return new WaitUntil(() => ActiveProjectiles.childCount == 0);
         ActionEnd();
     }
 
@@ -428,7 +435,7 @@ public class Battle : MonoBehaviour
     {
         foreach (Battler b in Battlers)
         {
-            b.SelectedSingleMeeleeTarget = null;
+            b.SingleSelectedTarget = null;
             b.Select(false);
             b.LockSelectTrigger = false;
         }

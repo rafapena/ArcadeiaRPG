@@ -31,9 +31,9 @@ public class BattleEnemy : BattlerAI
     /// -- Receiving ActiveTool Effects --
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public override void ReceiveToolEffects(Battler user, ActiveTool activeTool, float nerfPartition)
+    public override void ReceiveToolEffects(Battler user, ActiveTool activeTool, Projectile hitProjectile)
     {
-        base.ReceiveToolEffects(user, activeTool, nerfPartition);
+        base.ReceiveToolEffects(user, activeTool, hitProjectile);
         if (CurrentBattle?.BattleMenu ?? false) CurrentBattle.BattleMenu.UpdateEnemyEntry(this);
     }
 

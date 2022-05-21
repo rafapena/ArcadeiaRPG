@@ -477,7 +477,7 @@ public class MMInventory : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOp
     private void UseItem(int index)
     {
         PartyList.SelectedObject = SelectableTeammatesUse[index];
-        PartyList.SelectedObject.ReceiveToolEffects(PartyList.SelectedObject, InventoryFrame.ToolList.SelectedObject as Item, 1f);
+        PartyList.SelectedObject.ReceiveToolEffects(PartyList.SelectedObject, InventoryFrame.ToolList.SelectedObject as Item, null);
         PartyList.UpdateEntry(PartyList.SelectedObject, index);
     }
 

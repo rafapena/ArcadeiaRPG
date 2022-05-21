@@ -1577,7 +1577,7 @@ MonoBehaviour:
   Direction: {x: 0, y: 0, z: 0}
   Movement: {x: 0, y: 0, z: 0}
   SpriteSpeed: 0
-  TargetDestination: {x: 0, y: 0, z: 0}
+  ScopedTargetDestination: {x: 0, y: 0, z: 0}
   TurnDestination: {x: 0, y: 0, z: 0}
   MainImage: {fileID: 0}
   FaceImage: {fileID: 0}
@@ -1585,8 +1585,6 @@ MonoBehaviour:
   Level: 1
   Class: {fileID: 0}
   CombatRangeType: 1
-  HP: 0
-  SP: 0
   StatBoosts:
     MaxHP: 0
     Atk: 0
@@ -1607,7 +1605,7 @@ MonoBehaviour:
     Map: 40
     Mar: 40
     Rec: 40
-    Spd: 40
+    Spd: 20
     Tec: 40
     Acc: 100
     Eva: 100
@@ -1617,7 +1615,6 @@ MonoBehaviour:
   LockSelectTrigger: 0
   SelectedAction: {fileID: 0}
   SelectedWeapon: {fileID: 0}
-  IsCharging: 0
   States: []
   CurrentListIndex: 0
   RowPosition: 0
@@ -1630,7 +1627,6 @@ MonoBehaviour:
   HitResistant: 0
   ChangedElementRates: []
   ChangedStateRates: []
-  Flying: 0
   StatModifiers:
     MaxHP: 0
     Atk: 0

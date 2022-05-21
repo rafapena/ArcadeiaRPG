@@ -8,7 +8,6 @@ public class Projectile : MonoBehaviour
     private Battler Shooter;
     private List<Battler> Targets = new List<Battler>();
     private ActiveTool ToolEffect;
-    private float NerfPartition;
 
     private Vector3 ShootDir;
     public bool PointToDirection;
@@ -17,18 +16,22 @@ public class Projectile : MonoBehaviour
     public float DurationAfterCollision;
     public UnityEvent OnExplode;
 
+    public bool Finisher { get; private set; }
+    public float NerfPartition { get; private set; }
+
     public void Direct(Vector3 shootDir)
     {
-        ShootDir = shootDir;
+        ShootDir = shootDir.normalized;
         if (PointToDirection) transform.eulerAngles = new Vector3(0, 0, GetAngleFromVectorFloat(shootDir));
         if (Duration > 0) Destroy(gameObject, Duration);
     }
 
-    public void SetBattleInfo(Battler user, ActiveTool activeTool, float nerfPartition = 1f)
+    public void SetBattleInfo(Battler user, ActiveTool activeTool, float nerfPartition, bool finisher)
     {
         Shooter = user;
         ToolEffect = activeTool;
         NerfPartition = nerfPartition;
+        Finisher = finisher;
         GetComponent<SpriteRenderer>().sortingOrder += SpriteProperties.SPRITE_LAYER_DISTANCE * user.ColumnOverlapRank;
     }
 
@@ -55,15 +58,14 @@ public class Projectile : MonoBehaviour
             if (hb && hb.Battler.IsSelected && !Targets.Contains(hb.Battler))
             {
                 Targets.Add(hb.Battler);
-                hb.Battler.ReceiveToolEffects(Shooter, ToolEffect, NerfPartition);
-                if (DurationAfterCollision > 0) Explode();
+                hb.Battler.ReceiveToolEffects(Shooter, ToolEffect, this);
+                Explode();
             }
         }
     }
 
     private void Explode()
     {
-        MoveSpeed = 0;
         Destroy(gameObject, DurationAfterCollision);
         OnExplode?.Invoke();
     }

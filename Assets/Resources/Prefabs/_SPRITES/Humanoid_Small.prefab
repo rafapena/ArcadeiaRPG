@@ -238,6 +238,7 @@ GameObject:
   - component: {fileID: 5080328183572055474}
   - component: {fileID: 8564797191916981559}
   - component: {fileID: 980906203811666456}
+  - component: {fileID: 9055026487811262286}
   m_Layer: 0
   m_Name: Humanoid_Small
   m_TagString: Untagged
@@ -312,6 +313,18 @@ MonoBehaviour:
     showGizmo: 1
   - color: {r: 0, g: 1, b: 0, a: 1}
     showGizmo: 1
+--- !u!114 &9055026487811262286
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5149667342464974805}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6fe0c4d5c15bd2445a176dd6f4257b67, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &5543810547183341019
 GameObject:
   m_ObjectHideFlags: 0

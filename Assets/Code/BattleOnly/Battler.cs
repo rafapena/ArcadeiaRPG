@@ -64,13 +64,14 @@ public abstract class Battler : BaseObject
     [HideInInspector] public Weapon SelectedWeapon;
     [HideInInspector] public List<State> States = new List<State>();
     [HideInInspector] public int CurrentListIndex;
+    protected Projectile LastHitProjectile;
     public VerticalPositions RowPosition;
     public HorizontalPositions ColumnPosition;
 
     // Action execution info
     public bool UsingBasicAttack => SelectedAction == BasicAttackSkill;
     [HideInInspector] public Skill BasicAttackSkill;
-    [HideInInspector] public Battler SelectedSingleMeeleeTarget;
+    [HideInInspector] public Battler SingleSelectedTarget;
     [HideInInspector] public bool ExecutedAction;
     [HideInInspector] public bool HitCritical;
     [HideInInspector] public bool HitWeakness;
@@ -160,7 +161,7 @@ public abstract class Battler : BaseObject
         HitCritical = false;
         HitWeakness = false;
         HitResistant = false;
-        SelectedSingleMeeleeTarget = null;
+        SingleSelectedTarget = null;
     }
 
     public void SetBattle(Battle battle)
@@ -431,11 +432,13 @@ public abstract class Battler : BaseObject
     /// -- Receiving ActiveTool Effects --
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public virtual void ReceiveToolEffects(Battler user, ActiveTool activeTool, float nerfPartition)
+    public virtual void ReceiveToolEffects(Battler user, ActiveTool activeTool, Projectile hitProjectile)
     {
         float effectMagnitude = 1.0f;
         if (activeTool.Hit(user, this, effectMagnitude))
         {
+            LastHitProjectile = hitProjectile;
+
             int formulaOutput = activeTool.GetFormulaOutput(user, this, effectMagnitude);
             int directHPChange = activeTool.HPAmount + (MaxHP * activeTool.HPPercent / 100);
             
@@ -443,8 +446,9 @@ public abstract class Battler : BaseObject
             float elementRate = activeTool.GetElementRateRatio(user, this);                   // UPDATES HitWeakness and HitResistant
             int ratesTotal = (int)(critRate * elementRate);
 
-            int realHPTotal = (int)(activeTool.GetTotalWithVariance((formulaOutput + directHPChange) * ratesTotal) * nerfPartition);
-            int realSPTotal = (int)(activeTool.GetTotalWithVariance((formulaOutput + activeTool.SPPecent) * ratesTotal) * nerfPartition);
+            float nerf = hitProjectile?.NerfPartition ?? 1f;
+            int realHPTotal = (int)(activeTool.GetTotalWithVariance((formulaOutput + directHPChange) * ratesTotal) * nerf);
+            int realSPTotal = (int)(activeTool.GetTotalWithVariance((formulaOutput + activeTool.SPPecent) * ratesTotal) * nerf);
             if (activeTool.HPModType != ActiveTool.ModType.None && realHPTotal <= 0) realHPTotal = 1;
             if (activeTool.SPModType != ActiveTool.ModType.None && realSPTotal <= 0) realSPTotal = 1;
 
@@ -529,7 +533,7 @@ public abstract class Battler : BaseObject
     public virtual void AddHP(int val)
     {
         HP += val;
-        if (HP <= 0) GetKOd();
+        if (HP <= 0 && (LastHitProjectile?.Finisher ?? true)) GetKOd();
         else if (HP > MaxHP) HP = MaxHP;
         if (HP <= val && HP > 0 && CurrentBattle.Turn > 0) Revive();
     }

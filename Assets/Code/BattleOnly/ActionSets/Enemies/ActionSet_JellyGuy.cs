@@ -8,6 +8,6 @@ public class ActionSet_JellyGuy : BattleActionSet
 
     public void Tackle()
     {
-        SpawnProjectile(Bash, 1f);
+        MeeleeProjectile(Bash, 1f, true);
     }
 }

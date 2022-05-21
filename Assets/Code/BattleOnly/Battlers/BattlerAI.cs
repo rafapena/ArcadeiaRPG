@@ -135,7 +135,7 @@ public abstract class BattlerAI : Battler
             case ActiveTool.ScopeType.OneAlly:
                 var pt = PossibleTargets.Where(x => !x.KOd);
                 Battler target = pt.ElementAt(Random.Range(0, pt.Count()));
-                SelectedSingleMeeleeTarget = SelectedAction.Ranged ? null : target;
+                SingleSelectedTarget = target;
                 target.Select(true);
                 break;
 

@@ -356,11 +356,12 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
         if (resetSelectedTargets) CurrentBattle.ResetSelectedTargets();
     }
 
-    private void SetScopeTargetSearch(bool relativeToPlayer = true)
+    private void SetScopeTargetSearch()
     {
         ClearScope(true);
         switch (ActingPlayer.SelectedAction.Scope)
         {
+            // FIX ACTION HIT BOX SECTION FOR RANGED ATTACKS
             case ActiveTool.ScopeType.OneEnemy:
                 TargetFields.Single.Activate(ActingPlayer);
                 if (ActingPlayer.SelectedAction.Ranged) AimAtNearestEnemy();
@@ -427,16 +428,16 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
         }
     }
 
-    private void AimAtNearestPlayer() => AimAtNearestBattler(CurrentBattle.PlayerParty.Players.Where(x => !x.KOd), TargetFields.Single, true, ActingPlayer.SelectedAction.Ranged);
+    private void AimAtNearestPlayer() => AimAtNearestBattler(CurrentBattle.PlayerParty.Players.Where(x => !x.KOd), TargetFields.Single, ActingPlayer.SelectedAction.Ranged);
 
-    private void AimAtNearestKOdPlayer() => AimAtNearestBattler(CurrentBattle.PlayerParty.Players.Where(x => x.KOd), TargetFields.Single, true, ActingPlayer.SelectedAction.Ranged);
+    private void AimAtNearestKOdPlayer() => AimAtNearestBattler(CurrentBattle.PlayerParty.Players.Where(x => x.KOd), TargetFields.Single, ActingPlayer.SelectedAction.Ranged);
 
-    private void AimAtNearestEnemy() => AimAtNearestBattler(CurrentBattle.EnemyParty.Enemies.Where(x => !x.KOd), TargetFields.Single, false, ActingPlayer.SelectedAction.Ranged);
+    private void AimAtNearestEnemy() => AimAtNearestBattler(CurrentBattle.EnemyParty.Enemies.Where(x => !x.KOd), TargetFields.Single, ActingPlayer.SelectedAction.Ranged);
 
-    private void AimAtNearestBattler<T>(IEnumerable<T> targets, DynamicTargetField targetField, bool alwaysRanged, bool movable) where T : Battler
+    private void AimAtNearestBattler<T>(IEnumerable<T> targets, DynamicTargetField targetField, bool movable) where T : Battler
     {
         var battler = GetNearestTarget(AimRelativeToPlayer ? ActingPlayer.Position : targetField.transform.position, targets);
-        ActingPlayer.SelectedSingleMeeleeTarget = alwaysRanged || ActingPlayer.SelectedAction.Ranged ? null : battler;
+        ActingPlayer.SingleSelectedTarget = battler;
         targetField.AimAt(battler, movable);
     }
 
@@ -447,7 +448,7 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
         tf.DisposeOnDeactivate = true;
         tf.Activate(ActingPlayer, isSetup);
         tf.transform.localScale *= scale;
-        if (tf is DynamicTargetField dtf) AimAtNearestBattler(CurrentBattle.EnemyParty.Enemies.Where(x => !x.KOd), dtf, true, true);
+        if (tf is DynamicTargetField dtf) AimAtNearestBattler(CurrentBattle.EnemyParty.Enemies.Where(x => !x.KOd), dtf, true);
     }
 
     private IEnumerable<Battler> GetWideFrontalTargets()
