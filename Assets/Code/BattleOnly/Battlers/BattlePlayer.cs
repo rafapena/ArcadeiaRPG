@@ -28,6 +28,7 @@ public class BattlePlayer : Battler
     public int CounterattackRate = 100;
     public int AssistDamageRate = 100;
     public int StatBoostsRate = 100;
+    [HideInInspector] public Stats PermanentStatsBoosts;
 
     private bool ArrowKeyMovement;
 
@@ -45,6 +46,12 @@ public class BattlePlayer : Battler
             Sprite.RightArmHold(SelectedWeapon.Name);
         }
         Direction = Vector3.right;
+    }
+
+    public override void StatConversion()
+    {
+        base.StatConversion();
+        Stats.Add(PermanentStatsBoosts);
     }
 
     public void AddLearnedSkills()

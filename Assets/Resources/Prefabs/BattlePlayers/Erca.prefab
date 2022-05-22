@@ -3977,7 +3977,7 @@ MonoBehaviour:
   Direction: {x: 0, y: 0, z: 0}
   Movement: {x: 0, y: 0, z: 0}
   SpriteSpeed: 0
-  TargetDestination: {x: 0, y: 0, z: 0}
+  ScopedTargetDestination: {x: 0, y: 0, z: 0}
   TurnDestination: {x: 0, y: 0, z: 0}
   MainImage: {fileID: 0}
   FaceImage: {fileID: 21300000, guid: 9e5d479eb90a61941b1065c1d83e55b9, type: 3}
@@ -3985,8 +3985,6 @@ MonoBehaviour:
   Level: 1
   Class: {fileID: -615138847852756419, guid: aa68b1ce7e43d254d88764b2f4504a91, type: 3}
   CombatRangeType: 0
-  HP: 0
-  SP: 0
   StatBoosts:
     MaxHP: 0
     Atk: 0
@@ -4017,20 +4015,18 @@ MonoBehaviour:
   LockSelectTrigger: 0
   SelectedAction: {fileID: 0}
   SelectedWeapon: {fileID: 0}
-  IsCharging: 0
   States: []
   CurrentListIndex: 0
   RowPosition: 0
   ColumnPosition: 0
   BasicAttackSkill: {fileID: 0}
-  SelectedSingleMeeleeTarget: {fileID: 0}
+  SingleSelectedTarget: {fileID: 0}
   ExecutedAction: 0
   HitCritical: 0
   HitWeakness: 0
   HitResistant: 0
   ChangedElementRates: []
   ChangedStateRates: []
-  Flying: 0
   StatModifiers:
     MaxHP: 0
     Atk: 0
@@ -4089,6 +4085,19 @@ MonoBehaviour:
   CounterattackRate: 100
   AssistDamageRate: 100
   StatBoostsRate: 100
+  PermanentStatsBoosts:
+    MaxHP: 0
+    Atk: 0
+    Def: 0
+    Map: 0
+    Mar: 0
+    Rec: 0
+    Spd: 0
+    Tec: 0
+    Acc: 0
+    Eva: 0
+    Crt: 0
+    Cev: 0
 --- !u!114 &3619142708863583089
 MonoBehaviour:
   m_ObjectHideFlags: 0

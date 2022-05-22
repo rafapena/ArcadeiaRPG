@@ -59,7 +59,7 @@ public abstract class GaugeWithText : Gauge
             Label.color = SurpassedCapTextColor;
             Bar.color = SurpassedCapBarColor;
         }
-        else if (NotEmpty())
+        else if (!IsEmpty)
         {
             if (Title) Title.color = NormalTextColor;
             Label.color = NormalTextColor;

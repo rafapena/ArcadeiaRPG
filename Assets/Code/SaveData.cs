@@ -108,13 +108,14 @@ public class SaveData
     {
         string bt = "Battler" + index;
         PlayerPrefs.SetInt(bt + "Id_" + File, b.Id);
-        PlayerPrefs.SetInt(bt + "HP_" + File, b.HP);
-        PlayerPrefs.SetInt(bt + "SP_" + File, b.SP);
         if (b is BattlePlayer p)
         {
+            PlayerPrefs.SetString(bt + "PStats_" + File, p.PermanentStatsBoosts.GetToString());
             SaveBattlersList(p.Weapons, bt);
-            if (p.Weapons.Count > 0) PlayerPrefs.SetInt(bt + "SelectedWeapon_" + File, p.SelectedWeapon.Id);
+            if (p.Weapons.Count > 0) PlayerPrefs.SetInt(bt + "SelectedWeapon_" + File, p.SelectedWeapon?.Id ?? -1);
         }
+        PlayerPrefs.SetInt(bt + "HP_" + File, b.HP);
+        PlayerPrefs.SetInt(bt + "SP_" + File, b.SP);
         SaveBattlersList(b.Accessories, bt);
         SaveBattlersList(b.States, bt);
     }

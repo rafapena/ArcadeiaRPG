@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Runtime.ExceptionServices;
 using System.Runtime.InteropServices.ComTypes;
 using TMPro;
@@ -7,114 +8,91 @@ using UnityEngine.UI;
 
 public class BattleWin : MonoBehaviour
 {
-    // Selection process navigation
-    private enum Selections
-    {
-        None,
-        FirstWinScreen,
-        LevelUp,
-        CompanionShipUp
-    }
-
     // Battle data, including parties, levelling/exp and inventory info
     public Battle FinishedBattle;
 
-    // Selection management
-    private Selections Selection;
-    private string KeyPressed;
-    private bool ExitingBattle;
-
-    // Loading + Animating
-    private float DisableTime;
-    private bool TriggerAnimation;
-
     // Child GameObjects
     public MenuFrame VictoryBanner;
-    public MenuFrame LevelEXP;
-    public MenuFrame ItemsObtained;
-    public MenuFrame GoldObtained;
-    public MenuFrame LevelUp;
-    public MenuFrame CompanionShipUp;
+    public MenuFrame LevelEXPFrame;
+    public MenuFrame GoldFrame;
+    public MenuFrame NewSkillsFrame;
     public MenuFrame ProceedButton;
-
-    // General UI
-    public TextMeshProUGUI NoItemsLabel;
-    private Color CInfoFrameMainColor;
-    private Color CInfoFrameLevelUpColor;
 
     // Level and EXP
     private int LevelUps;
-    public Gauge EXPGauge;
-    private int EXPEarned;
-    private int EXPIncreaseSpeed;
-    private int NewEXPTotal;
     public TextMeshProUGUI LevelLabel;
-    public TextMeshProUGUI EXPGainedSoFarLabel;
-    public TextMeshProUGUI EXPGainedLabel;
-    public TextMeshProUGUI ToNextLabel;
-    public TextMeshProUGUI TotalEXPLabel;
+    public Gauge EXPGauge;
+    public NumberUpdater TotalEXPLabel;
+    public TextMeshProUGUI EXPEarnedLabel;
+    private int EXPEarned;
 
-    // Gold and Items
+    // Gold
+    public NumberUpdater TotalGoldLabel;
+    public TextMeshProUGUI GoldEarnedLabel;
     private int GoldEarned;
-    private int GoldIncreaseSpeed;
-    private int NewGoldTotal;
-    private List<IToolForInventory> ItemsEarned;
 
-    // Companionships
-    private List<PlayerRelation> CompaionshipUpPlayers;
-    private List<int> CompanionshipUpBoostAmounts;
+    // New Skills
+    private float DefaultNewSkillsListEntryHeight;
+    public GameObject NewSkillsListCover;
+    public Transform NewSkillsList;
 
     private void Start()
     {
-        Selection = Selections.None;
-        CInfoFrameMainColor = LevelEXP.GetComponent<Image>().color;
-        CInfoFrameLevelUpColor = new Color(1, 0.9f, 0.3f, CInfoFrameMainColor.a);
-        ItemsEarned = new List<IToolForInventory>();
-        CompaionshipUpPlayers = new List<PlayerRelation>();
-        CompanionshipUpBoostAmounts = new List<int>();
-        NoItemsLabel.gameObject.SetActive(false);
+        DefaultNewSkillsListEntryHeight = NewSkillsListCover.GetComponent<RectTransform>().sizeDelta.y;
     }
 
-    private void LateUpdate()
+    private void Update()
     {
-        if (DisableTime > Time.time) return;
-        KeyPressed = Input.inputString.ToUpper();
-        switch (Selection)
+        if (!VictoryBanner.Activated) return;
+        if (Input.GetKeyDown(KeyCode.Z) && ProceedButton.Activated) ExitBattle();
+    }
+
+    public void Setup()
+    {
+        FinishedBattle.PlayerParty.SetupExpCurve();
+
+        VictoryBanner.Activate();
+        LevelEXPFrame.Activate();
+        GoldFrame.Activate();
+        SetupEnemyInfo();
+        SetupLevelEXPInfo();
+
+        TotalEXPLabel.Initialize(FinishedBattle.PlayerParty.EXP);
+        EXPEarnedLabel.text = "+" + EXPEarned;
+        TotalGoldLabel.Initialize(FinishedBattle.PlayerParty.Inventory.Gold);
+        GoldEarnedLabel.text = "+" + GoldEarned;
+
+        StartCoroutine(AnimateMenu());
+    }
+
+    private IEnumerator AnimateMenu()
+    {
+        yield return new WaitForSecondsRealtime(1f);
+
+        int gCurr = FinishedBattle.PlayerParty.EXP + EXPEarned - FinishedBattle.PlayerParty.LastEXPToNext;
+        int gMax = FinishedBattle.PlayerParty.EXPToNext - FinishedBattle.PlayerParty.LastEXPToNext;
+        EXPGauge.SetAndAnimate(gCurr, gMax);
+        TotalEXPLabel.Add(ref FinishedBattle.PlayerParty.EXP, EXPEarned);
+        TotalGoldLabel.Add(ref FinishedBattle.PlayerParty.Inventory.Gold, GoldEarned);
+
+        while (FinishedBattle.PlayerParty.EXP >= FinishedBattle.PlayerParty.EXPToNext)
         {
-            case Selections.FirstWinScreen:
-                AnimateWinScreenContents();
-                if (FinishedBattle.PlayerParty.Inventory.Gold == NewGoldTotal && FinishedBattle.PlayerParty.EXP == NewEXPTotal)
-                {
-                    if (LevelUps > 0) SetupForLevelUp();
-                    else if (CompaionshipUpPlayers.Count > 0) SetupForCompanionshipUp();
-                    else ProceedButton.Activate();
-                }
-                if (KeyPressed == "Z" && ProceedButton.Activated) ExitBattle();
-                break;
-            case Selections.LevelUp:
-                break;
+            yield return new WaitUntil(() => EXPGauge.IsBarFull);
+            LevelUp();
         }
+        yield return new WaitUntil(() => !EXPGauge.IsUpdating);
+
+        if (LevelUps > 0)
+        {
+            HandleNewSkills();
+            yield return new WaitForSecondsRealtime(1f);
+        }
+        ProceedButton.Activate();
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- First Win Screen --
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    public void Setup()
-    {
-        FinishedBattle.PlayerParty.SetupExpCurve();
-        Selection = Selections.FirstWinScreen;
-        VictoryBanner.Activate();
-        LevelEXP.Activate();
-        ItemsObtained.Activate();
-        GoldObtained.Activate();
-        SetupEnemyInfo();
-        SetupLevelEXPInfo();
-        SetupItems();
-        SetupGold();
-        UpdateCompanionships();
-        DisableTime = Time.time + 2f;
-    }
 
     private void SetupEnemyInfo()
     {
@@ -122,24 +100,6 @@ public class BattleWin : MonoBehaviour
         {
             EXPEarned += e.Exp;
             GoldEarned += e.Gold;
-            foreach (ItemDropRate idr in e.DroppedItems)
-            {
-                if (Random.Range(0f, 100f) >= idr.Rate) continue;
-                bool itemAlreadyInList = false;
-                for (int i = 0; i < ItemsEarned.Count; i++)
-                {
-                    if (idr.ItemDropped.Info.Id == ItemsEarned[i].Info.Id)
-                    {
-                        ItemsEarned[i].Quantity++;
-                        itemAlreadyInList = true;
-                        break;
-                    }
-                }
-                if (itemAlreadyInList) continue;
-                IToolForInventory item = Instantiate(idr.ItemDropped as Item);
-                item.Quantity = 1;
-                ItemsEarned.Add(item);
-            }
         }
     }
 
@@ -148,146 +108,59 @@ public class BattleWin : MonoBehaviour
         int gCurr = FinishedBattle.PlayerParty.EXP - FinishedBattle.PlayerParty.LastEXPToNext;
         int gMax = FinishedBattle.PlayerParty.EXPToNext - FinishedBattle.PlayerParty.LastEXPToNext;
         EXPGauge.Set(gCurr, gMax);
-        EXPIncreaseSpeed = (int)(gMax * 0.005f);
-        NewEXPTotal = FinishedBattle.PlayerParty.EXP + EXPEarned;
-        UpdateForLevelUpInfo();
-        UpdateEXPInfo();
-    }
-
-    private void UpdateForLevelUpInfo()
-    {
         LevelLabel.text = FinishedBattle.PlayerParty.Level.ToString();
-        if (LevelUps > 0) LevelLabel.color = new Color(0.7f, 1, 0.5f);
-        ToNextLabel.text = "/ " + (FinishedBattle.PlayerParty.EXPToNext - FinishedBattle.PlayerParty.LastEXPToNext);
     }
 
-    private void UpdateEXPInfo()
-    {
-        int totalExp = FinishedBattle.PlayerParty.EXP;
-        EXPGainedLabel.text = EXPEarned > 0 ? ("+" + EXPEarned) : "";
-        EXPGainedSoFarLabel.text = (totalExp - FinishedBattle.PlayerParty.LastEXPToNext).ToString();
-        TotalEXPLabel.text = totalExp.ToString();
-    }
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// -- Level up --
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private void SetupItems()
-    {
-        int i = 0;
-        bool noItems = ItemsEarned.Count == 0;
-        NoItemsLabel.gameObject.SetActive(noItems);
-        if (noItems)
-        {
-            for (; i < ItemsObtained.transform.childCount; i++)
-                ItemsObtained.transform.GetChild(i).gameObject.SetActive(false);
-            return;
-        }
-        int childSize = ItemsObtained.transform.childCount;
-        int limit = ItemsEarned.Count < childSize ? ItemsEarned.Count : childSize;
-        for (; i < limit; i++)
-        {
-            Transform it = ItemsObtained.transform.GetChild(i);
-            it.gameObject.SetActive(true);
-            it.GetChild(0).GetComponent<TextMeshProUGUI>().text = ItemsEarned[i].Info.Name;
-            it.GetChild(1).GetComponent<Image>().sprite = ItemsEarned[i].Info.GetComponent<SpriteRenderer>().sprite;
-            it.GetChild(2).GetComponent<TextMeshProUGUI>().text = "+" + ItemsEarned[i].Quantity;
-        }
-        for (; i < childSize; i++)
-            ItemsObtained.transform.GetChild(i).gameObject.SetActive(false);
-    }
-
-    private void SetupGold()
-    {
-        GoldObtained.gameObject.SetActive(GoldEarned > 0);
-        int gsp = GoldEarned / 60;
-        GoldIncreaseSpeed = gsp < 1 ? 1 : gsp;
-        NewGoldTotal = FinishedBattle.PlayerParty.Inventory.Gold + GoldEarned;
-        UpdateGoldInfo();
-    }
-
-    private void UpdateGoldInfo()
-    {
-        GoldObtained.transform.GetChild(1).GetComponent<TextMeshProUGUI>().text = GoldEarned > 0 ? ("+" + GoldEarned) : "";
-        GoldObtained.transform.GetChild(2).GetComponent<TextMeshProUGUI>().text = FinishedBattle.PlayerParty.Inventory.Gold.ToString();
-    }
-
-    private void UpdateCompanionships()
-    {
-        /*foreach (PlayerCompanionship pc in FinishedBattle.PlayerParty.PartyPlayerCompanionShips)
-        {
-            //
-        }*/
-    }
-
-    private void AnimateWinScreenContents()
-    {
-        int lastExp = FinishedBattle.PlayerParty.LastEXPToNext;
-        if (!TriggerAnimation)
-        {
-            TriggerAnimation = true;
-            EXPGauge.SetAndAnimate(NewEXPTotal - lastExp, FinishedBattle.PlayerParty.EXPToNext - lastExp);
-        }
-        else if (FinishedBattle.PlayerParty.EXP - lastExp >= FinishedBattle.PlayerParty.EXPToNext - lastExp)
-        {
-            NotifyLevelUp();
-        }
-        AnimateTotalCount(ref EXPEarned, ref FinishedBattle.PlayerParty.EXP, EXPIncreaseSpeed, NewEXPTotal);
-        AnimateTotalCount(ref GoldEarned, ref FinishedBattle.PlayerParty.Inventory.Gold, GoldIncreaseSpeed, NewGoldTotal);
-        UpdateEXPInfo();
-        UpdateGoldInfo();
-    }
-
-    private void NotifyLevelUp()
+    private void LevelUp()
     {
         LevelUps++;
         FinishedBattle.PlayerParty.LevelUp();
+        LevelLabel.text = FinishedBattle.PlayerParty.Level.ToString();
+        if (LevelUps > 0) LevelLabel.color = new Color(0.7f, 1, 0.5f);
+
         int lastExp = FinishedBattle.PlayerParty.LastEXPToNext;
+        int newExpTotal = FinishedBattle.PlayerParty.EXP;
         EXPGauge.Empty();
-        EXPGauge.SetAndAnimate(NewEXPTotal - lastExp, FinishedBattle.PlayerParty.EXPToNext - lastExp);
+        EXPGauge.SetAndAnimate(newExpTotal - lastExp, FinishedBattle.PlayerParty.EXPToNext - lastExp);
+
         Instantiate(UIMaster.Popups["LevelUp"], transform.position, Quaternion.identity);
-        LevelEXP.GetComponent<Image>().color = CInfoFrameLevelUpColor;
-        GoldObtained.GetComponent<Image>().color = CInfoFrameLevelUpColor;
-        ItemsObtained.GetComponent<Image>().color = CInfoFrameLevelUpColor;
-        UpdateForLevelUpInfo();
     }
 
-    private void AnimateTotalCount(ref int earnedDisplay, ref int currentTotal, int earnSpeed, int savedNewTotal)
+    private void HandleNewSkills()
     {
-        if (earnedDisplay > 0)
+        int battlerCount = 0;
+        int oldLevel = FinishedBattle.PlayerParty.Level - LevelUps;
+        int maxSkills = NewSkillsList.GetChild(battlerCount).GetChild(1).childCount;
+
+        foreach (var b in FinishedBattle.PlayerParty.AllPlayers)
         {
-            earnedDisplay -= earnSpeed;
-            currentTotal += earnSpeed;
-            return;
+            int skillCount = 0;
+            foreach (var s in b.SkillSet)
+            {
+                if (oldLevel >= s.LearnLevel || s.LearnLevel > FinishedBattle.PlayerParty.Level) continue;
+                NewSkillsList.GetChild(battlerCount).GetChild(0).GetChild(0).GetComponent<Image>().sprite = b.FaceImage;
+                if (skillCount < maxSkills)
+                {
+                    NewSkillsList.GetChild(battlerCount).GetChild(1).GetChild(skillCount).GetComponent<TextMeshProUGUI>().text = s.LearnedSkill.Name;
+                    NewSkillsList.GetChild(battlerCount).GetChild(1).GetChild(skillCount).gameObject.SetActive(true);
+                }
+                skillCount++;
+            }
+            if (skillCount > 0) battlerCount++;
         }
-        earnedDisplay = 0;
-        currentTotal = savedNewTotal;
-    }
+        for (int i = battlerCount; i < NewSkillsList.childCount; i++) NewSkillsList.GetChild(i).gameObject.SetActive(false);
+        if (battlerCount > 0) NewSkillsFrame.Activate();
 
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// -- Level Up --
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    public void SetupForLevelUp()
-    {
-        Selection = Selections.LevelUp;
-        LevelUp.Activate();
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// -- CompanionShip Up --
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    public void SetupForCompanionshipUp()
-    {
-        Selection = Selections.CompanionShipUp;
-        CompanionShipUp.Activate();
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// -- Item Inventory Replace --
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    public void SetupForInventoryReplace()
-    {
-
+        Vector2 size0 = NewSkillsListCover.GetComponent<RectTransform>().sizeDelta;
+        Vector2 size1 = NewSkillsFrame.GetComponent<RectTransform>().sizeDelta;
+        size0.y += DefaultNewSkillsListEntryHeight * battlerCount;
+        size1.y += DefaultNewSkillsListEntryHeight * battlerCount;
+        NewSkillsListCover.GetComponent<RectTransform>().sizeDelta = size0;
+        NewSkillsFrame.GetComponent<RectTransform>().sizeDelta = size1;
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -296,8 +169,7 @@ public class BattleWin : MonoBehaviour
 
     public void ExitBattle()
     {
-        if (ExitingBattle) return;
-        ExitingBattle = true;
+        ProceedButton.Deactivate();
         SceneMaster.EndBattle(FinishedBattle.PlayerParty);
     }
 }

@@ -9,8 +9,7 @@ public class BattleEnemy : BattlerAI
     public EnemyTypes EnemyType;
     public int Exp;
     public int Gold;
-    public ItemDropRate[] DroppedItems;
-    public WeaponDropRate[] DroppedWeapons;
+    public ItemOrWeaponDropRate[] DroppedTools;
     public float MultiplyHP = 1f;
     public int ExtraTurns;
 

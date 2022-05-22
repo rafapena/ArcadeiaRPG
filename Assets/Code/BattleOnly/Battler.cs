@@ -128,7 +128,7 @@ public abstract class Battler : BaseObject
 
     public virtual void StatConversion()
     {
-        if (Class) Stats.SetTo(Class.BaseStats);
+        if (Class) Stats.Set(Class.BaseStats);
         Stats.ConvertFromBaseToActual(Level);
         HP = MaxHP;
         SP = BattleMaster.SP_CAP;

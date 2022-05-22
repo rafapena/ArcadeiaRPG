@@ -74,6 +74,7 @@ public class SceneMaster : MonoBehaviour
         MenuMaster.SetupSelectionBufferInGameplay(0.5f);
         ChangeScene(BATTLE_SCENE, BATTLE_TRANSITION_TIME / 2, ScreenTransitioner.SceneChangeModes.Remove, ScreenTransitioner.TransitionModes.BlackScreen);
         MapMaster.EnemyEncountered.DeclareDefeated();
+        GameplayMaster.Party = playerParty;
         InBattle = false;
     }
 

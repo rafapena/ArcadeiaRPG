@@ -116,15 +116,16 @@ public class PlayerParty : MonoBehaviour
         string bt = "Battler" + index;
         Battler b = Instantiate(list[PlayerPrefs.GetInt(bt + "Id_" + file)], mp.BattlersListDump);
         b.Level = Level;
+        if (b is BattlePlayer p)
+        {
+            p.PermanentStatsBoosts.SetFromString(PlayerPrefs.GetString(bt + "PStats_" + file));
+            int sw = PlayerPrefs.GetInt(bt + "SelectedWeapon_" + file);
+            p.SelectedWeapon = sw >= 0 ? p.Weapons.Find(x => x.Id == sw) : null;
+            p.Weapons = LoadBattlersList(file, b, ResourcesMaster.Weapons, bt);
+        }
         b.StatConversion();
         b.AddHP(PlayerPrefs.GetInt(bt + "HP_" + file) - b.MaxHP);
         b.AddSP(PlayerPrefs.GetInt(bt + "SP_" + file) - BattleMaster.SP_CAP);
-        if (b is BattlePlayer p)
-        {
-            string sw = bt + "SelectedWeapon_" + file;
-            if (PlayerPrefs.HasKey(sw)) p.SelectedWeapon = p.Weapons.Find(x => x.Id == PlayerPrefs.GetInt(sw));
-            p.Weapons = LoadBattlersList(file, b, ResourcesMaster.Weapons, bt);
-        }
         b.States = LoadBattlersList(file, b, ResourcesMaster.States, bt);
         b.gameObject.SetActive(false);
         return b as T;
@@ -216,21 +217,13 @@ public class PlayerParty : MonoBehaviour
         Level++;
         LastEXPToNext = EXPToNext;
         EXPToNext = LevelCurves[Level];
-        LevelUpStatBoosts(ref AllPlayers);
-        LevelUpLearnedSkills(ref AllPlayers);
-    }
-
-    private void LevelUpStatBoosts(ref List<BattlePlayer> players)
-    {
-        foreach (BattlePlayer p in players)
+        foreach (BattlePlayer p in AllPlayers)
         {
             p.Level++;
+            p.StatConversion();
+            p.Skills.Clear();
+            p.AddLearnedSkills();
         }
-    }
-    
-    private void LevelUpLearnedSkills(ref List<BattlePlayer> players)
-    {
-
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

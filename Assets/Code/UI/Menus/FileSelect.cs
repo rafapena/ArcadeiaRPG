@@ -225,6 +225,7 @@ public class FileSelect : MonoBehaviour
         FilesList.SelectedButton.KeepSelected();
         WaitingFrame.SetActive(true);
         WaitingFrame.transform.GetChild(0).GetComponent<TextMeshProUGUI>().text = waitingMessage;
+        yield return new WaitForSecondsRealtime(1);
         yield return new WaitUntil(() => !FilesList.SelectedObject.CurrentlyWritingData);
         DeclareSuccess();
         yield return new WaitForSecondsRealtime(1);

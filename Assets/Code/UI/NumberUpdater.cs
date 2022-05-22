@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using TMPro;
+﻿using TMPro;
 using UnityEngine;
 
 public class NumberUpdater : MonoBehaviour
@@ -49,4 +47,6 @@ public class NumberUpdater : MonoBehaviour
         }
         else BoostRate = br;
     }
+
+    public bool IsUpdating => BoostRate != 0;
 }

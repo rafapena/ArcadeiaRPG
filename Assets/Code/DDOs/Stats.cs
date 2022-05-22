@@ -20,7 +20,7 @@ public struct Stats
     public int Crt;
     public int Cev;
 
-    public void SetTo(Stats other)
+    public void Set(Stats other)
     {
         MaxHP = other.MaxHP;
         Atk = other.Atk;
@@ -50,6 +50,25 @@ public struct Stats
         Eva = accMod;
         Crt = accMod;
         Cev = accMod;
+    }
+
+    public string GetToString()
+    {
+        return MaxHP + "_" + Atk + "_" + Def + "_" + Map + "_" + Mar + "_" + Rec + "_" + Spd+ "_" + Tec;
+    }
+
+    public void SetFromString(string str)
+    {
+        var stats = str.Split('_');
+        if (stats.Length != 8) return;
+        MaxHP = int.Parse(stats[0]);
+        Atk = int.Parse(stats[1]);
+        Def = int.Parse(stats[2]);
+        Map = int.Parse(stats[3]);
+        Mar = int.Parse(stats[4]);
+        Rec = int.Parse(stats[5]);
+        Spd = int.Parse(stats[6]);
+        Tec = int.Parse(stats[7]);
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -92,8 +92,13 @@ public class Gauge : MonoBehaviour
         return BarChangeMode != BarChangeModes.None;
     }
 
-    protected bool NotEmpty()
-    {
-        return CurrentAmount > 0;
-    }
+    public bool IsFull => CurrentAmount >= 1;
+
+    public bool IsBarFull => Bar.fillAmount >= 1;
+
+    public bool IsEmpty => CurrentAmount == 0;
+
+    public bool IsBarEmpty => Bar.fillAmount == 0;
+
+    public bool IsUpdating => BarChangeMode != BarChangeModes.None;
 }

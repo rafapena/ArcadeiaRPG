@@ -87,9 +87,15 @@ public class MapEnemy : MapExplorer
         ChasingPlayer = false;
     }
 
+    public void DropItems()
+    {
+        //
+    }
+
     public void DeclareDefeated()
     {
         Defeated = true;
+        DropItems();
         MapMaster.EnemyEncountered.Blink(1.5f);
         Destroy(MapMaster.EnemyEncountered.gameObject, 1.5f);
     }

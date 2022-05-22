@@ -177,7 +177,7 @@ public class ChangeClass : MonoBehaviour
         ClassDescription.text = bc.Description;
         SetCanWieldInfo(ClassCanWield1, bc.UsableWeapon1Type);
         SetCanWieldInfo(ClassCanWield2, bc.UsableWeapon2Type);
-        NewClassStats.SetTo(bc.BaseStats);
+        NewClassStats.Set(bc.BaseStats);
         NewClassStats.ConvertFromBaseToActual(PartyInfo.Level, bp.NaturalStats);
         ClassStatsList.Setup(bp, NewClassStats);
 
