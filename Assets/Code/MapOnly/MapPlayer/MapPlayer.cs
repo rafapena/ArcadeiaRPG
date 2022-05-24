@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -22,7 +23,7 @@ public class MapPlayer : MapExplorer
     {
         base.Start();
         Party.Setup();
-        TEST_SETUP();
+        Setup();
         //if (GameplayMaster.NoFileSelected()) SetupPartyNew();
         //else if (!GameplayMaster.FinishedLoadingContent()) Party.LoadFromFile(GameplayMaster.SelectedFile, this);
         //else Setup();
@@ -31,7 +32,7 @@ public class MapPlayer : MapExplorer
 
     private void SetupPartyNew()
     {
-        List<Battler> all = Party.GetWholeParty();
+        List<Battler> all = Party.WholeParty.ToList();
         for (int i = 0; i < all.Count; i++)
         {
             all[i] = Instantiate(all[i], BattlersListDump);
@@ -41,7 +42,8 @@ public class MapPlayer : MapExplorer
             b.StatConversion();
             b.gameObject.SetActive(false);
         }
-        Party.UpdateAll(all);
+        Party.AllPlayers = all.Where(x => x is BattlePlayer).Select(x => x as BattlePlayer).ToList();
+        Party.Allies = all.Where(x => x is BattleAlly).Select(x => x as BattleAlly).ToList();
         for (int i = 0; i < Party.LoggedObjectives.Count; i++)
         {
             Party.LoggedObjectives[i] = Instantiate(Party.LoggedObjectives[i], ObjectivesListDump);
@@ -50,7 +52,7 @@ public class MapPlayer : MapExplorer
 
     private void Setup()
     {
-        List<Battler> all = Party.GetWholeParty();
+        List<Battler> all = Party.WholeParty.ToList();
         for (int i = 0; i < all.Count; i++)
         {
             all[i] = Instantiate(all[i], gameObject.transform);
@@ -66,41 +68,13 @@ public class MapPlayer : MapExplorer
             }
             for (int j = 0; j < b.States.Count; j++) b.States[j] = Instantiate(b.States[j], b.transform);
         }
-        Party.UpdateAll(all);
+        Party.AllPlayers = all.Where(x => x is BattlePlayer).Select(x => x as BattlePlayer).ToList();
+        Party.Allies = all.Where(x => x is BattleAlly).Select(x => x as BattleAlly).ToList();
         for (int i = 0; i < Party.LoggedObjectives.Count; i++)
         {
             Party.LoggedObjectives[i] = Instantiate(Party.LoggedObjectives[i], ObjectivesListDump);
         }
     }
-
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    // FOR TESTING PURPOSES ONLY
-    private void TEST_SETUP()
-    {
-        List<Battler> all = Party.GetWholeParty();
-        for (int i = 0; i < all.Count; i++)
-        {
-            all[i] = Instantiate(all[i], gameObject.transform);
-            Battler b = all[i];
-            b.Level = Party.Level;
-            b.StatConversion();
-            b.gameObject.SetActive(false);
-            if (b is BattlePlayer p)
-            {
-                p.AddLearnedSkills();
-                if (p.Weapons.Count > 0) p.SelectedWeapon = p.Weapons[0];
-                for (int j = 0; j < p.Weapons.Count; j++) p.Weapons[j] = Instantiate(p.Weapons[j], p.transform);
-            }
-            for (int j = 0; j < b.States.Count; j++) b.States[j] = Instantiate(b.States[j], b.transform);
-        }
-        Party.UpdateAll(all);
-        for (int i = 0; i < Party.LoggedObjectives.Count; i++)
-        {
-           Party.LoggedObjectives[i] = Instantiate(Party.LoggedObjectives[i], gameObject.transform);
-        }
-    }
-    // FOR TESTING PURPOSES ONLY
-    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     protected override void Update()
     {

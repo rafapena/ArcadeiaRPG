@@ -59,7 +59,6 @@ public class Battle : MonoBehaviour
     public Battler ActingBattler { get; private set; }
     public Battler NextActingBattler { get; private set; }
     public IEnumerable<Battler> AllBattlers => Battlers;
-    public IEnumerable<Battler> FightingPlayerParty => PlayerParty.Players.Cast<Battler>().Concat(PlayerParty.Allies);
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- Setup --
@@ -78,15 +77,15 @@ public class Battle : MonoBehaviour
         SceneMaster.DeactivateStoredGameObjects();
 
         // Setup player party
-        PlayerParty = BattleMaster.PlayerParty;
-        PlayerParty = BattleMaster.PlayerParty;
-        PlayerParty.Players = SetupPlayerPositions(PlayerParty.Players);
+        PlayerParty = GameplayMaster.Party;
+        var battlePlayers = SetupPlayerPositions(PlayerParty.Players);
+        battlePlayers = SetupBattlers(battlePlayers, PlayerPartyDump);
+        for (int i = 0; i < battlePlayers.Count; i++) PlayerParty.AllPlayers[i] = battlePlayers[i];
         PlayerParty.Allies = SetupAllyPositions(PlayerParty.Allies);
-        PlayerParty.Players = SetupBattlers(PlayerParty.Players, PlayerPartyDump);
         PlayerParty.Allies = SetupBattlers(PlayerParty.Allies, PlayerPartyDump);
 
         // Setup enemy party
-        EnemyParty = Instantiate(BattleMaster.EnemyParty, gameObject.transform);
+        EnemyParty = Instantiate(GameplayMaster.EnemyGroup, gameObject.transform);
         EnemyParty.gameObject.SetActive(false);
         EnemyParty.Enemies = SetupBattlers(EnemyParty.Enemies, EnemyPartyDump);
 
@@ -312,8 +311,8 @@ public class Battle : MonoBehaviour
         {
             BattleMenu.RefreshPartyFrames();
             yield return new WaitForSeconds(1);
-            if (ActingBattler is BattleAlly ally) ally.MakeDecision(FightingPlayerParty.ToList(), EnemyParty.Enemies);
-            else if (ActingBattler is BattleEnemy enemy) enemy.MakeDecision(EnemyParty.Enemies, FightingPlayerParty.ToList());
+            if (ActingBattler is BattleAlly ally) ally.MakeDecision(PlayerParty.BattlingParty, EnemyParty.Enemies);
+            else if (ActingBattler is BattleEnemy enemy) enemy.MakeDecision(EnemyParty.Enemies, PlayerParty.BattlingParty);
             yield return ExecuteAction();
         }
     }
@@ -488,7 +487,7 @@ public class Battle : MonoBehaviour
     private IEnumerator DeclareWin()
     {
         ClearAll();
-        foreach (var b in FightingPlayerParty) b.Sprite.Animation.SetInteger(Battler.AnimParams.Victory.ToString(), 1);
+        foreach (var b in PlayerParty.BattlingParty) b.Sprite.Animation.SetInteger(Battler.AnimParams.Victory.ToString(), 1);
         yield return new WaitForSeconds(2);
         BattleWinMenu.Setup();
     }

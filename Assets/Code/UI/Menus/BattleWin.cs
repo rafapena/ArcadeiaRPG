@@ -82,11 +82,8 @@ public class BattleWin : MonoBehaviour
         }
         yield return new WaitUntil(() => !EXPGauge.IsUpdating);
 
-        if (LevelUps > 0)
-        {
-            HandleNewSkills();
-            yield return new WaitForSecondsRealtime(1f);
-        }
+        HandleNewSkills();
+        if (NewSkillsFrame.Activated) yield return new WaitForSecondsRealtime(1f);
         ProceedButton.Activate();
     }
 

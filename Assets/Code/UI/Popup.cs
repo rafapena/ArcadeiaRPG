@@ -6,6 +6,7 @@ public class Popup : MonoBehaviour
 
     void Start()
     {
+        gameObject.GetComponent<MeshRenderer>().sortingLayerName = "Popup";
         Destroy(gameObject, Duration);
     }
 

@@ -180,7 +180,6 @@ public class MMTeam : MM_Super
         MenuManager.PartyInfo.AllPlayers[firstSelectedIndex] = MenuManager.PartyInfo.AllPlayers[secondSelectedIndex];
         MenuManager.PartyInfo.AllPlayers[secondSelectedIndex] = temp;
 
-        MenuManager.PartyInfo.UpdateActivePlayers();
         SetupLists();
         if (selectedSecondFromReserves) HoverOverReservePlayer();
         else HoverOverCurrentPlayer();

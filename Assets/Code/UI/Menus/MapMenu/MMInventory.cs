@@ -259,7 +259,7 @@ public class MMInventory : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOp
 
     private bool GetSelectableTeammatesForUsingItems()
     {
-        List<Battler> party = MenuManager.PartyInfo.GetWholeParty();
+        List<Battler> party = MenuManager.PartyInfo.WholeParty.ToList();
         Item item = InventoryFrame.ToolList.SelectedObject as Item;
         switch (item.Scope)
         {

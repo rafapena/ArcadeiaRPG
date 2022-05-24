@@ -64,7 +64,8 @@ public class SceneMaster : MonoBehaviour
     public static void StartBattle(PlayerParty playerParty, EnemyParty enemyParty)
     {
         InBattle = true;
-        BattleMaster.Setup(null, playerParty, enemyParty);
+        GameplayMaster.Party = playerParty;
+        GameplayMaster.EnemyGroup = enemyParty;
         StoreGameObjects();
         ChangeScene(BATTLE_SCENE, BATTLE_TRANSITION_TIME, ScreenTransitioner.SceneChangeModes.Add, ScreenTransitioner.TransitionModes.Batte);
     }

@@ -19,23 +19,4 @@ public class BattleMaster
     public enum ToolTypes { None, PhysicalOffense, PhysicalDefense, MagicalOffense, MagicalDefense, GeneralOffense, GeneralDefense }
     
     public enum ToolFormulas { None, PhysicalStandard, MagicalStandard, PhysicalGun, MagicalGun }
-
-    // Variables used to transitioning between scenes
-    public static Surrounding EnvironmentSettings { get; private set; }
-    public static PlayerParty PlayerParty { get; private set; }
-    public static EnemyParty EnemyParty { get; private set; }
-
-    public static void Setup(Surrounding environmentSettings, PlayerParty playerParty, EnemyParty enemyParty)
-    {
-        EnvironmentSettings = environmentSettings;
-        PlayerParty = playerParty;
-        EnemyParty = enemyParty;
-    }
-
-    public static void Reset()
-    {
-        EnvironmentSettings = null;
-        PlayerParty = null;
-        EnemyParty = null;
-    }
 }

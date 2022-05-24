@@ -17,8 +17,7 @@ public class PlayerParty : MonoBehaviour
     private int[] LevelCurves;
 
     // Party formation
-    public List<BattlePlayer> Players;      // Active players in battle
-    public List<BattlePlayer> AllPlayers;   // Includes reserve players
+    public List<BattlePlayer> AllPlayers;
     public List<BattleAlly> Allies;
 
     // Menu Items
@@ -35,6 +34,12 @@ public class PlayerParty : MonoBehaviour
     [HideInInspector] public List<PlayerRelation> Relations = new List<PlayerRelation>();
     public List<PlayerRelation> PreExistingRelations;
 
+    public List<BattlePlayer> Players => AllPlayers.Take(MAX_NUMBER_OF_PLAYABLE_BATTLERS).ToList();
+
+    public List<Battler> BattlingParty => Players.Cast<Battler>().Concat(Allies).ToList();
+
+    public List<Battler> WholeParty => AllPlayers.Cast<Battler>().Concat(Allies).ToList();
+
     private void Start()
     {
         //
@@ -42,18 +47,17 @@ public class PlayerParty : MonoBehaviour
 
     public void Setup()
     {
-        UpdateActivePlayers();
         SetupExpCurve();
         SetupRelations();
     }
    
-    public void UpdateActivePlayers()
+    /*public void UpdateActivePlayers()
     {
         Players = new List<BattlePlayer>();
         int inActivePartyCount = AllPlayers.Count < MAX_NUMBER_OF_PLAYABLE_BATTLERS ? AllPlayers.Count : MAX_NUMBER_OF_PLAYABLE_BATTLERS;
         for (int i = 0; i < inActivePartyCount; i++)
             Players.Add(AllPlayers[i]);
-    }
+    }*/
 
     public void SetupExpCurve()
     {
@@ -92,18 +96,16 @@ public class PlayerParty : MonoBehaviour
         LastEXPToNext = PlayerPrefs.GetInt("PartyLastEXPToNext_" + file);
         EXPToNext = PlayerPrefs.GetInt("PartyEXPToNext_" + file);
         AllPlayers = new List<BattlePlayer>();
-        Players = new List<BattlePlayer>();
         Allies = new List<BattleAlly>();
         int playerIndexCap = PlayerPrefs.GetInt("NumberOfPlayers");
         int allyIndexCap = PlayerPrefs.GetInt("NumberOfAllies");
         for (int i = 0; i < playerIndexCap; i++)
         {
             BattlePlayer b = LoadBattler(file, mp, ResourcesMaster.Players, i);
-            if (i < MAX_NUMBER_OF_PLAYABLE_BATTLERS) Players.Add(b);
             AllPlayers.Add(b);
         }
         for (int i = playerIndexCap; i < allyIndexCap; i++) LoadBattler(file, mp, ResourcesMaster.Allies, i);
-        UpdateAll(GetWholeParty());
+        SetupExpCurve();
         LoadRelations(file);
         LoadInventory(file);
         LoadStorage(file);
@@ -224,36 +226,5 @@ public class PlayerParty : MonoBehaviour
             p.Skills.Clear();
             p.AddLearnedSkills();
         }
-    }
-
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// -- Combining Lists --
-    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    public List<Battler> GetBattlingParty()
-    {
-        List<Battler> battlingParty = new List<Battler>();
-        battlingParty.AddRange(Players);
-        battlingParty.AddRange(Allies);
-        return battlingParty;
-    }
-
-    public List<Battler> GetWholeParty()
-    {
-        List<Battler> wholeParty = new List<Battler>();
-        foreach (Battler b in AllPlayers) wholeParty.Add(b);
-        foreach (Battler a in Allies) wholeParty.Add(a);
-        return wholeParty;
-    }
-
-    public void UpdateAll(List<Battler> all)
-    {
-        for (int i = 0; i < all.Count; i++)
-        {
-            if (i < AllPlayers.Count) AllPlayers[i] = all[i] as BattlePlayer;
-            else Allies[i - AllPlayers.Count] = all[i] as BattleAlly;
-        }
-        UpdateActivePlayers();
-        SetupExpCurve();
     }
 }

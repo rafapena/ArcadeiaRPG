@@ -478,23 +478,23 @@ public abstract class Battler : BaseObject
             case ActiveTool.ModType.Damage:
                 if (SceneMaster.InBattle) popup = Instantiate(UIMaster.Popups[HPorSP + "Damage"], Sprite.TargetPoint, Quaternion.identity);
                 setHPorSPForTarget(-total);
-                Sprite.Animation.SetTrigger(AnimParams.GetHit.ToString());
+                Sprite.Animation?.SetTrigger(AnimParams.GetHit.ToString());
                 break;
 
             case ActiveTool.ModType.Drain:
                 if (SceneMaster.InBattle) popup = Instantiate(UIMaster.Popups[HPorSP + "Drain"], Sprite.TargetPoint, Quaternion.identity);
                 setHPorSPForTarget(-total);
                 setHPorSPForUser(total);
-                Sprite.Animation.SetTrigger(AnimParams.GetHit.ToString());
+                Sprite.Animation?.SetTrigger(AnimParams.GetHit.ToString());
                 break;
 
             case ActiveTool.ModType.Recover:
                 if (SceneMaster.InBattle) popup = Instantiate(UIMaster.Popups[HPorSP + "Recover"], Sprite.TargetPoint, Quaternion.identity);
                 setHPorSPForTarget(total);
-                Sprite.Animation.SetTrigger(AnimParams.Recovered.ToString());
+                Sprite.Animation?.SetTrigger(AnimParams.Recovered.ToString());
                 break;
         }
-        if (popup) popup.GetComponent<TextMesh>().text = total.ToString();
+        if (popup) popup.Show(total.ToString());
     }
 
     protected virtual void Revive()

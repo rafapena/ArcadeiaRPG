@@ -133,11 +133,10 @@ public class BattlePlayer : Battler
     // Note: Must handle equipment management elsewhere (e.g. ChangeClass.cs)
     public void ChangeClass(BattlerClass newClass)
     {
-        Skills.Clear();
-        foreach (var sk in SkillSet) Skills.Add(sk.LearnedSkill);
         Class = newClass;
         StatConversion();
         Sprite.WearAttire(Class.Name);
+        Skills.Clear();
         AddLearnedSkills();
     }
 

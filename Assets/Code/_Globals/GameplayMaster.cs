@@ -36,6 +36,7 @@ public class GameplayMaster : MonoBehaviour
     public float InGameMinuteIncrementFrequency;
 
     public static PlayerParty Party;
+    public static EnemyParty EnemyGroup;
     public static Shopkeeper Shop;
     public static InventorySystem.ListType CraftingMode;
     public static bool IsCrafting => CraftingMode != InventorySystem.ListType.None;

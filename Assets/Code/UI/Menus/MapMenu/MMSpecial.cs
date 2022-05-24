@@ -8,6 +8,7 @@ using UnityEngine.AI;
 using UnityEditor.Tilemaps;
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
+using System.Linq;
 
 public class MMSpecial : MM_Super
 {
@@ -52,7 +53,7 @@ public class MMSpecial : MM_Super
             if (SkillsList.SelectedObject.EnoughSPFrom(PartyUserList.SelectedObject)) Selection = Selections.SelectTarget;
             else
             {
-                SkillsList.Refresh(SelectedPlayer, MenuManager.PartyInfo.GetWholeParty());
+                SkillsList.Refresh(SelectedPlayer, MenuManager.PartyInfo.WholeParty.ToList());
                 UndoSelectTarget();
             }
         }
@@ -112,7 +113,7 @@ public class MMSpecial : MM_Super
         PartyUserList.SetSelected();
         SelectedPlayer = PartyUserList.SelectedObject as BattlePlayer;
         SkillsList.Activate();
-        SkillsList.Refresh(SelectedPlayer, MenuManager.PartyInfo.GetWholeParty());
+        SkillsList.Refresh(SelectedPlayer, MenuManager.PartyInfo.WholeParty.ToList());
     }
 
     public void DeselectUser()
@@ -158,7 +159,7 @@ public class MMSpecial : MM_Super
 
     private bool GetSelectableTargetsForUsingSkills()
     {
-        List<Battler> party = MenuManager.PartyInfo.GetWholeParty();
+        List<Battler> party = MenuManager.PartyInfo.WholeParty.ToList();
         SelectableTeammates.Clear();
         switch (SkillsList.SelectedObject.Scope)
         {

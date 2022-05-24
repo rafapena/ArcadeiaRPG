@@ -149,7 +149,7 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
         if (ActingPlayer.TryConvertSkillToWeaponSettings()) SetScopeTargetSearch();
         if (SelectSkillsFrame.Activated)
         {
-            SelectSkillsList.Refresh(ActingPlayer, CurrentBattle.FightingPlayerParty.ToList());
+            SelectSkillsList.Refresh(ActingPlayer, CurrentBattle.PlayerParty.BattlingParty.ToList());
             SelectSkillsList.HoverOverTool();   // Refresh current entry immediately
         }
         SetWeaponOnMenuAndCharacter();
@@ -251,7 +251,7 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
         SelectActionFrame.Deactivate();
         SelectSkillsFrame.Activate();
         SelectItemsFrame.Deactivate();
-        SelectSkillsList.Refresh(ActingPlayer, CurrentBattle.FightingPlayerParty.ToList());
+        SelectSkillsList.Refresh(ActingPlayer, CurrentBattle.PlayerParty.BattlingParty.ToList());
         EventSystem.current.SetSelectedGameObject(SelectSkillsList.transform.GetChild(0).gameObject);
 
         ClearScope(true);
@@ -292,7 +292,7 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
 
     private bool GetScopeUsability(IToolForInventory tool)
     {
-        return (tool is Item it) ? it.AvailableTeammateTargets(CurrentBattle.FightingPlayerParty.ToList()) : true;
+        return (tool is Item it) ? it.AvailableTeammateTargets(CurrentBattle.PlayerParty.BattlingParty) : true;
     }
 
     public void SelectTabSuccess() { }
@@ -386,7 +386,7 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
 
             case ActiveTool.ScopeType.Self:
                 TargetFields.Single.Activate(ActingPlayer);
-                DisableTargetingForBattlers(CurrentBattle.FightingPlayerParty);
+                DisableTargetingForBattlers(CurrentBattle.PlayerParty.BattlingParty);
                 UpdateTarget = () => TargetFields.Single.AimAt(ActingPlayer, false);
                 break;
 
@@ -403,11 +403,11 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
                 break;
 
             case ActiveTool.ScopeType.AllAllies:
-                TargetAll(CurrentBattle.FightingPlayerParty.Where(x => !x.KOd), true);
+                TargetAll(CurrentBattle.PlayerParty.BattlingParty.Where(x => !x.KOd), true);
                 break;
 
             case ActiveTool.ScopeType.AllKnockedOutAllies:
-                TargetAll(CurrentBattle.FightingPlayerParty.Where(x => x.KOd), false);
+                TargetAll(CurrentBattle.PlayerParty.BattlingParty.Where(x => x.KOd), false);
                 break;
 
             case ActiveTool.ScopeType.TrapSetup:
@@ -525,7 +525,7 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
 
     private bool CheckTargetField()
     {
-        if (ActingPlayer.AimingForTeammates()) return CurrentBattle.FightingPlayerParty.Any(x => x.IsSelected);
+        if (ActingPlayer.AimingForTeammates()) return CurrentBattle.PlayerParty.BattlingParty.Any(x => x.IsSelected);
         if (ActingPlayer.AimingForEnemies()) return CurrentBattle.EnemyParty.Enemies.Any(x => x.IsSelected);
         if (ActingPlayer.SelectedAction.Scope == ActiveTool.ScopeType.TrapSetup) return CurrentBattle.AllBattlers.All(x => !x.IsSelected);
         return true;
@@ -581,7 +581,7 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
 
     public void AddEscapeHitboxes()
     {
-        foreach (var b in CurrentBattle.FightingPlayerParty)
+        foreach (var b in CurrentBattle.PlayerParty.BattlingParty)
         {
             if (b.KOd) return;
             Transform t = Instantiate(EscapeCatchHitboxes.GetChild(0), EscapeCatchHitboxes);
