@@ -11,8 +11,7 @@ public class InventorySystem : MonoBehaviour
         Accessories
     }
 
-    private MapPlayer Player;
-
+    public PlayerParty Party;
     public int Gold;
 
     // Public for Unity Editing: Will set to private set, afterwards
@@ -24,11 +23,8 @@ public class InventorySystem : MonoBehaviour
     [HideInInspector] public int CarryWeight;
     public int WeightCapacity = 30;
 
-    private void Awake()
+    public void Initialize()
     {
-        Player = gameObject.GetComponent<MapPlayer>();
-
-        // FOR TESTING ONLY
         Items = SetupToolGroup(Items);
         Weapons = SetupToolGroup(Weapons);
         Accessories = SetupToolGroup(Accessories);
@@ -59,7 +55,6 @@ public class InventorySystem : MonoBehaviour
         return inventory;
     }
 
-    // FOR TESTING ONLY
     private List<T> SetupToolGroup<T>(List<T> toolList) where T : IToolForInventory
     {
         List<T> groupedList = new List<T>();
@@ -68,7 +63,7 @@ public class InventorySystem : MonoBehaviour
             int foundTool = groupedList.FindIndex(t => t.Info.Id == toolList[i].Info.Id);
             if (foundTool < 0)
             {
-                toolList[i] = (T)InitializeTool(toolList[i], Player ? Player.ItemsListDump : null);
+                toolList[i] = (T)InitializeTool(toolList[i], Party.ItemsListDump);
                 toolList[i].Quantity = 1;
                 groupedList.Add(toolList[i]);
             }
@@ -119,7 +114,7 @@ public class InventorySystem : MonoBehaviour
         T tool = toolList.Find(t => t.Info.Id == newTool.Info.Id);
         if (tool == null)
         {
-            tool = (T)InitializeTool(newTool, Player ? Player.ItemsListDump : null);
+            tool = (T)InitializeTool(newTool, Party.ItemsListDump);
             tool.Quantity = amount;
             tool.Info.gameObject.GetComponent<Renderer>().enabled = false;
             toolList.Add(tool);

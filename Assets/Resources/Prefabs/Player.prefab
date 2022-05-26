@@ -1,5 +1,112 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &506927048538681562
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7850204954400374149}
+  - component: {fileID: 2650793718927232306}
+  - component: {fileID: 8062758330985813825}
+  - component: {fileID: 3493184212360806641}
+  m_Layer: 9
+  m_Name: PlayerParty
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7850204954400374149
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 506927048538681562}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 7915070692327612399}
+  - {fileID: 4963280099239760821}
+  - {fileID: 5910944019088726092}
+  m_Father: {fileID: 6050286444565747931}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2650793718927232306
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 506927048538681562}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0d7fe9f9c2c16124aa116ac06d511b65, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Level: 1
+  EXP: 2100
+  LastEXPToNext: 0
+  EXPToNext: 10
+  AllPlayers:
+  - {fileID: 946232549155108686, guid: 4f6e65423e3ae5343a9c2743693d2199, type: 3}
+  Allies:
+  - {fileID: 7660155867343399249, guid: de52526bd8be969459d822230593b213, type: 3}
+  Inventory: {fileID: 8062758330985813825}
+  Storage: {fileID: 3493184212360806641}
+  LoggedObjectives:
+  - {fileID: 919590195915574048, guid: 2d664c82c02a78a4aa46897d66851c79, type: 3}
+  CraftableItems: []
+  CraftableWeapons: []
+  CraftableAccessories: []
+  Relations: []
+  PreExistingRelations: []
+  BattlersListDump: {fileID: 7915070692327612399}
+  ItemsListDump: {fileID: 4963280099239760821}
+  ObjectivesListDump: {fileID: 5910944019088726092}
+--- !u!114 &8062758330985813825
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 506927048538681562}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2e58dd75ae14194dbbd85a96326b9ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Party: {fileID: 2650793718927232306}
+  Gold: 0
+  Items: []
+  Weapons: []
+  Accessories: []
+  CarryWeight: 0
+  WeightCapacity: 50
+--- !u!114 &3493184212360806641
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 506927048538681562}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2e58dd75ae14194dbbd85a96326b9ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Party: {fileID: 2650793718927232306}
+  Gold: 0
+  Items: []
+  Weapons: []
+  Accessories: []
+  CarryWeight: 0
+  WeightCapacity: 0
 --- !u!1 &2623362091392986366
 GameObject:
   m_ObjectHideFlags: 0
@@ -23,12 +130,12 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2623362091392986366}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 6050286444565747931}
+  m_Father: {fileID: 7850204954400374149}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2984960688667886673
@@ -54,12 +161,12 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2984960688667886673}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 6050286444565747931}
+  m_Father: {fileID: 7850204954400374149}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6050286444565747933
@@ -76,9 +183,6 @@ GameObject:
   - component: {fileID: 6050286444565747929}
   - component: {fileID: 6050286444565747928}
   - component: {fileID: 6050286444565747911}
-  - component: {fileID: 6050286444565747907}
-  - component: {fileID: 6050286444565747904}
-  - component: {fileID: 8185591634616524626}
   m_Layer: 9
   m_Name: Player
   m_TagString: Player
@@ -98,10 +202,8 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 7915070692327612399}
-  - {fileID: 4963280099239760821}
-  - {fileID: 5910944019088726092}
   - {fileID: 8936768048755580030}
+  - {fileID: 7850204954400374149}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -220,10 +322,7 @@ MonoBehaviour:
   Figure: {fileID: 0}
   Speed: 4
   Animate: {fileID: 6050286444565747911}
-  Party: {fileID: 6050286444565747907}
-  BattlersListDump: {fileID: 7915070692327612399}
-  ItemsListDump: {fileID: 4963280099239760821}
-  ObjectivesListDump: {fileID: 5910944019088726092}
+  Party: {fileID: 2650793718927232306}
 --- !u!95 &6050286444565747911
 Animator:
   serializedVersion: 4
@@ -244,72 +343,6 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
---- !u!114 &6050286444565747907
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6050286444565747933}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0d7fe9f9c2c16124aa116ac06d511b65, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Level: 1
-  EXP: 2100
-  LastEXPToNext: 0
-  EXPToNext: 10
-  Players: []
-  AllPlayers:
-  - {fileID: 946232549155108686, guid: 4f6e65423e3ae5343a9c2743693d2199, type: 3}
-  Allies:
-  - {fileID: 7660155867343399249, guid: de52526bd8be969459d822230593b213, type: 3}
-  Inventory: {fileID: 6050286444565747904}
-  Storage: {fileID: 8185591634616524626}
-  LoggedObjectives:
-  - {fileID: 919590195915574048, guid: 2d664c82c02a78a4aa46897d66851c79, type: 3}
-  CraftableItems: []
-  CraftableWeapons: []
-  CraftableAccessories: []
-  Relations: []
-  PreExistingRelations: []
---- !u!114 &6050286444565747904
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6050286444565747933}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a2e58dd75ae14194dbbd85a96326b9ef, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Gold: 0
-  Items: []
-  Weapons: []
-  Accessories: []
-  CarryWeight: 0
-  WeightCapacity: 50
---- !u!114 &8185591634616524626
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6050286444565747933}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a2e58dd75ae14194dbbd85a96326b9ef, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Gold: 0
-  Items: []
-  Weapons: []
-  Accessories: []
-  CarryWeight: 0
-  WeightCapacity: 0
 --- !u!1 &6178216448038086072
 GameObject:
   m_ObjectHideFlags: 0
@@ -333,12 +366,12 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6178216448038086072}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 6050286444565747931}
+  m_Father: {fileID: 7850204954400374149}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8073188324303874950
@@ -372,7 +405,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 6050286444565747931}
-  m_RootOrder: 3
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!58 &5716622604577645939
 CircleCollider2D:

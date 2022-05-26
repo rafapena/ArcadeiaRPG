@@ -1,5 +1,193 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &1705813863536690464
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3297842603222162604}
+  - component: {fileID: 1745900234515918720}
+  - component: {fileID: 7698025142157240863}
+  - component: {fileID: 60218697416509460}
+  m_Layer: 9
+  m_Name: PlayerParty
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3297842603222162604
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1705813863536690464}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 7771993840368400121}
+  - {fileID: 4227045953516215092}
+  - {fileID: 3119796608945377178}
+  m_Father: {fileID: 8854167014643114195}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1745900234515918720
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1705813863536690464}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0d7fe9f9c2c16124aa116ac06d511b65, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Level: 55
+  EXP: 2100
+  LastEXPToNext: 0
+  EXPToNext: 0
+  AllPlayers:
+  - {fileID: 946232549155108686, guid: 4f6e65423e3ae5343a9c2743693d2199, type: 3}
+  - {fileID: 6363325651278534380, guid: ada74891666cbb14f93abb5ae5464e91, type: 3}
+  - {fileID: 2008034214646324178, guid: afd5ec47c2d5c884baec561fbfcf7d62, type: 3}
+  - {fileID: -5909847340613243276, guid: 50758cbe08e20134fb463b8793e13d3b, type: 3}
+  - {fileID: -9131441895739667952, guid: f625d97b600c889439c9683bce3ba4a7, type: 3}
+  - {fileID: 1271467665200900025, guid: a3bfd939550328b44ac0e1f7536bd6a2, type: 3}
+  Allies:
+  - {fileID: 7660155867343399249, guid: de52526bd8be969459d822230593b213, type: 3}
+  Inventory: {fileID: 7698025142157240863}
+  Storage: {fileID: 60218697416509460}
+  LoggedObjectives:
+  - {fileID: 919590195915574048, guid: 2d664c82c02a78a4aa46897d66851c79, type: 3}
+  - {fileID: 7170123059155225320, guid: cf93fa54f76e782469ff2cebb7972034, type: 3}
+  - {fileID: 6739423826767732172, guid: 368870d38eefbad489e8ff4b6a9e728b, type: 3}
+  CraftableItems:
+  - {fileID: 1623505104987198706, guid: db3b6b36abc81214a8b4f9956b5e567c, type: 3}
+  - {fileID: 7230775191068158404, guid: 77df0195c5c99154580a874268a423bc, type: 3}
+  CraftableWeapons:
+  - {fileID: 4959000729214192542, guid: f43fc6a9a0487964283e05224babca5a, type: 3}
+  CraftableAccessories: []
+  Relations: []
+  PreExistingRelations: []
+  BattlersListDump: {fileID: 7771993840368400121}
+  ItemsListDump: {fileID: 4227045953516215092}
+  ObjectivesListDump: {fileID: 3119796608945377178}
+--- !u!114 &7698025142157240863
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1705813863536690464}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2e58dd75ae14194dbbd85a96326b9ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Party: {fileID: 1745900234515918720}
+  Gold: 699
+  Items:
+  - {fileID: 7230775191068158404, guid: 77df0195c5c99154580a874268a423bc, type: 3}
+  - {fileID: 7230775191068158404, guid: 77df0195c5c99154580a874268a423bc, type: 3}
+  - {fileID: 7230775191068158404, guid: 77df0195c5c99154580a874268a423bc, type: 3}
+  - {fileID: 7230775191068158404, guid: 77df0195c5c99154580a874268a423bc, type: 3}
+  - {fileID: 7230775191068158404, guid: 77df0195c5c99154580a874268a423bc, type: 3}
+  - {fileID: 7230775191068158404, guid: 77df0195c5c99154580a874268a423bc, type: 3}
+  - {fileID: 7230775191068158404, guid: 77df0195c5c99154580a874268a423bc, type: 3}
+  - {fileID: 7230775191068158404, guid: 77df0195c5c99154580a874268a423bc, type: 3}
+  - {fileID: 7230775191068158404, guid: 77df0195c5c99154580a874268a423bc, type: 3}
+  - {fileID: 7230775191068158404, guid: 77df0195c5c99154580a874268a423bc, type: 3}
+  - {fileID: 7230775191068158404, guid: 77df0195c5c99154580a874268a423bc, type: 3}
+  - {fileID: 7230775191068158404, guid: 77df0195c5c99154580a874268a423bc, type: 3}
+  - {fileID: 7230775191068158404, guid: 77df0195c5c99154580a874268a423bc, type: 3}
+  - {fileID: 7230775191068158404, guid: 77df0195c5c99154580a874268a423bc, type: 3}
+  - {fileID: 7230775191068158404, guid: 77df0195c5c99154580a874268a423bc, type: 3}
+  - {fileID: 7230775191068158404, guid: 77df0195c5c99154580a874268a423bc, type: 3}
+  - {fileID: 7230775191068158404, guid: 77df0195c5c99154580a874268a423bc, type: 3}
+  - {fileID: 7230775191068158404, guid: 77df0195c5c99154580a874268a423bc, type: 3}
+  - {fileID: 7230775191068158404, guid: 77df0195c5c99154580a874268a423bc, type: 3}
+  - {fileID: 7230775191068158404, guid: db8c71b6c4218214086cf5982e9e2adb, type: 3}
+  - {fileID: 7230775191068158404, guid: db8c71b6c4218214086cf5982e9e2adb, type: 3}
+  - {fileID: 7230775191068158404, guid: db8c71b6c4218214086cf5982e9e2adb, type: 3}
+  - {fileID: 7230775191068158404, guid: db8c71b6c4218214086cf5982e9e2adb, type: 3}
+  - {fileID: 7230775191068158404, guid: db8c71b6c4218214086cf5982e9e2adb, type: 3}
+  - {fileID: 7230775191068158404, guid: db8c71b6c4218214086cf5982e9e2adb, type: 3}
+  - {fileID: 7230775191068158404, guid: db8c71b6c4218214086cf5982e9e2adb, type: 3}
+  - {fileID: 7230775191068158404, guid: db8c71b6c4218214086cf5982e9e2adb, type: 3}
+  - {fileID: 7230775191068158404, guid: db8c71b6c4218214086cf5982e9e2adb, type: 3}
+  - {fileID: 7230775191068158404, guid: db8c71b6c4218214086cf5982e9e2adb, type: 3}
+  - {fileID: 7230775191068158404, guid: db8c71b6c4218214086cf5982e9e2adb, type: 3}
+  - {fileID: 7230775191068158404, guid: db8c71b6c4218214086cf5982e9e2adb, type: 3}
+  - {fileID: 7230775191068158404, guid: db8c71b6c4218214086cf5982e9e2adb, type: 3}
+  - {fileID: 7230775191068158404, guid: db8c71b6c4218214086cf5982e9e2adb, type: 3}
+  - {fileID: 7230775191068158404, guid: db8c71b6c4218214086cf5982e9e2adb, type: 3}
+  - {fileID: 7230775191068158404, guid: db8c71b6c4218214086cf5982e9e2adb, type: 3}
+  - {fileID: 1623505104987198706, guid: db3b6b36abc81214a8b4f9956b5e567c, type: 3}
+  - {fileID: 1623505104987198706, guid: db3b6b36abc81214a8b4f9956b5e567c, type: 3}
+  - {fileID: 1623505104987198706, guid: db3b6b36abc81214a8b4f9956b5e567c, type: 3}
+  - {fileID: 1623505104987198706, guid: db3b6b36abc81214a8b4f9956b5e567c, type: 3}
+  - {fileID: 1623505104987198706, guid: db3b6b36abc81214a8b4f9956b5e567c, type: 3}
+  - {fileID: 8767277357031307296, guid: 6312d90d97dee8445b8e10dce3b56572, type: 3}
+  - {fileID: 6112268103948333850, guid: eec7e0bb59d1bbb4196b0685c0191b3b, type: 3}
+  - {fileID: 6112268103948333850, guid: eec7e0bb59d1bbb4196b0685c0191b3b, type: 3}
+  - {fileID: 6112268103948333850, guid: eec7e0bb59d1bbb4196b0685c0191b3b, type: 3}
+  - {fileID: 3089699370764884450, guid: afdf96b2bb75cac42ab0bb4fd33b22b5, type: 3}
+  - {fileID: 3089699370764884450, guid: afdf96b2bb75cac42ab0bb4fd33b22b5, type: 3}
+  - {fileID: 3089699370764884450, guid: afdf96b2bb75cac42ab0bb4fd33b22b5, type: 3}
+  Weapons:
+  - {fileID: 3552097900181454016, guid: ffa9f6fe244c85248a1bb202285c251d, type: 3}
+  - {fileID: 4959000729214192542, guid: f43fc6a9a0487964283e05224babca5a, type: 3}
+  Accessories:
+  - {fileID: 4549664854553296160, guid: aef28947dc5666c4cbd2bc85b9beabce, type: 3}
+  - {fileID: 4549664854553296160, guid: aef28947dc5666c4cbd2bc85b9beabce, type: 3}
+  - {fileID: 4549664854553296160, guid: aef28947dc5666c4cbd2bc85b9beabce, type: 3}
+  - {fileID: 4549664854553296160, guid: aef28947dc5666c4cbd2bc85b9beabce, type: 3}
+  - {fileID: 8080823146443188448, guid: faef415b7e8519343b561564644fc8e2, type: 3}
+  - {fileID: 8080823146443188448, guid: faef415b7e8519343b561564644fc8e2, type: 3}
+  CarryWeight: 0
+  WeightCapacity: 80
+--- !u!114 &60218697416509460
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1705813863536690464}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2e58dd75ae14194dbbd85a96326b9ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  Party: {fileID: 1745900234515918720}
+  Gold: 10
+  Items:
+  - {fileID: 1623505104987198706, guid: db3b6b36abc81214a8b4f9956b5e567c, type: 3}
+  - {fileID: 1623505104987198706, guid: db3b6b36abc81214a8b4f9956b5e567c, type: 3}
+  - {fileID: 1623505104987198706, guid: db3b6b36abc81214a8b4f9956b5e567c, type: 3}
+  - {fileID: 1623505104987198706, guid: db3b6b36abc81214a8b4f9956b5e567c, type: 3}
+  - {fileID: 1623505104987198706, guid: db3b6b36abc81214a8b4f9956b5e567c, type: 3}
+  - {fileID: 1623505104987198706, guid: db3b6b36abc81214a8b4f9956b5e567c, type: 3}
+  - {fileID: 1623505104987198706, guid: db3b6b36abc81214a8b4f9956b5e567c, type: 3}
+  - {fileID: 1623505104987198706, guid: db3b6b36abc81214a8b4f9956b5e567c, type: 3}
+  - {fileID: 7230775191068158404, guid: db8c71b6c4218214086cf5982e9e2adb, type: 3}
+  - {fileID: 7230775191068158404, guid: db8c71b6c4218214086cf5982e9e2adb, type: 3}
+  Weapons:
+  - {fileID: 4959000729214192542, guid: f43fc6a9a0487964283e05224babca5a, type: 3}
+  - {fileID: 4959000729214192542, guid: f43fc6a9a0487964283e05224babca5a, type: 3}
+  - {fileID: 4959000729214192542, guid: f43fc6a9a0487964283e05224babca5a, type: 3}
+  - {fileID: 3552097900181454016, guid: ffa9f6fe244c85248a1bb202285c251d, type: 3}
+  Accessories:
+  - {fileID: 4549664854553296160, guid: aef28947dc5666c4cbd2bc85b9beabce, type: 3}
+  - {fileID: 4549664854553296160, guid: aef28947dc5666c4cbd2bc85b9beabce, type: 3}
+  CarryWeight: 0
+  WeightCapacity: 0
 --- !u!1 &4226830939898808472
 GameObject:
   m_ObjectHideFlags: 0
@@ -28,7 +216,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 8854167014643114195}
+  m_Father: {fileID: 3297842603222162604}
   m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6095027736145476278
@@ -62,7 +250,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 8854167014643114195}
-  m_RootOrder: 3
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!58 &6778746571605228649
 CircleCollider2D:
@@ -123,7 +311,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 8854167014643114195}
+  m_Father: {fileID: 3297842603222162604}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8240048304815964966
@@ -154,7 +342,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 8854167014643114195}
+  m_Father: {fileID: 3297842603222162604}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8854167014643114197
@@ -171,9 +359,6 @@ GameObject:
   - component: {fileID: 8854167014643114193}
   - component: {fileID: 8854167014643114192}
   - component: {fileID: 8854167014643114191}
-  - component: {fileID: 8854167014643114187}
-  - component: {fileID: 8854167014643114184}
-  - component: {fileID: 5726009491312351033}
   m_Layer: 9
   m_Name: PlayerTest
   m_TagString: Player
@@ -193,10 +378,8 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 7771993840368400121}
-  - {fileID: 4227045953516215092}
-  - {fileID: 3119796608945377178}
   - {fileID: 655868747556846406}
+  - {fileID: 3297842603222162604}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -315,10 +498,7 @@ MonoBehaviour:
   Figure: {fileID: 0}
   Speed: 4
   Animate: {fileID: 8854167014643114191}
-  Party: {fileID: 8854167014643114187}
-  BattlersListDump: {fileID: 7771993840368400121}
-  ItemsListDump: {fileID: 4227045953516215092}
-  ObjectivesListDump: {fileID: 3119796608945377178}
+  Party: {fileID: 1745900234515918720}
 --- !u!95 &8854167014643114191
 Animator:
   serializedVersion: 4
@@ -339,150 +519,3 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
---- !u!114 &8854167014643114187
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8854167014643114197}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0d7fe9f9c2c16124aa116ac06d511b65, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Level: 55
-  EXP: 2100
-  LastEXPToNext: 0
-  EXPToNext: 0
-  Players: []
-  AllPlayers:
-  - {fileID: 946232549155108686, guid: 4f6e65423e3ae5343a9c2743693d2199, type: 3}
-  - {fileID: 6363325651278534380, guid: ada74891666cbb14f93abb5ae5464e91, type: 3}
-  - {fileID: 2008034214646324178, guid: afd5ec47c2d5c884baec561fbfcf7d62, type: 3}
-  - {fileID: -5909847340613243276, guid: 50758cbe08e20134fb463b8793e13d3b, type: 3}
-  - {fileID: -9131441895739667952, guid: f625d97b600c889439c9683bce3ba4a7, type: 3}
-  - {fileID: 1271467665200900025, guid: a3bfd939550328b44ac0e1f7536bd6a2, type: 3}
-  Allies:
-  - {fileID: 7660155867343399249, guid: de52526bd8be969459d822230593b213, type: 3}
-  Inventory: {fileID: 8854167014643114184}
-  Storage: {fileID: 5726009491312351033}
-  LoggedObjectives:
-  - {fileID: 919590195915574048, guid: 2d664c82c02a78a4aa46897d66851c79, type: 3}
-  - {fileID: 7170123059155225320, guid: cf93fa54f76e782469ff2cebb7972034, type: 3}
-  - {fileID: 6739423826767732172, guid: 368870d38eefbad489e8ff4b6a9e728b, type: 3}
-  CraftableItems:
-  - {fileID: 1623505104987198706, guid: db3b6b36abc81214a8b4f9956b5e567c, type: 3}
-  - {fileID: 7230775191068158404, guid: 77df0195c5c99154580a874268a423bc, type: 3}
-  CraftableWeapons:
-  - {fileID: 4959000729214192542, guid: f43fc6a9a0487964283e05224babca5a, type: 3}
-  CraftableAccessories: []
-  Relations: []
-  PreExistingRelations: []
---- !u!114 &8854167014643114184
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8854167014643114197}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a2e58dd75ae14194dbbd85a96326b9ef, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Gold: 699
-  Items:
-  - {fileID: 7230775191068158404, guid: 77df0195c5c99154580a874268a423bc, type: 3}
-  - {fileID: 7230775191068158404, guid: 77df0195c5c99154580a874268a423bc, type: 3}
-  - {fileID: 7230775191068158404, guid: 77df0195c5c99154580a874268a423bc, type: 3}
-  - {fileID: 7230775191068158404, guid: 77df0195c5c99154580a874268a423bc, type: 3}
-  - {fileID: 7230775191068158404, guid: 77df0195c5c99154580a874268a423bc, type: 3}
-  - {fileID: 7230775191068158404, guid: 77df0195c5c99154580a874268a423bc, type: 3}
-  - {fileID: 7230775191068158404, guid: 77df0195c5c99154580a874268a423bc, type: 3}
-  - {fileID: 7230775191068158404, guid: 77df0195c5c99154580a874268a423bc, type: 3}
-  - {fileID: 7230775191068158404, guid: 77df0195c5c99154580a874268a423bc, type: 3}
-  - {fileID: 7230775191068158404, guid: 77df0195c5c99154580a874268a423bc, type: 3}
-  - {fileID: 7230775191068158404, guid: 77df0195c5c99154580a874268a423bc, type: 3}
-  - {fileID: 7230775191068158404, guid: 77df0195c5c99154580a874268a423bc, type: 3}
-  - {fileID: 7230775191068158404, guid: 77df0195c5c99154580a874268a423bc, type: 3}
-  - {fileID: 7230775191068158404, guid: 77df0195c5c99154580a874268a423bc, type: 3}
-  - {fileID: 7230775191068158404, guid: 77df0195c5c99154580a874268a423bc, type: 3}
-  - {fileID: 7230775191068158404, guid: 77df0195c5c99154580a874268a423bc, type: 3}
-  - {fileID: 7230775191068158404, guid: 77df0195c5c99154580a874268a423bc, type: 3}
-  - {fileID: 7230775191068158404, guid: 77df0195c5c99154580a874268a423bc, type: 3}
-  - {fileID: 7230775191068158404, guid: 77df0195c5c99154580a874268a423bc, type: 3}
-  - {fileID: 7230775191068158404, guid: db8c71b6c4218214086cf5982e9e2adb, type: 3}
-  - {fileID: 7230775191068158404, guid: db8c71b6c4218214086cf5982e9e2adb, type: 3}
-  - {fileID: 7230775191068158404, guid: db8c71b6c4218214086cf5982e9e2adb, type: 3}
-  - {fileID: 7230775191068158404, guid: db8c71b6c4218214086cf5982e9e2adb, type: 3}
-  - {fileID: 7230775191068158404, guid: db8c71b6c4218214086cf5982e9e2adb, type: 3}
-  - {fileID: 7230775191068158404, guid: db8c71b6c4218214086cf5982e9e2adb, type: 3}
-  - {fileID: 7230775191068158404, guid: db8c71b6c4218214086cf5982e9e2adb, type: 3}
-  - {fileID: 7230775191068158404, guid: db8c71b6c4218214086cf5982e9e2adb, type: 3}
-  - {fileID: 7230775191068158404, guid: db8c71b6c4218214086cf5982e9e2adb, type: 3}
-  - {fileID: 7230775191068158404, guid: db8c71b6c4218214086cf5982e9e2adb, type: 3}
-  - {fileID: 7230775191068158404, guid: db8c71b6c4218214086cf5982e9e2adb, type: 3}
-  - {fileID: 7230775191068158404, guid: db8c71b6c4218214086cf5982e9e2adb, type: 3}
-  - {fileID: 7230775191068158404, guid: db8c71b6c4218214086cf5982e9e2adb, type: 3}
-  - {fileID: 7230775191068158404, guid: db8c71b6c4218214086cf5982e9e2adb, type: 3}
-  - {fileID: 7230775191068158404, guid: db8c71b6c4218214086cf5982e9e2adb, type: 3}
-  - {fileID: 7230775191068158404, guid: db8c71b6c4218214086cf5982e9e2adb, type: 3}
-  - {fileID: 1623505104987198706, guid: db3b6b36abc81214a8b4f9956b5e567c, type: 3}
-  - {fileID: 1623505104987198706, guid: db3b6b36abc81214a8b4f9956b5e567c, type: 3}
-  - {fileID: 1623505104987198706, guid: db3b6b36abc81214a8b4f9956b5e567c, type: 3}
-  - {fileID: 1623505104987198706, guid: db3b6b36abc81214a8b4f9956b5e567c, type: 3}
-  - {fileID: 1623505104987198706, guid: db3b6b36abc81214a8b4f9956b5e567c, type: 3}
-  - {fileID: 8767277357031307296, guid: 6312d90d97dee8445b8e10dce3b56572, type: 3}
-  - {fileID: 6112268103948333850, guid: eec7e0bb59d1bbb4196b0685c0191b3b, type: 3}
-  - {fileID: 6112268103948333850, guid: eec7e0bb59d1bbb4196b0685c0191b3b, type: 3}
-  - {fileID: 6112268103948333850, guid: eec7e0bb59d1bbb4196b0685c0191b3b, type: 3}
-  - {fileID: 3089699370764884450, guid: afdf96b2bb75cac42ab0bb4fd33b22b5, type: 3}
-  - {fileID: 3089699370764884450, guid: afdf96b2bb75cac42ab0bb4fd33b22b5, type: 3}
-  - {fileID: 3089699370764884450, guid: afdf96b2bb75cac42ab0bb4fd33b22b5, type: 3}
-  Weapons:
-  - {fileID: 3552097900181454016, guid: ffa9f6fe244c85248a1bb202285c251d, type: 3}
-  - {fileID: 4959000729214192542, guid: f43fc6a9a0487964283e05224babca5a, type: 3}
-  Accessories:
-  - {fileID: 4549664854553296160, guid: aef28947dc5666c4cbd2bc85b9beabce, type: 3}
-  - {fileID: 4549664854553296160, guid: aef28947dc5666c4cbd2bc85b9beabce, type: 3}
-  - {fileID: 4549664854553296160, guid: aef28947dc5666c4cbd2bc85b9beabce, type: 3}
-  - {fileID: 4549664854553296160, guid: aef28947dc5666c4cbd2bc85b9beabce, type: 3}
-  - {fileID: 8080823146443188448, guid: faef415b7e8519343b561564644fc8e2, type: 3}
-  - {fileID: 8080823146443188448, guid: faef415b7e8519343b561564644fc8e2, type: 3}
-  CarryWeight: 0
-  WeightCapacity: 80
---- !u!114 &5726009491312351033
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8854167014643114197}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a2e58dd75ae14194dbbd85a96326b9ef, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  Gold: 10
-  Items:
-  - {fileID: 1623505104987198706, guid: db3b6b36abc81214a8b4f9956b5e567c, type: 3}
-  - {fileID: 1623505104987198706, guid: db3b6b36abc81214a8b4f9956b5e567c, type: 3}
-  - {fileID: 1623505104987198706, guid: db3b6b36abc81214a8b4f9956b5e567c, type: 3}
-  - {fileID: 1623505104987198706, guid: db3b6b36abc81214a8b4f9956b5e567c, type: 3}
-  - {fileID: 1623505104987198706, guid: db3b6b36abc81214a8b4f9956b5e567c, type: 3}
-  - {fileID: 1623505104987198706, guid: db3b6b36abc81214a8b4f9956b5e567c, type: 3}
-  - {fileID: 1623505104987198706, guid: db3b6b36abc81214a8b4f9956b5e567c, type: 3}
-  - {fileID: 1623505104987198706, guid: db3b6b36abc81214a8b4f9956b5e567c, type: 3}
-  - {fileID: 7230775191068158404, guid: db8c71b6c4218214086cf5982e9e2adb, type: 3}
-  - {fileID: 7230775191068158404, guid: db8c71b6c4218214086cf5982e9e2adb, type: 3}
-  Weapons:
-  - {fileID: 4959000729214192542, guid: f43fc6a9a0487964283e05224babca5a, type: 3}
-  - {fileID: 4959000729214192542, guid: f43fc6a9a0487964283e05224babca5a, type: 3}
-  - {fileID: 4959000729214192542, guid: f43fc6a9a0487964283e05224babca5a, type: 3}
-  - {fileID: 3552097900181454016, guid: ffa9f6fe244c85248a1bb202285c251d, type: 3}
-  Accessories:
-  - {fileID: 4549664854553296160, guid: aef28947dc5666c4cbd2bc85b9beabce, type: 3}
-  - {fileID: 4549664854553296160, guid: aef28947dc5666c4cbd2bc85b9beabce, type: 3}
-  CarryWeight: 0
-  WeightCapacity: 0

@@ -20,6 +20,10 @@ public class Battle : MonoBehaviour
     public BattleMenu BattleMenu;
     public BattleWin BattleWinMenu;
 
+    // Positioning
+    private const float X_POSITION_DISTANCE = 2.5f;
+    private const float Y_POSITION_DISTANCE = 0.8f;
+
     // Constants
     public Skill BasicAttack;
     public Projectile BasicWeaponlessProjectile;
@@ -30,16 +34,6 @@ public class Battle : MonoBehaviour
     [HideInInspector] public Surrounding Enviornment;
     [HideInInspector] public PlayerParty PlayerParty;
     [HideInInspector] public EnemyParty EnemyParty;
-
-    // Raw locations based on battler's horizontal/vertical positions
-    private static readonly float uX = 1.5f;
-    private static readonly float uY = 1f;
-    private readonly Vector3[][] Positions = new Vector3[][]
-    {
-        new Vector3[] { new Vector3(-uX, uY), new Vector3(0, uY), new Vector3(uX, uY) },
-        new Vector3[] { new Vector3(-uX, 0), Vector3.zero, new Vector3(uX, 0) },
-        new Vector3[] { new Vector3(-uX, -uY), new Vector3(0, -uY), new Vector3(uX, -uY) },
-    };
 
     // Battle state tracking
     public int Turn { get; private set; }
@@ -78,16 +72,19 @@ public class Battle : MonoBehaviour
 
         // Setup player party
         PlayerParty = GameplayMaster.Party;
-        var battlePlayers = SetupPlayerPositions(PlayerParty.Players);
-        battlePlayers = SetupBattlers(battlePlayers, PlayerPartyDump);
-        for (int i = 0; i < battlePlayers.Count; i++) PlayerParty.AllPlayers[i] = battlePlayers[i];
-        PlayerParty.Allies = SetupAllyPositions(PlayerParty.Allies);
-        PlayerParty.Allies = SetupBattlers(PlayerParty.Allies, PlayerPartyDump);
+        var teammates = SetupPositions( SetupBattlers(PlayerParty.BattlingParty), PlayerPartyDump, 1);
+        int i = 0;
+        int j = 0;
+        foreach (var t in teammates)
+        {
+            if (t is BattlePlayer p) PlayerParty.AllPlayers[i++] = p;
+            else if (t is BattleAlly a) PlayerParty.Allies[j++] = a;
+        }
 
         // Setup enemy party
         EnemyParty = Instantiate(GameplayMaster.EnemyGroup, gameObject.transform);
         EnemyParty.gameObject.SetActive(false);
-        EnemyParty.Enemies = SetupBattlers(EnemyParty.Enemies, EnemyPartyDump);
+        EnemyParty.Enemies = SetupPositions( SetupBattlers(EnemyParty.Enemies), EnemyPartyDump, -1);
 
         // Group into battlers list
         foreach (BattlePlayer p in PlayerParty.Players) Battlers.Add(p);
@@ -99,61 +96,17 @@ public class Battle : MonoBehaviour
         StartCoroutine(ProcessFirstTurn());
     }
 
-    private List<T> SetupBattlers<T>(List<T> list, Transform partyGameObject) where T : Battler
+    private List<T> SetupBattlers<T>(List<T> list) where T : Battler
     {
         List<T> result = new List<T>();
-        foreach (Battler b0 in list)
-        {
-            Vector3 bpPos = partyGameObject.position + Positions[(int)b0.RowPosition][(int)b0.ColumnPosition];
-            T b = (T)InstantiateBattler(b0, bpPos);
-            result.Add(b);
-        }
+        foreach (Battler b0 in list) result.Add((T)InstantiateBattler(b0));
         return result;
     }
 
-    private List<BattlePlayer> SetupPlayerPositions(List<BattlePlayer> party)
+    public T InstantiateBattler<T>(T newBattler, Vector3 position = default) where T : Battler
     {
-        switch (party.Count)
-        {
-            case 1:
-                party[0].SetBattlePositions(Battler.VerticalPositions.Center, Battler.HorizontalPositions.Right);
-                break;
-            case 2:
-                party[0].SetBattlePositions(Battler.VerticalPositions.Top, Battler.HorizontalPositions.Right);
-                party[1].SetBattlePositions(Battler.VerticalPositions.Bottom, Battler.HorizontalPositions.Right);
-                break;
-            case 3:
-                party[0].SetBattlePositions(Battler.VerticalPositions.Center, Battler.HorizontalPositions.Right);
-                party[1].SetBattlePositions(Battler.VerticalPositions.Top, Battler.HorizontalPositions.Left);
-                party[2].SetBattlePositions(Battler.VerticalPositions.Bottom, Battler.HorizontalPositions.Left);
-                break;
-            case 4:
-                party[0].SetBattlePositions(Battler.VerticalPositions.Top, Battler.HorizontalPositions.Right);
-                party[1].SetBattlePositions(Battler.VerticalPositions.Bottom, Battler.HorizontalPositions.Right);
-                party[2].SetBattlePositions(Battler.VerticalPositions.Bottom, Battler.HorizontalPositions.Left);
-                party[3].SetBattlePositions(Battler.VerticalPositions.Top, Battler.HorizontalPositions.Left);
-                break;
-        }
-        return party;
-    }
+        // MOVE PARTY MEMBER GAMEOBJECTS FROM SCENE TO SCENE
 
-    private List<BattleAlly> SetupAllyPositions(List<BattleAlly> allies)
-    {
-        switch (allies.Count)
-        {
-            case 1:
-                allies[0].SetBattlePositions(Battler.VerticalPositions.Center, Battler.HorizontalPositions.Center);
-                break;
-            case 2:
-                allies[0].SetBattlePositions(Battler.VerticalPositions.Top, Battler.HorizontalPositions.Center);
-                allies[1].SetBattlePositions(Battler.VerticalPositions.Bottom, Battler.HorizontalPositions.Center);
-                break;
-        }
-        return allies;
-    }
-
-    public T InstantiateBattler<T>(T newBattler, Vector3 position) where T : Battler
-    {
         // Clone battler and link battle
         T b = Instantiate(newBattler, position, Quaternion.identity, (newBattler is BattleEnemy ? EnemyPartyDump : PlayerPartyDump));
         b.SetBattle(this);
@@ -161,8 +114,8 @@ public class Battle : MonoBehaviour
         // Stats
         if (b is not BattleEnemy)
         {
-            b.AddHP(newBattler.HP);
-            b.AddSP(newBattler.SP);
+            b.AddHP(b.HP);
+            b.AddSP(b.SP);
         }
         else b.StatConversion();
 
@@ -184,6 +137,31 @@ public class Battle : MonoBehaviour
         b.transform.localScale = Vector3.one * 0.7f;
         b.gameObject.SetActive(true);
         return b;
+    }
+
+    private List<T> SetupPositions<T>(List<T> party, Transform partyGameObject, int mult) where T : Battler
+    {
+        if (party.Count >= 9) party = party.Take(9).ToList();
+        var dists = new List<Battler>[] { new List<Battler>(), new List<Battler>(), new List<Battler>() };
+        foreach (var b in party)
+        {
+            // x-position
+            int range = (int)(b.Class ? b.Class.CombatRangeType : b.CombatRangeType) - 1;
+            while (dists[range].Count >= 3) range = (range == 1) ? (dists[0].Count >= 3 ? 2 : 0) : 1;
+            float xPos = 1 * (range - 1) * X_POSITION_DISTANCE * mult + (mult >= 0 ? 0 : (b.transform.localScale.x / 2f));
+            Vector3 bPos = Vector3.left * xPos;
+
+            // y-position
+            var col = dists[range];
+            if (col.Count > 0) col[0].transform.position += Vector3.up * Y_POSITION_DISTANCE;
+            if (col.Count == 1) bPos += Vector3.down * Y_POSITION_DISTANCE;
+            else if (col.Count == 2) col[1].transform.position += Vector3.down * Y_POSITION_DISTANCE;
+
+            // Set position
+            col.Add(b);
+            b.SetPosition(partyGameObject.position + bPos);
+        }
+        return party;
     }
 
     private void SortBattlersInOrderLayer()

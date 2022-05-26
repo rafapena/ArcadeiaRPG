@@ -5,7 +5,7 @@ using UnityEngine.SceneManagement;
 // Directly handles screen transitioning and player position/cutscene changes
 public class ScreenTransitioner : MonoBehaviour
 {
-    public enum TransitionModes { BlackScreen, Batte }
+    public enum TransitionModes { BlackScreen, Battle }
     private static TransitionModes TransitionMode;
 
     public enum SceneChangeModes { Remove, Change, Add }

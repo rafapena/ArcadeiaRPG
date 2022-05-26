@@ -34,30 +34,47 @@ public class PlayerParty : MonoBehaviour
     [HideInInspector] public List<PlayerRelation> Relations = new List<PlayerRelation>();
     public List<PlayerRelation> PreExistingRelations;
 
+    // GameObject dump
+    public Transform BattlersListDump;
+    public Transform ItemsListDump;
+    public Transform ObjectivesListDump;
+
     public List<BattlePlayer> Players => AllPlayers.Take(MAX_NUMBER_OF_PLAYABLE_BATTLERS).ToList();
 
     public List<Battler> BattlingParty => Players.Cast<Battler>().Concat(Allies).ToList();
 
     public List<Battler> WholeParty => AllPlayers.Cast<Battler>().Concat(Allies).ToList();
 
-    private void Start()
-    {
-        //
-    }
-
-    public void Setup()
+    public void Initialize()
     {
         SetupExpCurve();
         SetupRelations();
+
+        var all = WholeParty.ToList();
+        for (int i = 0; i < all.Count; i++)
+        {
+            all[i] = Instantiate(all[i], BattlersListDump);
+            Battler b = all[i];
+            b.Level = Level;
+            b.StatConversion();
+            b.gameObject.SetActive(false);
+            if (b is BattlePlayer p)
+            {
+                p.AddLearnedSkills();
+                if (p.Weapons.Count > 0) p.SelectedWeapon = p.Weapons[0];
+                for (int j = 0; j < p.Weapons.Count; j++) p.Weapons[j] = Instantiate(p.Weapons[j], p.transform);
+            }
+            for (int j = 0; j < b.States.Count; j++) b.States[j] = Instantiate(b.States[j], b.transform);
+        }
+        AllPlayers = all.Where(x => x is BattlePlayer).Select(x => x as BattlePlayer).ToList();
+        Allies = all.Where(x => x is BattleAlly).Select(x => x as BattleAlly).ToList();
+        
+        Inventory.Initialize();
+        for (int i = 0; i < LoggedObjectives.Count; i++)
+        {
+            LoggedObjectives[i] = Instantiate(LoggedObjectives[i], ObjectivesListDump);
+        }
     }
-   
-    /*public void UpdateActivePlayers()
-    {
-        Players = new List<BattlePlayer>();
-        int inActivePartyCount = AllPlayers.Count < MAX_NUMBER_OF_PLAYABLE_BATTLERS ? AllPlayers.Count : MAX_NUMBER_OF_PLAYABLE_BATTLERS;
-        for (int i = 0; i < inActivePartyCount; i++)
-            Players.Add(AllPlayers[i]);
-    }*/
 
     public void SetupExpCurve()
     {
@@ -90,7 +107,7 @@ public class PlayerParty : MonoBehaviour
     /// -- Loading File --
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public void LoadFromFile(int file, MapPlayer mp)
+    public void LoadFromFile(int file)
     {
         EXP = PlayerPrefs.GetInt("PartyEXP_" + file);
         LastEXPToNext = PlayerPrefs.GetInt("PartyLastEXPToNext_" + file);
@@ -101,22 +118,22 @@ public class PlayerParty : MonoBehaviour
         int allyIndexCap = PlayerPrefs.GetInt("NumberOfAllies");
         for (int i = 0; i < playerIndexCap; i++)
         {
-            BattlePlayer b = LoadBattler(file, mp, ResourcesMaster.Players, i);
+            BattlePlayer b = LoadBattler(file, ResourcesMaster.Players, i);
             AllPlayers.Add(b);
         }
-        for (int i = playerIndexCap; i < allyIndexCap; i++) LoadBattler(file, mp, ResourcesMaster.Allies, i);
+        for (int i = playerIndexCap; i < allyIndexCap; i++) LoadBattler(file, ResourcesMaster.Allies, i);
         SetupExpCurve();
         LoadRelations(file);
         LoadInventory(file);
         LoadStorage(file);
-        LoadObjectives(file, mp);
+        LoadObjectives(file);
         GameplayMaster.DeclareContentLoaded();
     }
 
-    private T LoadBattler<T>(int file, MapPlayer mp, T[] list, int index) where T : Battler
+    private T LoadBattler<T>(int file, T[] list, int index) where T : Battler
     {
         string bt = "Battler" + index;
-        Battler b = Instantiate(list[PlayerPrefs.GetInt(bt + "Id_" + file)], mp.BattlersListDump);
+        Battler b = Instantiate(list[PlayerPrefs.GetInt(bt + "Id_" + file)], BattlersListDump);
         b.Level = Level;
         if (b is BattlePlayer p)
         {
@@ -188,7 +205,7 @@ public class PlayerParty : MonoBehaviour
         }
     }
 
-    private void LoadObjectives(int file, MapPlayer mp)
+    private void LoadObjectives(int file)
     {
         int markedObjective = PlayerPrefs.GetInt("MarkedObjective_" + file);
         int markedSubObjective = PlayerPrefs.GetInt("MarkedSubObjective_" + file);
@@ -196,7 +213,7 @@ public class PlayerParty : MonoBehaviour
         {
             int x = PlayerPrefs.GetInt("Objective" + obj.Id + "_" + file);
             if (x <= 0) continue;
-            Objective o = Instantiate(obj, mp.ObjectivesListDump);
+            Objective o = Instantiate(obj, ObjectivesListDump);
             if (x == 2) o.Cleared = true;
             else if (o.Id == markedObjective) o.Marked = true;
             foreach (SubObjective so in o.NextObjectives)

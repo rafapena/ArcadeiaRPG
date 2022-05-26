@@ -24,7 +24,7 @@ public class GameOver : MonoBehaviour
     {
         yield return new WaitForSecondsRealtime(INTRO_TIME);
         SelectionFrame.Activate();
-        if (GameplayMaster.NoFileSelected())
+        if (GameplayMaster.NoFileSelected)
         {
             MenuMaster.DisableSelection(ref ReloadButton);
             EventSystem.current.SetSelectedGameObject(ReturnToMenuButton);

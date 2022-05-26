@@ -9,9 +9,6 @@ public class MapPlayer : MapExplorer
     private int Mode;
 
     public PlayerParty Party;
-    public Transform BattlersListDump;
-    public Transform ItemsListDump;
-    public Transform ObjectivesListDump;
 
     protected override void Awake()
     {
@@ -22,58 +19,11 @@ public class MapPlayer : MapExplorer
     protected override void Start()
     {
         base.Start();
-        Party.Setup();
-        Setup();
-        //if (GameplayMaster.NoFileSelected()) SetupPartyNew();
-        //else if (!GameplayMaster.FinishedLoadingContent()) Party.LoadFromFile(GameplayMaster.SelectedFile, this);
-        //else Setup();
+        Party.Initialize();
+        //if (GameplayMaster.NoFileSelected) Party.Initialize();
+        //else if (!GameplayMaster.FinishedLoadingContent) Party.LoadFromFile(GameplayMaster.SelectedFile);
+        //else Party.Initialize();
         GameplayMaster.Party = Party;
-    }
-
-    private void SetupPartyNew()
-    {
-        List<Battler> all = Party.WholeParty.ToList();
-        for (int i = 0; i < all.Count; i++)
-        {
-            all[i] = Instantiate(all[i], BattlersListDump);
-            Battler b = all[i];
-            b.Level = Party.Level;
-            if (b is BattlePlayer p && p.Weapons.Count > 0) p.SelectedWeapon = p.Weapons[0];
-            b.StatConversion();
-            b.gameObject.SetActive(false);
-        }
-        Party.AllPlayers = all.Where(x => x is BattlePlayer).Select(x => x as BattlePlayer).ToList();
-        Party.Allies = all.Where(x => x is BattleAlly).Select(x => x as BattleAlly).ToList();
-        for (int i = 0; i < Party.LoggedObjectives.Count; i++)
-        {
-            Party.LoggedObjectives[i] = Instantiate(Party.LoggedObjectives[i], ObjectivesListDump);
-        }
-    }
-
-    private void Setup()
-    {
-        List<Battler> all = Party.WholeParty.ToList();
-        for (int i = 0; i < all.Count; i++)
-        {
-            all[i] = Instantiate(all[i], gameObject.transform);
-            Battler b = all[i];
-            b.Level = Party.Level;
-            b.StatConversion();
-            b.gameObject.SetActive(false);
-            if (b is BattlePlayer p)
-            {
-                p.AddLearnedSkills();
-                if (p.Weapons.Count > 0) p.SelectedWeapon = p.Weapons[0];
-                for (int j = 0; j < p.Weapons.Count; j++) p.Weapons[j] = Instantiate(p.Weapons[j], p.transform);
-            }
-            for (int j = 0; j < b.States.Count; j++) b.States[j] = Instantiate(b.States[j], b.transform);
-        }
-        Party.AllPlayers = all.Where(x => x is BattlePlayer).Select(x => x as BattlePlayer).ToList();
-        Party.Allies = all.Where(x => x is BattleAlly).Select(x => x as BattleAlly).ToList();
-        for (int i = 0; i < Party.LoggedObjectives.Count; i++)
-        {
-            Party.LoggedObjectives[i] = Instantiate(Party.LoggedObjectives[i], ObjectivesListDump);
-        }
     }
 
     protected override void Update()

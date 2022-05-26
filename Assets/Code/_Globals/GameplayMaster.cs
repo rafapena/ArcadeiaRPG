@@ -100,15 +100,9 @@ public class GameplayMaster : MonoBehaviour
         LoadedFile++;
     }
 
-    public static bool FinishedLoadingContent()
-    {
-        return LoadedFile >= MAX_LOADED_FILE_CONTENT;
-    }
+    public static bool FinishedLoadingContent => LoadedFile >= MAX_LOADED_FILE_CONTENT;
 
-    public static bool NoFileSelected()
-    {
-        return SelectedFile < 0;
-    }
+    public static bool NoFileSelected => SelectedFile < 0;
 
     public static int GetLastManagedFile()
     {

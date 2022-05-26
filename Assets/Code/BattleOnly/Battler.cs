@@ -13,8 +13,6 @@ using UnityEngine.UI;
 public abstract class Battler : BaseObject
 {
     public Battle CurrentBattle { get; private set; }
-    public enum VerticalPositions { Top, Center, Bottom }
-    public enum HorizontalPositions { Left, Center, Right }
 
     // Movement
     public Vector3 Position => Sprite.BaseHitBox.position;
@@ -65,8 +63,6 @@ public abstract class Battler : BaseObject
     [HideInInspector] public List<State> States = new List<State>();
     [HideInInspector] public int CurrentListIndex;
     protected Projectile LastHitProjectile;
-    public VerticalPositions RowPosition;
-    public HorizontalPositions ColumnPosition;
 
     // Action execution info
     public bool UsingBasicAttack => SelectedAction == BasicAttackSkill;
@@ -146,12 +142,6 @@ public abstract class Battler : BaseObject
         StateRates = new int[ResourcesMaster.States.Length];
         for (int i = 0; i < StateRates.Length; i++) StateRates[i] = BattleMaster.DEFAULT_RATE;
         foreach (StateRate sr in ChangedStateRates) StateRates[sr.State.Id] = sr.Rate;
-    }
-
-    public void SetBattlePositions(VerticalPositions vp, HorizontalPositions hp)
-    {
-        RowPosition = vp;
-        ColumnPosition = hp;
     }
 
     public void ResetAction()
