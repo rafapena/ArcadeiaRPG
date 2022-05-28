@@ -63,7 +63,7 @@ public class Storage : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameO
         {
             if (CollectionFrame.ActivatedSorter) CollectionFrame.DeactivateSorter();
             else if (ConfirmFrame.gameObject.activeSelf) UndoConfirmAmount();
-            else SceneMaster.CloseStorage(PartyInfo);
+            else SceneMaster.CloseStorage();
         }
         else if (Input.GetKeyDown(KeyCode.V)) Swap();
     }

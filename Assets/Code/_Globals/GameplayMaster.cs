@@ -7,6 +7,12 @@ using UnityEngine.SceneManagement;
 
 public class GameplayMaster : MonoBehaviour
 {
+    // Handles the player character
+    public static GameObject PlayerContainer;
+    public static MapPlayer OverworldAvatar => PlayerContainer.transform.GetChild(0).GetComponent<MapPlayer>();
+    public static PlayerParty Party => PlayerContainer.transform.GetChild(1).GetComponent<PlayerParty>();
+
+
     public CutsceneManager CutsceneManager;
 
     public enum Difficulties { Easy, Medium, Hard, Lunatic }
@@ -35,7 +41,6 @@ public class GameplayMaster : MonoBehaviour
     private static float InGameTimeCounter;
     public float InGameMinuteIncrementFrequency;
 
-    public static PlayerParty Party;
     public static EnemyParty EnemyGroup;
     public static Shopkeeper Shop;
     public static InventorySystem.ListType CraftingMode;

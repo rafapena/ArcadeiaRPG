@@ -31,7 +31,7 @@ public class Crafter : MapNPC
     public void OpenWorkshop(int mode)
     {
         if (mode >= 0 && mode < System.Enum.GetNames(typeof(InventorySystem.ListType)).Length)
-            SceneMaster.OpenCraftingMenu(Player.Party, this, (InventorySystem.ListType)mode);
+            SceneMaster.OpenCraftingMenu(this, (InventorySystem.ListType)mode);
     }
 
     public void CloseWorkshop(bool doneTransaction)

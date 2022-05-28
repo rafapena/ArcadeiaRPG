@@ -39,7 +39,7 @@ public class Shopkeeper : MapNPC
 
     public void OpenShop(bool onlyBuying)
     {
-        SceneMaster.OpenShop(onlyBuying, Player.Party, this);
+        SceneMaster.OpenShop(onlyBuying, this);
     }
 
     public void CloseShop(bool doneTransaction)
@@ -49,7 +49,7 @@ public class Shopkeeper : MapNPC
 
     public void OpenClassChange()
     {
-        SceneMaster.OpenChangeClassMenu(Player.Party);
+        SceneMaster.OpenChangeClassMenu();
     }
 
     public void CloseClassChange()

@@ -160,7 +160,7 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
         if (!ActingPlayer.SelectedWeapon) return;
         OptionWeapon.transform.GetChild(0).GetComponent<Image>().sprite = ActingPlayer.SelectedWeapon.GetComponent<SpriteRenderer>().sprite;
         OptionWeapon.transform.GetChild(2).gameObject.SetActive(ActingPlayer.Weapons.Count > 1);
-        ActingPlayer.Sprite.RightArmHold(ActingPlayer.SelectedWeapon.Name);
+        ActingPlayer.SpriteInfo.RightArmHold(ActingPlayer.SelectedWeapon.Name);
     }
 
     private void UpdateEnemyPartyList()

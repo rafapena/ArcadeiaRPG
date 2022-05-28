@@ -5,7 +5,7 @@ public class Weapon : ActiveTool, IToolEquippable
 {
     public BattleMaster.WeaponTypes WeaponType;
 
-    public BaseObject Info => this;
+    public DataObject Info => this;
 
     [SerializeField]
     private int _DefaultPrice;

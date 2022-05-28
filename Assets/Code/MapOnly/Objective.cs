@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 
-public class Objective : BaseObject
+public class Objective : DataObject
 {
     public enum Types { Main, Secondary, Other };
 

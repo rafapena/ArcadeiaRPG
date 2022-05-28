@@ -35,6 +35,7 @@ public class PlayerParty : MonoBehaviour
     public List<PlayerRelation> PreExistingRelations;
 
     // GameObject dump
+    public GameObject Container;
     public Transform BattlersListDump;
     public Transform ItemsListDump;
     public Transform ObjectivesListDump;
@@ -45,7 +46,7 @@ public class PlayerParty : MonoBehaviour
 
     public List<Battler> WholeParty => AllPlayers.Cast<Battler>().Concat(Allies).ToList();
 
-    public void Initialize()
+    public void Setup()
     {
         SetupExpCurve();
         SetupRelations();
@@ -54,17 +55,7 @@ public class PlayerParty : MonoBehaviour
         for (int i = 0; i < all.Count; i++)
         {
             all[i] = Instantiate(all[i], BattlersListDump);
-            Battler b = all[i];
-            b.Level = Level;
-            b.StatConversion();
-            b.gameObject.SetActive(false);
-            if (b is BattlePlayer p)
-            {
-                p.AddLearnedSkills();
-                if (p.Weapons.Count > 0) p.SelectedWeapon = p.Weapons[0];
-                for (int j = 0; j < p.Weapons.Count; j++) p.Weapons[j] = Instantiate(p.Weapons[j], p.transform);
-            }
-            for (int j = 0; j < b.States.Count; j++) b.States[j] = Instantiate(b.States[j], b.transform);
+            all[i].Setup(this);
         }
         AllPlayers = all.Where(x => x is BattlePlayer).Select(x => x as BattlePlayer).ToList();
         Allies = all.Where(x => x is BattleAlly).Select(x => x as BattleAlly).ToList();
@@ -146,11 +137,10 @@ public class PlayerParty : MonoBehaviour
         b.AddHP(PlayerPrefs.GetInt(bt + "HP_" + file) - b.MaxHP);
         b.AddSP(PlayerPrefs.GetInt(bt + "SP_" + file) - BattleMaster.SP_CAP);
         b.States = LoadBattlersList(file, b, ResourcesMaster.States, bt);
-        b.gameObject.SetActive(false);
         return b as T;
     }
 
-    private List<T> LoadBattlersList<T>(int file, Battler b, T[] list, string pre) where T : BaseObject
+    private List<T> LoadBattlersList<T>(int file, Battler b, T[] list, string pre) where T : DataObject
     {
         List<T> destList = new List<T>();
         int listSize = PlayerPrefs.GetInt(pre + typeof(T).Name + "Count_" + file);

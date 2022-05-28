@@ -14,7 +14,7 @@ public class Item : ActiveTool, IToolForInventory
     public Stats PermantentStatChanges;
     public Item TurnsInto;
 
-    public BaseObject Info => this;
+    public DataObject Info => this;
 
     [SerializeField]
     private int _DefaultPrice;

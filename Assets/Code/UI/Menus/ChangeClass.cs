@@ -80,7 +80,7 @@ public class ChangeClass : MonoBehaviour
                 if (PassedTime) SetupCharacterSelection();
                 break;
             case Selections.SelectingCharacter:
-                if (InputMaster.GoingBack) SceneMaster.CloseChangeClassMenu(PartyInfo);
+                if (InputMaster.GoingBack) SceneMaster.CloseChangeClassMenu();
                 break;
             case Selections.SelectingClass:
                 if (InputMaster.GoingBack)
@@ -93,7 +93,7 @@ public class ChangeClass : MonoBehaviour
                 if (PassedTime) SetupChangedClass();
                 break;
             case Selections.ChangedClass:
-                if (PassedTime && (InputMaster.ProceedInMenu || InputMaster.GoingBack)) SceneMaster.CloseChangeClassMenu(PartyInfo);
+                if (PassedTime && (InputMaster.ProceedInMenu || InputMaster.GoingBack)) SceneMaster.CloseChangeClassMenu();
                 break;
         }
     }

@@ -19,7 +19,7 @@ MonoBehaviour:
     width: 1920
     height: 997
   m_ShowMode: 4
-  m_Title: Scene
+  m_Title: Game
   m_RootView: {fileID: 6}
   m_MinSize: {x: 875, y: 300}
   m_MaxSize: {x: 10000, y: 10000}
@@ -48,7 +48,7 @@ MonoBehaviour:
   m_MinSize: {x: 300, y: 200}
   m_MaxSize: {x: 24288, y: 16192}
   vertical: 0
-  controlID: 84
+  controlID: 22
 --- !u!114 &3
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -224,7 +224,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 200}
   m_MaxSize: {x: 16192, y: 16192}
   vertical: 1
-  controlID: 94
+  controlID: 23
 --- !u!114 &10
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -249,7 +249,7 @@ MonoBehaviour:
   m_MinSize: {x: 200, y: 100}
   m_MaxSize: {x: 16192, y: 8096}
   vertical: 0
-  controlID: 95
+  controlID: 24
 --- !u!114 &11
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -308,7 +308,7 @@ MonoBehaviour:
     m_SaveData: []
   m_LockTracker:
     m_IsLocked: 0
-  m_LastSelectedObjectID: -136706
+  m_LastSelectedObjectID: -3707862
 --- !u!114 &13
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -351,36 +351,36 @@ MonoBehaviour:
     m_SkipHidden: 0
     m_SearchArea: 1
     m_Folders:
-    - Assets/Resources/Prefabs/Projectiles/Fire
+    - Assets/Scenes/Maps/_TestLand
     m_Globs: []
     m_OriginalText: 
   m_ViewMode: 1
   m_StartGridSize: 64
   m_LastFolders:
-  - Assets/Resources/Prefabs/Projectiles/Fire
+  - Assets/Scenes/Maps/_TestLand
   m_LastFoldersGridSize: -1
   m_LastProjectPath: C:\Users\rafap\OneDrive\Documents\GitHub\ArcadeiaRPG
   m_LockTracker:
     m_IsLocked: 0
   m_FolderTreeState:
-    scrollPos: {x: 0, y: 406}
-    m_SelectedIDs: 30740000
-    m_LastClickedID: 29744
-    m_ExpandedIDs: 00000000ca730000cc730000ce730000d0730000d2730000d4730000d6730000d8730000da730000dc730000de730000e0730000e2730000e4730000e6730000e8730000ea730000ec730000ee730000f0730000f273000000ca9a3b
+    scrollPos: {x: 0, y: 618}
+    m_SelectedIDs: 44740000
+    m_LastClickedID: 29764
+    m_ExpandedIDs: 00000000ca730000cc730000ce730000d0730000d2730000d4730000d6730000d8730000da730000dc730000de730000e0730000e2730000e4730000e6730000e8730000ea730000ec730000ee730000f0730000f27300003674000000ca9a3b
     m_RenameOverlay:
       m_UserAcceptedRename: 0
-      m_Name: 
-      m_OriginalName: 
+      m_Name: Samples
+      m_OriginalName: Samples
       m_EditFieldRect:
         serializedVersion: 2
         x: 0
         y: 0
         width: 0
         height: 0
-      m_UserData: 0
+      m_UserData: 29762
       m_IsWaitingForDelay: 0
       m_IsRenaming: 0
-      m_OriginalEventType: 11
+      m_OriginalEventType: 0
       m_IsRenamingFilename: 1
       m_ClientGUIView: {fileID: 5}
     m_SearchString: 
@@ -419,9 +419,9 @@ MonoBehaviour:
       m_Icon: {fileID: 0}
       m_ResourceFile: 
   m_ListAreaState:
-    m_SelectedInstanceIDs: be570000
-    m_LastClickedInstanceID: 22462
-    m_HadKeyboardFocusLastEvent: 1
+    m_SelectedInstanceIDs: 
+    m_LastClickedInstanceID: 0
+    m_HadKeyboardFocusLastEvent: 0
     m_ExpandedInstanceIDs: c6230000
     m_RenameOverlay:
       m_UserAcceptedRename: 0
@@ -524,20 +524,20 @@ MonoBehaviour:
   m_SceneHierarchy:
     m_TreeViewState:
       scrollPos: {x: 0, y: 0}
-      m_SelectedIDs: fee9fdff
-      m_LastClickedID: -136706
-      m_ExpandedIDs: 307cfdffc6d6fdff7ceafdff18f7fdffb6bbffff2cfbffff6a9f00009aec000030fc0000
+      m_SelectedIDs: 2a6cc7ff
+      m_LastClickedID: -3707862
+      m_ExpandedIDs: 4effc6ff5a2cc7ff2a6cc7ff3e6cc7ff186fc7ff98fdc8ffa2fdc8ffb8fdc8ff1600c9ff9400c9ffb0e9c9ff7effc9ff7427caff1a48caffda34cbff38a6cbffb6dfcbff2a3eccffee3eccff0241ccffb64bccffe094ccff4ae4ccff54e4ccfff6faccff8e0ccdff302bcdffe6b6cdff14c4cdff869fceffd4aeceff72f3cfff4c1fd0ff2235d0fff83ed0ffb806d6ffcabfd7ff76fad7ff06cedaffded0daff6085dbffb22bdcff063adcff9658dcffe896dcffe8f9dcff5cfedcfff201ddff2809ddff6ab0ddffe657deffee54dfffa03ae3ffb8cde3ff34dfe3ff84f0e3ffaa4ee4ffa429e5ffdc30e5ff4c3be5ff265ee6ff7c6ee6ff4071e6fff02de7ffd44ee7ff9688e7ff9493e7ffd8aee7ff40e2e7ff9a12e8ff8a1ee8ffe44ee8ff1a5ae8ff1499e8ffeca3e8ff08bfe8ff3ac2e8ff0653e9ff0853e9ffae98e9ffb098e9ffc29be9ffc49be9ffc89be9ffca9be9ffcc9be9fffe9be9ff009ce9ffa2a4e9ff06a5e9ff00a6e9ff42a7e9ffe016eaffce10edffa81dedff96e0efffb4f7f0fffe03f1ff0004f1ff4c63f5ff8c6df5ff90f9f5ff9605f6ff6435f6ffb241f6ff9071f6ff447cf6ff9abbf6ffacd1f6ffe8d4f6fffce9f6ff24ebf6ff30ebf6ffbcebf6ff22f9f6ff2cf9f6ff36f9f6ffd6fdf6fff676f7ffda82f7ff2cb3f7ff2ac4f7ff84f4f7ff4200f8ff8070f9ff249afaffaca7faff225dfbffbe6bfbfffe6cfbff006dfbff7c86fcff7098fcff50cefcffd2dafcffd4dafcff040bfdff7c18fdff9e3bfdfff817feffa822feff0281feffb49bfeff58b5feff68c1feff6ac1feff6ec1feff8ecbfeff4af1feff52f1feff5cf1feff66f1feff00f5fefffc2effff10c0ffff8ccaffff2cfbffff9eb60000f8b6000014b7000048b7000078b70000deb70000b0c00000a4c5000020c8000096c8000022ca000054de000098de0000c8de000036df00004ef600007ef60000943201003033010060330100c63301006a4001009a400100fe490100ca4a0100427c0100727c0100f2fd01003efe0100a2fe010094150200f8150200ca2b0200022f020080330200543402006a340200b0340200c64102002a420200b4710200c47d0200667e02001e1b0300ac1b0300dc1b03004e1d030016c6030086c70300227b0400527b040048e50400ceef04001a040500340405002206050038060500a4330500f4330500243405002e34050054340500f83505007e3705008c37050094370500225f0500d25f050064620500fc62050012630500a6ad05002ee60500a8e60500d2e6050032e90500d2e90500e0e90500e8e905005cef0500d6ef050000f0050000f305000ef3050016f30500c4580700b4a0070058790a00607b0a00e88e0a00ac360b008e480b007a590b0082a10c006caa0c00
       m_RenameOverlay:
         m_UserAcceptedRename: 0
-        m_Name: BattleManager
-        m_OriginalName: BattleManager
+        m_Name: BattlerList
+        m_OriginalName: BattlerList
         m_EditFieldRect:
           serializedVersion: 2
           x: 0
           y: 0
           width: 0
           height: 0
-        m_UserData: 61346
+        m_UserData: -3707872
         m_IsWaitingForDelay: 0
         m_IsRenaming: 0
         m_OriginalEventType: 0
@@ -798,9 +798,9 @@ MonoBehaviour:
   m_PlayAudio: 0
   m_AudioPlay: 0
   m_Position:
-    m_Target: {x: 5.3036804, y: 8.692868, z: -0.22596359}
+    m_Target: {x: 2.104702, y: -2.7628295, z: 0.05514186}
     speed: 2
-    m_Value: {x: 5.3036804, y: 8.692868, z: -0.22596359}
+    m_Value: {x: 2.104702, y: -2.7628295, z: 0.05514186}
   m_RenderMode: 0
   m_CameraMode:
     drawMode: 0
@@ -851,9 +851,9 @@ MonoBehaviour:
     speed: 2
     m_Value: {x: 0, y: 0, z: 0, w: 1}
   m_Size:
-    m_Target: 23.462374
+    m_Target: 6.423397
     speed: 2
-    m_Value: 23.462374
+    m_Value: 6.423397
   m_Ortho:
     m_Target: 1
     speed: 2

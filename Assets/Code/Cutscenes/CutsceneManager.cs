@@ -48,7 +48,7 @@ public class CutsceneManager : MonoBehaviour
 
     public void Close()
     {
-        SceneMaster.CloseCutscene(Player);
+        SceneMaster.CloseCutscene();
         HideGold();
         ObjectiveFrame.Deactivate();
         ItemsFrame.Deactivate();

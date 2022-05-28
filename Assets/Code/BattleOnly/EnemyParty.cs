@@ -11,8 +11,13 @@ public class EnemyParty : MonoBehaviour
 
     [HideInInspector] public int[][] IndexMapping;
 
-    public void Start()
+    private void Awake()
     {
-        //
+        gameObject.SetActive(false);
+    }
+
+    public void Setup()
+    {
+        foreach (var e in Enemies) e.Setup();
     }
 }

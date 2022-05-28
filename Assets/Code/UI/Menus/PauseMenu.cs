@@ -57,21 +57,21 @@ public class PauseMenu : MonoBehaviour
     public void Continue()
     {
         if (!MenuMaster.ReadyToSelectInMenu) return;
-        SceneMaster.ClosePauseMenu(PartyInfo);
+        SceneMaster.ClosePauseMenu();
     }
 
     public void GoToMenu()
     {
         if (!MenuMaster.ReadyToSelectInMenu) return;
-        SceneMaster.ClosePauseMenu(PartyInfo);
-        SceneMaster.OpenMapMenu(PartyInfo);
+        SceneMaster.ClosePauseMenu();
+        SceneMaster.OpenMapMenu();
     }
 
     public void GoToLoadGame()
     {
         if (!MenuMaster.ReadyToSelectInMenu) return;
-        SceneMaster.ClosePauseMenu(PartyInfo);
-        SceneMaster.OpenFileSelect(FileSelect.FileMode.LoadOrDelete, PartyInfo);
+        SceneMaster.ClosePauseMenu();
+        SceneMaster.OpenFileSelect(FileSelect.FileMode.LoadOrDelete);
     }
 
     public void GoToOptions()

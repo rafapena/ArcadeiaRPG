@@ -21,8 +21,8 @@ public class SceneMaster : MonoBehaviour
     public static bool InCutscene { get; private set; } = false;
 
     public static bool InBattle { get; private set; } = false;
-     
-    public static List<GameObject> StoredMapScene;
+
+    public static List<GameObject> StoredMapScene { get; private set; }
 
     public const string TITLE_SCREEN_SCENE = "Title";
     public const string MAP_MENU_SCENE = "MapMenu";
@@ -61,89 +61,102 @@ public class SceneMaster : MonoBehaviour
         Time.timeScale = 1;
     }
 
-    public static void StartBattle(PlayerParty playerParty, EnemyParty enemyParty)
+    public static void StartBattle(EnemyParty enemyParty)
     {
         InBattle = true;
-        GameplayMaster.Party = playerParty;
         GameplayMaster.EnemyGroup = enemyParty;
         StoreGameObjects();
         ChangeScene(BATTLE_SCENE, BATTLE_TRANSITION_TIME, ScreenTransitioner.SceneChangeModes.Add, ScreenTransitioner.TransitionModes.Battle);
     }
 
-    public static void EndBattle(PlayerParty playerParty)
+    public static void EndBattle()
     {
         MenuMaster.SetupSelectionBufferInGameplay(0.5f);
         ChangeScene(BATTLE_SCENE, BATTLE_TRANSITION_TIME / 2, ScreenTransitioner.SceneChangeModes.Remove, ScreenTransitioner.TransitionModes.BlackScreen);
         MapMaster.EnemyEncountered.DeclareDefeated();
-        GameplayMaster.Party = playerParty;
         InBattle = false;
+    }
+
+    public static void ApplyBattleStartChanges()
+    {
+        DeactivateStoredGameObjects();
+        GameplayMaster.PlayerContainer.SetActive(true);
+        GameplayMaster.Party.gameObject.SetActive(true);
+        foreach (Transform t in GameplayMaster.Party.transform) t.gameObject.SetActive(true);
+        SceneManager.MoveGameObjectToScene(GameplayMaster.PlayerContainer, SceneManager.GetSceneByName(BATTLE_SCENE));
+    }
+
+    public static void ApplyBattleEndChanges()
+    {
+        ActivateStoredGameObjects();
+        GameplayMaster.OverworldAvatar.gameObject.SetActive(true);
+        GameplayMaster.Party.gameObject.SetActive(false);
+        SceneManager.MoveGameObjectToScene(GameplayMaster.PlayerContainer, SceneManager.GetSceneByName(MapMaster.SceneName));
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- Opening/closeing UI menus --
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    private static void OpenMenu(PlayerParty playerParty, string sceneName, ref bool menuCheck)
+    private static void OpenMenu(string sceneName, ref bool menuCheck)
     {
-        if (!GameplayMaster.Party && playerParty != null) GameplayMaster.Party = playerParty;
         SceneManager.LoadScene(sceneName, LoadSceneMode.Additive);
         menuCheck = true;
         Time.timeScale = 0;
     }
 
-    private static void CloseMenu(PlayerParty playerParty, string sceneName, ref bool menuCheck)
+    private static void CloseMenu(string sceneName, ref bool menuCheck)
     {
         MenuMaster.SetupSelectionBufferInGameplay(0.3f);
-        GameplayMaster.Party = playerParty;
         SceneManager.UnloadSceneAsync(sceneName);
         menuCheck = false;
         if (!InMenu) Time.timeScale = 1;
     }
 
-    public static void OpenMapMenu(PlayerParty playerParty) => OpenMenu(playerParty, MAP_MENU_SCENE, ref InMapMenu);
+    public static void OpenMapMenu() => OpenMenu(MAP_MENU_SCENE, ref InMapMenu);
 
-    public static void CloseMapMenu(PlayerParty playerParty) => CloseMenu(playerParty, MAP_MENU_SCENE, ref InMapMenu);
+    public static void CloseMapMenu() => CloseMenu(MAP_MENU_SCENE, ref InMapMenu);
 
-    public static void OpenPauseMenu(PlayerParty playerParty) => OpenMenu(playerParty, PAUSE_MENU_SCENE, ref InPauseMenu);
+    public static void OpenPauseMenu() => OpenMenu(PAUSE_MENU_SCENE, ref InPauseMenu);
 
-    public static void ClosePauseMenu(PlayerParty playerParty) => CloseMenu(playerParty, PAUSE_MENU_SCENE, ref InPauseMenu);
+    public static void ClosePauseMenu() => CloseMenu(PAUSE_MENU_SCENE, ref InPauseMenu);
 
-    public static void OpenFileSelect(FileSelect.FileMode fileMode, PlayerParty playerParty = null)
+    public static void OpenFileSelect(FileSelect.FileMode fileMode)
     {
         FileSelect.FileSelectMode = fileMode;
-        OpenMenu(playerParty, FILE_SELECT_MENU_SCENE, ref InFileSelectMenu);
+        OpenMenu(FILE_SELECT_MENU_SCENE, ref InFileSelectMenu);
     }
 
-    public static void CloseFileSelect() => CloseMenu(null, FILE_SELECT_MENU_SCENE, ref InFileSelectMenu);
+    public static void CloseFileSelect() => CloseMenu(FILE_SELECT_MENU_SCENE, ref InFileSelectMenu);
 
-    public static void OpenShop(bool onlyBuying, PlayerParty playerParty, Shopkeeper shop)
+    public static void OpenShop(bool onlyBuying, Shopkeeper shop)
     {
         GameplayMaster.Shop = shop;
         InShopMenu = onlyBuying ? 1 : 2;
-        OpenMenu(playerParty, SHOP_SCENE, ref InShop);
+        OpenMenu(SHOP_SCENE, ref InShop);
     }
 
-    public static void CloseShop(PlayerParty playerParty) => CloseMenu(playerParty, SHOP_SCENE, ref InShop);
+    public static void CloseShop() => CloseMenu(SHOP_SCENE, ref InShop);
 
-    public static void OpenStorage(PlayerParty playerParty) => OpenMenu(playerParty, STORAGE_SCENE, ref InStorageMenu);
+    public static void OpenStorage() => OpenMenu(STORAGE_SCENE, ref InStorageMenu);
 
-    public static void CloseStorage(PlayerParty playerParty) => CloseMenu(playerParty, STORAGE_SCENE, ref InStorageMenu);
+    public static void CloseStorage() => CloseMenu(STORAGE_SCENE, ref InStorageMenu);
 
-    public static void OpenCraftingMenu(PlayerParty playerParty, Crafter crafter, InventorySystem.ListType craftables)
+    public static void OpenCraftingMenu(Crafter crafter, InventorySystem.ListType craftables)
     {
         GameplayMaster.CraftingMode = craftables;
-        OpenMapMenu(playerParty);
+        OpenMapMenu();
     }
 
-    public static void CloseCraftingMenu(PlayerParty playerParty)
+    public static void CloseCraftingMenu()
     {
         GameplayMaster.CraftingMode = InventorySystem.ListType.None;
-        CloseMapMenu(playerParty);
+        CloseMapMenu();
     }
 
-    public static void OpenChangeClassMenu(PlayerParty playerParty) => OpenMenu(playerParty, CHANGE_CLASS_SCENE, ref InShop);
+    public static void OpenChangeClassMenu() => OpenMenu(CHANGE_CLASS_SCENE, ref InShop);
 
-    public static void CloseChangeClassMenu(PlayerParty playerParty) => CloseMenu(playerParty, CHANGE_CLASS_SCENE, ref InShop);
+    public static void CloseChangeClassMenu() => CloseMenu(CHANGE_CLASS_SCENE, ref InShop);
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- Cutscenes/Other --
@@ -154,9 +167,8 @@ public class SceneMaster : MonoBehaviour
         InCutscene = true;
     }
 
-    public static void CloseCutscene(MapPlayer player)
+    public static void CloseCutscene()
     {
-        GameplayMaster.Party = player.Party;
         MenuMaster.SetupSelectionBufferInGameplay(0.5f);
         InCutscene = false;
     }

@@ -14,7 +14,7 @@ public class BattleActionSet_General : BattleActionSet
     private ParticleSystem DefaultWeaponParticles()
     {
         if (!User?.SelectedWeapon?.ChargingEffect) return null;
-        var ps = User.Sprite.ObjectSpawnPoint.GetComponent<ParticleSystem>();
+        var ps = User.SpriteInfo.ObjectSpawnPoint.GetComponent<ParticleSystem>();
         ps = User.SelectedWeapon.ChargingEffect;
         ps.Play();
         return ps;
@@ -28,7 +28,7 @@ public class BattleActionSet_General : BattleActionSet
 
     private BattlerAI SummonBattler(BattlerAI b0)
     {
-        var b = User.CurrentBattle.InstantiateBattler(b0, User.ScopedTargetDestination);
+        var b = Instantiate(b0);// User.CurrentBattle.InstantiateBattler(b0, User.ScopedTargetDestination);
         b.StatConversion();
         b.IsSummon = true;
         if (b is BattleAlly a) User.CurrentBattle.PlayerParty.Allies.Add(a);

@@ -72,13 +72,13 @@ public class ResourcesMaster : MonoBehaviour
     /// -- Sorting --
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public static T[] SortById<T>(T[] arr) where T : BaseObject
+    public static T[] SortById<T>(T[] arr) where T : DataObject
     {
         QSort(ref arr, 0, arr.Length - 1);
         return arr;
     }
 
-    private static void QSort<T>(ref T[] arr, int low, int high) where T : BaseObject
+    private static void QSort<T>(ref T[] arr, int low, int high) where T : DataObject
     {
         if (low >= high) return;
         int pi = RandomizedPartition(ref arr, low, high);
@@ -86,7 +86,7 @@ public class ResourcesMaster : MonoBehaviour
         QSort(ref arr, pi + 1, high);
     }
 
-    private static int RandomizedPartition<T>(ref T[] arr, int low, int high) where T : BaseObject
+    private static int RandomizedPartition<T>(ref T[] arr, int low, int high) where T : DataObject
     {
         int i = Random.Range(low, high);
         T pivot = arr[i];
@@ -95,7 +95,7 @@ public class ResourcesMaster : MonoBehaviour
         return Partition(ref arr, low, high);
     }
 
-    private static int Partition<T>(ref T[] arr, int low, int high) where T : BaseObject
+    private static int Partition<T>(ref T[] arr, int low, int high) where T : DataObject
     {
         T pivot = arr[high];
         int i = low;

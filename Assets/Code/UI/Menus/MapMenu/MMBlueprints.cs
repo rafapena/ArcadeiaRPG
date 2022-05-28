@@ -111,7 +111,7 @@ public class MMBlueprints : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameO
         {
             case Selections.SelectingBlueprints:
                 Selection = Selections.None;
-                if (GameplayMaster.IsCrafting) SceneMaster.CloseCraftingMenu(MenuManager.PartyInfo);
+                if (GameplayMaster.IsCrafting) SceneMaster.CloseCraftingMenu();
                 else MenuManager.GoToMain();
                 break;
             case Selections.ConfirmCraft:

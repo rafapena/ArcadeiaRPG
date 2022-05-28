@@ -49,6 +49,11 @@ public class SkillSelectionList : SelectionList_Super<Skill>
         ReferenceBattler = b;
         ReferenceData.Clear();
         NoSkillsLabel.SetActive(!b.HasAnySkills);
+        if (!b.HasAnySkills)
+        {
+            InfoFrame.SetActive(false);
+            CannotUseFrame.SetActive(false);
+        }
         int i = 0;
         foreach (Skill dataEntry in b.Skills)
         {

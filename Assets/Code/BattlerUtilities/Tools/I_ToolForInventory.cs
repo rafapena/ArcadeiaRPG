@@ -3,7 +3,7 @@ using UnityEngine;
 
 public interface IToolForInventory
 {
-    BaseObject Info { get; }
+    DataObject Info { get; }
 
 
     int Price { get; set; }

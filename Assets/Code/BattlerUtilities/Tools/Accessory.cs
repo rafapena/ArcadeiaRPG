@@ -20,7 +20,7 @@ public class Accessory : PassiveEffect, IToolEquippable
     public int UserCondition;
     public List<BattlerClass> ClassExclusives;
 
-    public BaseObject Info => this;
+    public DataObject Info => this;
 
     [SerializeField]
     private int _DefaultPrice;

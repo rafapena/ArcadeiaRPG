@@ -15,7 +15,7 @@ public abstract class BattleActionSet : MonoBehaviour
     protected Projectile SpawnProjectile(Projectile p0, float nerfPartition, bool finisher)
     {
         Projectile p = Instantiate(p0, User.CurrentBattle.ActiveProjectiles);
-        p.transform.position = User.Sprite.ObjectSpawnPoint.position;
+        p.transform.position = User.SpriteInfo.ObjectSpawnPoint.position;
         p.SetBattleInfo(User, User.SelectedAction, nerfPartition, finisher);
         return p;
     }
@@ -30,7 +30,7 @@ public abstract class BattleActionSet : MonoBehaviour
     protected Projectile FireAimedProjectile(Projectile p0, float nerfPartition, bool finisher)
     {
         var p = SpawnProjectile(p0, nerfPartition, finisher);
-        p.Direct(User.SingleSelectedTarget.Sprite.ActionHitbox.transform.position - User.Sprite.ObjectSpawnPoint.transform.position);
+        p.Direct(User.SingleSelectedTarget.SpriteInfo.ActionHitbox.transform.position - User.SpriteInfo.ObjectSpawnPoint.transform.position);
         return p;
     }
 }

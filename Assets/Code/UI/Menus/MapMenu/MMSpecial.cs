@@ -31,6 +31,7 @@ public class MMSpecial : MM_Super
     // List of potential targets
     private List<Battler> SelectableTeammates;
     private bool SelectAllTeammates;
+    private BattlePlayer HoveredPlayer;
     private BattlePlayer SelectedPlayer;
 
     // Delay after a skill has been used
@@ -109,11 +110,11 @@ public class MMSpecial : MM_Super
 
     public void HoverOverUser()
     {
-        if (!ListsSetup || Selection != Selections.SelectPlayer) return;
+        if (!ListsSetup || Selection != Selections.SelectPlayer && Selection != Selections.SelectSkill) return;
         PartyUserList.SetSelected();
-        SelectedPlayer = PartyUserList.SelectedObject as BattlePlayer;
+        HoveredPlayer = PartyUserList.SelectedObject as BattlePlayer;
         SkillsList.Activate();
-        SkillsList.Refresh(SelectedPlayer, MenuManager.PartyInfo.WholeParty.ToList());
+        SkillsList.Refresh(HoveredPlayer, MenuManager.PartyInfo.WholeParty.ToList());
     }
 
     public void DeselectUser()
@@ -124,11 +125,12 @@ public class MMSpecial : MM_Super
 
     public void SelectUser()
     {
-        if (!SelectedPlayer.HasAnySkills) return;
+        if (!HoveredPlayer.HasAnySkills) return;
         Selection = Selections.SelectSkill;
         PartyUserList.SetSelected();
         PartyUserList.UnhighlightAll();
         PartyUserList.SelectedButton.KeepSelected();
+        SelectedPlayer = PartyUserList.SelectedObject as BattlePlayer;
         EventSystem.current.SetSelectedGameObject(SkillsList.transform.GetChild(0).gameObject);
     }
 

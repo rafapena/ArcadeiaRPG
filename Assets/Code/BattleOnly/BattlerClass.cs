@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class BattlerClass : BaseObject
+public class BattlerClass : DataObject
 {
     public BattleMaster.CombatRangeTypes CombatRangeType;
     public Stats BaseStats;

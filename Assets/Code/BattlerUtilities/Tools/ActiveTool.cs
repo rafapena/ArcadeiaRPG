@@ -3,7 +3,7 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 
-public abstract class ActiveTool : BaseObject
+public abstract class ActiveTool : DataObject
 {
     public enum ModType { None, Damage, Recover, Drain }
 

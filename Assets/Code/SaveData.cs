@@ -120,7 +120,7 @@ public class SaveData
         SaveBattlersList(b.States, bt);
     }
 
-    private void SaveBattlersList<T>(List<T> list, string pre) where T : BaseObject
+    private void SaveBattlersList<T>(List<T> list, string pre) where T : DataObject
     {
         int i = 0;
         foreach (T entry in list) PlayerPrefs.SetInt(pre + typeof(T).Name + i++ + "_" + File, entry.Id);

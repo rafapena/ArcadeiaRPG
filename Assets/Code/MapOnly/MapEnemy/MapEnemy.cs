@@ -49,7 +49,7 @@ public class MapEnemy : MapExplorer
     {
         if (collision.gameObject.GetComponent<MapPlayer>() && !SceneMaster.InCutscene)
         {
-            SceneMaster.StartBattle(TargetPlayer.Party, EnemyPartyOnContact);
+            SceneMaster.StartBattle(EnemyPartyOnContact);
             MapMaster.EnemyEncountered = this;
         }
     }

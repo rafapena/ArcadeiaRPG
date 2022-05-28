@@ -21,6 +21,8 @@ public class Battle : MonoBehaviour
     public BattleWin BattleWinMenu;
 
     // Positioning
+    public Transform PlayerPartyField;
+    public Transform EnemyPartyField;
     private const float X_POSITION_DISTANCE = 2.5f;
     private const float Y_POSITION_DISTANCE = 0.8f;
 
@@ -46,8 +48,6 @@ public class Battle : MonoBehaviour
     public Transform ActivePopups;
 
     // Grouping battlers
-    public Transform PlayerPartyDump;
-    public Transform EnemyPartyDump;
     private List<Battler> Battlers = new List<Battler>();
     private List<Battler> BattlersByColumn = new List<Battler>();
     public Battler ActingBattler { get; private set; }
@@ -67,28 +67,23 @@ public class Battle : MonoBehaviour
 
     private void Start()
     {
-        // Hide overworld
-        SceneMaster.DeactivateStoredGameObjects();
+        // Scene update
+        SceneMaster.ApplyBattleStartChanges();
 
         // Setup player party
         PlayerParty = GameplayMaster.Party;
-        var teammates = SetupPositions( SetupBattlers(PlayerParty.BattlingParty), PlayerPartyDump, 1);
-        int i = 0;
-        int j = 0;
-        foreach (var t in teammates)
-        {
-            if (t is BattlePlayer p) PlayerParty.AllPlayers[i++] = p;
-            else if (t is BattleAlly a) PlayerParty.Allies[j++] = a;
-        }
+        var teammates = PlayerParty.BattlingParty;
+        ActivateBattlers(ref teammates);
+        SetupStartingPositions(ref teammates, PlayerPartyField, 1);
 
         // Setup enemy party
-        EnemyParty = Instantiate(GameplayMaster.EnemyGroup, gameObject.transform);
-        EnemyParty.gameObject.SetActive(false);
-        EnemyParty.Enemies = SetupPositions( SetupBattlers(EnemyParty.Enemies), EnemyPartyDump, -1);
+        EnemyParty = Instantiate(GameplayMaster.EnemyGroup);
+        ActivateBattlers(ref EnemyParty.Enemies);
+        SetupStartingPositions(ref EnemyParty.Enemies, EnemyPartyField, -1);
+        EnemyParty.Setup();
 
         // Group into battlers list
-        foreach (BattlePlayer p in PlayerParty.Players) Battlers.Add(p);
-        foreach (BattleAlly a in PlayerParty.Allies) Battlers.Add(a);
+        foreach (Battler b in teammates) Battlers.Add(b);
         foreach (BattleEnemy e in EnemyParty.Enemies) Battlers.Add(e);
         SortBattlersInOrderLayer();
 
@@ -96,50 +91,16 @@ public class Battle : MonoBehaviour
         StartCoroutine(ProcessFirstTurn());
     }
 
-    private List<T> SetupBattlers<T>(List<T> list) where T : Battler
+    private void ActivateBattlers<T>(ref List<T> party) where T : Battler
     {
-        List<T> result = new List<T>();
-        foreach (Battler b0 in list) result.Add((T)InstantiateBattler(b0));
-        return result;
+        foreach (var b in party)
+        {
+            b.transform.gameObject.SetActive(true);
+            b.SetBattle(this);
+        }
     }
 
-    public T InstantiateBattler<T>(T newBattler, Vector3 position = default) where T : Battler
-    {
-        // MOVE PARTY MEMBER GAMEOBJECTS FROM SCENE TO SCENE
-
-        // Clone battler and link battle
-        T b = Instantiate(newBattler, position, Quaternion.identity, (newBattler is BattleEnemy ? EnemyPartyDump : PlayerPartyDump));
-        b.SetBattle(this);
-
-        // Stats
-        if (b is not BattleEnemy)
-        {
-            b.AddHP(b.HP);
-            b.AddSP(b.SP);
-        }
-        else b.StatConversion();
-
-        // Class and skills
-        var skills = gameObject.GetComponentsInChildren<Skill>();
-        foreach (var skill in skills) skill.DisableForWarmup();
-        if (b.Class)
-        {
-            b.Class = Instantiate(b.Class, b.transform);
-            var classSkills = b.Class.gameObject.GetComponentsInChildren<Skill>();
-            foreach (var skill in classSkills) skill.DisableForWarmup();
-        }
-
-        // States setup
-        for (int i = 0; i < b.States.Count; i++) b.States[i] = Instantiate(b.States[i], b.transform);
-        b.StatBoosts.SetToZero();
-        
-        // GameObject management
-        b.transform.localScale = Vector3.one * 0.7f;
-        b.gameObject.SetActive(true);
-        return b;
-    }
-
-    private List<T> SetupPositions<T>(List<T> party, Transform partyGameObject, int mult) where T : Battler
+    private void SetupStartingPositions<T>(ref List<T> party, Transform battlerPartyField, int mult) where T : Battler
     {
         if (party.Count >= 9) party = party.Take(9).ToList();
         var dists = new List<Battler>[] { new List<Battler>(), new List<Battler>(), new List<Battler>() };
@@ -159,9 +120,8 @@ public class Battle : MonoBehaviour
 
             // Set position
             col.Add(b);
-            b.SetPosition(partyGameObject.position + bPos);
+            b.SetPosition(battlerPartyField.position + bPos);
         }
-        return party;
     }
 
     private void SortBattlersInOrderLayer()
@@ -309,14 +269,14 @@ public class Battle : MonoBehaviour
             NextActingBattler = Battlers.FirstOrDefault(x => x != ActingBattler && !x.KOd);
         }
         
-        ActingBattler.Sprite.HandleTurnIndicators(true, false);
-        NextActingBattler.Sprite.HandleTurnIndicators(false, true);
+        ActingBattler.SpriteInfo.HandleTurnIndicators(true, false);
+        NextActingBattler.SpriteInfo.HandleTurnIndicators(false, true);
         return true;
     }
 
     private void ClearAllTurnIndicators()
     {
-        foreach (var b in Battlers) b.Sprite.HandleTurnIndicators(false, false);
+        foreach (var b in Battlers) b.SpriteInfo.HandleTurnIndicators(false, false);
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -337,7 +297,7 @@ public class Battle : MonoBehaviour
         if (ActingBattler.SingleSelectedTarget && !ActingBattler.SelectedAction.Ranged)
         {
             RestrictBattlerWallCollision(false);
-            var sp = ActingBattler.SingleSelectedTarget.Sprite;
+            var sp = ActingBattler.SingleSelectedTarget.SpriteInfo;
             ActingBattler.ApproachTarget(sp.ApproachPointLeft.position, sp.ApproachPointRight.position);
             yield return new WaitUntil(ActingBattler.HasApproachedTarget);
         }
@@ -347,14 +307,14 @@ public class Battle : MonoBehaviour
         if (!skill?.Basic ?? true) StartCoroutine(BattleMenu.DisplayUsedAction(ActingBattler, ActingBattler.SelectedAction?.Name ?? string.Empty));
 
         // Use action
-        ActingBattler.Sprite.Animation.SetTrigger(Battler.AnimParams.DoAction.ToString());
+        ActingBattler.SpriteInfo.Animation.SetTrigger(Battler.AnimParams.DoAction.ToString());
         if (ActingBattler.UsingBasicAttack) ActingBattler.UseBasicAttack(ActingBattler.SelectedWeapon);
         else if (skill) ActingBattler.UseSkill(skill);
         else if (ActingBattler.SelectedAction is Item item) ActingBattler.UseItem(item);
         yield return new WaitUntil(ActingBattler.ActionAnimationCompleted);
 
         // Complete action
-        ActingBattler.Sprite.Animation.SetTrigger(Battler.AnimParams.DoneAction.ToString());
+        ActingBattler.SpriteInfo.Animation.SetTrigger(Battler.AnimParams.DoneAction.ToString());
         ActingBattler.ApproachForNextTurn();
         yield return new WaitUntil(ActingBattler.HasApproachedNextTurnDestination);
         yield return new WaitUntil(() => ActiveProjectiles.childCount == 0);
@@ -434,13 +394,13 @@ public class Battle : MonoBehaviour
         {
             BattleMenu.RefreshPartyFrames();
             if (EnemyParty.ShowVictoryWhenDefeated) StartCoroutine(DeclareWin());
-            else SceneMaster.EndBattle(PlayerParty);
+            else SceneMaster.EndBattle();
             return true;
         }
         else if (PlayerPartyDefeated)
         {
             if (EnemyParty.HasGameOverScreen) StartCoroutine(DeclareGameOver());
-            else SceneMaster.EndBattle(PlayerParty);
+            else SceneMaster.EndBattle();
             return true;
         }
         return false;
@@ -459,13 +419,13 @@ public class Battle : MonoBehaviour
         foreach (var e in EnemyParty.Enemies) e.SetToEscapeMode(false, false);
         StartCoroutine(BattleMenu.DisplayUsedAction(ActingBattler, "ESCAPED!"));
         yield return new WaitForSeconds(2);
-        SceneMaster.EndBattle(PlayerParty);
+        SceneMaster.EndBattle();
     }
 
     private IEnumerator DeclareWin()
     {
         ClearAll();
-        foreach (var b in PlayerParty.BattlingParty) b.Sprite.Animation.SetInteger(Battler.AnimParams.Victory.ToString(), 1);
+        foreach (var b in PlayerParty.BattlingParty) b.SpriteInfo.Animation.SetInteger(Battler.AnimParams.Victory.ToString(), 1);
         yield return new WaitForSeconds(2);
         BattleWinMenu.Setup();
     }
@@ -486,6 +446,7 @@ public class Battle : MonoBehaviour
 
     private void OnDestroy()
     {
-        SceneMaster.ActivateStoredGameObjects();    // Return overworld
+        foreach (var b in PlayerParty.BattlingParty) b.SetBattle(null);
+        SceneMaster.ApplyBattleEndChanges();
     }
 }

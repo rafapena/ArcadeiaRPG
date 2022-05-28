@@ -167,6 +167,6 @@ public class BattleWin : MonoBehaviour
     public void ExitBattle()
     {
         ProceedButton.Deactivate();
-        SceneMaster.EndBattle(FinishedBattle.PlayerParty);
+        SceneMaster.EndBattle();
     }
 }

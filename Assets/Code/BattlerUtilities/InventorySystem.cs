@@ -116,7 +116,6 @@ public class InventorySystem : MonoBehaviour
         {
             tool = (T)InitializeTool(newTool, Party.ItemsListDump);
             tool.Quantity = amount;
-            tool.Info.gameObject.GetComponent<Renderer>().enabled = false;
             toolList.Add(tool);
         }
         else tool.Quantity += amount;

@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 
 [System.Serializable]
-public abstract class PassiveEffect : BaseObject
+public abstract class PassiveEffect : DataObject
 {
     public enum TurnSequence { ActionStart, ActionEnd, TurnEnd }
 

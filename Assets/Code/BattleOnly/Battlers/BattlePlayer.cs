@@ -39,13 +39,21 @@ public class BattlePlayer : Battler
     protected override void Start()
     {
         base.Start();
-        if (Class) Sprite.WearAttire(Class.Name);
+        if (Class) SpriteInfo.WearAttire(Class.Name);
         if (Weapons.Count > 0)
         {
             if (!SelectedWeapon) SelectedWeapon = Weapons[0];
-            Sprite.RightArmHold(SelectedWeapon.Name);
+            SpriteInfo.RightArmHold(SelectedWeapon.Name);
         }
         Direction = Vector3.right;
+    }
+
+    public override void Setup(PlayerParty party = null)
+    {
+        base.Setup(party);
+        AddLearnedSkills();
+        if (Weapons.Count > 0) SelectedWeapon = Weapons[0];
+        for (int j = 0; j < Weapons.Count; j++) Weapons[j] = Instantiate(Weapons[j], transform);
     }
 
     public override void StatConversion()
@@ -135,7 +143,7 @@ public class BattlePlayer : Battler
     {
         Class = newClass;
         StatConversion();
-        Sprite.WearAttire(Class.Name);
+        SpriteInfo.WearAttire(Class.Name);
         Skills.Clear();
         AddLearnedSkills();
     }

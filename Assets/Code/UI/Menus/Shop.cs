@@ -122,7 +122,7 @@ public class Shop : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFrameOper
     {
         Selection = Selections.None;
         Shopkeep.CloseShop(DoneTransaction);
-        SceneMaster.CloseShop(PartyInfo);
+        SceneMaster.CloseShop();
     }
 
     public void ReturnToSelection()

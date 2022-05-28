@@ -10,12 +10,12 @@ using UnityEngine.iOS;
 using UnityEngine.U2D.Animation;
 using UnityEngine.UI;
 
-public abstract class Battler : BaseObject
+public abstract class Battler : DataObject
 {
     public Battle CurrentBattle { get; private set; }
 
     // Movement
-    public Vector3 Position => Sprite.BaseHitBox.position;
+    public Vector3 Position => SpriteInfo.BaseHitBox.position;
     [HideInInspector] public Rigidbody2D Figure;
     [HideInInspector] public Vector3 Direction;
     [HideInInspector] public Vector3 Movement;
@@ -32,7 +32,8 @@ public abstract class Battler : BaseObject
     public int ColumnOverlapRank { get; private set; }
     public Sprite MainImage;
     public Sprite FaceImage;
-    [HideInInspector] public SpriteProperties Sprite;
+    [HideInInspector] public SpriteProperties SpriteInfo;
+    private const float SIZE_CORRECTER = 0.7f;
 
     // Animation management
     public enum AnimParams { Action, Victory, Running, Block, Dodge, DoAction, DoneAction, GetHit, Recovered, KOd }
@@ -103,8 +104,8 @@ public abstract class Battler : BaseObject
         base.Awake();
 
         Figure = gameObject.GetComponent<Rigidbody2D>();
-        Sprite = transform.GetChild(0)?.GetChild(0)?.GetComponent<SpriteProperties>();
-        if (!Sprite) Debug.LogError("Sprite must be set up in the correct hierarchy");
+        SpriteInfo = transform.GetChild(0)?.GetChild(0)?.GetComponent<SpriteProperties>();
+        if (!SpriteInfo) Debug.LogError("Sprite must be set up in the correct hierarchy");
         if (CurrentBattle) BasicAttackSkill = Instantiate(CurrentBattle.BasicAttack, transform);
 
         SetupElementRates();
@@ -118,8 +119,29 @@ public abstract class Battler : BaseObject
 
     protected virtual void Start()
     {
-        Sprite.ActionHitbox.SetBattler(this);
-        Sprite.ScopeHitbox.SetBattler(this);
+        transform.localScale = Vector3.one * SIZE_CORRECTER;
+        SpriteInfo.ActionHitbox.SetBattler(this);
+        SpriteInfo.ScopeHitbox.SetBattler(this);
+        gameObject.SetActive(false);
+    }
+
+    public virtual void Setup(PlayerParty party = null)
+    {
+        if (party) Level = party.Level;
+        StatConversion();
+        for (int j = 0; j < States.Count; j++) States[j] = Instantiate(States[j], transform);
+
+        var skills = gameObject.GetComponentsInChildren<Skill>();
+        foreach (var skill in skills) skill.DisableForWarmup();
+        if (Class)
+        {
+            Class = Instantiate(Class, transform);
+            var classSkills = Class.gameObject.GetComponentsInChildren<Skill>();
+            foreach (var skill in classSkills) skill.DisableForWarmup();
+        }
+
+        for (int i = 0; i < States.Count; i++) States[i] = Instantiate(States[i], transform);
+        StatBoosts.SetToZero();
     }
 
     public virtual void StatConversion()
@@ -165,7 +187,7 @@ public abstract class Battler : BaseObject
 
     protected virtual void Update()
     {
-        Sprite.Animation.SetBool(AnimParams.Running.ToString(), Movement != Vector3.zero);
+        SpriteInfo.Animation.SetBool(AnimParams.Running.ToString(), Movement != Vector3.zero);
         Figure.velocity = Movement * SpriteSpeed;
     }
 
@@ -177,7 +199,7 @@ public abstract class Battler : BaseObject
 
     public void SetColumnOverlapRank(int rank)
     {
-        Sprite.MoveForwardInOrder(rank - ColumnOverlapRank);
+        SpriteInfo.MoveForwardInOrder(rank - ColumnOverlapRank);
         ColumnOverlapRank = rank;
     }
 
@@ -201,7 +223,7 @@ public abstract class Battler : BaseObject
         Debug.Log(Name + " --> ");
         foreach (string s in animStateList)
         {
-            if (Sprite.Animation.GetCurrentAnimatorStateInfo(0).IsName(s)) Debug.Log(s.ToUpper());
+            if (SpriteInfo.Animation.GetCurrentAnimatorStateInfo(0).IsName(s)) Debug.Log(s.ToUpper());
         }
     }
 
@@ -389,7 +411,7 @@ public abstract class Battler : BaseObject
 
     public void UseBasicAttack(Weapon weapon)
     {
-        Sprite.Animation.SetInteger(AnimParams.Action.ToString(), (int)(weapon?.WeaponType ?? 0) + 1);
+        SpriteInfo.Animation.SetInteger(AnimParams.Action.ToString(), (int)(weapon?.WeaponType ?? 0) + 1);
         CurrentAnimStateName = BASIC_ATTACK_STATE_PREFIX + (weapon?.WeaponType.ToString() ?? string.Empty);
     }
 
@@ -398,23 +420,23 @@ public abstract class Battler : BaseObject
         skill.StartCharge();
         int paramAction = skill.ClassSkill ? CLASS_PARAM_ACTION : CHARACTER_PARAM_ACTION;
         CurrentAnimStateName = (skill.ClassSkill ? CLASS_SKILL_STATE_PREFIX : CHARACTER_SKILL_STATE_PREFIX) + skill.Id;
-        Sprite.Animation.SetInteger(AnimParams.Action.ToString(), paramAction + skill.Id);
+        SpriteInfo.Animation.SetInteger(AnimParams.Action.ToString(), paramAction + skill.Id);
     }
 
     public void UseItem(Item item)
     {
         int mode = (int)item.UseType;
         CurrentAnimStateName = ITEM_STATE_PREFIX + mode;
-        Sprite.Animation.SetInteger(AnimParams.Action.ToString(), ITEM_PARAM_ACTION + mode);
+        SpriteInfo.Animation.SetInteger(AnimParams.Action.ToString(), ITEM_PARAM_ACTION + mode);
     }
 
     public bool ActionAnimationCompleted()
     {
-        var animInfo = Sprite.Animation.GetCurrentAnimatorStateInfo(0);
+        var animInfo = SpriteInfo.Animation.GetCurrentAnimatorStateInfo(0);
         if (animInfo.normalizedTime <= 1f || !animInfo.IsName(CurrentAnimStateName)) return false;
-        Sprite.Animation.SetBool(AnimParams.Running.ToString(), true);
-        Sprite.Animation.SetInteger(AnimParams.Action.ToString(), 0);
-        Sprite.Animation.SetTrigger(AnimParams.DoneAction.ToString());
+        SpriteInfo.Animation.SetBool(AnimParams.Running.ToString(), true);
+        SpriteInfo.Animation.SetInteger(AnimParams.Action.ToString(), 0);
+        SpriteInfo.Animation.SetTrigger(AnimParams.DoneAction.ToString());
         return true;
     }
 
@@ -453,7 +475,7 @@ public abstract class Battler : BaseObject
         }
         else
         {
-            Popup popup = Instantiate(UIMaster.Popups["NoHit"], Sprite.TargetPoint, Quaternion.identity);
+            Popup popup = Instantiate(UIMaster.Popups["NoHit"], SpriteInfo.TargetPoint, Quaternion.identity);
             popup.GetComponent<TextMesh>().text = "MISS";
         }
     }
@@ -466,22 +488,22 @@ public abstract class Battler : BaseObject
         switch (modType)
         {
             case ActiveTool.ModType.Damage:
-                if (SceneMaster.InBattle) popup = Instantiate(UIMaster.Popups[HPorSP + "Damage"], Sprite.TargetPoint, Quaternion.identity);
+                if (SceneMaster.InBattle) popup = Instantiate(UIMaster.Popups[HPorSP + "Damage"], SpriteInfo.TargetPoint, Quaternion.identity);
                 setHPorSPForTarget(-total);
-                Sprite.Animation?.SetTrigger(AnimParams.GetHit.ToString());
+                SpriteInfo.Animation?.SetTrigger(AnimParams.GetHit.ToString());
                 break;
 
             case ActiveTool.ModType.Drain:
-                if (SceneMaster.InBattle) popup = Instantiate(UIMaster.Popups[HPorSP + "Drain"], Sprite.TargetPoint, Quaternion.identity);
+                if (SceneMaster.InBattle) popup = Instantiate(UIMaster.Popups[HPorSP + "Drain"], SpriteInfo.TargetPoint, Quaternion.identity);
                 setHPorSPForTarget(-total);
                 setHPorSPForUser(total);
-                Sprite.Animation?.SetTrigger(AnimParams.GetHit.ToString());
+                SpriteInfo.Animation?.SetTrigger(AnimParams.GetHit.ToString());
                 break;
 
             case ActiveTool.ModType.Recover:
-                if (SceneMaster.InBattle) popup = Instantiate(UIMaster.Popups[HPorSP + "Recover"], Sprite.TargetPoint, Quaternion.identity);
+                if (SceneMaster.InBattle) popup = Instantiate(UIMaster.Popups[HPorSP + "Recover"], SpriteInfo.TargetPoint, Quaternion.identity);
                 setHPorSPForTarget(total);
-                Sprite.Animation?.SetTrigger(AnimParams.Recovered.ToString());
+                SpriteInfo.Animation?.SetTrigger(AnimParams.Recovered.ToString());
                 break;
         }
         if (popup) popup.Show(total.ToString());
@@ -496,22 +518,22 @@ public abstract class Battler : BaseObject
     {
         HP = 0;
         ResetAction();
-        Sprite.Animation.SetTrigger(AnimParams.KOd.ToString());
+        SpriteInfo.Animation.SetTrigger(AnimParams.KOd.ToString());
         TurnDestination = Position;
     }
 
     protected IEnumerator ApplyKOEffect(ParticleSystem ps, float slowdownSeconds, bool knockAway)
     {
-        var p = Instantiate(ps, Sprite.ActionEffects);
+        var p = Instantiate(ps, SpriteInfo.ActionEffects);
         Destroy(p.gameObject, p.main.duration * 10);
 
         Time.timeScale = 0.1f;
         yield return new WaitForSecondsRealtime(slowdownSeconds);
         Time.timeScale = 1;
         
-        Sprite.SpritesList.gameObject.SetActive(knockAway);
-        Sprite.BaseHitBox.gameObject.SetActive(!knockAway);
-        Sprite.ScopeHitbox.gameObject.SetActive(knockAway);
+        SpriteInfo.SpritesList.gameObject.SetActive(knockAway);
+        SpriteInfo.BaseHitBox.gameObject.SetActive(!knockAway);
+        SpriteInfo.ScopeHitbox.gameObject.SetActive(knockAway);
         if (knockAway)
         {
             Movement = Vector3.left * 3;

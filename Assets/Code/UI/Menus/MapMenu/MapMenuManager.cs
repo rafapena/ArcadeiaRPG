@@ -54,7 +54,7 @@ public class MapMenuManager : MonoBehaviour
 
     public void ExitAll()
     {
-        if (CloseAll()) SceneMaster.CloseMapMenu(PartyInfo);
+        if (CloseAll()) SceneMaster.CloseMapMenu();
     }
 
     private bool CloseAll()
