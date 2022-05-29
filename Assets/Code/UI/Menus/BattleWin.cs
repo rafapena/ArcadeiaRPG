@@ -49,8 +49,6 @@ public class BattleWin : MonoBehaviour
 
     public void Setup()
     {
-        FinishedBattle.PlayerParty.SetupExpCurve();
-
         VictoryBanner.Activate();
         LevelEXPFrame.Activate();
         GoldFrame.Activate();

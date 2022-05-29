@@ -106,7 +106,6 @@ public abstract class Battler : DataObject
         Figure = gameObject.GetComponent<Rigidbody2D>();
         SpriteInfo = transform.GetChild(0)?.GetChild(0)?.GetComponent<SpriteProperties>();
         if (!SpriteInfo) Debug.LogError("Sprite must be set up in the correct hierarchy");
-        if (CurrentBattle) BasicAttackSkill = Instantiate(CurrentBattle.BasicAttack, transform);
 
         SetupElementRates();
         SetupStateRates();
@@ -122,7 +121,6 @@ public abstract class Battler : DataObject
         transform.localScale = Vector3.one * SIZE_CORRECTER;
         SpriteInfo.ActionHitbox.SetBattler(this);
         SpriteInfo.ScopeHitbox.SetBattler(this);
-        gameObject.SetActive(false);
     }
 
     public virtual void Setup(PlayerParty party = null)

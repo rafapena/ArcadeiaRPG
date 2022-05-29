@@ -105,6 +105,18 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
         }
     }
 
+    public void Setup(Battler b)
+    {
+        SelectItemsList.SetToolListOnTab(0, CurrentBattle.PlayerParty.Inventory.Items.FindAll(x => !x.IsKey));
+        if (b is BattlePlayer p)
+        {
+            ActingPlayer = p;
+            p.IsDecidingAction = true;
+        }
+        ActingPlayer.EnableArrowKeyMovement();
+        SetupForSelectAction();
+    }
+
     public void RefreshPartyFrames()
     {
         PartyList.Refresh(CurrentBattle.PlayerParty.Players);
@@ -117,18 +129,6 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
     {
         PartyFrame.Deactivate();
         EnemiesFrame.Deactivate();
-    }
-
-    public void Setup(Battler b)
-    {
-        SelectItemsList.SetToolListOnTab(0, CurrentBattle.PlayerParty.Inventory.Items.FindAll(x => !x.IsKey));
-        if (b is BattlePlayer p)
-        {
-            ActingPlayer = p;
-            p.IsDecidingAction = true;
-        }
-        ActingPlayer.EnableArrowKeyMovement();
-        SetupForSelectAction();
     }
 
     public void Hide()
@@ -361,7 +361,6 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
         ClearScope(true);
         switch (ActingPlayer.SelectedAction.Scope)
         {
-            // FIX ACTION HIT BOX SECTION FOR RANGED ATTACKS
             case ActiveTool.ScopeType.OneEnemy:
                 TargetFields.Single.Activate(ActingPlayer);
                 if (ActingPlayer.SelectedAction.Ranged) AimAtNearestEnemy();

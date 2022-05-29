@@ -1,4 +1,5 @@
-﻿using TMPro;
+﻿using System.Collections;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -13,13 +14,11 @@ public class ScreenTransitioner : MonoBehaviour
 
     private static string SourceScene;
     private static string TargetScene;
+    private static float DefaultBlackScreenTime;
     private static GameObject TransitionScreen;
+    private static bool FinishedLoadingContents;
 
-    private bool SceneUpdated;
-    private static float InBlackScreenTime;
-    private static float TimeMarker;
-    private static int FadeChangesMade;
-
+    private static float Fading;
     private const float FADE_IN_TIMER = 0.5f;
     private const float FADE_OUT_TIMER = 0.5f;
     private const float FADE_SPEED = 0.01f;
@@ -27,78 +26,67 @@ public class ScreenTransitioner : MonoBehaviour
     // NOTE: Setup components should be called first, beforehand
     void Start()
     {
+        FinishedLoadingContents = true;     // FALSE
+        Fading = 0;
+
         for (int i = 0; i < transform.childCount; i++) transform.GetChild(i).gameObject.SetActive(false);
         TransitionScreen = transform.GetChild((int)TransitionMode).gameObject;
         TransitionScreen.SetActive(true);
         TransitionScreen.GetComponent<CanvasGroup>().alpha = 0;
-        FadeChangesMade = 1;
-        TimeMarker = Time.realtimeSinceStartup + FADE_OUT_TIMER;
+
+        StartCoroutine(ScreenFade());
+    }
+
+    private IEnumerator ScreenFade()
+    {
         Time.timeScale = 0;
-        FadeInStart(InBlackScreenTime);
+        yield return Waiting(1, FADE_IN_TIMER);
+
+        switch (ChangeMode)
+        {
+            case SceneChangeModes.Remove:
+                SceneManager.UnloadSceneAsync(TargetScene);
+                break;
+            case SceneChangeModes.Change:
+                SceneManager.UnloadSceneAsync(SourceScene);
+                SceneManager.LoadScene(TargetScene, LoadSceneMode.Additive);
+                break;
+            case SceneChangeModes.Add:
+                SceneManager.LoadScene(TargetScene, LoadSceneMode.Additive);
+                break;
+        }
+
+        yield return Waiting(0, DefaultBlackScreenTime, FinishedLoadingContents);
+        yield return Waiting(-1, FADE_OUT_TIMER);
+
+        Fading = 0;
+        Time.timeScale = 1;
+        SceneManager.UnloadSceneAsync(SceneMaster.SCREEN_TRANSITION_SCENE);
     }
 
     void Update()
     {
-        float time = TimeMarker - Time.realtimeSinceStartup;
-
-        if (time > InBlackScreenTime + FADE_OUT_TIMER)
-            TransitionScreen.GetComponent<CanvasGroup>().alpha += FADE_SPEED;
-
-        // Black screen period
-        else if (time > FADE_OUT_TIMER)
-        {
-            TransitionScreen.GetComponent<CanvasGroup>().alpha = 1;
-            if (!SceneUpdated)
-            {
-                SceneUpdated = true;
-                switch (ChangeMode)
-                {
-                    case SceneChangeModes.Remove:
-                        SceneManager.UnloadSceneAsync(TargetScene);
-                        break;
-                    case SceneChangeModes.Change:
-                        SceneManager.UnloadSceneAsync(SourceScene);
-                        SceneManager.LoadScene(TargetScene, LoadSceneMode.Additive);
-                        break;
-                    case SceneChangeModes.Add:
-                        SceneManager.LoadScene(TargetScene, LoadSceneMode.Additive);
-                        break;
-                }
-            }
-        }
-
-        else if (FadeChangesMade == 0)
-            FadeChangesMade++; 
-
-        else if (time > 0)
-            TransitionScreen.GetComponent<CanvasGroup>().alpha -= FADE_SPEED;
-
-        else if (time <= 0 && FadeChangesMade == 1)
-            FadeOutEnd();
+        var c = TransitionScreen.GetComponent<CanvasGroup>();
+        if (c.alpha > 1) c.alpha = 1;
+        else if (c.alpha < 0) c.alpha = 0;
+        else c.alpha += Fading * FADE_SPEED;
     }
 
     public static void SetupComponents(string fromScene, string toScene, float inBlackScreenTime, SceneChangeModes changeMode, TransitionModes transitionMode)
     {
         SourceScene = fromScene;
         TargetScene = toScene;
-        InBlackScreenTime = inBlackScreenTime;
+        DefaultBlackScreenTime = inBlackScreenTime;
         ChangeMode = changeMode;
         TransitionMode = transitionMode;
     }
 
-    private static void FadeInStart(float blackScreenTime)
+    private IEnumerator Waiting(float fadingMode, float waitTime, bool waitCondition = true)
     {
-        FadeChangesMade = 0;
-        InBlackScreenTime = blackScreenTime;
-        Time.timeScale = 0;
-        TimeMarker = Time.realtimeSinceStartup + InBlackScreenTime + FADE_IN_TIMER + FADE_OUT_TIMER;
+        Fading = fadingMode;
+        yield return new WaitForSecondsRealtime(waitTime);
+        yield return new WaitUntil(() => waitCondition);
     }
 
-    private static void FadeOutEnd()
-    {
-        FadeChangesMade++;
-        Time.timeScale = 1;
-        TransitionScreen.GetComponent<CanvasGroup>().alpha = 0;
-        SceneManager.UnloadSceneAsync(SceneMaster.SCREEN_TRANSITION_SCENE);
-    }
+    public static void NotifyFinishLoading() => FinishedLoadingContents = true;
 }

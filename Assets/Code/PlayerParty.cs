@@ -65,6 +65,8 @@ public class PlayerParty : MonoBehaviour
         {
             LoggedObjectives[i] = Instantiate(LoggedObjectives[i], ObjectivesListDump);
         }
+
+        foreach (Transform t in BattlersListDump) t.gameObject.SetActive(false);
     }
 
     public void SetupExpCurve()

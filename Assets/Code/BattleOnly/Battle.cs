@@ -77,7 +77,8 @@ public class Battle : MonoBehaviour
         SetupStartingPositions(ref teammates, PlayerPartyField, 1);
 
         // Setup enemy party
-        EnemyParty = Instantiate(GameplayMaster.EnemyGroup);
+        EnemyParty = GameplayMaster.EnemyGroup;
+        EnemyParty.Enemies = GameplayMaster.EnemyGroup.Enemies;
         ActivateBattlers(ref EnemyParty.Enemies);
         SetupStartingPositions(ref EnemyParty.Enemies, EnemyPartyField, -1);
         EnemyParty.Setup();
@@ -97,6 +98,7 @@ public class Battle : MonoBehaviour
         {
             b.transform.gameObject.SetActive(true);
             b.SetBattle(this);
+            if (!b.BasicAttackSkill) b.BasicAttackSkill = Instantiate(BasicAttack, transform);
         }
     }
 
@@ -109,7 +111,7 @@ public class Battle : MonoBehaviour
             // x-position
             int range = (int)(b.Class ? b.Class.CombatRangeType : b.CombatRangeType) - 1;
             while (dists[range].Count >= 3) range = (range == 1) ? (dists[0].Count >= 3 ? 2 : 0) : 1;
-            float xPos = 1 * (range - 1) * X_POSITION_DISTANCE * mult + (mult >= 0 ? 0 : (b.transform.localScale.x / 2f));
+            float xPos = (range - 1) * X_POSITION_DISTANCE * mult + (mult >= 0 ? 0 : (b.transform.localScale.x / 2f));
             Vector3 bPos = Vector3.left * xPos;
 
             // y-position

@@ -64,7 +64,7 @@ public class SceneMaster : MonoBehaviour
     public static void StartBattle(EnemyParty enemyParty)
     {
         InBattle = true;
-        GameplayMaster.EnemyGroup = enemyParty;
+        GameplayMaster.EnemyGroup = Instantiate(enemyParty);
         StoreGameObjects();
         ChangeScene(BATTLE_SCENE, BATTLE_TRANSITION_TIME, ScreenTransitioner.SceneChangeModes.Add, ScreenTransitioner.TransitionModes.Battle);
     }
@@ -80,10 +80,16 @@ public class SceneMaster : MonoBehaviour
     public static void ApplyBattleStartChanges()
     {
         DeactivateStoredGameObjects();
+
+        // Player party game objects
+        SceneManager.MoveGameObjectToScene(GameplayMaster.PlayerContainer, SceneManager.GetSceneByName(BATTLE_SCENE));
         GameplayMaster.PlayerContainer.SetActive(true);
         GameplayMaster.Party.gameObject.SetActive(true);
         foreach (Transform t in GameplayMaster.Party.transform) t.gameObject.SetActive(true);
-        SceneManager.MoveGameObjectToScene(GameplayMaster.PlayerContainer, SceneManager.GetSceneByName(BATTLE_SCENE));
+
+        // Enemy party game objects
+        SceneManager.MoveGameObjectToScene(GameplayMaster.EnemyGroup.gameObject, SceneManager.GetSceneByName(BATTLE_SCENE));
+        GameplayMaster.EnemyGroup.gameObject.SetActive(true);
     }
 
     public static void ApplyBattleEndChanges()

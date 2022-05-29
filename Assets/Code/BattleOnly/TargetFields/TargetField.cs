@@ -52,7 +52,7 @@ public abstract class TargetField : MonoBehaviour
             AimingPlayer.SelectedAction.Scope == ActiveTool.ScopeType.EveryoneButSelf && b is BattlePlayer && b.Id == AimingPlayer.Id ||
             AimingPlayer.SelectedAction.Scope == ActiveTool.ScopeType.Everyone)
             {
-                b.Select(true);
+                SelectBattler(b);
             }
         }
     }
@@ -62,4 +62,6 @@ public abstract class TargetField : MonoBehaviour
         Battler b = collision.gameObject.CompareTag(Battle.SCOPE_HITBOX_TAG) ? collision.gameObject.GetComponent<BattlerHitbox>()?.Battler : null;
         if (b && !b.LockSelectTrigger && AimingPlayer != null && AimingPlayer.IsDecidingAction) b.Select(false);
     }
+
+    protected virtual void SelectBattler(Battler b) => b.Select(true);
 }

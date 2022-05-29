@@ -23,4 +23,10 @@ public class DynamicTargetField : TargetField
         Vector3 pos = target.SpriteInfo.ScopeHitbox.transform.position;
         transform.position = new Vector3(pos.x, pos.y, target.transform.position.z - 1);
     }
+
+    protected override void SelectBattler(Battler b)
+    {
+        base.SelectBattler(b);
+        AimingPlayer.SingleSelectedTarget = b;
+    }
 }
