@@ -13,12 +13,13 @@ public class Battle : MonoBehaviour
     public const int BASE_HITBOX_LAYER = 11;
     public const int ACTION_HITBOX_LAYER = 12;
     public const int MOVING_SCOPE_HITBOX_LAYER = 13;
+    public const int SPLIT_WALL_LAYER = 14;
     public GameObject[] Boundaries;
 
     // UI
-    public BattleCamera BattleCamera;
-    public BattleMenu BattleMenu;
-    public BattleWin BattleWinMenu;
+    public BattleCamera Camera;
+    public BattleMenu Menu;
+    public BattleWin WinMenu;
 
     // Positioning
     public Transform PlayerPartyField;
@@ -29,6 +30,7 @@ public class Battle : MonoBehaviour
     // Constants
     public Skill BasicAttack;
     public Projectile BasicWeaponlessProjectile;
+    public Projectile ItemProjectile;
     public ParticleSystem PlayerKOParticles;
     public ParticleSystem[] EnemyKOParticles;
 
@@ -98,7 +100,7 @@ public class Battle : MonoBehaviour
         {
             b.transform.gameObject.SetActive(true);
             b.SetBattle(this);
-            if (!b.BasicAttackSkill) b.BasicAttackSkill = Instantiate(BasicAttack, transform);
+            if (!b.BasicAttackSkill) b.BasicAttackSkill = Instantiate(BasicAttack, b.transform);
         }
     }
 
@@ -138,6 +140,8 @@ public class Battle : MonoBehaviour
     {
         foreach (var b in Boundaries) b.gameObject.SetActive(restrict);
     }
+
+    public void IgnoreSplitWallForTarget(bool split) => Physics2D.IgnoreLayerCollision(MOVING_SCOPE_HITBOX_LAYER, SPLIT_WALL_LAYER, split);
 
     private IEnumerator ProcessFirstTurn()
     {
@@ -235,24 +239,25 @@ public class Battle : MonoBehaviour
         }
         else if (!ActingBattler.CanDoAction)
         {
-            BattleMenu.RefreshPartyFrames();
+            Menu.RefreshPartyFrames();
             yield return new WaitForSeconds(2.5f);
             ActionEnd();
         }
         else if (ActingBattler is BattlePlayer p)
         {
             yield return new WaitForSeconds(1);
-            BattleMenu.RefreshPartyFrames();
-            BattleMenu.Setup(p);
-            yield return new WaitUntil(BattleMenu.SelectedAction);
-            yield return BattleMenu.Escaping ? AttemptEscape() : ExecuteAction();
+            Menu.RefreshPartyFrames();
+            Menu.Setup(p);
+            yield return new WaitUntil(Menu.SelectedAction);
+            yield return Menu.Escaping ? AttemptEscape() : ExecuteAction();
         }
         else  // Battler AI
         {
-            BattleMenu.RefreshPartyFrames();
+            Menu.RefreshPartyFrames();
             yield return new WaitForSeconds(1);
             if (ActingBattler is BattleAlly ally) ally.MakeDecision(PlayerParty.BattlingParty, EnemyParty.Enemies);
             else if (ActingBattler is BattleEnemy enemy) enemy.MakeDecision(EnemyParty.Enemies, PlayerParty.BattlingParty);
+            Menu.DisplayAITargets();
             yield return ExecuteAction();
         }
     }
@@ -306,7 +311,7 @@ public class Battle : MonoBehaviour
 
         // Display action usage popup
         Skill skill = ActingBattler.SelectedAction as Skill;
-        if (!skill?.Basic ?? true) StartCoroutine(BattleMenu.DisplayUsedAction(ActingBattler, ActingBattler.SelectedAction?.Name ?? string.Empty));
+        if (!skill?.Basic ?? false) StartCoroutine(Menu.DisplayUsedAction(ActingBattler, ActingBattler.SelectedAction.Name));
 
         // Use action
         ActingBattler.SpriteInfo.Animation.SetTrigger(Battler.AnimParams.DoAction.ToString());
@@ -325,19 +330,19 @@ public class Battle : MonoBehaviour
 
     private IEnumerator AttemptEscape()
     {
-        BattleMenu.RemovePartyFrames();
+        Menu.RemovePartyFrames();
         RestrictBattlerWallCollision(false);
-        BattleMenu.AddEscapeHitboxes();
+        Menu.AddEscapeHitboxes();
         yield return new WaitForSeconds(1);
         foreach (var b in Battlers) b.SetToEscapeMode(true, b is not BattleEnemy);
         yield return new WaitForSeconds(3);
-        if (BattleMenu.Escaping) yield return Escape();
+        if (Menu.Escaping) yield return Escape();
     }
 
     public void NotifyEscapeFailure()
     {
-        BattleMenu.RemoveEscapeHitboxes();
-        StartCoroutine(BattleMenu.DisplayUsedAction(ActingBattler, "COULD NOT ESCAPE"));
+        Menu.RemoveEscapeHitboxes();
+        StartCoroutine(Menu.DisplayUsedAction(ActingBattler, "COULD NOT ESCAPE"));
         StartCoroutine(EscapeFailureSequence());
     }
 
@@ -361,8 +366,12 @@ public class Battle : MonoBehaviour
     {
         ActingBattler.ExecutedAction = true;
         if (ActingBattler.SelectedAction is Skill skill) skill.ApplyActionEndEffects();
+        else if (ActingBattler is BattlePlayer && ActingBattler.SelectedAction is Item it) PlayerParty.Inventory.ApplyPostItemUseEffects(it);
+
+        Menu.RemoveAITargets();
         ResetSelectedTargets();
         RestrictBattlerWallCollision(true);
+        
         if (!CheckBattleEndCondition())
         {
             if (LastActionOfTurn) TurnReset();
@@ -380,21 +389,11 @@ public class Battle : MonoBehaviour
         }
     }
 
-    private void FinishActionUsage()
-    {
-        if (ActingBattler.SelectedAction is Item it)
-        {
-            //Stats.Add(item.PermantentStatChanges);
-            //if (it.TurnsInto) Items[Items.FindIndex(x => x.Id == it.Id)] = Instantiate(it.TurnsInto, gameObject.transform);
-            //else if (it.Consumable) Items.Remove(it);
-        }
-    }
-
     private bool CheckBattleEndCondition()
     {
         if (EnemyPartyDefeated)
         {
-            BattleMenu.RefreshPartyFrames();
+            Menu.RefreshPartyFrames();
             if (EnemyParty.ShowVictoryWhenDefeated) StartCoroutine(DeclareWin());
             else SceneMaster.EndBattle();
             return true;
@@ -419,7 +418,7 @@ public class Battle : MonoBehaviour
     {
         ClearAll();
         foreach (var e in EnemyParty.Enemies) e.SetToEscapeMode(false, false);
-        StartCoroutine(BattleMenu.DisplayUsedAction(ActingBattler, "ESCAPED!"));
+        StartCoroutine(Menu.DisplayUsedAction(ActingBattler, "ESCAPED!"));
         yield return new WaitForSeconds(2);
         SceneMaster.EndBattle();
     }
@@ -429,7 +428,7 @@ public class Battle : MonoBehaviour
         ClearAll();
         foreach (var b in PlayerParty.BattlingParty) b.SpriteInfo.Animation.SetInteger(Battler.AnimParams.Victory.ToString(), 1);
         yield return new WaitForSeconds(2);
-        BattleWinMenu.Setup();
+        WinMenu.Setup();
     }
 
     private IEnumerator DeclareGameOver()
@@ -443,7 +442,7 @@ public class Battle : MonoBehaviour
     {
         ClearAllTurnIndicators();
         ResetBattlerActions();
-        BattleMenu.RemovePartyFrames();
+        Menu.RemovePartyFrames();
     }
 
     private void OnDestroy()

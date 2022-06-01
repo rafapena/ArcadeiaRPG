@@ -16,12 +16,9 @@ public abstract class PassiveEffect : DataObject
     public int RemoveByHitChance;
     public int CounterRate;
     public int ReflectRate;
-    public int PhysicalDamageRate;
-    public int MagicalDamageRate;
-    public int ExtraTurns;
+    public int ExpGainRate;
+    public int GoldGainRate;
     public BattleMaster.ToolTypes[] DisabledToolTypes;
     public ElementRate[] ChangedElementRates;
     public StateRate[] ChangedStateRates;
-
-    [HideInInspector] public int TurnsLeft;
 }

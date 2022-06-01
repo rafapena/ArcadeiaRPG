@@ -30,13 +30,15 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
     public struct TargetFieldsGroup
     {
         public Transform FieldsList;
-        public DynamicTargetField Single;
-        public DynamicTargetField SplashRange;
-        public StaticTargetField SplashMeelee;
+        public Transform SingleArrow;
+        public DynamicTargetField Default;
+        public Transform EnemyTargetDefault;
         public StaticTargetField StraightThrough;
     }
     public TargetFieldsGroup TargetFields;
     public Transform EscapeCatchHitboxes;
+    private Vector3 DefaultTargetFieldScale;
+    private const string NON_TRIGGER_TARGET_FIELD = "NonTriggerTargetField";
 
     // Child GameObjects
     public MenuFrame PartyFrame;
@@ -73,6 +75,7 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
         SelectItemsList.ToolList.SetEnableCondition(GetScopeUsability);
         ClearScope(true);
         EnemyListHeight = EnemiesFrame.gameObject.GetComponent<RectTransform>().sizeDelta.y;
+        DefaultTargetFieldScale = TargetFields.Default.transform.localScale;
     }
 
     private void Update()
@@ -352,7 +355,8 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
     public void ClearScope(bool resetSelectedTargets)
     {
         UpdateTarget = null;
-        foreach (Transform t in TargetFields.FieldsList) t.GetComponent<TargetField>().Deactivate();
+        CurrentBattle.IgnoreSplitWallForTarget(false);
+        foreach (Transform t in TargetFields.FieldsList) t.GetComponent<TargetField>()?.Deactivate();
         if (resetSelectedTargets) CurrentBattle.ResetSelectedTargets();
     }
 
@@ -361,93 +365,54 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
         ClearScope(true);
         switch (ActingPlayer.SelectedAction.Scope)
         {
-            case ActiveTool.ScopeType.OneEnemy:
-                TargetFields.Single.Activate(ActingPlayer);
-                if (ActingPlayer.SelectedAction.Ranged) AimAtNearestEnemy();
-                else UpdateTarget = AimAtNearestEnemy;
-                break;
-
-            case ActiveTool.ScopeType.OneArea:
-                SetSplashTarget();
-                break;
-
-            case ActiveTool.ScopeType.WideFrontal:
-                TargetAll(GetWideFrontalTargets(), false);
-                break;
-
-            case ActiveTool.ScopeType.StraightThrough:
-                TargetFields.StraightThrough.Activate(ActingPlayer);
-                break;
-
-            case ActiveTool.ScopeType.AllEnemies:
-                TargetAll(CurrentBattle.EnemyParty.Enemies.Where(x => !x.KOd), false);
-                break;
-
-            case ActiveTool.ScopeType.Self:
-                TargetFields.Single.Activate(ActingPlayer);
-                DisableTargetingForBattlers(CurrentBattle.PlayerParty.BattlingParty);
-                UpdateTarget = () => TargetFields.Single.AimAt(ActingPlayer, false);
-                break;
-
-            case ActiveTool.ScopeType.OneAlly:
-                TargetFields.Single.Activate(ActingPlayer);
-                if (ActingPlayer.SelectedAction.Ranged) AimAtNearestPlayer();
-                else UpdateTarget = AimAtNearestPlayer;
-                break;
-
-            case ActiveTool.ScopeType.OneKnockedOutAlly:
-                TargetFields.Single.Activate(ActingPlayer);
-                if (ActingPlayer.SelectedAction.Ranged) AimAtNearestKOdPlayer();
-                else UpdateTarget = AimAtNearestKOdPlayer;
-                break;
-
-            case ActiveTool.ScopeType.AllAllies:
-                TargetAll(CurrentBattle.PlayerParty.BattlingParty.Where(x => !x.KOd), true);
-                break;
-
-            case ActiveTool.ScopeType.AllKnockedOutAllies:
-                TargetAll(CurrentBattle.PlayerParty.BattlingParty.Where(x => x.KOd), false);
-                break;
-
-            case ActiveTool.ScopeType.TrapSetup:
-                SetSplashTarget(0.6f);
-                break;
-
-            case ActiveTool.ScopeType.Planting:
-                SetSplashTarget(1.5f);
-                break;
-
-            case ActiveTool.ScopeType.EveryoneButSelf:
-                TargetAll(CurrentBattle.AllBattlers.Where(x => !x.KOd && x.Id != ActingPlayer.Id), false);
-                break;
-
-            case ActiveTool.ScopeType.Everyone:
-                TargetAll(CurrentBattle.AllBattlers.Where(x => !x.KOd), true);
-                break;
+            case ActiveTool.ScopeType.OneEnemy:             TargetAim(1f, 0.7f, true, AimAtNearestEnemy); break;
+            case ActiveTool.ScopeType.OneArea:              TargetAim(3f, false, AimAtNearestEnemy); break;
+            case ActiveTool.ScopeType.WideFrontal:          TargetAll(GetWideFrontalTargets(), false); break;
+            case ActiveTool.ScopeType.StraightThrough:      TargetFields.StraightThrough.Activate(ActingPlayer); break;
+            case ActiveTool.ScopeType.AllEnemies:           TargetAll(CurrentBattle.EnemyParty.Enemies.Where(x => x.CanTarget), false); break;
+            case ActiveTool.ScopeType.Self:                 AimAtSelf(); break;
+            case ActiveTool.ScopeType.OneAlly:              TargetAim(1f, 0.7f, true, AimAtNearestPlayer); break;
+            case ActiveTool.ScopeType.OneKnockedOutAlly:    TargetAim(1f, 0.7f, true, AimAtNearestKOdPlayer); break;
+            case ActiveTool.ScopeType.AllAllies:            TargetAll(CurrentBattle.PlayerParty.BattlingParty.Where(x => x.CanTarget), true); break;
+            case ActiveTool.ScopeType.AllKnockedOutAllies:  TargetAll(CurrentBattle.PlayerParty.BattlingParty.Where(x => x.KOd), false); break;
+            case ActiveTool.ScopeType.TrapSetup:            TargetAim(0.7f, false, AimAtNearestEnemy, true); break;
+            case ActiveTool.ScopeType.Planting:             TargetAim(1.5f, false, AimAtNearestEnemy, true); break;
+            case ActiveTool.ScopeType.EveryoneButSelf:      TargetAll(CurrentBattle.AllBattlers.Where(x => x.CanTarget && x.Id != ActingPlayer.Id), false); break;
+            case ActiveTool.ScopeType.Everyone:             TargetAll(CurrentBattle.AllBattlers.Where(x => x.CanTarget), true); break;
         }
     }
 
-    private void AimAtNearestPlayer() => AimAtNearestBattler(CurrentBattle.PlayerParty.Players.Where(x => !x.KOd), TargetFields.Single, ActingPlayer.SelectedAction.Ranged);
+    private void AimAtNearestPlayer() => AimAtNearestBattler(CurrentBattle.PlayerParty.Players.Where(x => x.CanTarget));
 
-    private void AimAtNearestKOdPlayer() => AimAtNearestBattler(CurrentBattle.PlayerParty.Players.Where(x => x.KOd), TargetFields.Single, ActingPlayer.SelectedAction.Ranged);
+    private void AimAtNearestKOdPlayer() => AimAtNearestBattler(CurrentBattle.PlayerParty.Players.Where(x => x.KOd));
 
-    private void AimAtNearestEnemy() => AimAtNearestBattler(CurrentBattle.EnemyParty.Enemies.Where(x => !x.KOd), TargetFields.Single, ActingPlayer.SelectedAction.Ranged);
+    private void AimAtNearestEnemy() => AimAtNearestBattler(CurrentBattle.EnemyParty.Enemies.Where(x => x.CanTarget));
 
-    private void AimAtNearestBattler<T>(IEnumerable<T> targets, DynamicTargetField targetField, bool movable) where T : Battler
+    private void AimAtNearestBattler<T>(IEnumerable<T> targets) where T : Battler
     {
-        var battler = GetNearestTarget(AimRelativeToPlayer ? ActingPlayer.Position : targetField.transform.position, targets);
+        var battler = GetNearestTarget(AimRelativeToPlayer ? ActingPlayer.Position : TargetFields.Default.transform.position, targets);
         ActingPlayer.SingleSelectedTarget = battler;
-        targetField.AimAt(battler, movable);
+        TargetFields.Default.AimAt(battler, ActingPlayer.SelectedAction.Ranged);
     }
 
-    private void SetSplashTarget(float scale = 1.0f, bool isSetup = false)
+    private void TargetAim(float scale, bool targetOnlyOne, Action aimFunc, bool isSetup = false) => TargetAim(scale, scale, targetOnlyOne, aimFunc, isSetup);
+
+    private void TargetAim(float scaleMeelee, float scaleRanged, bool targetOnlyOne, Action aimFunc, bool isSetup = false)
     {
-        TargetFieldsGroup tfg = TargetFields;
-        TargetField tf = Instantiate(ActingPlayer.SelectedAction.Ranged ? (TargetField)tfg.SplashRange : (TargetField)tfg.SplashMeelee, tfg.FieldsList);
-        tf.DisposeOnDeactivate = true;
-        tf.Activate(ActingPlayer, isSetup);
-        tf.transform.localScale *= scale;
-        if (tf is DynamicTargetField dtf) AimAtNearestBattler(CurrentBattle.EnemyParty.Enemies.Where(x => !x.KOd), dtf, true);
+        TargetFields.Default.Activate(ActingPlayer, isSetup);
+        TargetFields.Default.TargetOnlyOne = targetOnlyOne;
+        if (ActingPlayer.SelectedAction.Ranged) aimFunc.Invoke();
+        else UpdateTarget = aimFunc;
+        CurrentBattle.IgnoreSplitWallForTarget(isSetup);
+        TargetFields.Default.transform.localScale = DefaultTargetFieldScale * (ActingPlayer.SelectedAction.Ranged ? scaleRanged : scaleMeelee);
+    }
+
+    private void AimAtSelf()
+    {
+        TargetFields.Default.Activate(ActingPlayer);
+        TargetFields.Default.TargetOnlyOne = true;
+        DisableTargetingForBattlers(CurrentBattle.PlayerParty.BattlingParty);
+        UpdateTarget = () => TargetFields.Default.AimAt(ActingPlayer, false);
     }
 
     private IEnumerable<Battler> GetWideFrontalTargets()
@@ -458,12 +423,14 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
 
     private void TargetAll<T>(IEnumerable<T> battlers, bool addTargetFieldToActingPlayer) where T : Battler
     {
-        TargetFields.Single.Activate(ActingPlayer);
-        if (addTargetFieldToActingPlayer) UpdateTarget = () => TargetFields.Single.AimAt(ActingPlayer, false);
+        TargetFields.Default.Activate(ActingPlayer);
+        TargetFields.Default.TargetOnlyOne = false;
+        TargetFields.Default.transform.localScale = DefaultTargetFieldScale;
+        if (addTargetFieldToActingPlayer) UpdateTarget = () => TargetFields.Default.AimAt(ActingPlayer, false);
         foreach (T b in battlers)
         {
             if (b is BattlePlayer p && p.Id == ActingPlayer.Id) continue;
-            DynamicTargetField dtf = Instantiate(TargetFields.Single, TargetFields.FieldsList);
+            DynamicTargetField dtf = Instantiate(TargetFields.Default, TargetFields.FieldsList);
             dtf.DisposeOnDeactivate = true;
             dtf.AimAt(b, false);
             b.Select(true);
@@ -553,17 +520,39 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// -- Updating party list in real-time --
+    /// -- Updating party in real-time --
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public void UpdatePlayerEntry(Battler b)
+    public void UpdatePlayerEntry(Battler b) => PartyList.UpdateEntry(b, b.CurrentListIndex);
+
+    public void UpdateEnemyEntry(Battler b) => EnemiesList.UpdateEntry(b, b.CurrentListIndex);
+
+    public void SetHighlightSelectedPlayerEntries(Battler b, bool highlight) => SetHighlightSelectedBattlerEntries(PartyList, b, highlight);
+
+    public void SetHighlightSelectedEnemyEntries(Battler b, bool highlight) => SetHighlightSelectedBattlerEntries(EnemiesList, b, highlight);
+
+    private void SetHighlightSelectedBattlerEntries(PlayerSelectionList BattlerList, Battler b, bool highlight)
     {
-        PartyList.UpdateEntry(b, b.CurrentListIndex);
+        if (b.CurrentListIndex >= BattlerList.transform.childCount) return;
+        var entry = BattlerList.transform.GetChild(b.CurrentListIndex).GetComponent<ListSelectable>();
+        if (highlight) entry.KeepSelected();
+        else entry.ClearHighlights();
     }
 
-    public void UpdateEnemyEntry(Battler b)
+    public void DisplayAITargets()
     {
-        EnemiesList.UpdateEntry(b, b.CurrentListIndex);
+        foreach (var b in CurrentBattle.AllBattlers)
+        {
+            if (b.IsSelected) Instantiate(TargetFields.EnemyTargetDefault, b.Position, Quaternion.identity, TargetFields.FieldsList).gameObject.tag = NON_TRIGGER_TARGET_FIELD;
+        }
+    }
+
+    public void RemoveAITargets()
+    {
+        foreach (Transform t in TargetFields.FieldsList)
+        {
+            if (t.gameObject.CompareTag(NON_TRIGGER_TARGET_FIELD)) Destroy(t.gameObject);
+        }
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

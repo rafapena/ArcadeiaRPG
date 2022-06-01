@@ -5,6 +5,9 @@ public class DynamicTargetField : TargetField
     protected Vector3 Movement;
     private float Speed;
 
+    [HideInInspector]
+    public bool TargetOnlyOne;
+
     [SerializeField]
     private float DefaultSpeed;
 
@@ -26,7 +29,8 @@ public class DynamicTargetField : TargetField
 
     protected override void SelectBattler(Battler b)
     {
-        base.SelectBattler(b);
+        if (AimingPlayer.SingleSelectedTarget && TargetOnlyOne) AimingPlayer.SingleSelectedTarget.Select(false);
         AimingPlayer.SingleSelectedTarget = b;
+        base.SelectBattler(b);
     }
 }

@@ -13,8 +13,6 @@ public class Accessory : PassiveEffect, IToolEquippable
     public State StateActive2;
     public State StateInactive1;
     public State StateInactive2;
-    public int ExpGainRate;
-    public int GoldGainRate;
     public int AllyCondition;
     public int FoeCondition;
     public int UserCondition;

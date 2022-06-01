@@ -52,7 +52,7 @@ public abstract class TargetField : MonoBehaviour
             AimingPlayer.SelectedAction.Scope == ActiveTool.ScopeType.EveryoneButSelf && b is BattlePlayer && b.Id == AimingPlayer.Id ||
             AimingPlayer.SelectedAction.Scope == ActiveTool.ScopeType.Everyone)
             {
-                SelectBattler(b);
+                if (b.Targettable) SelectBattler(b);
             }
         }
     }

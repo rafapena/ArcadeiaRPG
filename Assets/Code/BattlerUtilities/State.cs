@@ -7,14 +7,16 @@ public class State : PassiveEffect
     public int ContactSpreadRate;
     public bool Stun;
     public bool Petrify;
-
-    // Appearance
     public ParticleSystem SurroundingEffect;
-    //public Sprite Eyes;
-    //public Sprite Mouth;
-    //public Animation IdleAnimation
+
+    public int TurnsLeft { get; private set; }
 
     public int Stack { get; private set; }
+
+    protected override void Awake()
+    {
+        TurnsLeft = Random.Range(TurnEnd1, TurnEnd2 + 1);
+    }
 
     public void StackState(int i)
     {

@@ -73,8 +73,7 @@ public class PlayerParty : MonoBehaviour
     {
         LevelCurves = new int[100];
         LevelCurves[0] = 0;
-        for (int i = 1; i < LevelCurves.Length; i++)
-            LevelCurves[i] = LevelCurves[i - 1] + i * 100;
+        for (int i = 1; i < LevelCurves.Length; i++) LevelCurves[i] = LevelCurves[i - 1] + i * 100;
         LastEXPToNext = Level <= 1 ? 0 : LevelCurves[Level - 1];
         EXPToNext = LevelCurves[Level];
         EXP = LastEXPToNext;

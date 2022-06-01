@@ -448,30 +448,26 @@ public class MMInventory : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOp
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- Use item --
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    private void UseItem()
-    {
-        Selection = Selections.UsageDone;
-        DoneTimer = Time.realtimeSinceStartup + 1.5f;
-        EventSystem.current.SetSelectedGameObject(null);
-        Item it = InventoryFrame.ToolList.SelectedObject as Item;
-        if (it.Consumable)
-        {
-            MenuManager.PartyInfo.Inventory.Remove(it);
-            InventoryFrame.Refresh(GetInventoryItems(false));
-        }
-    }
     
     private void UseItemOnSingle(int index)
     {
-        UseItem();
+        PreUseItem();
         UseItem(index);
+        PostUseItem();
     }
     
     private void UseItemOnMultiple()
     {
-        UseItem();
+        PreUseItem();
         for (int i = 0; i < SelectableTeammatesUse.Count; i++) UseItem(i);
+        PostUseItem();
+    }
+
+    private void PreUseItem()
+    {
+        Selection = Selections.UsageDone;
+        DoneTimer = Time.realtimeSinceStartup + 1.5f;
+        EventSystem.current.SetSelectedGameObject(null);
     }
 
     private void UseItem(int index)
@@ -479,6 +475,12 @@ public class MMInventory : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOp
         PartyList.SelectedObject = SelectableTeammatesUse[index];
         PartyList.SelectedObject.ReceiveToolEffects(PartyList.SelectedObject, InventoryFrame.ToolList.SelectedObject as Item, null);
         PartyList.UpdateEntry(PartyList.SelectedObject, index);
+    }
+
+    private void PostUseItem()
+    {
+        MenuManager.PartyInfo.Inventory.ApplyPostItemUseEffects(InventoryFrame.ToolList.SelectedObject as Item);
+        InventoryFrame.Refresh(GetInventoryItems(false));
     }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

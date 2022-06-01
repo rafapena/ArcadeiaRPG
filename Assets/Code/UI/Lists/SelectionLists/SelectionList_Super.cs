@@ -116,7 +116,7 @@ public abstract class SelectionList_Super<T> : MonoBehaviour
     {
         SelectedIndex = 0;
         SelectedButton = transform.GetChild(0).GetComponent<ListSelectable>();
-        SelectedObject = ReferenceData[0];
+        if (ReferenceData.Count > 0) SelectedObject = ReferenceData[0];
     }
 
     public virtual void SetSelected()

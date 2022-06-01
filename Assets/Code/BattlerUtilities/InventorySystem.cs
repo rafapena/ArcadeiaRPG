@@ -84,6 +84,15 @@ public class InventorySystem : MonoBehaviour
     /// -- Add/Remove Content --
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    public void ApplyPostItemUseEffects(Item it)
+    {
+        if (!it.Consumable) return;
+        Remove(it);
+        // Permanent stat boosts
+        // Add new item to inventory
+        // Other specific special effects
+    }
+
     public IToolForInventory Add<T>(T tool, int amount = 1) where T : IToolForInventory
     {
         if (tool is Item it) return AddInventoryTool(ref Items, it, amount);

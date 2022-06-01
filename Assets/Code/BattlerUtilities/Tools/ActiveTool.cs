@@ -95,7 +95,6 @@ public abstract class ActiveTool : DataObject
         return (int)(formulaTotal * power * effectMagnitude);
     }
 
-    // WRITES TO THE USER
     public int GetCriticalHitRatio(Battler u, Battler t, float effectMagnitude = 1.0f)
     {
         float weaponCritRate = u.SelectedWeapon != null ? u.SelectedWeapon.CriticalRateBoost : 100;
@@ -104,17 +103,12 @@ public abstract class ActiveTool : DataObject
         float critExponent = 1.1f;
         float result = 2 * Mathf.Pow(u.Tec * toolCrt, critExponent) * u.Crt / (def != 0 ? def : 0.01f);
         int cRate = Chance(result * effectMagnitude) ? 3 : 1;
-        u.HitCritical = (cRate == 3);
         return cRate;
     }
 
-    // WRITES TO THE THE USER
     public float GetElementRateRatio(Battler u, Battler t)
     {
-        int eRate = t.ElementRates[(int)Element];
-        u.HitWeakness = eRate > 120;
-        u.HitWeakness = eRate < 80;
-        return eRate / 100f;
+        return t.ElementRates[(int)Element] / 100f;
     }
 
     public int GetTotalWithVariance(int total)

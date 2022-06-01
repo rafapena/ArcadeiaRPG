@@ -14,10 +14,18 @@ public class BattleActionSet_General : BattleActionSet
     private ParticleSystem DefaultWeaponParticles()
     {
         if (!User?.SelectedWeapon?.ChargingEffect) return null;
-        var ps = User.SpriteInfo.ObjectSpawnPoint.GetComponent<ParticleSystem>();
-        ps = User.SelectedWeapon.ChargingEffect;
+        var ps = User.SelectedWeapon.ChargingEffect;
         ps.Play();
         return ps;
+    }
+
+    private Projectile ThrowItem()
+    {
+        var it = User.SelectedAction as Item;
+        if (!it) return null;
+        var p = FireAimedProjectile(User.CurrentBattle.ItemProjectile, 1f, true);
+        p.GetComponent<SpriteRenderer>().sprite = it.GetComponent<SpriteRenderer>().sprite;
+        return p;
     }
 
     private ParticleSystem GenerateParticles(ParticleSystem ps)

@@ -53,6 +53,8 @@ public abstract class Battler : DataObject
     [HideInInspector] public Stats StatBoosts;
     public Stats Stats;
     public List<Accessory> Accessories;
+    public bool Targettable = true;
+    public int RecoveryRate = 100;
     public int HP { get; private set; }
     public int SP { get; private set; }
 
@@ -70,9 +72,6 @@ public abstract class Battler : DataObject
     [HideInInspector] public Skill BasicAttackSkill;
     [HideInInspector] public Battler SingleSelectedTarget;
     [HideInInspector] public bool ExecutedAction;
-    [HideInInspector] public bool HitCritical;
-    [HideInInspector] public bool HitWeakness;
-    [HideInInspector] public bool HitResistant;
 
     // PassiveEffect dependent info
     public ElementRate[] ChangedElementRates;
@@ -168,9 +167,6 @@ public abstract class Battler : DataObject
     {
         SelectedAction = null;
         ExecutedAction = false;
-        HitCritical = false;
-        HitWeakness = false;
-        HitResistant = false;
         SingleSelectedTarget = null;
     }
 
@@ -209,6 +205,7 @@ public abstract class Battler : DataObject
         transform.localScale = vec;
     }
 
+    // DEBUG MODE ONLY
     public void PrintCurrentAnimationState()
     {
         var animStateList = new string[]
@@ -228,11 +225,6 @@ public abstract class Battler : DataObject
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- Approaching / Escaping --
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    public virtual void Select(bool selected)
-    {
-        IsSelected = selected;
-    }
 
     public void ApproachTarget(Vector3 leftPoint, Vector3 rightPoint)
     {
@@ -353,6 +345,11 @@ public abstract class Battler : DataObject
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- ActiveTool scoping --
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public virtual void Select(bool selected)
+    {
+        IsSelected = selected;
+    }
 
     public bool AimingForTeammates(ActiveTool tool = null)
     {
@@ -486,26 +483,28 @@ public abstract class Battler : DataObject
         switch (modType)
         {
             case ActiveTool.ModType.Damage:
-                if (SceneMaster.InBattle) popup = Instantiate(UIMaster.Popups[HPorSP + "Damage"], SpriteInfo.TargetPoint, Quaternion.identity);
+                if (SceneMaster.InBattle) popup = SpawnPopup(HPorSP + "Damage");
                 setHPorSPForTarget(-total);
                 SpriteInfo.Animation?.SetTrigger(AnimParams.GetHit.ToString());
                 break;
 
             case ActiveTool.ModType.Drain:
-                if (SceneMaster.InBattle) popup = Instantiate(UIMaster.Popups[HPorSP + "Drain"], SpriteInfo.TargetPoint, Quaternion.identity);
+                if (SceneMaster.InBattle) popup = SpawnPopup(HPorSP + "Drain");
                 setHPorSPForTarget(-total);
                 setHPorSPForUser(total);
                 SpriteInfo.Animation?.SetTrigger(AnimParams.GetHit.ToString());
                 break;
 
             case ActiveTool.ModType.Recover:
-                if (SceneMaster.InBattle) popup = Instantiate(UIMaster.Popups[HPorSP + "Recover"], SpriteInfo.TargetPoint, Quaternion.identity);
+                if (SceneMaster.InBattle) popup = SpawnPopup(HPorSP + "Recover");
                 setHPorSPForTarget(total);
                 SpriteInfo.Animation?.SetTrigger(AnimParams.Recovered.ToString());
                 break;
         }
         if (popup) popup.Show(total.ToString());
     }
+
+    private Popup SpawnPopup(string name) => Instantiate(UIMaster.Popups[name], SpriteInfo.TargetPoint, Quaternion.identity, CurrentBattle.ActivePopups);
 
     protected virtual void Revive()
     {
@@ -558,6 +557,8 @@ public abstract class Battler : DataObject
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- Applying Passive Effects --
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public virtual bool CanTarget => !KOd && Targettable;
 
     public bool CanDoAction => CanEscape && !IsCharging;
 

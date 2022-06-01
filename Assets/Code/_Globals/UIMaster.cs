@@ -15,7 +15,8 @@ public class UIMaster : MonoBehaviour
     private static readonly string[] PopupsListFileNames = new string[]
     {
         "HPDamage", "SPDamage", "HPRecover", "SPRecover", "HPDrain", "SPDrain",
-        "NoHit", "ExBalloon", "QBalloon", "Button", "LevelUp"
+        "NoHit", "Weakpoint", "Resistant", "AddState",
+        "ExBalloon", "QBalloon", "Button", "LevelUp"
     };
 
     public static Dictionary<BattleMaster.WeaponTypes, Sprite> WeaponImages { get; private set; }
