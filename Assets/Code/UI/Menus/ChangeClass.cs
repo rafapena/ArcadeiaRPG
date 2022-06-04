@@ -245,19 +245,12 @@ public class ChangeClass : MonoBehaviour
     private void HandleEquipment()
     {
         BattlePlayer p = PartyList.SelectedObject as BattlePlayer;
-        foreach (Weapon wp in p.Weapons.FindAll(x => !x.CanEquipWith(p.Class))) PartyInfo.Inventory.Add(wp);
-        foreach (Accessory ac in p.Accessories.FindAll(x => !x.CanEquipWith(p.Class))) PartyInfo.Inventory.Add(ac);
-        p.Weapons.RemoveAll(x => !x.CanEquipWith(p.Class));
-        p.Accessories.RemoveAll(x => !x.CanEquipWith(p.Class));
+        foreach (Weapon wp in p.Weapons.FindAll(x => !x.CanEquipWith(p.Class))) PartyInfo.Inventory.Unequip(p, wp);
+        foreach (Accessory ac in p.Accessories.FindAll(x => !x.CanEquipWith(p.Class))) PartyInfo.Inventory.Unequip(p, ac);
         if (p.Weapons.Count == 0)
         {
             IEnumerable<Weapon> equippableWeapons = PartyInfo.Inventory.Weapons.Where(x => x.CanEquipWith(p.Class)).OrderByDescending(x => x.Power);
-            if (equippableWeapons != null && equippableWeapons.Any())
-            {
-                Weapon strongestInInventory = equippableWeapons.First();
-                p.Equip(strongestInInventory);
-                PartyInfo.Inventory.Remove(strongestInInventory);
-            }
+            if (equippableWeapons != null && equippableWeapons.Any()) PartyInfo.Inventory.Equip(p, equippableWeapons.First());
         }
     }
 

@@ -34,10 +34,12 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
         public DynamicTargetField Default;
         public Transform EnemyTargetDefault;
         public StaticTargetField StraightThrough;
+        public Transform PositionRestrictor;
     }
     public TargetFieldsGroup TargetFields;
     public Transform EscapeCatchHitboxes;
     private Vector3 DefaultTargetFieldScale;
+    private bool RestrictorIsBlinking = false;
     private const string NON_TRIGGER_TARGET_FIELD = "NonTriggerTargetField";
 
     // Child GameObjects
@@ -76,11 +78,13 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
         ClearScope(true);
         EnemyListHeight = EnemiesFrame.gameObject.GetComponent<RectTransform>().sizeDelta.y;
         DefaultTargetFieldScale = TargetFields.Default.transform.localScale;
+        TargetFields.PositionRestrictor.gameObject.SetActive(false);
     }
 
     private void Update()
     {
         if (Input.GetKeyDown(KeyCode.Q) && (Selection == Selections.Actions || Selection == Selections.Skills)) UpdateWeapon();
+        if (Selection != Selections.Disabled) TargetFields.PositionRestrictor.position = ActingPlayer.Position;
     }
 
     private void LateUpdate()
@@ -91,16 +95,13 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
                 UpdateTarget?.Invoke();
                 SelectingAction();
                 break;
-
             case Selections.Skills:
                 if (Input.GetKeyDown(KeyCode.X)) SetupForSelectAction();
                 break;
-
             case Selections.Items:
                 if (Input.GetKeyDown(KeyCode.X)) SetupForSelectAction();
                 SelectItemsList.SelectTabInputs();
                 break;
-
             case Selections.Targeting:
                 UpdateTarget?.Invoke();
                 if (PassedSelectedToolBuffer) SelectingTarget();
@@ -115,6 +116,7 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
         {
             ActingPlayer = p;
             p.IsDecidingAction = true;
+            p.SpriteInfo.ActionHitbox.gameObject.SetActive(false);
         }
         ActingPlayer.EnableArrowKeyMovement();
         SetupForSelectAction();
@@ -474,27 +476,43 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
             AimRelativeToPlayer = true;
             return;
         }
-        FinalizeDecision();
+        ActingPlayer.FinalizeDecision();
         Hide();
         ClearScope(false);
     }
 
     public bool SelectedAction() => !ActingPlayer.IsDecidingAction;
 
-    private void FinalizeDecision()
-    {
-        ActingPlayer.DisableArrowKeyMovement();
-        ActingPlayer.Movement = Vector3.zero;
-        ActingPlayer.TurnDestination = ActingPlayer.Position;
-        ActingPlayer.IsDecidingAction = false;
-    }
-
     private bool CheckTargetField()
     {
+        if (TargetFields.PositionRestrictor.gameObject.activeSelf || RestrictorIsBlinking)
+        {
+            if (!RestrictorIsBlinking) StartCoroutine(BlinkRestrictor());
+            return false;
+        }
         if (ActingPlayer.AimingForTeammates()) return CurrentBattle.PlayerParty.BattlingParty.Any(x => x.IsSelected);
         if (ActingPlayer.AimingForEnemies()) return CurrentBattle.EnemyParty.Enemies.Any(x => x.IsSelected);
         if (ActingPlayer.SelectedAction.Scope == ActiveTool.ScopeType.TrapSetup) return CurrentBattle.AllBattlers.All(x => !x.IsSelected);
         return true;
+    }
+
+    private IEnumerator BlinkRestrictor()
+    {
+        RestrictorIsBlinking = true;
+        float counter = 1;
+        while (counter > 0)
+        {
+            TargetFields.PositionRestrictor.gameObject.GetComponent<SpriteRenderer>().color = new Color(counter, counter, counter);
+            counter -= 0.1f;
+            yield return new WaitForSeconds(0.01f);
+        }
+        while (counter < 1)
+        {
+            TargetFields.PositionRestrictor.gameObject.GetComponent<SpriteRenderer>().color = new Color(counter, counter, counter);
+            counter += 0.1f;
+            yield return new WaitForSeconds(0.01f);
+        }
+        RestrictorIsBlinking = false;
     }
 
     public IEnumerator DisplayUsedAction(Battler battler, string action)
@@ -563,7 +581,7 @@ public class BattleMenu : MonoBehaviour, Assets.Code.UI.Lists.IToolCollectionFra
     {
         Hide();
         Selection = Selections.Escaping;
-        FinalizeDecision();
+        ActingPlayer.FinalizeDecision();
         ClearScope(true);
     }
 

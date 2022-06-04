@@ -84,6 +84,48 @@ public class InventorySystem : MonoBehaviour
     /// -- Add/Remove Content --
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    public int Equip<T>(BattlePlayer p, T equipment) where T : IToolEquippable
+    {
+        if (p.MaxEquipment || !p) return -1;
+        else if (equipment is Weapon wp)
+        {
+            wp = Instantiate(wp, p.transform);
+            p.Weapons.Add(wp);
+            Remove(wp);
+            return p.Weapons.Count - 1;
+        }
+        else if (equipment is Accessory ac)
+        {
+            ac = Instantiate(ac, p.transform);
+            p.Accessories.Add(ac);
+            Remove(ac);
+            return p.Accessories.Count - 1;
+        }
+        return -1;
+    }
+
+    public int Unequip<T>(BattlePlayer p, T tool) where T : IToolEquippable
+    {
+        int index = 0;
+        if (!p) return -1;
+        else if (tool is Weapon && p.Weapons.Count > 0)
+        {
+            index = p.Weapons.FindIndex(x => x.Id == tool.Info.Id && x.Name.Equals(tool.Info.Name));
+            Add(p.Weapons[index]);
+            Destroy(p.Weapons[index].gameObject);
+            p.Weapons.RemoveAt(index);
+        }
+        else if (tool is Accessory && Accessories.Count > 0)
+        {
+            index = p.Accessories.FindIndex(x => x.Id == tool.Info.Id && x.Name.Equals(tool.Info.Name));
+            Add(p.Accessories[index]);
+            Destroy(p.Accessories[index].gameObject);
+            p.Accessories.RemoveAt(index);
+        }
+        else return -1;
+        return index;
+    }
+
     public void ApplyPostItemUseEffects(Item it)
     {
         if (!it.Consumable) return;
@@ -135,8 +177,12 @@ public class InventorySystem : MonoBehaviour
     {
         if (index < 0 || index >= toolList.Count) return default(T);
         T t = toolList[index];
-        int fixedAmount = (t.Quantity - amount < 0) ? t.Quantity : amount; 
-        if (t.Quantity - fixedAmount <= 0) toolList.RemoveAt(index);
+        int fixedAmount = (t.Quantity - amount < 0) ? t.Quantity : amount;
+        if (t.Quantity - fixedAmount <= 0)
+        {
+            Destroy(toolList[index].Info.gameObject);
+            toolList.RemoveAt(index);
+        }
         else t.Quantity -= fixedAmount;
         CarryWeight -= t.Weight * fixedAmount;
         return t;

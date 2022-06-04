@@ -193,10 +193,8 @@ public class ObtainingWeapons : MonoBehaviour
         SetEntryAsEquipped(PartyList.GetChild(SelectedPlayerIndex), true);
         PlayerEquipBoost peb = NeededPlayers[SelectedPlayerIndex];
         IToolEquippable tool = SelectEquipmentList.SelectedObject as IToolEquippable;
-        peb.Player.Unequip(tool);
-        Party.Inventory.Add(tool);
-        peb.Player.Equip(Weapon);
-        Party.Inventory.Remove(Weapon);
+        Party.Inventory.Unequip(peb.Player, tool);
+        Party.Inventory.Equip(peb.Player, tool);
         SelectEquipmentList.Selecting = false;
         CheckDone();
     }
@@ -205,13 +203,8 @@ public class ObtainingWeapons : MonoBehaviour
     {
         SetEntryAsEquipped(PartyList.GetChild(index), true);
         PlayerEquipBoost peb = NeededPlayers[index];
-        if (peb.WeakestWeapon)
-        {
-            peb.Player.Unequip(peb.WeakestWeapon);
-            Party.Inventory.Add(peb.WeakestWeapon);
-        }
-        peb.Player.Equip(Weapon);
-        Party.Inventory.Remove(Weapon);
+        if (peb.WeakestWeapon) Party.Inventory.Unequip(peb.Player, peb.WeakestWeapon);
+        Party.Inventory.Equip(peb.Player, Weapon);
         CheckDone();
     }
 

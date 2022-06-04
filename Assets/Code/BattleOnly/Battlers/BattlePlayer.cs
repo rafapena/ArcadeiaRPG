@@ -31,6 +31,7 @@ public class BattlePlayer : Battler
     [HideInInspector] public Stats PermanentStatsBoosts;
 
     private bool ArrowKeyMovement;
+    private int CollideCounter;
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- Setup --
@@ -48,11 +49,11 @@ public class BattlePlayer : Battler
         Direction = Vector3.right;
     }
 
-    public override void Setup(PlayerParty party = null)
+    public override void Setup(PlayerParty party)
     {
         base.Setup(party);
         AddLearnedSkills();
-        if (Weapons.Count > 0) SelectedWeapon = Weapons[0];
+        if (Weapons.Count > 0 && !SelectedWeapon) SelectedWeapon = Weapons[0];
         for (int j = 0; j < Weapons.Count; j++) Weapons[j] = Instantiate(Weapons[j], transform);
     }
 
@@ -85,63 +86,42 @@ public class BattlePlayer : Battler
 
     public void DisableArrowKeyMovement() => ArrowKeyMovement = false;
 
+    private void OnTriggerEnter2D(Collider2D collider)
+    {
+        if (IsDecidingAction && collider.gameObject.CompareTag(Battle.SCOPE_HITBOX_TAG))
+        {
+            CollideCounter++;
+            CurrentBattle.Menu.TargetFields.PositionRestrictor.gameObject.SetActive(CollideCounter > 0);
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D collider)
+    {
+        if (IsDecidingAction && collider.gameObject.CompareTag(Battle.SCOPE_HITBOX_TAG))
+        {
+            CollideCounter--;
+            CurrentBattle.Menu.TargetFields.PositionRestrictor.gameObject.SetActive(CollideCounter > 0);
+        }
+    }
+
+    public void FinalizeDecision()
+    {
+        DisableArrowKeyMovement();
+        Movement = Vector3.zero;
+        TurnDestination = Position;
+        IsDecidingAction = false;
+        SpriteInfo.ActionHitbox.gameObject.SetActive(true);
+    }
+
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- Class/Equip Management --
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public int Equip<T>(T equipment) where T : IToolEquippable
-    {
-        if (MaxEquipment) return -1;
-        else if (equipment is Weapon wp)
-        {
-            Weapons.Add(wp);
-            return Weapons.Count - 1;
-        }
-        else // equipment is Accessory
-        {
-            Accessories.Add(equipment as Accessory);
-            return Accessories.Count - 1;
-        }
-    }
-
-    public IToolEquippable Unequip<T>(int index) where T : IToolEquippable
-    {
-        if (typeof(T).Name.Equals("Weapon") && index >= 0 && index < Weapons.Count)
-        {
-            Weapon weapon = Weapons[index];
-            Weapons.RemoveAt(index);
-            return weapon;
-        }
-        else if (typeof(T).Name.Equals("Accessory") && index >= 0 && index < Accessories.Count)
-        {
-            Accessory accessory = Accessories[index];
-            Accessories.RemoveAt(index);
-            return accessory;
-        }
-        else return default(T);
-    }
-
-    public int Unequip<T>(T tool) where T : IToolEquippable
-    {
-        int index = 0;
-        if (tool is Weapon && Weapons.Count > 0)
-        {
-            index = Weapons.FindIndex(x => x.Id == tool.Info.Id && x.Name.Equals(tool.Info.Name));
-            Weapons.RemoveAt(index);
-        }
-        else if (tool is Accessory && Accessories.Count > 0)
-        {
-            index = Accessories.FindIndex(x => x.Id == tool.Info.Id && x.Name.Equals(tool.Info.Name));
-            Accessories.RemoveAt(index);
-        }
-        else return -1;
-        return index;
-    }
-
     // Note: Must handle equipment management elsewhere (e.g. ChangeClass.cs)
     public void ChangeClass(BattlerClass newClass)
     {
-        Class = newClass;
+        Destroy(Class.gameObject);
+        Class = Instantiate(newClass, transform);
         StatConversion();
         SpriteInfo.WearAttire(Class.Name);
         Skills.Clear();

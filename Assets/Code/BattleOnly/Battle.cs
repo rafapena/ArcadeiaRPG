@@ -232,12 +232,25 @@ public class Battle : MonoBehaviour
 
     private IEnumerator ActionStart()
     {
+        // Failsafe
         if (!DeclareActingBattlers())
         {
             TurnReset();
             StartCoroutine(ActionStart());
+            yield break;
         }
-        else if (!ActingBattler.CanDoAction)
+
+        // State effects
+        bool applyingStateEffects = false;
+        foreach (var b in Battlers)
+        {
+            if (b.States.Count > 0) applyingStateEffects = true;
+            b.ApplyStateEffects();
+        }
+        if (applyingStateEffects) yield return new WaitForSeconds(2f);
+
+        // Deciding action
+        if (!ActingBattler.CanDoAction)
         {
             Menu.RefreshPartyFrames();
             yield return new WaitForSeconds(2.5f);

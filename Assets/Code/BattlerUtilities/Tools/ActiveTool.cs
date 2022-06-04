@@ -69,7 +69,6 @@ public abstract class ActiveTool : DataObject
     public int GetFormulaOutput(Battler u, Battler t, float effectMagnitude = 1.0f)
     {
         float power = Power * (u.SelectedWeapon?.Power ?? 5) / 100f;
-
         float formulaTotal = 0;
         float offMod = 2f;
         float defMod = 1f;
@@ -83,13 +82,9 @@ public abstract class ActiveTool : DataObject
             case BattleMaster.ToolFormulas.MagicalStandard:
                 formulaTotal = offMod * u.Map - defMod * t.Mar;
                 break;
-            case BattleMaster.ToolFormulas.PhysicalGun:
+            case BattleMaster.ToolFormulas.GunStandard:
                 float physicalOffense = (u.Atk + u.Tec * tecMod) / gunOffenseReduce;
                 formulaTotal = offMod * physicalOffense - defMod * t.Def;
-                break;
-            case BattleMaster.ToolFormulas.MagicalGun:
-                float magicalOffense = (u.Map + u.Tec * tecMod) / gunOffenseReduce;
-                formulaTotal = offMod * magicalOffense  - defMod * t.Mar;
                 break;
         }
         return (int)(formulaTotal * power * effectMagnitude);

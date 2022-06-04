@@ -9,13 +9,12 @@ public abstract class PassiveEffect : DataObject
     public int HPRegen;
     public int SPRegen;
     public int SPConsumeRate;
-    public int ComboDifficulty;
     public int TurnEnd1;
     public int TurnEnd2;
     public TurnSequence WhenToExecute;
     public int RemoveByHitChance;
-    public int CounterRate;
-    public int ReflectRate;
+    public bool Counter;
+    public bool Reflect;
     public int ExpGainRate;
     public int GoldGainRate;
     public BattleMaster.ToolTypes[] DisabledToolTypes;

@@ -80,8 +80,8 @@ public abstract class Battler : DataObject
     [HideInInspector] public bool Petrified;
     [HideInInspector] public int CannotMove;
     [HideInInspector] public int SPConsumeRate;
-    [HideInInspector] public int Counter;
-    [HideInInspector] public int Reflect;
+    [HideInInspector] public int Countering;
+    [HideInInspector] public int Reflecting;
     [HideInInspector] public List<BattleMaster.ToolTypes> DisabledToolTypes;
     [HideInInspector] public List<int> RemoveByHit = new List<int>();
     [HideInInspector] public List<int> ContactSpread = new List<int>();
@@ -108,6 +108,7 @@ public abstract class Battler : DataObject
 
         SetupElementRates();
         SetupStateRates();
+        if (Class) Class = Instantiate(Class, transform);
         if (CombatRangeType == BattleMaster.CombatRangeTypes.Any)
         {
             if (Class) CombatRangeType = Class.CombatRangeType;
@@ -126,19 +127,10 @@ public abstract class Battler : DataObject
     {
         if (party) Level = party.Level;
         StatConversion();
-        for (int j = 0; j < States.Count; j++) States[j] = Instantiate(States[j], transform);
-
-        var skills = gameObject.GetComponentsInChildren<Skill>();
-        foreach (var skill in skills) skill.DisableForWarmup();
-        if (Class)
-        {
-            Class = Instantiate(Class, transform);
-            var classSkills = Class.gameObject.GetComponentsInChildren<Skill>();
-            foreach (var skill in classSkills) skill.DisableForWarmup();
-        }
-
-        for (int i = 0; i < States.Count; i++) States[i] = Instantiate(States[i], transform);
-        StatBoosts.SetToZero();
+        foreach (var skill in gameObject.GetComponentsInChildren<Skill>()) skill.DisableForWarmup();
+        foreach (var skill in Class?.gameObject.GetComponentsInChildren<Skill>() ?? new Skill[] { }) skill.DisableForWarmup();
+        StatBoosts.SetAll(0, 0);
+        StatModifiers.SetAll(100, 100);
     }
 
     public virtual void StatConversion()
@@ -270,51 +262,43 @@ public abstract class Battler : DataObject
     /// -- Add/Remove Passive Effect Components --
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    /*
-    public int AddState(List<State> statesList, int id)
+    /*public int AddState(State state)
     {
-        if (!ValidListInput(statesList, id)) return -1;
-        State toAdd = new State(statesList[id]);
+        state = Instantiate(state, transform);
+        //AddPassiveEffects(state);
         foreach (State existingState in States)
         {
-            if (toAdd.Id != existingState.Id) continue;
-            if (existingState.Stack >= existingState.MaxStack) return -1;
-            existingState.Stack++;
-            existingState.TurnsLeft++;
-            AddPassiveEffects(existingState);
+            if (state.Id != existingState.Id) continue;
+            if (existingState.StackState()) return -1;
+            existingState.StackState();
+            existingState.AddExtraTurn();
             return existingState.Id;
         }
-        toAdd.TurnsLeft = toAdd.TurnEnd2 > toAdd.TurnEnd1 ? RandInt(toAdd.TurnEnd1, toAdd.TurnEnd2) : -1;
-        if (toAdd.KO || toAdd.Petrify) IsConscious = false;
-        if (toAdd.Stun) CannotMove++;
-        if (toAdd.ContactSpreadRate > 0) ContactSpread.AddRange(new int[] { toAdd.Id, toAdd.ContactSpreadRate });
-        AddPassiveEffects(toAdd);
-        States.Add(toAdd);
-        return toAdd.Id;
+        if (state.Stun) CannotMove++;
+        if (state.ContactSpreadRate > 0) ContactSpread.AddRange(new int[] { state.Id, state.ContactSpreadRate });
+        States.Add(state);
+        return state.Id;
     }
    
     public int RemoveState(int listIndex)
     {
-        if (!ValidListInput(States, listIndex)) return -1;
         State toRemove = States[listIndex];
-        if (toRemove.KO || toRemove.Petrify) IsConscious = true;
         if (toRemove.Stun) CannotMove--;
         for (int i = 0; i < ContactSpread.Count; i += 2)
             if (toRemove.Id == ContactSpread[i] && toRemove.ContactSpreadRate == ContactSpread[i + 1]) ContactSpread.RemoveRange(i, 2);
-        for (int i = 0; i < States[listIndex].Stack; i++) RemovePassiveEffects(toRemove);
+        //for (int i = 0; i < States[listIndex].Stack; i++) RemovePassiveEffects(toRemove);
         States.RemoveAt(listIndex);
         return toRemove.Id;
-    }
+    }*/
 
-    public int AddPassiveEffects(PassiveEffect pe)
+    /*public int AddPassiveEffects(PassiveEffect pe)
     {
         for (int i = 0; i < ElementRates.Length; i++) ElementRates[i] += pe.ElementRates[i];
         for (int i = 0; i < StateRates.Length; i++) StateRates[i] += pe.StateRates[i];
         StatModifiers.Add(pe.StatModifiers);
         SPConsumeRate += pe.SPConsumeRate;
-        ComboDifficulty += pe.ComboDifficulty;
-        Counter += pe.Counter;
-        Reflect += pe.Reflect;
+        if (pe.Counter) Countering++;
+        if (pe.Reflect) Reflecting++;
         if (pe.DisabledToolType1 > 0) DisabledToolTypes.Add(pe.DisabledToolType1);
         if (pe.DisabledToolType2 > 0) DisabledToolTypes.Add(pe.DisabledToolType2);
         if (pe.RemoveByHit > 0) RemoveByHit.AddRange(new int[] { pe.Id, pe.RemoveByHit });
@@ -325,11 +309,10 @@ public abstract class Battler : DataObject
     {
         for (int i = 0; i < ElementRates.Length; i++) ElementRates[i] -= pe.ElementRates[i];
         for (int i = 0; i < StateRates.Length; i++) StateRates[i] -= pe.StateRates[i];
-        if (pe.StatModifiers != null) StatModifiers.Subtract(pe.StatModifiers);
+        StatModifiers.Subtract(pe.StatModifiers);
         SPConsumeRate -= pe.SPConsumeRate;
-        ComboDifficulty -= pe.ComboDifficulty;
-        Counter -= pe.Counter;
-        Reflect -= pe.Reflect;
+        if (pe.Counter) Countering--;
+        if (pe.Reflect) Reflecting--;
         bool d1 = false;
         bool d2 = false;
         for (int i = 0; i < DisabledToolTypes.Count; i += 2)
@@ -504,6 +487,7 @@ public abstract class Battler : DataObject
         if (popup) popup.Show(total.ToString());
     }
 
+
     private Popup SpawnPopup(string name) => Instantiate(UIMaster.Popups[name], SpriteInfo.TargetPoint, Quaternion.identity, CurrentBattle.ActivePopups);
 
     protected virtual void Revive()
@@ -566,26 +550,13 @@ public abstract class Battler : DataObject
 
     public bool IsCharging => ((SelectedAction as Skill)?.ChargeCount ?? 0) > 0;
 
-    /*
-    public void ApplyStartActionEffects(Environment e)
+    public void ApplyStateEffects()
     {
-        //foreach (State s in States) if (s.) ;
-        //foreach (PassiveSkill p in PassiveSkills) if () ;
+        foreach (var s in States)
+        {
+            //
+        }
     }
-    public void ApplyEndActionEffects(Environment e)
-    {
-
-    }
-    public void ApplyEndTurnEffects(Environment e)
-    {
-
-    }
-
-    private void ApplyEffects(Environment e)
-    {
-
-    }
-    */
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- Stat Management: TEMPORARY FUNCTIONS UNTIL ALL STATE MANAGEMENT HAS BEEN IMPLEMENTED --
@@ -593,20 +564,7 @@ public abstract class Battler : DataObject
 
     public int MaxHP => Stats.MaxHP;
 
-    public int Atk => Stats.Atk;
-    public int Def => Stats.Def;
-    public int Map => Stats.Map;
-    public int Mar => Stats.Mar;
-    public int Rec => Stats.Rec;
-    public int Spd => Stats.Spd;
-    public int Tec => Stats.Tec;
-
-    public int Acc => Stats.Acc;
-    public int Eva => Stats.Eva;
-    public int Crt => Stats.Crt;
-    public int Cev => Stats.Cev;
-
-    /*public int Atk => NaturalNumber((Stats.Atk + StatBoosts.Atk) * StatModifiers.Atk / 100);
+    public int Atk => NaturalNumber((Stats.Atk + StatBoosts.Atk) * StatModifiers.Atk / 100);
     public int Def => NaturalNumber((Stats.Def + StatBoosts.Def) * StatModifiers.Def / 100);
     public int Map => NaturalNumber((Stats.Map + StatBoosts.Map) * StatModifiers.Map / 100);
     public int Mar => NaturalNumber((Stats.Mar + StatBoosts.Mar) * StatModifiers.Mar / 100);
@@ -617,10 +575,7 @@ public abstract class Battler : DataObject
     public int Acc => (Stats.Acc + StatBoosts.Acc) * StatModifiers.Acc / 100;
     public int Eva => (Stats.Eva + StatBoosts.Eva) * StatModifiers.Eva / 100;
     public int Crt => (Stats.Crt + StatBoosts.Crt) * StatModifiers.Crt / 100;
-    public int Cev => (Stats.Cev + StatBoosts.Cev) * StatModifiers.Cev / 100;*/
+    public int Cev => (Stats.Cev + StatBoosts.Cev) * StatModifiers.Cev / 100;
 
-    public int NaturalNumber(int number)
-    {
-        return number < 0 ? 0 : number;
-    }
+    public int NaturalNumber(int number) => number < 0 ? 0 : number;
 }

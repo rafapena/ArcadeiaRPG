@@ -18,9 +18,20 @@ public class State : PassiveEffect
         TurnsLeft = Random.Range(TurnEnd1, TurnEnd2 + 1);
     }
 
-    public void StackState(int i)
+    public bool StackState()
     {
-        Stack += i;
-        if (Stack > MaxStack) Stack = MaxStack;
+        if (Stack >= MaxStack) return false;
+        Stack++;
+        return true;
+    }
+
+    public void AddExtraTurn()
+    {
+        TurnsLeft++;
+    }
+
+    public void PassTurn()
+    {
+        TurnsLeft--;
     }
 }

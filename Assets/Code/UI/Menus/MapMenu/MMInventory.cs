@@ -561,13 +561,8 @@ public class MMInventory : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOp
         DoneTimer = Time.realtimeSinceStartup + 1f;
 
         IToolEquippable tool = InventoryFrame.ToolList.SelectedObject as IToolEquippable;
-        if (switchOut)
-        {
-            SelectedPlayerForEquipping.Unequip(EquippedToolList.SelectedObject as IToolEquippable);
-            MenuManager.PartyInfo.Inventory.Add(EquippedToolList.SelectedObject);
-        }
-        SelectedPlayerForEquipping.Equip(tool);
-        MenuManager.PartyInfo.Inventory.Remove(tool);
+        if (switchOut) MenuManager.PartyInfo.Inventory.Unequip(SelectedPlayerForEquipping, EquippedToolList.SelectedObject as IToolEquippable);
+        MenuManager.PartyInfo.Inventory.Equip(SelectedPlayerForEquipping, tool);
 
         RefreshInventoryTabs();
         if (tool is Weapon) InventoryFrame.Refresh(MenuManager.PartyInfo.Inventory.Weapons);

@@ -12,11 +12,11 @@ public class BattleMaster
 
     public enum CombatRangeTypes { Any, Close, Medium, Far }
 
-    public enum Elements { None, Fire, Ice, Thunder, Earth, Wind, Light, Dark }
+    public enum Elements { None, Fire, Ice, Thunder, Earth, Wind }
 
-    public enum WeaponTypes { None, Blade, Hammer, Staff, Gun, Tools, Camera }
+    public enum WeaponTypes { None, Blade, Hammer, Staff, Gun, Camera }
     
     public enum ToolTypes { None, PhysicalOffense, PhysicalDefense, MagicalOffense, MagicalDefense, GeneralOffense, GeneralDefense }
     
-    public enum ToolFormulas { None, PhysicalStandard, MagicalStandard, PhysicalGun, MagicalGun }
+    public enum ToolFormulas { None, PhysicalStandard, MagicalStandard, GunStandard }
 }

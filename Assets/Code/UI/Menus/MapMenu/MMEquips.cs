@@ -245,8 +245,7 @@ public class MMEquips : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOpera
     private void UnequipTool()
     {
         IToolEquippable tool = EquippedTools.SelectedObject as IToolEquippable;
-        SelectedPlayer.Unequip(tool);
-        MenuManager.PartyInfo.Inventory.Add(tool);
+        MenuManager.PartyInfo.Inventory.Unequip(SelectedPlayer, tool);
         EquippedTools.Refresh(SelectedPlayer.Equipment, BattleMaster.MAX_NUMBER_OF_EQUIPS, true);
         RefreshInventoryEquipTabs(tool, true);
     }
@@ -254,8 +253,7 @@ public class MMEquips : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOpera
     private void EquipTool()
     {
         IToolEquippable tool = InventoryFrame.ToolList.SelectedObject as IToolEquippable;
-        SelectedPlayer.Equip(tool);
-        MenuManager.PartyInfo.Inventory.Remove(tool);
+        MenuManager.PartyInfo.Inventory.Equip(SelectedPlayer, tool);
         EquippedTools.Refresh(SelectedPlayer.Equipment, BattleMaster.MAX_NUMBER_OF_EQUIPS, true);
         RefreshInventoryEquipTabs(tool);
     }
@@ -284,10 +282,8 @@ public class MMEquips : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOpera
         Selection = Selections.SelectTool;
         IToolEquippable inventoryTool = InventoryFrame.ToolList.SelectedObject as IToolEquippable;
         IToolEquippable equippedTool = EquippedTools.SelectedObject as IToolEquippable;
-        SelectedPlayer.Unequip(equippedTool);
-        SelectedPlayer.Equip(inventoryTool);
-        MenuManager.PartyInfo.Inventory.Add(equippedTool);
-        MenuManager.PartyInfo.Inventory.Remove(inventoryTool);
+        MenuManager.PartyInfo.Inventory.Unequip(SelectedPlayer, equippedTool);
+        MenuManager.PartyInfo.Inventory.Equip(SelectedPlayer, inventoryTool);
         EquippedTools.Refresh(SelectedPlayer.Equipment, BattleMaster.MAX_NUMBER_OF_EQUIPS, true);
         RefreshInventoryEquipTabs(inventoryTool, true);
     }
@@ -300,10 +296,6 @@ public class MMEquips : MM_Super, Assets.Code.UI.Lists.IToolCollectionFrameOpera
     {
         if (Selection != Selections.SelectTool) return;
         List<IToolEquippable> equips = SelectedPlayer.Equipment;
-        foreach (IToolEquippable tool in equips)
-        {
-            SelectedPlayer.Unequip(tool);
-            MenuManager.PartyInfo.Inventory.Add(tool);
-        }
+        foreach (IToolEquippable tool in equips) MenuManager.PartyInfo.Inventory.Unequip(SelectedPlayer, tool);
     }
 }
