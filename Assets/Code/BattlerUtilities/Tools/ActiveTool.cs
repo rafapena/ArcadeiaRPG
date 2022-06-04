@@ -45,28 +45,19 @@ public abstract class ActiveTool : DataObject
         // Set up states give and receive rates
     }
 
-    public bool IsOffense()
-    {
-        return Type == BattleMaster.ToolTypes.PhysicalOffense || Type == BattleMaster.ToolTypes.MagicalOffense || Type == BattleMaster.ToolTypes.GeneralOffense;
-    }
+    public bool IsOffense => Type == BattleMaster.ToolTypes.PhysicalOffense || Type == BattleMaster.ToolTypes.MagicalOffense || Type == BattleMaster.ToolTypes.GeneralOffense;
 
-    public bool IsDefense()
-    {
-        return Type == BattleMaster.ToolTypes.PhysicalDefense || Type == BattleMaster.ToolTypes.MagicalDefense || Type == BattleMaster.ToolTypes.GeneralDefense;
-    }
+    public bool IsDefense() => Type == BattleMaster.ToolTypes.PhysicalDefense || Type == BattleMaster.ToolTypes.MagicalDefense || Type == BattleMaster.ToolTypes.GeneralDefense;
 
-    public bool Hit(Battler u, Battler t, float effectMagnitude = 1.0f)
+    public bool Hit(Battler u, Battler t)
     {
         if (AlwaysHits) return true;
         float weaponAcc = u.SelectedWeapon?.Accuracy ?? 100;
-        float toolAcc = Accuracy * weaponAcc / 100f;
-        
-        float statsAcc = u.Tec / t.Spd;
-        float result = toolAcc;// * statsAcc * u.Acc / t.Eva;
-        return Chance(result * effectMagnitude);
+        float result = Accuracy * weaponAcc / 100f;
+        return Chance((int)result);
     }
 
-    public int GetFormulaOutput(Battler u, Battler t, float effectMagnitude = 1.0f)
+    public int GetFormulaOutput(Battler u, Battler t)
     {
         float power = Power * (u.SelectedWeapon?.Power ?? 5) / 100f;
         float formulaTotal = 0;
@@ -76,28 +67,21 @@ public abstract class ActiveTool : DataObject
         float gunOffenseReduce = 4f;
         switch (Formula)
         {
-            case BattleMaster.ToolFormulas.PhysicalStandard:
-                formulaTotal = offMod * u.Atk - defMod * t.Def;
-                break;
-            case BattleMaster.ToolFormulas.MagicalStandard:
-                formulaTotal = offMod * u.Map - defMod * t.Mar;
-                break;
-            case BattleMaster.ToolFormulas.GunStandard:
-                float physicalOffense = (u.Atk + u.Tec * tecMod) / gunOffenseReduce;
-                formulaTotal = offMod * physicalOffense - defMod * t.Def;
-                break;
+            case BattleMaster.ToolFormulas.PhysicalStandard: formulaTotal = offMod * u.Atk - defMod * t.Def; break;
+            case BattleMaster.ToolFormulas.MagicalStandard:  formulaTotal = offMod * u.Map - defMod * t.Mar; break;
+            case BattleMaster.ToolFormulas.GunStandard:      formulaTotal = offMod * ((u.Atk + u.Tec * tecMod) / gunOffenseReduce) - defMod * t.Def; break;
         }
-        return (int)(formulaTotal * power * effectMagnitude);
+        return (int)(formulaTotal * power);
     }
 
-    public int GetCriticalHitRatio(Battler u, Battler t, float effectMagnitude = 1.0f)
+    public int GetCriticalHitRatio(Battler u, Battler t)
     {
         float weaponCritRate = u.SelectedWeapon != null ? u.SelectedWeapon.CriticalRateBoost : 100;
         float toolCrt = CriticalRateBoost * weaponCritRate / 10000f;
         float def = t.Tec * t.Cev;
         float critExponent = 1.1f;
         float result = 2 * Mathf.Pow(u.Tec * toolCrt, critExponent) * u.Crt / (def != 0 ? def : 0.01f);
-        int cRate = Chance(result * effectMagnitude) ? 3 : 1;
+        int cRate = Chance((int)result) ? 3 : 1;
         return cRate;
     }
 
@@ -112,31 +96,13 @@ public abstract class ActiveTool : DataObject
         return (int)(total + Random.Range(-variance, variance));
     }
 
-    public List<int>[] TriggeredStates(Battler u, Battler t, float effectMagnitude = 1.0f)
-    {
-        List<int>[] stateIds = new List<int>[] { new List<int>(), new List<int>() };
-        /*for (int i = 0; i < StatesGiveRate.Length; i++)
-        {
-            if (StatesGiveRate[i] <= 0) continue;
-            float tAttr = (t.StateRates[i] + 100) * u.Rec() / (100 * t.Rec());
-            float result = (StatesGiveRate[i] + 100) * tAttr / 100f * effectMagnitude;
-            if (Chance((int)result)) stateIds[0].Add(i);
-        }
-        for (int i = 0; i < StatesReceiveRate.Length; i++)
-        {
-            if (StatesReceiveRate[i] <= 0) continue;
-            float result = (StatesReceiveRate[i] + 100) * (u.StateRates[i] + 100) / 10000f;
-            if (Chance((int)result)) stateIds[1].Add(i);
-        }*/
-        return stateIds;
-    }
+    public static bool Chance(int chance) => Random.Range(0, 100) < chance;
 
-    private bool Chance(float chance)
+    public virtual void ApplyActionEndEffects()
     {
-        return Random.Range(0f, 99.99f) < chance;
+        // Add receive state rates
+        // Add recoil damage
     }
-
-    public virtual void ApplyActionEndEffects() { }
 
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- Use conditions --

@@ -22,12 +22,8 @@ public class State : PassiveEffect
     {
         if (Stack >= MaxStack) return false;
         Stack++;
-        return true;
-    }
-
-    public void AddExtraTurn()
-    {
         TurnsLeft++;
+        return true;
     }
 
     public void PassTurn()

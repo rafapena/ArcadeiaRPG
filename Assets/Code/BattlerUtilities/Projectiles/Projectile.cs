@@ -49,7 +49,7 @@ public class Projectile : MonoBehaviour
         return n;
     }
 
-    // BulletHurtBox manages player damage: This ensures that specific hitboxes can be ignored
+    // Handles action-to-player interaction
     private void OnTriggerEnter2D(Collider2D collider)
     {
         if (collider.gameObject.CompareTag(Battle.ACTION_HITBOX_TAG))

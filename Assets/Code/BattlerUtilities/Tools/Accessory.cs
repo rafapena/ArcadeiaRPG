@@ -9,10 +9,8 @@ public class Accessory : PassiveEffect, IToolEquippable
     public int SPMax = 100;
     public bool AnyState;
     public bool NoState;
-    public State StateActive1;
-    public State StateActive2;
-    public State StateInactive1;
-    public State StateInactive2;
+    public State[] AnyActiveStates;
+    public State[] AllInactiveStates;
     public int AllyCondition;
     public int FoeCondition;
     public int UserCondition;

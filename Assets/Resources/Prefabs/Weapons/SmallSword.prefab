@@ -118,8 +118,13 @@ MonoBehaviour:
   Accuracy: 100
   Variance: 10
   ClassExclusives: []
-  StatesGiveRate: []
-  StatesReceiveRate: []
+  StatesGiveRate:
+  - State: {fileID: 3779496790374096947, guid: bd7eb85fa4a761a4d9789a5478bae024, type: 3}
+    Rate: 100
+  StatesReceiveRate:
+  - State: {fileID: -3619838760116883592, guid: bfb92392437e0f745814f8ea718f2ae8,
+      type: 3}
+    Rate: 100
   WeaponType: 1
   _DefaultPrice: 50
   _RequiredTools: []

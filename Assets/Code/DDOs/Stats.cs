@@ -36,20 +36,20 @@ public struct Stats
         Cev = other.Cev;
     }
 
-    public void SetAll(int mainStatValues, int accModValues)
+    public void SetAll(int value)
     {
-        MaxHP = mainStatValues;
-        Atk = mainStatValues;
-        Def = mainStatValues;
-        Map = mainStatValues;
-        Mar = mainStatValues;
-        Rec = mainStatValues;
-        Spd = mainStatValues;
-        Tec = mainStatValues;
-        Acc = accModValues;
-        Eva = accModValues;
-        Crt = accModValues;
-        Cev = accModValues;
+        MaxHP = value;
+        Atk = value;
+        Def = value;
+        Map = value;
+        Mar = value;
+        Rec = value;
+        Spd = value;
+        Tec = value;
+        Acc = value;
+        Eva = value;
+        Crt = value;
+        Cev = value;
     }
 
     public string GetToString()

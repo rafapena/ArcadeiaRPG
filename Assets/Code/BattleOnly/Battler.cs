@@ -66,6 +66,7 @@ public abstract class Battler : DataObject
     [HideInInspector] public List<State> States = new List<State>();
     [HideInInspector] public int CurrentListIndex;
     protected Projectile LastHitProjectile;
+    protected bool Guarded;
 
     // Action execution info
     public bool UsingBasicAttack => SelectedAction == BasicAttackSkill;
@@ -129,8 +130,8 @@ public abstract class Battler : DataObject
         StatConversion();
         foreach (var skill in gameObject.GetComponentsInChildren<Skill>()) skill.DisableForWarmup();
         foreach (var skill in Class?.gameObject.GetComponentsInChildren<Skill>() ?? new Skill[] { }) skill.DisableForWarmup();
-        StatBoosts.SetAll(0, 0);
-        StatModifiers.SetAll(100, 100);
+        StatBoosts.SetAll(0);
+        StatModifiers.SetAll(BattleMaster.DEFAULT_RATE);
     }
 
     public virtual void StatConversion()
@@ -376,13 +377,6 @@ public abstract class Battler : DataObject
         return false;
     }
 
-    private List<int> ExecuteSteal(List<int> oneActResult, Battler target, double effectMagnitude)
-    {
-        //double willSteal = effectMagnitude * 100 * Rec() / target.Rec();
-        //oneActResult.Add(SelectedSkill.Steal && Chance((int)willSteal) ? 1 : 0);
-        return oneActResult;
-    }
-
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- Using ActiveTool Effects --
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -424,43 +418,70 @@ public abstract class Battler : DataObject
 
     public virtual void ReceiveToolEffects(Battler user, ActiveTool activeTool, Projectile hitProjectile)
     {
-        float effectMagnitude = 1.0f;
-        if (activeTool.Hit(user, this, effectMagnitude))
+        // Target did not hit
+        if (!activeTool.Hit(user, this))
         {
-            LastHitProjectile = hitProjectile;
-
-            int formulaOutput = activeTool.GetFormulaOutput(user, this, effectMagnitude);
-            int directHPChange = activeTool.HPAmount + (MaxHP * activeTool.HPPercent / 100);
-            
-            int critRate = activeTool.GetCriticalHitRatio(user, this, effectMagnitude);       // UPDATES HitCritical
-            float elementRate = activeTool.GetElementRateRatio(user, this);                   // UPDATES HitWeakness and HitResistant
-            int ratesTotal = (int)(critRate * elementRate);
-
-            float nerf = hitProjectile?.NerfPartition ?? 1f;
-            int realHPTotal = (int)(activeTool.GetTotalWithVariance((formulaOutput + directHPChange) * ratesTotal) * nerf);
-            int realSPTotal = (int)(activeTool.GetTotalWithVariance((formulaOutput + activeTool.SPPecent) * ratesTotal) * nerf);
-            if (activeTool.HPModType != ActiveTool.ModType.None && realHPTotal <= 0) realHPTotal = 1;
-            if (activeTool.SPModType != ActiveTool.ModType.None && realSPTotal <= 0) realSPTotal = 1;
-
-            //List<int>[] states = ActiveTool.TriggeredStates(user, this, effectMagnitude);
-            //oneTarget.Add(states[0].Count);
-            //foreach (int stateGiveId in states[0]) oneTarget.Add(stateGiveId);
-            //oneTarget.Add(states[1].Count);
-            //foreach (int stateReceiveId in states[1]) oneTarget.Add(stateReceiveId);
-
-            SetHPSPAndDisplayPopup(realHPTotal, activeTool.HPModType, "HP", user.AddHP, AddHP);
-            SetHPSPAndDisplayPopup(realSPTotal, activeTool.SPModType, "SP", user.AddSP, AddSP);
+            Dodge();
+            return;
         }
-        else
+
+        // Projectile carrying the action/tool's effects
+        LastHitProjectile = hitProjectile;
+
+        // Formula changes
+        int formulaOutput = activeTool.GetFormulaOutput(user, this);
+        int directHPChange = activeTool.HPAmount + (MaxHP * activeTool.HPPercent / 100);
+
+        // Critical and elemental hits
+        int critRate = activeTool.GetCriticalHitRatio(user, this);
+        float elementRate = activeTool.GetElementRateRatio(user, this);
+        int ratesTotal = (int)(critRate * elementRate);
+
+        // Damage/recovery variance
+        float nerf = hitProjectile?.NerfPartition ?? 1f;
+        int realHPTotal = (int)(activeTool.GetTotalWithVariance((formulaOutput + directHPChange) * ratesTotal) * nerf);
+        int realSPTotal = (int)(activeTool.GetTotalWithVariance((formulaOutput + activeTool.SPPecent) * ratesTotal) * nerf);
+        if (activeTool.HPModType != ActiveTool.ModType.None && realHPTotal <= 0) realHPTotal = 1;
+        if (activeTool.SPModType != ActiveTool.ModType.None && realSPTotal <= 0) realSPTotal = 1;
+
+        // Handle states
+        if (hitProjectile.Finisher)
         {
-            Popup popup = Instantiate(UIMaster.Popups["NoHit"], SpriteInfo.TargetPoint, Quaternion.identity);
-            popup.GetComponent<TextMesh>().text = "MISS";
+            var stateRatesGive = CombineStateRates(activeTool, activeTool.StatesGiveRate);
+            foreach (var s in stateRatesGive)
+                if (ActiveTool.Chance((int)(s.Rate * StateRates[s.State.Id] / 100f))) AddState(s.State);
         }
+
+        // Guarding
+        if (Guarded)
+        {
+            if (activeTool.HPModType != ActiveTool.ModType.Recover && realHPTotal > 0) realHPTotal /= 2;
+            if (activeTool.SPModType != ActiveTool.ModType.Recover && realSPTotal > 0) realSPTotal /= 2;
+        }
+        
+        // Popups
+        SetHPSPAndDisplayPopup(realHPTotal, activeTool.HPModType, "HP", user.AddHP, AddHP);
+        SetHPSPAndDisplayPopup(realSPTotal, activeTool.SPModType, "SP", user.AddSP, AddSP);
     }
 
-    // Helper for function above
-    public delegate void SetFunc(int total);
-    public void SetHPSPAndDisplayPopup(int total, ActiveTool.ModType modType, string HPorSP, SetFunc setHPorSPForUser, SetFunc setHPorSPForTarget)
+    private List<StateRate> CombineStateRates(ActiveTool tool, StateRate[] other)
+    {
+        var rates = new List<StateRate>();
+        foreach (var r in other) rates.Add(r);
+        if (SelectedWeapon != null || tool is Skill sk && sk.WeaponDependent)
+        {
+            // Merge with 
+        }
+        if (tool is not Item)
+        {
+            // Combine with accessories
+            // Combine with passive skills
+        }
+        return rates;
+    }
+
+    private delegate void SetFunc(int total);
+    private void SetHPSPAndDisplayPopup(int total, ActiveTool.ModType modType, string HPorSP, SetFunc setHPorSPForUser, SetFunc setHPorSPForTarget)
     {
         Popup popup = null;
         switch (modType)
@@ -489,6 +510,12 @@ public abstract class Battler : DataObject
 
 
     private Popup SpawnPopup(string name) => Instantiate(UIMaster.Popups[name], SpriteInfo.TargetPoint, Quaternion.identity, CurrentBattle.ActivePopups);
+
+    protected virtual void Dodge()
+    {
+        var popup = Instantiate(UIMaster.Popups["NoHit"], SpriteInfo.TargetPoint, Quaternion.identity);
+        popup.GetComponent<TextMesh>().text = "MISS";
+    }
 
     protected virtual void Revive()
     {
@@ -538,6 +565,17 @@ public abstract class Battler : DataObject
         else if (SP > BattleMaster.SP_CAP) SP = BattleMaster.SP_CAP;
     }
 
+    public virtual void ApplyActionEndEffects()
+    {
+        ExecutedAction = true;
+        if (SelectedAction)
+        {
+            var stateRatesReceive = CombineStateRates(SelectedAction, SelectedAction.StatesReceiveRate);
+            foreach (var s in stateRatesReceive)
+                if (ActiveTool.Chance((int)(s.Rate * StateRates[s.State.Id] / 100f))) AddState(s.State);
+        }
+    }
+
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     /// -- Applying Passive Effects --
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -550,12 +588,24 @@ public abstract class Battler : DataObject
 
     public bool IsCharging => ((SelectedAction as Skill)?.ChargeCount ?? 0) > 0;
 
-    public void ApplyStateEffects()
+    public void AddState(State state)
+    {
+        state = Instantiate(state, transform);
+        var popup = Instantiate(UIMaster.Popups["AddState"], SpriteInfo.TargetPoint, Quaternion.identity);
+        popup.GetComponent<TextMesh>().text = state.Name;
+        popup.transform.GetChild(0).GetComponent<SpriteRenderer>().sprite = state.GetComponent<SpriteRenderer>().sprite;
+        var existingState = States.FirstOrDefault(x => x.Id == state.Id);
+        if (existingState) existingState.StackState();
+        else States.Add(state);
+    }
+
+    public bool ApplyStateEffects()
     {
         foreach (var s in States)
         {
             //
         }
+        return States.Count > 0;
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -66,20 +66,20 @@ public class PlayerSelectionList : SelectionList_Super<Battler>
         if (hpg) hpg.Set(dataEntry.HP, dataEntry.MaxHP);
         if (spg) spg.Set(dataEntry.SP, 100);
         
-        AddStates(entry, dataEntry);
+        UpdateStates(entry, dataEntry);
         if (entry.childCount > 6) entry.GetChild(6).gameObject.SetActive(dataEntry.KOd);
     }
 
-    private void AddStates<T>(Transform entry, T teammate) where T : Battler
+    private void UpdateStates<T>(Transform entry, T battler) where T : Battler
     {
         Transform statesGO = entry.GetChild(5).transform;
         if (!statesGO.gameObject.activeSelf) return;
-        int limit = teammate.States.Count < statesGO.childCount ? teammate.States.Count : statesGO.childCount;
+        int limit = battler.States.Count < statesGO.childCount ? battler.States.Count : statesGO.childCount;
         int i = 0;
         for (; i < limit; i++)
         {
             statesGO.GetChild(i).gameObject.SetActive(true);
-            statesGO.GetChild(i).GetComponent<Image>().sprite = teammate.States[i].GetComponent<Image>().sprite;
+            statesGO.GetChild(i).GetComponent<Image>().sprite = battler.States[i].GetComponent<SpriteRenderer>().sprite;
         }
         for (; i < statesGO.childCount; i++) statesGO.GetChild(i).gameObject.SetActive(false);
     }
@@ -95,7 +95,7 @@ public class PlayerSelectionList : SelectionList_Super<Battler>
         Gauge spg = entry.GetChild(4).GetComponent<Gauge>();
         hpg.SetAndAnimate(battler.HP, battler.MaxHP);
         spg.SetAndAnimate(battler.SP, BattleMaster.SP_CAP);
-        AddStates(entry, battler);
+        UpdateStates(entry, battler);
         entry.GetChild(6).gameObject.SetActive(battler.KOd);
     }
 }

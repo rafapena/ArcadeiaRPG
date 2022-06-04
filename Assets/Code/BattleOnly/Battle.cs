@@ -232,33 +232,22 @@ public class Battle : MonoBehaviour
 
     private IEnumerator ActionStart()
     {
-        // Failsafe
         if (!DeclareActingBattlers())
         {
             TurnReset();
             StartCoroutine(ActionStart());
             yield break;
         }
-
-        // State effects
-        bool applyingStateEffects = false;
-        foreach (var b in Battlers)
-        {
-            if (b.States.Count > 0) applyingStateEffects = true;
-            b.ApplyStateEffects();
-        }
-        if (applyingStateEffects) yield return new WaitForSeconds(2f);
-
-        // Deciding action
-        if (!ActingBattler.CanDoAction)
+        else if (!ActingBattler.CanDoAction)
         {
             Menu.RefreshPartyFrames();
+            ActingBattler.ApplyStateEffects();
             yield return new WaitForSeconds(2.5f);
             ActionEnd();
         }
         else if (ActingBattler is BattlePlayer p)
         {
-            yield return new WaitForSeconds(1);
+            yield return new WaitForSeconds(ActingBattler.ApplyStateEffects() ? 2.5f : 1f);
             Menu.RefreshPartyFrames();
             Menu.Setup(p);
             yield return new WaitUntil(Menu.SelectedAction);
@@ -267,7 +256,7 @@ public class Battle : MonoBehaviour
         else  // Battler AI
         {
             Menu.RefreshPartyFrames();
-            yield return new WaitForSeconds(1);
+            yield return new WaitForSeconds(ActingBattler.ApplyStateEffects() ? 2.5f : 1f);
             if (ActingBattler is BattleAlly ally) ally.MakeDecision(PlayerParty.BattlingParty, EnemyParty.Enemies);
             else if (ActingBattler is BattleEnemy enemy) enemy.MakeDecision(EnemyParty.Enemies, PlayerParty.BattlingParty);
             Menu.DisplayAITargets();
@@ -377,9 +366,9 @@ public class Battle : MonoBehaviour
 
     private void ActionEnd()
     {
-        ActingBattler.ExecutedAction = true;
-        if (ActingBattler.SelectedAction is Skill skill) skill.ApplyActionEndEffects();
-        else if (ActingBattler is BattlePlayer && ActingBattler.SelectedAction is Item it) PlayerParty.Inventory.ApplyPostItemUseEffects(it);
+        ActingBattler.ApplyActionEndEffects();
+        ActingBattler.SelectedAction?.ApplyActionEndEffects();
+        if (ActingBattler is BattlePlayer && ActingBattler.SelectedAction is Item it) PlayerParty.Inventory.ApplyPostItemUseEffects(it);
 
         Menu.RemoveAITargets();
         ResetSelectedTargets();
